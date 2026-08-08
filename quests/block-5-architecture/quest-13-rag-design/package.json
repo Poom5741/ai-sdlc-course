@@ -1,0 +1,13 @@
+{
+  "name": "quest-13-rag-design",
+  "version": "1.0.0",
+  "description": "Quest 5.1: RAG Design - Design a Retrieval-Augmented Generation system",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

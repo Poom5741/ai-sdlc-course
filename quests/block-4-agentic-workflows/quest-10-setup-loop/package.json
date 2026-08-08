@@ -1,0 +1,13 @@
+{
+  "name": "quest-10-setup-loop",
+  "version": "1.0.0",
+  "description": "Quest 4.1: Set Up a Loop - Create an automated development loop",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

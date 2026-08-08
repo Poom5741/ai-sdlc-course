@@ -1,0 +1,13 @@
+{
+  "name": "quest-11-generate-review-fix",
+  "version": "1.0.0",
+  "description": "Quest 4.2: Generate-Review-Fix Loop - Create an iterative code improvement loop",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

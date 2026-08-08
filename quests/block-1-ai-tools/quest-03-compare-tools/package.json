@@ -1,0 +1,13 @@
+{
+  "name": "quest-03-compare-tools",
+  "version": "1.0.0",
+  "description": "Quest 1.3: Compare Tools - Compare different AI coding tools",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

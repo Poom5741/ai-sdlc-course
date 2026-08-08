@@ -1,0 +1,13 @@
+{
+  "name": "quest-01-first-completion",
+  "version": "1.0.0",
+  "description": "Quest 1.1: First AI Code Completion - Write a factorial function with AI help",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

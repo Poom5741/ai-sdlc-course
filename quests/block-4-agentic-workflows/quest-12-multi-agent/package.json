@@ -1,0 +1,13 @@
+{
+  "name": "quest-12-multi-agent",
+  "version": "1.0.0",
+  "description": "Quest 4.3: Multi-Agent Pipeline - Create a pipeline with multiple AI agents",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

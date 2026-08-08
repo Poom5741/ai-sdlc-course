@@ -1,0 +1,13 @@
+{
+  "name": "quest-14-full-system",
+  "version": "1.0.0",
+  "description": "Quest 5.2: Full System Design - Design a complete AI-powered system",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}
