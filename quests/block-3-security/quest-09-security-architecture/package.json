@@ -1,0 +1,13 @@
+{
+  "name": "quest-09-security-architecture",
+  "version": "1.0.0",
+  "description": "Quest 3.3: Security Architecture - Design secure systems",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "block-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}
