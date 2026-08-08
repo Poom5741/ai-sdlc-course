@@ -1,0 +1,10 @@
+{"type":"session_rebound","value":{"reason":"startup"},"at":"2026-08-08T05:39:37.272Z"}
+{"type":"session_waiting_for_load","value":{"reason":"startup"},"at":"2026-08-08T05:39:37.278Z"}
+{"type":"state","value":{"goal":null,"list":[],"loop":null,"mainModelRecovery":null,"lastModelRef":"opencode-go/mimo-v2.5"},"at":"2026-08-08T05:41:42.907Z"}
+{"type":"session_shutdown","value":{"reason":"quit"},"at":"2026-08-08T05:56:31.655Z"}
+{"type":"session_rebound","value":{"reason":"startup"},"at":"2026-08-08T05:56:45.190Z"}
+{"type":"id_invalidation","value":{"oldId":"019fdfe2-4730-7a1a-b94f-1394d291e242","newId":"019fdff1-dcfb-705d-bce9-efd2887a38fb","reason":"session_shutdown","shutdownReason":"quit","at":"2026-08-08T05:56:45.201Z"},"at":"2026-08-08T05:56:45.201Z"}
+{"type":"session_waiting_for_load","value":{"reason":"startup"},"at":"2026-08-08T05:56:45.201Z"}
+{"type":"session_shutdown","value":{"reason":"resume"},"at":"2026-08-08T05:56:55.691Z"}
+{"type":"session_rebound","value":{"reason":"resume"},"at":"2026-08-08T05:56:55.798Z"}
+{"type":"id_invalidation","value":{"oldId":"019fdff1-dcfb-705d-bce9-efd2887a38fb","newId":"019fdfe2-4730-7a1a-b94f-1394d291e242","reason":"session_shutdown","shutdownReason":"resume","at":"2026-08-08T05:56:55.801Z"},"at":"2026-08-08T05:56:55.801Z"}

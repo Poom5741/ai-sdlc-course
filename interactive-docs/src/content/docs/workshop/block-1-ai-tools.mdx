@@ -1,0 +1,196 @@
+---
+title: Block 1 - AI Tools Setup
+description: Set up your AI development toolkit and complete your first AI-assisted coding tasks
+---
+
+import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+
+# Block 1: AI Tools Setup
+
+<Badge text="09:00 - 10:30" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+เมื่อจบบล็อกนี้ คุณจะ:
+- ติดตั้งและตั้งค่า GitHub Copilot ใน VS Code
+- ใช้ Claude Code สำหรับ terminal-based AI
+- เปรียบเทียบเครื่องมือ AI ที่แตกต่างกัน
+
+---
+
+## 📖 Concept: The AI Toolkit Landscape (30 min)
+
+### What is AI-Assisted Development?
+
+AI-assisted development คือการใช้ AI tools เพื่อช่วยเขียนโค้ด เร็วขึ้นและดีขึ้น
+
+### The Shift: Manual → AI-Assisted
+
+```
+เดิม: คิด → เขียนโค้ด → Debug → Test
+ใหม่: คิด → บอก AI → Review → Refine → Deploy
+```
+
+### Key Concepts
+
+#### Tokens
+- หน่วยย่อยของข้อความที่ AI อ่าน
+- แต่ละ token อาจเป็นคำ หรือส่วนของคำ
+- สำคัญเพราะมีผลต่อ cost และ context window
+
+#### Context Window
+- จำนวนข้อมูลที่ AI จำได้ในแต่ละครั้ง
+- มากขึ้น = จำได้มากขึ้น = ดีขึ้น
+
+#### Hallucination
+- เมื่อ AI สร้างสิ่งที่ไม่มีอยู่จริง
+- ต้อง verify ทุกครั้ง
+
+---
+
+## 🛠️ Tools Overview
+
+### GitHub Copilot
+- **What**: AI pair programmer ใน VS Code
+- **How**: Suggests code as you type
+- **Best for**: Inline code completion
+
+### Claude Code
+- **What**: Terminal-based AI assistant
+- **How**: Chat in terminal, execute commands
+- **Best for**: Complex tasks, debugging
+
+### CodeRabbit
+- **What**: AI code review
+- **How**: Reviews PRs automatically
+- **Best for**: Quality assurance
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 1.1: First AI Completion
+
+**Goal**: Use GitHub Copilot to write a function
+
+<Steps>
+
+1. **Install GitHub Copilot**
+   - Open VS Code
+   - Go to Extensions (Ctrl+Shift+X)
+   - Search "GitHub Copilot Chat"
+   - Install and sign in
+
+2. **Create a new file**
+   ```javascript
+   // factorial.js
+   ```
+
+3. **Write a comment**
+   ```javascript
+   // Calculate factorial of n using recursion
+   ```
+
+4. **Accept Copilot's suggestion** (Tab key)
+
+5. **Test your function**
+   ```javascript
+   console.log(factorial(5)); // Should output 120
+   console.log(factorial(10)); // What does this output?
+   ```
+
+</Steps>
+
+**Deliverable**: Working factorial function + screenshot
+
+---
+
+### 🟡 Quest 1.2: Multi-file Generation
+
+**Goal**: Generate a complete API endpoint
+
+<Steps>
+
+1. **Create a new file**
+   ```javascript
+   // user-api.js
+   ```
+
+2. **Write a detailed comment**
+   ```javascript
+   // Create a REST API endpoint for user management
+   // GET /users - list all users
+   // POST /users - create new user
+   // Include input validation and error handling
+   ```
+
+3. **Let Copilot generate the code**
+
+4. **Review and refine** the generated code
+
+5. **Add validation** for email format
+
+</Steps>
+
+**Deliverable**: Working API endpoint with validation
+
+---
+
+### 🟡 Quest 1.3: Compare Tools
+
+**Goal**: Compare Copilot vs Claude Code
+
+<Steps>
+
+1. **Open Claude Code in terminal**
+   ```bash
+   claude
+   ```
+
+2. **Ask Claude to write the same factorial function**
+   ```
+   Write a JavaScript function to calculate factorial using recursion
+   ```
+
+3. **Compare the outputs**
+
+4. **Document differences**
+   ```markdown
+   # Copilot vs Claude Code Comparison
+   
+   ## Copilot Output
+   [Copy code here]
+   
+   ## Claude Code Output
+   [Copy code here]
+   
+   ## Differences
+   - Difference 1
+   - Difference 2
+   
+   ## Which is better? Why?
+   [Your analysis]
+   ```
+
+</Steps>
+
+**Deliverable**: Comparison document
+
+---
+
+## ✅ Block 1 Checklist
+
+- [ ] GitHub Copilot installed
+- [ ] Quest 1.1 completed
+- [ ] Quest 1.2 completed
+- [ ] Quest 1.3 completed
+
+---
+
+## 🚀 Next Block
+
+**Block 2: Prompt Engineering + Loops** → Learn to write better prompts and set up iterative workflows.
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard title="Continue to Block 2" href="/workshop/block-2-prompting" />

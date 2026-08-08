@@ -1,0 +1,219 @@
+/* Custom styles for AI SDLC Workshop */
+
+/* Color palette */
+:root {
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-high: #60a5fa;
+  --sl-color-accent-low: #1d4ed8;
+  
+  /* Challenge colors */
+  --challenge-easy: #22c55e;
+  --challenge-medium: #eab308;
+  --challenge-hard: #ef4444;
+  
+  /* Status colors */
+  --status-completed: #22c55e;
+  --status-pending: #94a3b8;
+  --status-failed: #ef4444;
+}
+
+/* Dark mode adjustments */
+.dark {
+  --sl-color-accent: #60a5fa;
+  --sl-color-accent-high: #93c5fd;
+  --sl-color-accent-low: #3b82f6;
+}
+
+/* Challenge card styles */
+.challenge-card {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: border-color 0.2s;
+}
+
+.challenge-card:hover {
+  border-color: var(--sl-color-accent);
+}
+
+.challenge-card.easy {
+  border-left: 4px solid var(--challenge-easy);
+}
+
+.challenge-card.medium {
+  border-left: 4px solid var(--challenge-medium);
+}
+
+.challenge-card.hard {
+  border-left: 4px solid var(--challenge-hard);
+}
+
+/* Flag input styles */
+.flag-input {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.flag-input input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.375rem;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+}
+
+.flag-input button {
+  padding: 0.5rem 1rem;
+  background: var(--sl-color-accent);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.flag-input button:hover {
+  background: var(--sl-color-accent-high);
+}
+
+/* Progress tracker */
+.progress-tracker {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.progress-step {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: var(--sl-color-gray-5);
+  color: var(--sl-color-text);
+}
+
+.progress-step.completed {
+  background: var(--status-completed);
+  color: white;
+}
+
+.progress-step.current {
+  background: var(--sl-color-accent);
+  color: white;
+}
+
+/* Code playground */
+.code-playground {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.code-playground-header {
+  background: var(--sl-color-gray-6);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.code-playground-content {
+  padding: 1rem;
+}
+
+/* Timer */
+.workshop-timer {
+  background: var(--sl-color-gray-6);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+/* Bilingual toggle */
+.language-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.language-toggle button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.375rem;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.language-toggle button.active {
+  background: var(--sl-color-accent);
+  color: white;
+  border-color: var(--sl-color-accent);
+}
+
+/* Block header */
+.block-header {
+  background: linear-gradient(135deg, var(--sl-color-accent-low), var(--sl-color-accent));
+  color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+}
+
+.block-header h1 {
+  color: white;
+  margin: 0;
+}
+
+.block-header p {
+  opacity: 0.9;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Contrast box (vibe coding vs proper engineering) */
+.contrast-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.contrast-box .bad {
+  border: 1px solid var(--challenge-hard);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.contrast-box .good {
+  border: 1px solid var(--challenge-easy);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .contrast-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flag-input {
+    flex-direction: column;
+  }
+  
+  .progress-tracker {
+    flex-wrap: wrap;
+  }
+}
