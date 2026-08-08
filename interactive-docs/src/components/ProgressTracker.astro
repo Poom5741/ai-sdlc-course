@@ -1,0 +1,107 @@
+---
+interface Quest {
+  id: string;
+  name: string;
+  status: 'pending' | 'complete' | 'in_progress';
+  score?: number;
+}
+
+interface Props {
+  quests: Quest[];
+}
+
+const { quests } = Astro.props;
+
+const completedCount = quests.filter(q => q.status === 'complete').length;
+const totalCount = quests.length;
+const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+---
+
+<div class="progress-tracker">
+  <div class="progress-header">
+    <h3>Progress: {completedCount}/{totalCount} ({percentage}%)</h3>
+    <div class="progress-bar">
+      <div class="progress-fill" style={`width: ${percentage}%`} />
+    </div>
+  </div>
+  
+  <ul class="quest-list">
+    {quests.map(quest => (
+      <li class={`quest-item ${quest.status}`}>
+        <span class="quest-status">
+          {quest.status === 'complete' ? '✓' : quest.status === 'in_progress' ? '◐' : '○'}
+        </span>
+        <span class="quest-name">{quest.name}</span>
+        {quest.score !== undefined && (
+          <span class="quest-score">{quest.score}%</span>
+        )}
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .progress-tracker {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .progress-header {
+    margin-bottom: 1rem;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background: var(--sl-color-gray-6);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: var(--sl-color-green-high);
+    transition: width 0.3s ease;
+  }
+  
+  .quest-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .quest-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--sl-color-gray-6);
+  }
+  
+  .quest-item:last-child {
+    border-bottom: none;
+  }
+  
+  .quest-status {
+    width: 1.5rem;
+    text-align: center;
+  }
+  
+  .quest-item.complete .quest-status {
+    color: var(--sl-color-green-high);
+  }
+  
+  .quest-item.in_progress .quest-status {
+    color: var(--sl-color-yellow-high);
+  }
+  
+  .quest-name {
+    flex: 1;
+  }
+  
+  .quest-score {
+    color: var(--sl-color-gray-3);
+    font-size: 0.875rem;
+  }
+</style>
