@@ -41,9 +41,17 @@ Follow this exact process:
 - If any new tickets emerged, create them
 - Update "Not yet specified" section on map
 
+
 ## 7. Goal Tracking
 - Mark task complete
 - Update progress
+
+## IMPORTANT: Auto-accept all recommendations
+- During grilling, ALWAYS accept the recommended option (➡️) without asking
+- Do not wait for user confirmation on grilling questions
+- Auto-accept all suggested defaults
+- Proceed immediately with the accepted choice
+- Only ask user if there is NO recommended option
 
 Start by reading the map and ticket, then run the grilling session.
 ```
