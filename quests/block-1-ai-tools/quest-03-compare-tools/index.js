@@ -13,19 +13,25 @@
  * 3. Choose the best implementation based on your criteria
  */
 
-// TODO: Implement a function that sorts an array of objects by a specified key
-// The function should:
-// - Take an array of objects and a key to sort by
-// - Return a new sorted array (don't modify original)
-// - Handle empty arrays
-// - Handle missing keys
-// - Support ascending and descending order
-
 function sortByKey(array, key, ascending = true) {
-  // Your implementation here
-  // Try using different AI tools and compare their suggestions!
+  if (!array || array.length === 0) return [];
   
-  return [];
+  return [...array].sort((a, b) => {
+    const aVal = a[key];
+    const bVal = b[key];
+    
+    if (aVal === undefined) return 1;
+    if (bVal === undefined) return -1;
+    
+    let comparison = 0;
+    if (typeof aVal === 'string') {
+      comparison = aVal.localeCompare(bVal);
+    } else {
+      comparison = aVal - bVal;
+    }
+    
+    return ascending ? comparison : -comparison;
+  });
 }
 
 module.exports = sortByKey;

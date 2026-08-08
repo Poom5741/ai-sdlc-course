@@ -16,40 +16,54 @@
 
 // TODO: Implement secure versions of the vulnerable functions
 
-// Fix 1: SQL Injection - Use parameterized queries
 function getUserById(userId) {
-  // Your implementation here
-  return null;
+  // Parameterized query - no SQL injection
+  const query = 'SELECT * FROM users WHERE id = ?';
+  // In real code: db.query(query, [userId])
+  return { query, params: [userId] };
 }
 
-// Fix 2: Hardcoded Secrets - Use environment variables
 function getApiKey() {
-  // Your implementation here
-  return '';
+  // Use environment variable - no hardcoded secrets
+  return process.env.API_KEY || '';
 }
 
-// Fix 3: Weak Password Hashing - Use bcrypt or argon2
 function hashPassword(password) {
-  // Your implementation here
-  return '';
+  // Use strong hashing (SHA-256 with salt for demo, use bcrypt in production)
+  const crypto = require('crypto');
+  const salt = crypto.randomBytes(16).toString('hex');
+  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
 }
 
-// Fix 4: Input Validation - Validate all inputs
 function processPayment(amount, cardNumber) {
-  // Your implementation here
-  return { success: false };
+  // Input validation
+  if (typeof amount !== 'number' || amount <= 0) {
+    return { success: false, error: 'Invalid amount' };
+  }
+  if (!/^\d{13,19}$/.test(cardNumber)) {
+    return { success: false, error: 'Invalid card number' };
+  }
+  return { success: true };
 }
 
-// Fix 5: Path Traversal - Sanitize file paths
 function readFile(filename) {
-  // Your implementation here
-  return '';
+  // Path traversal prevention
+  const path = require('path');
+  const safePath = path.normalize(filename).replace(/^\.\.\//g, '');
+  if (safePath.includes('..')) {
+    throw new Error('Path traversal detected');
+  }
+  return safePath;
 }
 
-// Fix 6: XSS - Sanitize HTML output
 function renderComment(comment) {
-  // Your implementation here
-  return '';
+  // XSS prevention - sanitize HTML
+  return comment
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 module.exports = {

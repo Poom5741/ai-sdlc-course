@@ -47,19 +47,24 @@ class EcommerceValidator extends DomainValidator {
     super('ecommerce');
   }
 
-  // TODO: Validate product data
   validateProduct(product) {
-    // Your implementation here
+    const errors = [];
+    if (!product.name || product.name.length < 2) errors.push('Name required');
+    if (typeof product.price !== 'number' || product.price < 0) errors.push('Invalid price');
+    if (!product.sku) errors.push('SKU required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Validate order data
   validateOrder(order) {
-    // Your implementation here
+    const errors = [];
+    if (!order.items || order.items.length === 0) errors.push('No items');
+    if (!order.customerId) errors.push('Customer required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Calculate total with tax
   calculateTotal(items, taxRate = 0.08) {
-    // Your implementation here
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return Math.round(subtotal * (1 + taxRate) * 100) / 100;
   }
 }
 
@@ -69,19 +74,23 @@ class HealthcareValidator extends DomainValidator {
     super('healthcare');
   }
 
-  // TODO: Validate patient data
   validatePatient(patient) {
-    // Your implementation here
+    const errors = [];
+    if (!patient.name) errors.push('Name required');
+    if (!patient.dob || isNaN(Date.parse(patient.dob))) errors.push('Invalid DOB');
+    if (!patient.insuranceId) errors.push('Insurance ID required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Validate appointment data
   validateAppointment(appointment) {
-    // Your implementation here
+    const errors = [];
+    if (!appointment.patientId) errors.push('Patient required');
+    if (!appointment.date) errors.push('Date required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Check insurance eligibility
   checkInsurance(patient, insurance) {
-    // Your implementation here
+    return { eligible: !!patient.insuranceId && !!insurance };
   }
 }
 
@@ -91,19 +100,23 @@ class FinanceValidator extends DomainValidator {
     super('finance');
   }
 
-  // TODO: Validate transaction data
   validateTransaction(transaction) {
-    // Your implementation here
+    const errors = [];
+    if (typeof transaction.amount !== 'number' || transaction.amount < 0) errors.push('Invalid amount');
+    if (!transaction.type) errors.push('Type required');
+    if (!transaction.account) errors.push('Account required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Validate account data
   validateAccount(account) {
-    // Your implementation here
+    const errors = [];
+    if (!account.id) errors.push('ID required');
+    if (!account.owner) errors.push('Owner required');
+    return { valid: errors.length === 0, errors };
   }
 
-  // TODO: Calculate interest
   calculateInterest(principal, rate, time) {
-    // Your implementation here
+    return principal * rate * time;
   }
 }
 

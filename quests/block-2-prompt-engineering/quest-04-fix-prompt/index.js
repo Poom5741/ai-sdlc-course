@@ -17,21 +17,35 @@
 // Vague prompt (BAD):
 // "Make a function that handles users"
 
-// TODO: Write your improved prompt here
 const improvedPrompt = `
+Create a function called createUser that:
+- Takes an object with name (string) and email (string)
+- Validates that email matches standard format (user@domain.com)
+- Returns { success: true, id, name, email } on success
+- Returns { success: false, error: 'message' } on failure
+- Generates a unique ID for the user
 `;
 
-// TODO: Implement the function that your improved prompt would generate
-// The function should:
-// - Create a user object with id, name, email
-// - Validate email format
-// - Save user (simulate with console.log)
-// - Return success/failure status
-
 function createUser(userData) {
-  // Your implementation here
+  const { name, email } = userData || {};
   
-  return { success: false, error: 'Not implemented' };
+  if (!name || typeof name !== 'string') {
+    return { success: false, error: 'Name is required' };
+  }
+  
+  if (!email || typeof email !== 'string') {
+    return { success: false, error: 'Email is required' };
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { success: false, error: 'Invalid email format' };
+  }
+  
+  const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+  console.log('User created:', { id, name, email });
+  
+  return { success: true, id, name, email };
 }
 
 module.exports = createUser;

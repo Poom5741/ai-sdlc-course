@@ -36,40 +36,57 @@ class TodoManager {
     this.todos = [];
   }
 
-  // TODO: Implement addTodo method
   addTodo(title, dueDate = null) {
-    // Your implementation here
+    const todo = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+      title,
+      completed: false,
+      dueDate,
+      createdAt: new Date().toISOString(),
+    };
+    this.todos.push(todo);
+    return todo;
   }
 
-  // TODO: Implement removeTodo method
   removeTodo(id) {
-    // Your implementation here
+    this.todos = this.todos.filter(t => t.id !== id);
   }
 
-  // TODO: Implement updateTodo method
   updateTodo(id, updates) {
-    // Your implementation here
+    const todo = this.todos.find(t => t.id === id);
+    if (todo) {
+      Object.assign(todo, updates);
+    }
+    return todo;
   }
 
-  // TODO: Implement completeTodo method
   completeTodo(id) {
-    // Your implementation here
+    const todo = this.todos.find(t => t.id === id);
+    if (todo) {
+      todo.completed = true;
+    }
+    return todo;
   }
 
-  // TODO: Implement listTodos method
   listTodos(filter = 'all') {
-    // Your implementation here
-    return [];
+    if (filter === 'completed') {
+      return this.todos.filter(t => t.completed);
+    }
+    if (filter === 'pending') {
+      return this.todos.filter(t => !t.completed);
+    }
+    return [...this.todos];
   }
 
-  // TODO: Implement saveToFile method
   async saveToFile(filename) {
-    // Your implementation here
+    const fs = require('fs').promises;
+    await fs.writeFile(filename, JSON.stringify(this.todos, null, 2));
   }
 
-  // TODO: Implement loadFromFile method
   async loadFromFile(filename) {
-    // Your implementation here
+    const fs = require('fs').promises;
+    const data = await fs.readFile(filename, 'utf8');
+    this.todos = JSON.parse(data);
   }
 }
 

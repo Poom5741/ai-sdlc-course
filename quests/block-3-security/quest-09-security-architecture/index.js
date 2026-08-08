@@ -22,31 +22,27 @@ class SecurityArchitect {
     this.threats = [];
   }
 
-  // TODO: Add a security control
   addControl(name, type, description) {
-    // Your implementation here
+    this.controls.push({ name, type, description });
   }
 
-  // TODO: Add a threat
   addThreat(name, severity, mitigation) {
-    // Your implementation here
+    this.threats.push({ name, severity, mitigation });
   }
 
-  // TODO: Generate security architecture document
   generateDocument() {
-    // Your implementation here
     return {
       system: this.systemName,
-      controls: [],
-      threats: [],
-      recommendations: [],
+      controls: this.controls,
+      threats: this.threats,
+      recommendations: this.controls.map(c => `Implement ${c.type}: ${c.name}`),
     };
   }
 
-  // TODO: Validate security requirements
   validateRequirements(requirements) {
-    // Your implementation here
-    return { valid: false, missing: [] };
+    const required = ['authentication', 'authorization', 'encryption'];
+    const missing = required.filter(r => !this.controls.some(c => c.type === r));
+    return { valid: missing.length === 0, missing };
   }
 }
 
@@ -56,10 +52,12 @@ class AuthenticationControl {
     this.type = 'authentication';
   }
 
-  // TODO: Implement authentication
   async authenticate(credentials) {
-    // Your implementation here
-    return { authenticated: false, token: null };
+    if (!credentials || !credentials.username || !credentials.password) {
+      return { authenticated: false, token: null };
+    }
+    const token = Buffer.from(JSON.stringify({ user: credentials.username })).toString('base64');
+    return { authenticated: true, token };
   }
 }
 
@@ -68,10 +66,10 @@ class AuthorizationControl {
     this.type = 'authorization';
   }
 
-  // TODO: Implement authorization
   async authorize(token, resource, action) {
-    // Your implementation here
-    return { authorized: false };
+    if (!token) return { authorized: false };
+    // Simple authorization - in production use proper RBAC
+    return { authorized: true };
   }
 }
 
@@ -80,16 +78,23 @@ class EncryptionControl {
     this.type = 'encryption';
   }
 
-  // TODO: Implement encryption
   async encrypt(data) {
-    // Your implementation here
-    return { encrypted: '' };
+    const crypto = require('crypto');
+    const key = crypto.randomBytes(32);
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { encrypted, key: key.toString('hex'), iv: iv.toString('hex') };
   }
 
-  // TODO: Implement decryption
   async decrypt(encryptedData) {
-    // Your implementation here
-    return { decrypted: '' };
+    const crypto = require('crypto');
+    const { encrypted, key, iv } = encryptedData;
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return { decrypted: JSON.parse(decrypted) };
   }
 }
 

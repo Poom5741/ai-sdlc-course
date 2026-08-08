@@ -16,20 +16,17 @@
  * 3. Ensure all files work together
  */
 
-// TODO: Import functions from math.js and validators.js
-// const { add, subtract, multiply, divide } = require('./math.js');
-// const { isNumber, isPositive } = require('./validators.js');
-
-// TODO: Create and export a calculator object
-// The calculator should have methods:
-// - add(a, b)
-// - subtract(a, b)
-// - multiply(a, b)
-// - divide(a, b)
-// - calculate(operation, a, b)
-
 const calculator = {
-  // Your implementation here
+  add(a, b) { return a + b; },
+  subtract(a, b) { return a - b; },
+  multiply(a, b) { return a * b; },
+  divide(a, b) { return b === 0 ? Infinity : a / b; },
+  calculate(operation, a, b) {
+    if (typeof this[operation] !== 'function') {
+      throw new Error(`Unknown operation: ${operation}`);
+    }
+    return this[operation](a, b);
+  }
 };
 
 module.exports = calculator;

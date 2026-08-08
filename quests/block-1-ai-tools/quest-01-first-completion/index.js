@@ -14,18 +14,13 @@
  * 4. Accept and test the suggestion
  */
 
-// TODO: Write a comment here describing a factorial function
-// Example: "Calculate factorial of n using recursion"
-
-// TODO: Implement the factorial function below
-// The function should:
-// - Take a number n as input
-// - Return n! (n factorial)
-// - Handle base case: factorial(0) = 1, factorial(1) = 1
-// - Handle recursive case: factorial(n) = n * factorial(n-1)
+// Calculate factorial of n using recursion
 
 function factorial(n) {
-  // Your code here
+  // Base case
+  if (n <= 1) return 1;
+  // Recursive case
+  return n * factorial(n - 1);
 }
 
 // Test your function

@@ -12,9 +12,9 @@ console.log("Quest 2.2: Multi-Step Prompting\n");
 console.log("Running tests...\n");
 
 // Setup
-beforeEach(() => {
+function resetManager() {
   manager = new TodoManager();
-});
+}
 
 function test(description, fn) {
   try {
@@ -42,6 +42,7 @@ function assertEqual(actual, expected, message) {
 
 // Tests
 test('addTodo creates a todo', () => {
+  resetManager();
   manager.addTodo('Test todo');
   const todos = manager.listTodos();
   assertEqual(todos.length, 1);
@@ -49,12 +50,14 @@ test('addTodo creates a todo', () => {
 });
 
 test('addTodo with due date', () => {
+  resetManager();
   manager.addTodo('Test todo', '2024-12-31');
   const todos = manager.listTodos();
   assertEqual(todos[0].dueDate, '2024-12-31');
 });
 
 test('removeTodo removes a todo', () => {
+  resetManager();
   manager.addTodo('Test todo');
   const todo = manager.listTodos()[0];
   manager.removeTodo(todo.id);
@@ -62,6 +65,7 @@ test('removeTodo removes a todo', () => {
 });
 
 test('completeTodo marks todo as complete', () => {
+  resetManager();
   manager.addTodo('Test todo');
   const todo = manager.listTodos()[0];
   manager.completeTodo(todo.id);
@@ -70,6 +74,7 @@ test('completeTodo marks todo as complete', () => {
 });
 
 test('listTodos with filter', () => {
+  resetManager();
   manager.addTodo('Todo 1');
   manager.addTodo('Todo 2');
   const todo1 = manager.listTodos()[0];
@@ -83,6 +88,7 @@ test('listTodos with filter', () => {
 });
 
 test('updateTodo updates fields', () => {
+  resetManager();
   manager.addTodo('Original title');
   const todo = manager.listTodos()[0];
   manager.updateTodo(todo.id, { title: 'Updated title' });
