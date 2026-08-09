@@ -1,0 +1,555 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BlueBeltDojo — Stitch Landing Page Prompt</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: #f7f8fa;
+    color: #1f2328;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #3b82d4;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1f2328;
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: #57606a;
+  }
+
+  .how-to {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left: 3px solid #3b82d4;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 13px;
+    color: #57606a;
+    line-height: 1.7;
+  }
+  .how-to strong { color: #1f2328; }
+
+  /* PROMPT BLOCK */
+  .prompt-wrapper {
+    background: #0a0a0a;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #1c1c1c;
+  }
+  .prompt-toolbar {
+    background: #141414;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .prompt-toolbar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: "SFMono-Regular", Consolas, monospace;
+  }
+  .prompt-toolbar-badge {
+    font-size: 10px;
+    background: #1a6cc4;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+
+  .prompt-body {
+    padding: 28px 28px 32px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #c9d1d9;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Syntax coloring inside prompt */
+  .c-heading  { color: #2d8cf0; font-weight: 700; }
+  .c-label    { color: #a78bfa; font-weight: 600; }
+  .c-value    { color: #86efac; }
+  .c-comment  { color: #4b5563; font-style: italic; }
+  .c-copy     { color: #f9fafb; }
+  .c-accent   { color: #fbbf24; }
+  .c-muted    { color: #6b7280; }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed #1c1c1c;
+    margin: 6px 0;
+  }
+
+  /* SECTION INDEX */
+  .index {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .index-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #57606a;
+    margin-bottom: 14px;
+  }
+  .index-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+  }
+  .index-item {
+    font-size: 12px;
+    color: #57606a;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .index-num {
+    font-size: 10px;
+    color: #3b82d4;
+    font-weight: 700;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    width: 18px;
+    flex-shrink: 0;
+  }
+
+  .footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-eyebrow">Stitch Design Agent · Landing Page Prompt</div>
+    <div class="header-title">BlueBeltDojo — Full Page Prompt</div>
+    <div class="header-sub">Paste this entire prompt into Stitch. It contains all sections, copy, brand tokens, and layout instructions.</div>
+  </div>
+
+  <div class="how-to">
+    <strong>How to use:</strong> Go to <strong>stitch.withgoogle.com</strong> → New design → Paste the full prompt below. Stitch works best with long, structured prompts — every section label, color value, and copy line is intentional. Do not abbreviate.
+  </div>
+
+  <div class="index">
+    <div class="index-title">Page Sections (in order)</div>
+    <div class="index-grid">
+      <div class="index-item"><span class="index-num">01</span> Brand &amp; Design System</div>
+      <div class="index-item"><span class="index-num">02</span> Hero</div>
+      <div class="index-item"><span class="index-num">03</span> Social Proof Bar</div>
+      <div class="index-item"><span class="index-num">04</span> Pain Points</div>
+      <div class="index-item"><span class="index-num">05</span> The BJJ Metaphor</div>
+      <div class="index-item"><span class="index-num">06</span> Belt Progression</div>
+      <div class="index-item"><span class="index-num">07</span> Workshop Schedule</div>
+      <div class="index-item"><span class="index-num">08</span> Who This Is For</div>
+      <div class="index-item"><span class="index-num">09</span> What You'll Walk Out With</div>
+      <div class="index-item"><span class="index-num">10</span> Workshop Format</div>
+      <div class="index-item"><span class="index-num">11</span> FAQ</div>
+      <div class="index-item"><span class="index-num">12</span> Final CTA</div>
+      <div class="index-item"><span class="index-num">13</span> Footer</div>
+    </div>
+  </div>
+
+  <div class="prompt-wrapper">
+    <div class="prompt-toolbar">
+      <span class="prompt-toolbar-label">stitch_prompt.txt</span>
+      <span class="prompt-toolbar-badge">READY TO PASTE</span>
+    </div>
+    <div class="prompt-body"><span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND: BlueBeltDojo
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">BRAND CONCEPT:</span>
+<span class="c-copy">A coding school that teaches AI-assisted software development
+the same way a BJJ gym teaches jiu-jitsu — through progressive
+belt ranks, drills, live sparring, and earned promotions.
+No shortcuts. No white-belt energy in production.</span>
+
+<span class="c-label">BRAND NAME:</span> <span class="c-value">BlueBeltDojo</span> <span class="c-comment">(always camelCase, one word)</span>
+<span class="c-label">TAGLINE:</span> <span class="c-value">"Earn Your Blue Belt. Ship Like an Engineer."</span>
+
+<span class="c-label">COLOR PALETTE:</span>
+<span class="c-value">  Page background:  #0A0A0A  (Dojo Black)
+  Card surfaces:    #111111  (Mat Charcoal)
+  Borders:          #1C1C1C  (Canvas Dark)
+  Primary accent:   #1A6CC4  (Belt Blue)
+  CTAs / glow:      #2D8CF0  (Electric Blue)
+  Advanced tier:    #7C3AED  (Purple Belt)
+  Beginner / text:  #F9FAFB  (White Belt)
+  Success:          #22C55E  (Tap Out Green)</span>
+
+<span class="c-label">TYPOGRAPHY:</span>
+<span class="c-value">  Headlines: Space Grotesk or Inter, weight 900, tight tracking (-1.5px)
+  Body: Inter, 15px, #9CA3AF, line-height 1.65
+  Code: JetBrains Mono or Fira Code, Belt Blue on deep navy (#0A1628) bg</span>
+
+<span class="c-label">AESTHETIC:</span>
+<span class="c-copy">  Dark dojo — black mats, deep charcoal, worn canvas texture.
+  Subtle noise/grain overlay on hero. Faint grid or tatami
+  pattern on backgrounds. No gradients. No glow effects except
+  on primary CTA button (Electric Blue outer glow).
+  Raw, underground gym energy — not a SaaS startup.</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Single column, mobile-first, max-width 1100px centered.</span>
+<span class="c-label">ANIMATIONS:</span> <span class="c-copy">Subtle fade-up on scroll for cards. CTA button pulse glow only.</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 01 — HERO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Full-width dark section, tatami/grid texture background.
+Center-aligned. Large vertical padding (120px top, 100px bottom).</span>
+
+<span class="c-label">EYEBROW:</span> <span class="c-value">"AI SDLC · ONE-DAY INTENSIVE WORKSHOP"</span>
+<span class="c-comment">(small caps, Belt Blue, letter-spaced)</span>
+
+<span class="c-label">HEADLINE (H1, weight 900):</span>
+<span class="c-value">"Train Your AI Coding Like You Train BJJ."</span>
+
+<span class="c-label">SUBHEADLINE:</span>
+<span class="c-copy">"Most people vibe code. They paste from ChatGPT, skip the review,
+and wonder why prod breaks at 2am. At BlueBeltDojo, you earn
+your blue belt — with drills, discipline, and real agentic workflows."</span>
+
+<span class="c-label">PRIMARY CTA:</span> <span class="c-value">"Earn Your Blue Belt →"</span>
+<span class="c-comment">(large button, #1A6CC4 fill, Electric Blue outer glow on hover)</span>
+
+<span class="c-label">SECONDARY CTA:</span> <span class="c-value">"View the Curriculum"</span>
+<span class="c-comment">(ghost button, Electric Blue border)</span>
+
+<span class="c-label">HERO VISUAL:</span>
+<span class="c-copy">  Right side (or background on mobile): a worn blue BJJ belt
+  rendered as a glowing SVG or stylized graphic. Below it, a
+  terminal window showing:
+
+  $ claude code --max-turns 3 "fix failing tests"
+  ✓ Test loop running... 3/3 passed
+  🥋 Stripe earned.
+
+  The terminal uses JetBrains Mono, Belt Blue text on #0A1628 bg.</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 02 — SOCIAL PROOF BAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Thin horizontal band, #111111 bg, 1px border top/bottom #1C1C1C.</span>
+
+<span class="c-label">CONTENT:</span>
+<span class="c-copy">  Left label: "Training alongside →"  (muted, #4B5563)
+  Scrolling text or static pills:
+  "Startup founders" · "Senior engineers" · "Product managers"
+  · "Non-technical builders" · "Freelancers" · "CTOs"</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 03 — PAIN POINTS ("Sound Familiar?")
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"Still Rolling With White Belt Energy?"</span>
+<span class="c-label">SUBTEXT:</span> <span class="c-copy">"Every blue belt remembers being here."</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">3-column cards, dark charcoal (#111111), subtle red left-border.</span>
+
+<span class="c-label">CARD 1:</span>
+<span class="c-value">  Icon: broken code / bug
+  "You paste AI code straight into prod and pray it works."</span>
+
+<span class="c-label">CARD 2:</span>
+<span class="c-value">  Icon: lock / shield broken
+  "Your AI-generated code has SQL injections, hardcoded secrets,
+  and zero tests."</span>
+
+<span class="c-label">CARD 3:</span>
+<span class="c-value">  Icon: question mark / confused robot
+  "You've heard of agents, RAG, and MCP — but have no idea
+  how to actually use them in a real project."</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 04 — THE BJJ METAPHOR (Brand Differentiator)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">2-column split. Dark bg with subtle tatami texture.
+Left: copy. Right: visual comparison table.</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"You Don't Learn BJJ From YouTube. You Roll."</span>
+
+<span class="c-label">BODY:</span>
+<span class="c-copy">"In BJJ, you don't earn your belt by watching tutorials.
+You drill the move. You spar. You tap out. You go again.
+
+BlueBeltDojo works the same way. Every concept is followed
+by a live Drill — a hands-on Code Quest where you ship real code,
+with real AI tools, under real constraints."</span>
+
+<span class="c-label">RIGHT SIDE — Comparison table (2 cols):</span>
+<span class="c-value">  Header col 1: "BJJ Gym"      Header col 2: "BlueBeltDojo"
+  Drill            →  Code Quest
+  Spar             →  Live Workshop
+  Tap Out          →  Request a hint
+  Stripe           →  Quest milestone
+  Belt Promotion   →  Level up on the platform
+  Sensei           →  Workshop instructor</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 05 — BELT PROGRESSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"Your Path From Zero to Purple Belt"</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Horizontal belt progression bar or vertical card stack.
+Each belt rendered as a colored belt graphic with stripe marks.
+Active belt (Blue) glows with Belt Blue aura.</span>
+
+<span class="c-label">BELT 1 — White Belt  (#E5E7EB):</span>
+<span class="c-copy">  "You just showed up. Zero shame.
+  Complete your pre-workshop setup and first drills."
+  Milestone: Pre-workshop</span>
+
+<span class="c-label">BELT 2 — White Belt + Stripes:</span>
+<span class="c-copy">  "Earning your first stripes through Blocks 1 &amp; 2.
+  Prompt engineering, first AI-generated APIs."
+  Milestone: Blocks 1–2 quests</span>
+
+<span class="c-label">BELT 3 — Blue Belt  (#1A6CC4)  ← FEATURED, glowing:</span>
+<span class="c-copy">  "Workshop complete. You know the fundamentals,
+  respect the process, and your code doesn't ship vulnerabilities."
+  Milestone: Complete the 8-hour Spar (workshop day)
+  Badge: 🥋 BLUE BELT</span>
+
+<span class="c-label">BELT 4 — Blue Belt + Stripes:</span>
+<span class="c-copy">  "Post-workshop platform drills. Agents, RAG, pipelines.
+  You're building real systems now."
+  Milestone: Extended platform quests</span>
+
+<span class="c-label">BELT 5 — Purple Belt  (#7C3AED):</span>
+<span class="c-copy">  "Mastery. Agentic workflows, production security,
+  full system design. You teach others now."
+  Milestone: Advanced mastery track
+  Badge: 🟣 PURPLE BELT</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 06 — WORKSHOP SCHEDULE ("The Spar Day")
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"8 Hours. 5 Blocks. 14 Drills."</span>
+<span class="c-label">SUBTEXT:</span> <span class="c-copy">"This is the Spar day. Every 90-minute block is
+30 min concept + 60 min live Code Quests. You pick your difficulty."</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Vertical timeline with large block cards. Left: time + belt color
+accent line. Right: block details. Dark bg, charcoal cards.</span>
+
+<span class="c-label">BLOCK 1 — 09:00  (accent: white):</span>
+<span class="c-value">  🛠️  "AI Tools Setup &amp; First Wins"
+  Concept: The AI Toolkit Landscape — Copilot, Claude Code,
+  Gemini CLI, CodeRabbit. Vibe coding vs vibe engineering.
+  Drills: First AI completion · Multi-file API · Tool comparison</span>
+
+<span class="c-label">BLOCK 2 — 10:45  (accent: #4B5563 light gray):</span>
+<span class="c-value">  🧠  "Prompt Engineering Mastery"
+  Concept: Tokens, context windows, the anatomy of a great prompt.
+  Drills: Fix the vague prompt · Multi-step prompting ·
+           Domain-specific prompt library</span>
+
+<span class="c-label">LUNCH — 12:15  (muted divider):</span>
+<span class="c-value">  🍜  "Lunch Break — 60 min"</span>
+
+<span class="c-label">BLOCK 3 — 13:15  (accent: #EF4444 red):</span>
+<span class="c-value">  🔒  "Security in AI-Generated Code"
+  Concept: AI doesn't know your security context.
+  SQL injection, hardcoded secrets, XSS.
+  Drills: Spot the vulnerability · Fix and harden ·
+           Design a secure AI workflow (Guard)</span>
+
+<span class="c-label">BLOCK 4 — 15:00  (accent: #2D8CF0 blue):</span>
+<span class="c-value">  🤖  "Agentic Workflows &amp; Loops"
+  Concept: Tool calling, MCP, ReAct pattern.
+  Drills: Set up a loop · Generate→Review→Fix pipeline ·
+           Multi-agent system design</span>
+
+<span class="c-label">BLOCK 5 — 16:45  (accent: #7C3AED purple):</span>
+<span class="c-value">  🏗️  "Architecture &amp; System Design"
+  Concept: RAG architecture, context engineering.
+  Drills: RAG system design · Full AI-powered feature end-to-end
+  Wrap-up: Belt promotions 🥋</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 07 — WHO THIS IS FOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"Two Tracks. One Dojo."</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">2 large side-by-side cards, each with a belt badge in corner.</span>
+
+<span class="c-label">CARD 1 — Badge: ⬜ WHITE BELT TRACK:</span>
+<span class="c-value">  Heading: "The Builder"
+  Body: "You're a founder, PM, or creative who wants to build
+  software with AI — without hiring a dev team. You'll learn
+  to prompt like a pro, spot bad AI output, and ship your first
+  working API on day one."
+  Tags: Founders · PMs · Non-technical builders</span>
+
+<span class="c-label">CARD 2 — Badge: 🥋 BLUE BELT TRACK:</span>
+<span class="c-value">  Heading: "The Engineer"
+  Body: "You know how to code but AI keeps making a mess of your
+  codebase. You'll learn proper vibe engineering — security reviews,
+  agentic loops, RAG design, and multi-agent pipelines that
+  actually work in production."
+  Tags: Senior devs · Full-stack engineers · Tech leads</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 08 — OUTCOMES ("Walk Out With")
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"What You Earn on Spar Day"</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">2×3 icon grid. Each item: Tap Out Green checkmark + label.</span>
+
+<span class="c-value">  ✅  A working AI-powered REST API
+  ✅  A prompt engineering playbook (yours to keep)
+  ✅  Security-hardened AI development workflow
+  ✅  An agentic generate → review → fix loop
+  ✅  RAG architecture blueprint
+  ✅  Your 🥋 Blue Belt certification</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 09 — FORMAT DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"The Dojo Details"</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Clean icon + text list, 2 columns, charcoal card bg.</span>
+
+<span class="c-value">  📅  Duration: 1-day intensive Spar (8 hours)
+  👥  Cohort size: 10–20 students
+  🗣️  Language: Thai explanations + English technical terms
+  💻  Format: 14 live Code Quest Drills
+  🏆  Difficulty: 🟢 Drill / 🟡 Spar / 🔴 Tournament tracks
+  🥋  Certification: Blue Belt on completion
+  🔁  After the Dojo: Access to interactive platform + extended quests
+  📍  Location: [In-person / Online — add your venue here]</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 10 — FAQ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">HEADING:</span> <span class="c-value">"Questions From White Belts"</span>
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Accordion, dark bg, Belt Blue expand icon.</span>
+
+<span class="c-value">  Q: Do I need coding experience to attend?
+  A: No. We have a White Belt track built for complete beginners.
+     If you can use a laptop, you can start. The blue belt is earned
+     through effort — not prior experience.
+
+  Q: What tools do I need?
+  A: Just a laptop. We set up GitHub Copilot, Claude Code, and
+     Gemini CLI together in Block 1. No pre-install required.
+
+  Q: Is this in Thai or English?
+  A: Both. Thai explanations for concepts, English for technical terms
+     — exactly how Thai developers actually talk.
+
+  Q: What if I get stuck on a drill?
+  A: Tap Out. It's not giving up — it's part of the process. You get
+     a hint, finish the drill, and learn the technique properly.
+
+  Q: What happens after the workshop?
+  A: You get access to the BlueBeltDojo interactive platform with
+     extended drills, belt-track progression, and post-workshop quests
+     all the way to Purple Belt.
+
+  Q: How big are the cohorts?
+  A: Maximum 20 students per Spar day. Small enough that every student
+     gets real attention from the Sensei.</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 11 — FINAL CTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Full-width dark section, slightly lighter than page bg (#111111).
+Center-aligned. Vertical padding 100px. Belt Blue top border (3px).</span>
+
+<span class="c-label">OVERLINE:</span> <span class="c-value">"LIMITED TO 20 SEATS PER COHORT"</span>
+<span class="c-comment">(small caps, Belt Blue, letter-spaced)</span>
+
+<span class="c-label">HEADING:</span>
+<span class="c-value">"The Mat Doesn't Care About Your Excuses.
+Are You Ready to Roll?"</span>
+
+<span class="c-label">SUBTEXT:</span>
+<span class="c-copy">"Next cohort booking is open. Earn your blue belt — or stay
+a white belt forever. Your call."</span>
+
+<span class="c-label">CTA BUTTON:</span> <span class="c-value">"Register for the Spar Day →"</span>
+<span class="c-comment">(large, full-width on mobile, Belt Blue bg, Electric Blue glow)</span>
+
+<span class="c-label">BELOW BUTTON:</span> <span class="c-copy">Small muted text: "🥋 Every seat includes Blue Belt certification
++ post-workshop platform access"</span>
+
+<span class="c-heading">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 12 — FOOTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="c-label">LAYOUT:</span> <span class="c-copy">Simple dark footer, 1px top border #1C1C1C.</span>
+
+<span class="c-value">  Left: "BlueBeltDojo" logo mark (BBD in Belt Blue square)
+  Center: tagline — "Train hard. Ship clean. Earn your belt."
+  Right: Links — Curriculum · FAQ · Contact · GitHub</span>
+
+<span class="c-comment">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF PROMPT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span></div>
+  </div>
+
+  <div class="footer">
+    Made with IBM Bob  ·  BlueBeltDojo Brand Identity v1.0
+  </div>
+
+</div>
+</body>
+</html>

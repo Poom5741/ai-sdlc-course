@@ -1,0 +1,167 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+---
+
+<DocLayout title="Block 1 - AI Tools Setup" description="Set up your AI development toolkit and complete your first AI-assisted coding tasks" sidebar={true}>
+  <h1>Block 1: AI Tools Setup</h1>
+  
+  <p>
+    <Badge text="09:00 - 10:30" variant="note" /> 
+    <Badge text="90 minutes" variant="note" /> 
+    <Badge text="3 Quests" variant="success" />
+  </p>
+
+  <h2>🎯 Learning Goals</h2>
+  <p>เมื่อจบบล็อกนี้ คุณจะ:</p>
+  <ul>
+    <li>ติดตั้งและตั้งค่า GitHub Copilot ใน VS Code</li>
+    <li>ใช้ Claude Code สำหรับ terminal-based AI</li>
+    <li>เปรียบเทียบเครื่องมือ AI ที่แตกต่างกัน</li>
+  </ul>
+
+  <hr />
+
+  <h2>📖 Concept: The AI Toolkit Landscape (30 min)</h2>
+  
+  <h3>What is AI-Assisted Development?</h3>
+  <p>AI-assisted development คือการใช้ AI tools เพื่อช่วยเขียนโค้ด เร็วขึ้นและดีขึ้น</p>
+
+  <h3>The Shift: Manual → AI-Assisted</h3>
+  <pre><code>เดิม: คิด → เขียนโค้ด → Debug → Test
+ใหม่: คิด → บอก AI → Review → Refine → Deploy</code></pre>
+
+  <h3>Key Concepts</h3>
+  
+  <h4>Tokens</h4>
+  <ul>
+    <li>หน่วยย่อยของข้อความที่ AI อ่าน</li>
+    <li>แต่ละ token อาจเป็นคำ หรือส่วนของคำ</li>
+    <li>สำคัญเพราะมีผลต่อ cost และ context window</li>
+  </ul>
+
+  <h4>Context Window</h4>
+  <ul>
+    <li>จำนวนข้อมูลที่ AI จำได้ในแต่ละครั้ง</li>
+    <li>มากขึ้น = จำได้มากขึ้น = ดีขึ้น</li>
+  </ul>
+
+  <h4>Hallucination</h4>
+  <ul>
+    <li>เมื่อ AI สร้างสิ่งที่ไม่มีอยู่จริง</li>
+    <li>ต้อง verify ทุกครั้ง</li>
+  </ul>
+
+  <hr />
+
+  <h2>🛠️ Tools Overview</h2>
+  
+  <h3>GitHub Copilot</h3>
+  <ul>
+    <li><strong>What</strong>: AI pair programmer ใน VS Code</li>
+    <li><strong>How</strong>: Suggests code as you type</li>
+    <li><strong>Best for</strong>: Inline code completion</li>
+  </ul>
+
+  <h3>Claude Code</h3>
+  <ul>
+    <li><strong>What</strong>: Terminal-based AI assistant</li>
+    <li><strong>How</strong>: Chat in terminal, execute commands</li>
+    <li><strong>Best for</strong>: Complex tasks, debugging</li>
+  </ul>
+
+  <h3>CodeRabbit</h3>
+  <ul>
+    <li><strong>What</strong>: AI code review</li>
+    <li><strong>How</strong>: Reviews PRs automatically</li>
+    <li><strong>Best for</strong>: Quality assurance</li>
+  </ul>
+
+  <hr />
+
+  <h2>🎮 Code Quests</h2>
+
+  <h3>🟢 Quest 1.1: First AI Completion</h3>
+  <p><strong>Goal</strong>: Use GitHub Copilot to write a function</p>
+  
+  <Steps>
+    <li><strong>Install GitHub Copilot</strong>
+      <ul>
+        <li>Open VS Code</li>
+        <li>Go to Extensions (Ctrl+Shift+X)</li>
+        <li>Search "GitHub Copilot Chat"</li>
+        <li>Install and sign in</li>
+      </ul>
+    </li>
+    <li><strong>Create a new file</strong>
+      <pre><code>// factorial.js</code></pre>
+    </li>
+    <li><strong>Write a comment</strong>
+      <pre><code>// Calculate factorial of n using recursion</code></pre>
+    </li>
+    <li><strong>Accept Copilot's suggestion</strong> (Tab key)</li>
+    <li><strong>Test your function</strong>
+      <pre><code>console.log(factorial(5)); // Should output 120
+console.log(factorial(10)); // What does this output?</code></pre>
+    </li>
+  </Steps>
+  
+  <p><strong>Deliverable</strong>: Working factorial function + screenshot</p>
+
+  <hr />
+
+  <h3>🟡 Quest 1.2: Multi-file Generation</h3>
+  <p><strong>Goal</strong>: Generate a complete API endpoint</p>
+  
+  <Steps>
+    <li><strong>Create a new file</strong>
+      <pre><code>// user-api.js</code></pre>
+    </li>
+    <li><strong>Write a detailed comment</strong>
+      <pre><code>// Create a REST API endpoint for user management
+// GET /users - list all users
+// POST /users - create new user
+// Include input validation and error handling</code></pre>
+    </li>
+    <li><strong>Let Copilot generate the code</strong></li>
+    <li><strong>Review and refine</strong> the generated code</li>
+    <li><strong>Add validation</strong> for email format</li>
+  </Steps>
+  
+  <p><strong>Deliverable</strong>: Working API endpoint with validation</p>
+
+  <hr />
+
+  <h3>🟡 Quest 1.3: Compare Tools</h3>
+  <p><strong>Goal</strong>: Compare Copilot vs Claude Code</p>
+  
+  <Steps>
+    <li><strong>Open Claude Code in terminal</strong>
+      <pre><code>claude</code></pre>
+    </li>
+    <li><strong>Ask Claude to write the same factorial function</strong>
+      <pre><code>Write a JavaScript function to calculate factorial using recursion</code></pre>
+    </li>
+    <li><strong>Compare the outputs</strong></li>
+    <li><strong>Document differences</strong></li>
+  </Steps>
+  
+  <p><strong>Deliverable</strong>: Comparison document</p>
+
+  <hr />
+
+  <h2>✅ Block 1 Checklist</h2>
+  <ul>
+    <li>☐ GitHub Copilot installed</li>
+    <li>☐ Quest 1.1 completed</li>
+    <li>☐ Quest 1.2 completed</li>
+    <li>☐ Quest 1.3 completed</li>
+  </ul>
+
+  <hr />
+
+  <h2>🚀 Next Block</h2>
+  <p><strong>Block 2: Prompt Engineering + Loops</strong> → Learn to write better prompts and set up iterative workflows.</p>
+  <p><a href="/workshop/block-2-prompting">Continue to Block 2 →</a></p>
+</DocLayout>

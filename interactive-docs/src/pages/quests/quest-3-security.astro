@@ -1,0 +1,107 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+---
+
+<DocLayout
+  title="Quest 3.1 - Spot the Vulnerability"
+  description="Find security issues in AI-generated code"
+  sidebar={true}
+>
+  <h1>Quest 3.1: Spot the Vulnerability</h1>
+
+  <p>
+    <Badge text="🟢 Easy" variant="success" />
+    <Badge text="15 minutes" variant="note" />
+    <Badge text="Block 3: Security" variant="tip" />
+  </p>
+
+  <h2>🎯 Goal</h2>
+  <p>ค้นหา security vulnerabilities ใน AI-generated code</p>
+
+  <hr />
+
+  <h2>📋 Instructions</h2>
+
+  <Steps>
+    <li>
+      <strong>Review vulnerable code</strong> ใน <code>vulnerable.js</code>
+    </li>
+    <li>
+      <strong>ระบุ vulnerabilities</strong> ทั้งหมด:
+      <ul>
+        <li>SQL Injection</li>
+        <li>Hardcoded Secrets</li>
+        <li>Weak Hashing</li>
+        <li>No Input Validation</li>
+        <li>Path Traversal</li>
+        <li>XSS</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Document</strong> แต่ละ vulnerability
+    </li>
+    <li>
+      <strong>รัน tests</strong> เพื่อตรวจสอบ
+    </li>
+  </Steps>
+
+  <hr />
+
+  <h2>🎮 Code Playground</h2>
+
+  <iframe
+    src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-3-security/quest-07-spot-vulnerability/vulnerable.js&view=editor"
+    style="width:100%;height:500px;border:0;border-radius:4px;"
+    allow="cross-origin-isolation"
+    title="Quest 3.1: Spot the Vulnerability"
+  />
+
+  <hr />
+
+  <h2>✅ Verification</h2>
+
+  <pre><code class="language-bash">{`node test.js`}</code></pre>
+
+  <hr />
+
+  <h2>🔍 Common Vulnerabilities</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Vulnerability</th>
+        <th>Severity</th>
+        <th>Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SQL Injection</td>
+        <td>Critical</td>
+        <td>Parameterized queries</td>
+      </tr>
+      <tr>
+        <td>Hardcoded Secrets</td>
+        <td>Critical</td>
+        <td>Environment variables</td>
+      </tr>
+      <tr>
+        <td>Weak Hashing</td>
+        <td>High</td>
+        <td>bcrypt/argon2</td>
+      </tr>
+      <tr>
+        <td>Path Traversal</td>
+        <td>High</td>
+        <td>Sanitize paths</td>
+      </tr>
+      <tr>
+        <td>XSS</td>
+        <td>High</td>
+        <td>Escape HTML</td>
+      </tr>
+    </tbody>
+  </table>
+</DocLayout>

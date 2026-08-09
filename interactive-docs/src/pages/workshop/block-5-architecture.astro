@@ -1,0 +1,268 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+---
+
+<DocLayout title="Block 5 - Architecture" description="Design complete AI-powered systems with RAG and multi-component architecture" sidebar={true}>
+  <h1>Block 5: Architecture</h1>
+
+  <p>
+    <Badge text="16:45 - 18:00" variant="note" /> 
+    <Badge text="75 minutes" variant="note" /> 
+    <Badge text="2 Quests" variant="success" />
+  </p>
+
+  <h2>🎯 Learning Goals</h2>
+  <p>เมื่อจบบล็อกนี้ คุณจะ:</p>
+  <ul>
+    <li>ออกแบบ AI-powered system architecture</li>
+    <li>สร้าง RAG (Retrieval-Augmented Generation) system</li>
+    <li>บันทึก architectural decisions</li>
+  </ul>
+
+  <hr />
+
+  <h2>📖 Concept: System Architecture (30 min)</h2>
+
+  <h3>What is System Architecture?</h3>
+  <p>System Architecture คือการออกแบบโครงสร้างของระบบ รวมถึง:</p>
+  <ul>
+    <li><strong>Components</strong>: ส่วนประกอบของระบบ</li>
+    <li><strong>Interfaces</strong>: การเชื่อมต่อระหว่างส่วนประกอบ</li>
+    <li><strong>Data Flow</strong>: การไหลของข้อมูล</li>
+    <li><strong>Security</strong>: การป้องกันระบบ</li>
+  </ul>
+
+  <h3>AI-Powered System Patterns</h3>
+
+  <h4>Pattern 1: RAG (Retrieval-Augmented Generation)</h4>
+  <pre><code>┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Documents  │────▶│  Embeddings │────▶│ Vector Store│
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+┌─────────────┐     ┌─────────────┐           │
+│   Query     │────▶│  Embeddings │───────────┘
+└─────────────┘     └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │     LLM     │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   Answer    │
+                    └─────────────┘</code></pre>
+
+  <p><strong>Use Cases</strong>:</p>
+  <ul>
+    <li>Chat with your documents</li>
+    <li>Knowledge base Q&amp;A</li>
+    <li>Document search</li>
+  </ul>
+
+  <h4>Pattern 2: Multi-Agent System</h4>
+  <pre><code>┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Planner  │───▶│  Coder   │───▶│ Reviewer │
+└──────────┘    └──────────┘    └────┬─────┘
+                                     │
+                    ┌────────────────┘
+                    ▼
+              ┌──────────┐
+              │  Tester  │
+              └──────────┘</code></pre>
+
+  <p><strong>Use Cases</strong>:</p>
+  <ul>
+    <li>Complex code generation</li>
+    <li>Automated workflows</li>
+    <li>Quality assurance</li>
+  </ul>
+
+  <h4>Pattern 3: Event-Driven Architecture</h4>
+  <pre><code>┌─────────┐     ┌─────────┐     ┌─────────┐
+│ Event   │────▶│ Handler │────▶│ Side    │
+│ Source  │     │         │     │ Effects │
+└─────────┘     └─────────┘     └─────────┘</code></pre>
+
+  <p><strong>Use Cases</strong>:</p>
+  <ul>
+    <li>Microservices</li>
+    <li>Real-time systems</li>
+    <li>Scalable applications</li>
+  </ul>
+
+  <hr />
+
+  <h2>🛠️ Architecture Documentation</h2>
+
+  <h3>Architecture Decision Records (ADR)</h3>
+  <p>บันทึกการตัดสินใจทางสถาปัตยกรรม:</p>
+  <pre><code># ADR-001: [Decision Title]
+
+## Status
+Accepted
+
+## Context
+[สถานการณ์ที่ต้องตัดสินใจ]
+
+## Decision
+[สิ่งที่ตัดสินใจ]
+
+## Consequences
+- [ผลบวก]
+- [ผลลบ]</code></pre>
+
+  <h3>System Design Document</h3>
+  <pre><code># System Design: [System Name]
+
+## Overview
+- Purpose
+- Users
+- Key Features
+
+## Architecture
+- Components
+- Interfaces
+- Data Flow
+
+## Security
+- Authentication
+- Authorization
+- Encryption
+
+## Deployment
+- Infrastructure
+- CI/CD
+- Monitoring</code></pre>
+
+  <hr />
+
+  <h2>🎮 Code Quests</h2>
+
+  <h3>🟡 Quest 5.1: RAG Design</h3>
+  <p><strong>Goal</strong>: Design a Retrieval-Augmented Generation system</p>
+
+  <Steps>
+    <li>
+      <strong>Understand RAG components</strong>
+      <ul>
+        <li>Document Store: เก็บเอกสาร</li>
+        <li>Embedding Service: แปลงข้อความเป็น vector</li>
+        <li>Vector Store: เก็บ embeddings</li>
+        <li>LLM: สร้างคำตอบ</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Design the system</strong>
+      <pre><code>{'class RAGPipeline {'}
+  constructor(documentStore, embeddingService) {'{}'}
+  async retrieve(query) {'{}'}
+  async generate(query, context) {'{}'}
+  async query(question) {'{}'}
+{'}'}</code></pre>
+    </li>
+    <li><strong>Implement core components</strong></li>
+    <li><strong>Test with sample documents</strong></li>
+  </Steps>
+
+  <p><strong>Deliverable</strong>: Working RAG pipeline</p>
+
+  <hr />
+
+  <h3>🔴 Quest 5.2: Full System Design</h3>
+  <p><strong>Goal</strong>: Design a complete AI-powered system</p>
+
+  <Steps>
+    <li><strong>Choose a system</strong>: Chatbot, Code Reviewer, or Content Generator</li>
+    <li>
+      <strong>Define components</strong>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input Handler</td>
+            <td>Process user input</td>
+          </tr>
+          <tr>
+            <td>AI Engine</td>
+            <td>Generate responses</td>
+          </tr>
+          <tr>
+            <td>Data Store</td>
+            <td>Persist data</td>
+          </tr>
+          <tr>
+            <td>Output Formatter</td>
+            <td>Format responses</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      <strong>Design interfaces</strong>
+      <pre><code>{'class AISystem {'}
+  addComponent(name, component) {'{}'}
+  async process(input) {'{}'}
+  getStatus() {'{}'}
+  toDocumentation() {'{}'}
+{'}'}</code></pre>
+    </li>
+    <li>
+      <strong>Document architecture</strong>
+      <ul>
+        <li>Overview</li>
+        <li>Components</li>
+        <li>Data Flow</li>
+        <li>Security</li>
+      </ul>
+    </li>
+  </Steps>
+
+  <p><strong>Deliverable</strong>: Complete system design with documentation</p>
+
+  <hr />
+
+  <h2>✅ Block 5 Checklist</h2>
+  <ul>
+    <li>☐ Understand AI architecture patterns</li>
+    <li>☐ Quest 5.1 completed</li>
+    <li>☐ Quest 5.2 completed</li>
+  </ul>
+
+  <hr />
+
+  <h2>🎉 Workshop Complete!</h2>
+  <p>Congratulations! You've completed all 5 blocks:</p>
+  <ol>
+    <li>✅ <strong>Block 1</strong>: AI Tools Setup</li>
+    <li>✅ <strong>Block 2</strong>: Prompt Engineering</li>
+    <li>✅ <strong>Block 3</strong>: Security</li>
+    <li>✅ <strong>Block 4</strong>: Agentic Workflows</li>
+    <li>✅ <strong>Block 5</strong>: Architecture</li>
+  </ol>
+
+  <h3>What You've Learned</h3>
+  <ul>
+    <li>Setting up and using AI coding tools</li>
+    <li>Writing effective prompts</li>
+    <li>Identifying and fixing security vulnerabilities</li>
+    <li>Creating automated development loops</li>
+    <li>Designing AI-powered systems</li>
+  </ul>
+
+  <h3>Next Steps</h3>
+  <ol>
+    <li><strong>Apply</strong>: Use these skills in your real projects</li>
+    <li><strong>Share</strong>: Teach others what you've learned</li>
+    <li><strong>Iterate</strong>: Continuously improve your workflow</li>
+  </ol>
+
+  <p><a href="/quests/quest-1-first-code">View All Code Quests →</a></p>
+</DocLayout>

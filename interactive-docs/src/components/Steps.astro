@@ -1,0 +1,41 @@
+---
+// ponytail: ordered list with CSS counter for numbered steps
+---
+
+<div class="steps">
+  <ol>
+    <slot />
+  </ol>
+</div>
+
+<style>
+  .steps :global(ol) {
+    counter-reset: step-counter;
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .steps :global(ol > li) {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .steps :global(ol > li::before) {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+</style>

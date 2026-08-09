@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BlueBeltDojo | Zen Knot Variant</title>
+<style>@layer base{html,body{margin:0;padding:0;background-color:#F5F5F5;color:#2C2C2C;scroll-behavior: smooth;}body{overscroll-behavior:none;position:relative;}}::-webkit-scrollbar{display:none;}
+/* Tatami Grid System */
+.tatami-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px; /* Representing the gaps between mats */
+  background-color: #EFEBE9; /* Grid line color */
+  border: 2px solid #EFEBE9;
+}
+.tatami-mat {
+  background-color: #F5F5F5;
+  padding: 4rem;
+  position: relative;
+}
+/* Focus on Ma (empty space) */
+.ma-space {
+  padding-top: 12rem;
+  padding-bottom: 12rem;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* Scroll Reveal Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 3D Canvas Container */
+#knot-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.15; /* Subtle background presence */
+}
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-tint":"#a7c8ff","on-secondary":"#00315e","on-primary-container":"#e8eeff","primary-fixed":"#d5e3ff","surface-container-low":"#1c1b1b","primary-container":"#1a6cc4","inverse-on-surface":"#313030","outline-variant":"#414752","tertiary-fixed":"#eaddff","on-primary-fixed":"#001b3b","surface-variant":"#353534","error-container":"#93000a","surface":"#131313","background":"#131313","secondary":"#a5c8ff","on-secondary-fixed":"#001c3a","secondary-fixed":"#d4e3ff","on-surface-variant":"#c1c6d4","primary-fixed-dim":"#a7c8ff","tertiary-container":"#8141f3","error":"#ffb4ab","tertiary":"#d2bbff","on-surface":"#e5e2e1","inverse-primary":"#005eb2","on-primary-fixed-variant":"#004788","on-background":"#e5e2e1","on-tertiary":"#3f008e","surface-bright":"#3a3939","surface-container-highest":"#353534","surface-dim":"#131313","on-secondary-fixed-variant":"#004785","tertiary-fixed-dim":"#d2bbff","secondary-container":"#3792f7","on-tertiary-fixed-variant":"#5a00c6","on-primary":"#003060","on-secondary-container":"#002a52","on-error-container":"#ffdad6","surface-container":"#201f1f","on-tertiary-fixed":"#25005a","on-tertiary-container":"#f4eaff","inverse-surface":"#e5e2e1","primary":"#a7c8ff","outline":"#8b919d","surface-container-lowest":"#0e0e0e","on-error":"#690005","surface-container-high":"#2a2a2a","secondary-fixed-dim":"#a5c8ff", "wabi-ink": "#2C2C2C", "wabi-paper": "#F5F5F5", "wabi-accent": "#1a6cc4"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"24px","unit":"4px","container-max":"1100px","margin-mobile":"16px","section-gap":"80px"},"fontFamily":{"headline-lg-mobile":["Space Grotesk"],"body-sm":["Inter"],"headline-lg":["Space Grotesk"],"code-block":["JetBrains Mono"],"label-caps":["Space Grotesk"],"headline-md":["Space Grotesk"],"body-base":["Inter"],"headline-xl":["Space Grotesk"]},"fontSize":{"headline-lg-mobile":["32px",{"lineHeight":"36px","letterSpacing":"-1px","fontWeight":"900"}],"body-sm":["13px",{"lineHeight":"20px","letterSpacing":"0px","fontWeight":"400"}],"headline-lg":["48px",{"lineHeight":"52px","letterSpacing":"-1.5px","fontWeight":"900"}],"code-block":["14px",{"lineHeight":"22px","letterSpacing":"0px","fontWeight":"400"}],"label-caps":["12px",{"lineHeight":"16px","letterSpacing":"1px","fontWeight":"700"}],"headline-md":["24px",{"lineHeight":"28px","letterSpacing":"-0.5px","fontWeight":"800"}],"body-base":["15px",{"lineHeight":"24px","letterSpacing":"0px","fontWeight":"400"}],"headline-xl":["72px",{"lineHeight":"72px","letterSpacing":"-2.5px","fontWeight":"900"}]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&amp;family=Space+Grotesk:wght@300;700;900&amp;family=Noto+Serif+JP:wght@300;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head><body class="bg-wabi-paper font-body-base text-wabi-ink">
+<!-- 3D Background -->
+<div id="knot-canvas-container"></div>
+<header class="fixed top-0 w-full z-50 bg-wabi-paper/90 backdrop-blur-md border-b border-wabi-ink/10"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between"><div class="flex items-center gap-4"><img alt="BlueBeltDojo Logo" class="h-10 w-auto object-contain rounded-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLv1Pa7DgiovnXv7xmPHEoVXZLrAL9_v6xE0dNNnK4FvSZy9Wkfk3cZd0W5l2QXYC-i_dX01krxbjS9h-Vn0DTih4IJZYBkU6NU0tNnYr9vYLzRXreVXRpnY9pO0qhn3bngBPg-YTivujH57VNmYqr4fw9ATWkcBdVxVznZ58C1AK0L6OjXrPO2Q0GnxxaaYDxfz6QZkJd2cMcIcqUPGykl0MguFkdbTbBJAT-8kyTa5wxoKYcv6ffP8KmA"/><span class="font-headline-md text-headline-md tracking-widest uppercase text-wabi-ink font-light">BlueBeltDojo</span></div><nav class="hidden md:flex items-center gap-12" data-active-classes="text-wabi-accent"><a class="font-label-caps text-label-caps tracking-widest uppercase text-wabi-ink/60 hover:text-wabi-ink transition-colors" data-path="curriculum" href="#">Curriculum</a><a class="font-label-caps text-label-caps tracking-widest uppercase text-wabi-ink/60 hover:text-wabi-ink transition-colors" data-path="faq" href="#">FAQ</a><a class="font-label-caps text-label-caps tracking-widest uppercase text-wabi-ink/60 hover:text-wabi-ink transition-colors" data-path="schedule" href="#">Schedule</a><a class="font-label-caps text-label-caps tracking-widest uppercase text-wabi-ink/60 hover:text-wabi-ink transition-colors" data-path="reviews" href="#">Reviews</a></nav><div class="flex items-center gap-8"><button class="border border-wabi-ink text-wabi-ink px-8 py-3 font-label-caps text-label-caps uppercase tracking-widest hover:bg-wabi-ink hover:text-wabi-paper transition-all duration-300">Earn Your Belt</button></div></div></header>
+<main class="w-full pt-32 pb-32 relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+<div class="tatami-container">
+<!-- HERO MAT (Full Width) -->
+<section class="tatami-mat col-span-12 min-h-[80vh] flex flex-col justify-center reveal active">
+<div class="flex flex-col md:flex-row gap-16 items-start z-10">
+<div class="w-12 pt-4 hidden md:block">
+<p class="vertical-text font-serif text-xl tracking-[0.5em] text-wabi-ink/40 uppercase">AI SDLC · INTENSIVE</p>
+</div>
+<div class="flex flex-col gap-12 flex-1 max-w-4xl">
+<h1 class="font-serif text-7xl md:text-9xl text-wabi-ink tracking-tighter leading-[0.85] font-light">Train Your<br/><span class="font-black text-wabi-accent">AI Coding</span><br/>Like You<br/>Train BJJ.</h1>
+<div class="w-24 h-[2px] bg-wabi-ink/20"></div>
+<p class="font-body-base text-body-base text-wabi-ink/80 max-w-xl text-xl font-light leading-relaxed">Most people vibe code... At BlueBeltDojo, you earn your blue belt — with drills, discipline, and real agentic workflows.</p>
+<div class="flex flex-col sm:flex-row gap-6 mt-4">
+<button class="bg-wabi-accent text-white px-10 py-5 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:opacity-90 shadow-lg shadow-wabi-accent/20">Earn Your Blue Belt</button>
+<button class="bg-transparent border border-wabi-ink/20 text-wabi-ink px-10 py-5 font-label-caps text-label-caps uppercase tracking-widest hover:border-wabi-ink transition-colors">Curriculum</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SOCIAL PROOF MAT (Full Width) -->
+<section class="tatami-mat col-span-12 py-12 reveal">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-center gap-12">
+<span class="font-label-caps text-label-caps text-wabi-ink/50 uppercase tracking-widest whitespace-nowrap">Training alongside</span>
+<div class="flex flex-wrap gap-8 items-center justify-center">
+<div class="font-body-sm text-body-sm text-wabi-ink/80 tracking-widest uppercase">Startup Founders</div>
+<div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
+<div class="font-body-sm text-body-sm text-wabi-ink/80 tracking-widest uppercase">Senior Engineers</div>
+<div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
+<div class="font-body-sm text-body-sm text-wabi-ink/80 tracking-widest uppercase">Product Managers</div>
+<div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
+<div class="font-body-sm text-body-sm text-wabi-ink/80 tracking-widest uppercase">Technical Leads</div>
+</div>
+</div>
+</section>
+<!-- MASTERY FOCAL MAT (Half Width) -->
+<section class="tatami-mat col-span-12 md:col-span-6 min-h-[60vh] flex flex-col justify-center reveal items-center text-center relative overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none flex items-center justify-center">
+<span class="font-serif text-[400px] text-wabi-accent leading-none">道</span>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<h2 class="font-serif text-5xl text-wabi-ink mb-6">The Path of Mastery</h2>
+<p class="font-body-base text-wabi-ink/70 max-w-sm">Repetition breeds intuition. Command AI agents with the precision of a seasoned black belt.</p>
+</div>
+</section>
+<!-- PAIN POINTS MAT (Half Width) -->
+<section class="tatami-mat col-span-12 md:col-span-6 min-h-[60vh] flex flex-col justify-center reveal">
+<div class="flex flex-col gap-12">
+<div>
+<h2 class="font-serif text-5xl md:text-6xl text-wabi-ink leading-tight font-light">Still<br/>Rolling<br/><span class="font-black italic text-wabi-ink">White Belt</span><br/>Energy?</h2>
+</div>
+<div class="flex flex-col gap-10 border-t border-wabi-ink/10 pt-10">
+<!-- Card 1 -->
+<div class="flex gap-6 items-start">
+<span class="font-serif text-3xl text-wabi-accent font-black">01</span>
+<p class="font-body-base text-wabi-ink/80 text-lg font-light leading-relaxed">You paste AI code straight into prod... and pray nothing breaks.</p>
+</div>
+<!-- Card 2 -->
+<div class="flex gap-6 items-start">
+<span class="font-serif text-3xl text-wabi-accent font-black">02</span>
+<p class="font-body-base text-wabi-ink/80 text-lg font-light leading-relaxed">Your AI-generated code has SQL injections that a junior could spot.</p>
+</div>
+<!-- Card 3 -->
+<div class="flex gap-6 items-start">
+<span class="font-serif text-3xl text-wabi-accent font-black">03</span>
+<p class="font-body-base text-wabi-ink/80 text-lg font-light leading-relaxed">You've heard of "agents"... but have no idea how to actually command them.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<footer class="w-full border-t border-wabi-ink/10 bg-wabi-paper py-24"><div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between gap-16"><div class="max-w-sm"><div class="flex items-center gap-4 mb-8"><img alt="BlueBeltDojo Logo" class="h-8 w-auto object-contain rounded" src="https://lh3.googleusercontent.com/aida/AP1WRLv1Pa7DgiovnXv7xmPHEoVXZLrAL9_v6xE0dNNnK4FvSZy9Wkfk3cZd0W5l2QXYC-i_dX01krxbjS9h-Vn0DTih4IJZYBkU6NU0tNnYr9vYLzRXreVXRpnY9pO0qhn3bngBPg-YTivujH57VNmYqr4fw9ATWkcBdVxVznZ58C1AK0L6OjXrPO2Q0GnxxaaYDxfz6QZkJd2cMcIcqUPGykl0MguFkdbTbBJAT-8kyTa5wxoKYcv6ffP8KmA"/><span class="font-headline-md text-headline-md tracking-widest uppercase text-wabi-ink font-light text-xl">BlueBeltDojo</span></div><p class="font-serif text-wabi-ink/60 mb-6 italic text-lg">Train hard. Ship clean. Earn your belt.</p></div><div class="grid grid-cols-2 gap-16"><div class="flex flex-col gap-6"><h4 class="font-label-caps text-label-caps text-wabi-ink uppercase tracking-widest font-bold">Academy</h4><a class="font-body-sm text-body-sm text-wabi-ink/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">Curriculum</a><a class="font-body-sm text-body-sm text-wabi-ink/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">FAQ</a><a class="font-body-sm text-body-sm text-wabi-ink/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">Contact</a></div><div class="flex flex-col gap-6"><h4 class="font-label-caps text-label-caps text-wabi-ink uppercase tracking-widest font-bold">Connect</h4><a class="font-body-sm text-body-sm text-wabi-ink/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">GitHub</a><a class="font-body-sm text-body-sm text-wabi-ink/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">Discord</a></div></div></div><div class="max-w-7xl mx-auto px-6 lg:px-12 mt-24 pt-8 border-t border-wabi-ink/10"><p class="font-body-sm text-body-sm text-wabi-ink/40 tracking-widest uppercase text-center text-xs">© 2024 BlueBeltDojo. All rights reserved.</p></div></footer>
+<script>
+// Reveal Animation Logic
+function reveal() {
+  var reveals = document.querySelectorAll(".reveal");
+  for (var i = 0; i < reveals.length; i++) {
+    var windowHeight = window.innerHeight;
+    var elementTop = reveals[i].getBoundingClientRect().top;
+    var elementVisible = 150;
+    if (elementTop < windowHeight - elementVisible) {
+      reveals[i].classList.add("active");
+    }
+  }
+}
+window.addEventListener("scroll", reveal);
+reveal(); // Trigger on load
+
+// 3D Belt Knot Logic
+const container = document.getElementById('knot-canvas-container');
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(width, height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0x1A6CC4, 1.5); // Belt Blue
+dirLight.position.set(1, 1, 1);
+scene.add(dirLight);
+
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5); 
+dirLight2.position.set(-1, -1, -1);
+scene.add(dirLight2);
+
+const geometry = new THREE.TorusKnotGeometry(1.5, 0.4, 256, 32);
+const material = new THREE.MeshPhongMaterial({ 
+    color: 0x1A6CC4, // Belt Blue
+    shininess: 50,
+    flatShading: false,
+    transparent: true,
+    opacity: 0.8
+});
+
+const knot = new THREE.Mesh(geometry, material);
+// Position it slightly off-center
+knot.position.x = 2;
+scene.add(knot);
+
+const animate = () => {
+    requestAnimationFrame(animate);
+    
+    knot.rotation.x += 0.002;
+    knot.rotation.y += 0.003;
+    
+    const scale = 1 + Math.sin(Date.now() * 0.001) * 0.02;
+    knot.scale.set(scale, scale, scale);
+
+    renderer.render(scene, camera);
+};
+
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+});
+</script>
+</body></html>

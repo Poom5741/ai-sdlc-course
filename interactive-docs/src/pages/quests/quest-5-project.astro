@@ -1,0 +1,97 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+---
+
+<DocLayout
+  title="Quest 5.2 - Full System Design"
+  description="Design a complete AI-powered system"
+  sidebar={true}
+>
+  <h1>Quest 5.2: Full System Design</h1>
+
+  <p>
+    <Badge text="🔴 Hard" variant="danger" />
+    <Badge text="25 minutes" variant="note" />
+    <Badge text="Block 5: Architecture" variant="tip" />
+  </p>
+
+  <h2>🎯 Goal</h2>
+  <p>ออกแบบ AI-powered system ที่สมบูรณ์</p>
+
+  <hr />
+
+  <h2>📋 Instructions</h2>
+
+  <Steps>
+    <li>
+      <strong>เลือกระบบ</strong>: Chatbot, Code Reviewer, หรือ Content Generator
+    </li>
+    <li>
+      <strong>Define components</strong>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input Handler</td>
+            <td>Process user input</td>
+          </tr>
+          <tr>
+            <td>AI Engine</td>
+            <td>Generate responses</td>
+          </tr>
+          <tr>
+            <td>Data Store</td>
+            <td>Persist data</td>
+          </tr>
+          <tr>
+            <td>Output Formatter</td>
+            <td>Format responses</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      <strong>Design interfaces</strong>
+    </li>
+    <li>
+      <strong>Document architecture</strong>
+    </li>
+  </Steps>
+
+  <hr />
+
+  <h2>🎮 Code Playground</h2>
+
+  <iframe
+    src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-5-architecture/quest-14-full-system/index.js&view=editor"
+    style="width:100%;height:500px;border:0;border-radius:4px;"
+    allow="cross-origin-isolation"
+    title="Quest 5.2: Full System Design"
+  />
+
+  <hr />
+
+  <h2>✅ Verification</h2>
+
+  <pre><code class="language-bash">{`node test.js`}</code></pre>
+
+  <hr />
+
+  <h2>📐 Architecture Patterns</h2>
+
+  <h3>RAG System</h3>
+  <pre><code>{`Documents → Embeddings → Vector Store → LLM → Answer`}</code></pre>
+
+  <h3>Multi-Agent System</h3>
+  <pre><code>{`Planner → Coder → Reviewer → Tester`}</code></pre>
+
+  <h3>Event-Driven</h3>
+  <pre><code>{`Event → Handler → Side Effects`}</code></pre>
+</DocLayout>

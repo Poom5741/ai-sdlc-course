@@ -1,0 +1,244 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+import Card from '../../components/Card.astro';
+import CardGrid from '../../components/CardGrid.astro';
+---
+
+<DocLayout title="Block 2 - Prompt Engineering" description="Master the art of writing effective prompts for AI coding assistants" sidebar={true}>
+  <h1>Block 2: Prompt Engineering</h1>
+
+  <p>
+    <Badge text="10:45 - 12:15" variant="note" /> 
+    <Badge text="90 minutes" variant="note" /> 
+    <Badge text="3 Quests" variant="success" />
+  </p>
+
+  <h2>🎯 Learning Goals</h2>
+  <p>เมื่อจบบล็อกนี้ คุณจะ:</p>
+  <ul>
+    <li>เข้าใจหลักการของ Prompt Engineering</li>
+    <li>เขียน prompts ที่มีประสิทธิภาพสำหรับ code generation</li>
+    <li>ใช้ multi-step prompting สำหรับงานที่ซับซ้อน</li>
+    <li>สร้าง domain-specific prompts</li>
+  </ul>
+
+  <hr />
+
+  <h2>📖 Concept: Prompt Engineering (30 min)</h2>
+
+  <h3>What is Prompt Engineering?</h3>
+  <p>Prompt Engineering คือศิลปะในการสื่อสารกับ AI อย่างมีประสิทธิภาพ เพื่อให้ได้ผลลัพธ์ที่ต้องการ</p>
+
+  <h3>Why Prompt Quality Matters</h3>
+  <pre><code>Bad Prompt: "Make a function"
+Good Prompt: "Create a JavaScript function called calculateDiscount that takes:
+- price (number, required)
+- discountPercent (number, 0-100, required)
+- memberType ('gold' | 'silver' | 'bronze', optional, default: 'bronze')
+
+Rules:
+- Gold members get extra 10% off
+- Discount cannot exceed 100%
+- Return {'{'} originalPrice, discountAmount, finalPrice {'}'}
+- Throw error for invalid inputs"</code></pre>
+
+  <h3>The Anatomy of a Good Prompt</h3>
+  <CardGrid>
+    <Card title="1. Clear Objective" icon="target">
+      Tell AI exactly what to build
+    </Card>
+    <Card title="2. Input Specification" icon="input">
+      Define all parameters with types
+    </Card>
+    <Card title="3. Output Format" icon="document">
+      Specify return structure
+    </Card>
+    <Card title="4. Constraints" icon="warning">
+      List rules and limitations
+    </Card>
+  </CardGrid>
+
+  <h3>Prompt Patterns</h3>
+
+  <h4>Pattern 1: Role-Task-Format</h4>
+  <pre><code>Act as a [ROLE]
+[TASK]
+Output in [FORMAT]</code></pre>
+
+  <h4>Pattern 2: Few-Shot Examples</h4>
+  <pre><code>Here's an example of what I want:
+Input: [example]
+Output: [example]
+
+Now do the same for:
+Input: [your input]</code></pre>
+
+  <h4>Pattern 3: Chain of Thought</h4>
+  <pre><code>Think step by step:
+1. First, [step 1]
+2. Then, [step 2]
+3. Finally, [step 3]</code></pre>
+
+  <h3>Common Prompting Mistakes</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Mistake</th>
+        <th>Why It Fails</th>
+        <th>Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Too vague</td>
+        <td>AI guesses wrong</td>
+        <td>Be specific about inputs/outputs</td>
+      </tr>
+      <tr>
+        <td>No examples</td>
+        <td>No reference point</td>
+        <td>Include 1-2 examples</td>
+      </tr>
+      <tr>
+        <td>Missing constraints</td>
+        <td>Unexpected behavior</td>
+        <td>List all rules</td>
+      </tr>
+      <tr>
+        <td>Wrong scope</td>
+        <td>Too much at once</td>
+        <td>Break into smaller tasks</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr />
+
+  <h2>🛠️ Advanced Techniques</h2>
+
+  <h3>Multi-Step Prompting</h3>
+  <p>สำหรับงานที่ซับซ้อน แบ่งเป็นขั้นตอน:</p>
+  <pre><code>Step 1: Design the data model
+Step 2: Create the API endpoints
+Step 3: Add validation
+Step 4: Write tests</code></pre>
+
+  <h3>Domain-Specific Prompting</h3>
+  <p>เพิ่ม context เกี่ยวกับ domain:</p>
+  <pre><code>For a healthcare application (HIPAA compliant):
+- Patient data must be encrypted
+- Audit logs required for all access
+- Session timeout: 15 minutes</code></pre>
+
+  <h3>Iterative Refinement</h3>
+  <pre><code>Iteration 1: Basic implementation
+Iteration 2: Add error handling
+Iteration 3: Optimize performance
+Iteration 4: Add documentation</code></pre>
+
+  <hr />
+
+  <h2>🎮 Code Quests</h2>
+
+  <h3>🟢 Quest 2.1: Fix the Vague Prompt</h3>
+  <p><strong>Goal</strong>: Transform a vague prompt into a specific one</p>
+
+  <Steps>
+    <li>
+      <strong>Analyze the bad prompt</strong>
+      <pre><code>Make a function that handles users</code></pre>
+    </li>
+    <li>
+      <strong>Identify what's missing</strong>
+      <ul>
+        <li>What does "handle" mean?</li>
+        <li>What data does a user have?</li>
+        <li>What validation is needed?</li>
+        <li>What should it return?</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Write an improved prompt</strong>
+      <pre><code>Create a function called createUser that:
+- Takes {'{'} name: string, email: string {'}'}
+- Validates email format (user@domain.com)
+- Returns {'{'} success: true, id, name, email {'}'} on success
+- Returns {'{'} success: false, error: 'message' {'}'} on failure</code></pre>
+    </li>
+    <li><strong>Use your prompt with an AI tool</strong></li>
+    <li><strong>Test the generated code</strong></li>
+  </Steps>
+
+  <p><strong>Deliverable</strong>: Improved prompt + working code</p>
+
+  <hr />
+
+  <h3>🟡 Quest 2.2: Multi-Step Prompting</h3>
+  <p><strong>Goal</strong>: Break a complex task into steps</p>
+
+  <Steps>
+    <li><strong>The complex task</strong>: Build a todo list manager</li>
+    <li>
+      <strong>Break it down</strong>:
+      <ul>
+        <li>Step 1: Define data structure</li>
+        <li>Step 2: Implement CRUD operations</li>
+        <li>Step 3: Add filtering</li>
+        <li>Step 4: Implement file storage</li>
+        <li>Step 5: Create CLI interface</li>
+      </ul>
+    </li>
+    <li><strong>Write prompts for each step</strong></li>
+    <li><strong>Implement incrementally</strong></li>
+    <li><strong>Test after each step</strong></li>
+  </Steps>
+
+  <p><strong>Deliverable</strong>: Working todo manager with all features</p>
+
+  <hr />
+
+  <h3>🔴 Quest 2.3: Domain-Specific Prompting</h3>
+  <p><strong>Goal</strong>: Write prompts for specialized domains</p>
+
+  <Steps>
+    <li><strong>Choose a domain</strong>: E-commerce, Healthcare, or Finance</li>
+    <li>
+      <strong>Research domain rules</strong>
+      <ul>
+        <li>E-commerce: product validation, tax calculation</li>
+        <li>Healthcare: HIPAA compliance, patient data</li>
+        <li>Finance: transaction validation, interest calculation</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Write domain-specific prompts</strong>
+      <pre><code>Create a healthcare patient validator:
+- Validates HIPAA-compliant fields
+- Checks insurance ID format (XXX-XXXX-XXX)
+- Validates DOB (past date, max age 150)
+- Returns validation errors with compliance codes</code></pre>
+    </li>
+    <li><strong>Implement the validator</strong></li>
+    <li><strong>Test with domain-specific cases</strong></li>
+  </Steps>
+
+  <p><strong>Deliverable</strong>: Domain-specific validator with tests</p>
+
+  <hr />
+
+  <h2>✅ Block 2 Checklist</h2>
+  <ul>
+    <li>☐ Understand prompt anatomy</li>
+    <li>☐ Quest 2.1 completed</li>
+    <li>☐ Quest 2.2 completed</li>
+    <li>☐ Quest 2.3 completed</li>
+  </ul>
+
+  <hr />
+
+  <h2>🚀 Next Block</h2>
+  <p><strong>Block 3: Security</strong> → Learn to identify and fix security vulnerabilities in AI-generated code.</p>
+  <p><a href="/workshop/block-3-security">Continue to Block 3 →</a></p>
+</DocLayout>

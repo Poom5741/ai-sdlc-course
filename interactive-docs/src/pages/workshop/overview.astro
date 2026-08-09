@@ -1,0 +1,135 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Card from '../../components/Card.astro';
+import CardGrid from '../../components/CardGrid.astro';
+---
+
+<DocLayout title="AI SDLC Workshop - Overview" description="One-day intensive workshop on AI-assisted software development" sidebar={true}>
+  <h1>🚀 AI SDLC Workshop</h1>
+  
+  <p><strong>หลักสูตรการพัฒนาซอฟต์แวร์ด้วย AI แบบเข้มข้น 1 วัน</strong></p>
+  
+  <p>
+    <Badge text="8 Hours" variant="note" /> 
+    <Badge text="14 Code Quests" variant="success" /> 
+    <Badge text="Bilingual" variant="caution" />
+  </p>
+
+  <h2>Workshop Overview</h2>
+  <p>เรียนรู้การพัฒนาซอฟต์แวร์ยุคใหม่ด้วย AI ตั้งแต่การตั้งค่าเครื่องมือไปจนถึงการออกแบบระบบ</p>
+
+  <h3>🎯 Learning Outcomes</h3>
+  <p>เมื่อเรียนจบ workshop นี้ คุณจะสามารถ:</p>
+  <ol>
+    <li><strong>Setup</strong>: ติดตั้งและตั้งค่า AI coding tools</li>
+    <li><strong>Prompt</strong>: เขียน prompts ที่มีประสิทธิภาพสำหรับ code generation</li>
+    <li><strong>Review</strong>: ระบุปัญหาด้านความปลอดภัยใน AI-generated code</li>
+    <li><strong>Loop</strong>: ตั้งค่า automated development loops</li>
+    <li><strong>Agent</strong>: ออกแบบ agentic workflows</li>
+    <li><strong>Architect</strong>: ตัดสินใจเรื่อง AI integration</li>
+  </ol>
+
+  <hr />
+
+  <h2>📅 Workshop Schedule</h2>
+  
+  <CardGrid>
+    <Card title="Block 1: AI Tools" icon="🧩">
+      <p><strong>09:00 - 10:30</strong> (90 min)</p>
+      <p>ตั้งค่า GitHub Copilot, Claude Code</p>
+      <p><strong>Quests</strong>: 3</p>
+    </Card>
+    <Card title="Block 2: Prompting" icon="💬">
+      <p><strong>10:45 - 12:15</strong> (90 min)</p>
+      <p>Prompt engineering + Iterative refinement</p>
+      <p><strong>Quests</strong>: 3</p>
+    </Card>
+    <Card title="Block 3: Security" icon="🔒">
+      <p><strong>13:15 - 14:45</strong> (90 min)</p>
+      <p>ความปลอดภัยใน AI-generated code</p>
+      <p><strong>Quests</strong>: 3</p>
+    </Card>
+    <Card title="Block 4: Loops" icon="🔄">
+      <p><strong>15:00 - 16:30</strong> (90 min)</p>
+      <p>Loop engineering patterns</p>
+      <p><strong>Quests</strong>: 3</p>
+    </Card>
+    <Card title="Block 5: Architecture" icon="⭐">
+      <p><strong>16:45 - 18:00</strong> (75 min)</p>
+      <p>System design + Final project</p>
+      <p><strong>Quests</strong>: 2</p>
+    </Card>
+  </CardGrid>
+
+  <hr />
+
+  <h2>🎮 Code Quests</h2>
+  <p>workshop ใช้รูปแบบ <strong>Code Quest</strong> - coding challenges ที่ท้าทายและสนุก</p>
+
+  <h3>Quest Types</h3>
+  <table>
+    <thead>
+      <tr><th>Type</th><th>Description</th><th>Difficulty</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>🟢 <strong>Fix the Code</strong></td><td>หาและแก้ไข bugs</td><td>Easy</td></tr>
+      <tr><td>🟡 <strong>Build the Feature</strong></td><td>สร้างจาก specification</td><td>Medium</td></tr>
+      <tr><td>🔴 <strong>Design the System</strong></td><td>Architecture challenge</td><td>Hard</td></tr>
+      <tr><td>🟡 <strong>Set Up the Loop</strong></td><td>ตั้งค่า automated workflow</td><td>Medium</td></tr>
+    </tbody>
+  </table>
+
+  <h3>All 14 Quests</h3>
+  <table>
+    <thead>
+      <tr><th>Block</th><th>Quest</th><th>Type</th><th>Difficulty</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Quest 1.1: First AI Completion</td><td>🟢</td><td>Easy</td></tr>
+      <tr><td>1</td><td>Quest 1.2: Multi-file Generation</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>1</td><td>Quest 1.3: Compare Tools</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>2</td><td>Quest 2.1: Fix the Vague Prompt</td><td>🟢</td><td>Easy</td></tr>
+      <tr><td>2</td><td>Quest 2.2: Multi-Step Prompting</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>2</td><td>Quest 2.3: Domain-Specific Prompting</td><td>🔴</td><td>Hard</td></tr>
+      <tr><td>3</td><td>Quest 3.1: Spot the Vulnerability</td><td>🟢</td><td>Easy</td></tr>
+      <tr><td>3</td><td>Quest 3.2: Fix and Harden</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>3</td><td>Quest 3.3: Security Architecture</td><td>🔴</td><td>Hard</td></tr>
+      <tr><td>4</td><td>Quest 4.1: Set Up a Loop</td><td>🟢</td><td>Easy</td></tr>
+      <tr><td>4</td><td>Quest 4.2: Generate-Review-Fix Loop</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>4</td><td>Quest 4.3: Multi-Agent Pipeline</td><td>🔴</td><td>Hard</td></tr>
+      <tr><td>5</td><td>Quest 5.1: RAG Design</td><td>🟡</td><td>Medium</td></tr>
+      <tr><td>5</td><td>Quest 5.2: Full System Design</td><td>🔴</td><td>Hard</td></tr>
+    </tbody>
+  </table>
+
+  <hr />
+
+  <h2>🛠️ Prerequisites</h2>
+  <h3>Required</h3>
+  <ul>
+    <li>Laptop with internet connection</li>
+    <li>GitHub account</li>
+    <li>VS Code installed</li>
+  </ul>
+  <h3>Optional (Nice to have)</h3>
+  <ul>
+    <li>GitHub Copilot subscription</li>
+    <li>Claude Pro subscription</li>
+  </ul>
+
+  <hr />
+
+  <h2>🚀 Ready to Start?</h2>
+  <p><a href="/workshop/block-1-ai-tools">Start Block 1: AI Tools →</a></p>
+
+  <hr />
+
+  <h2>🌐 Language</h2>
+  <p>Workshop นี้เป็นแบบ <strong>Bilingual</strong>:</p>
+  <ul>
+    <li>🇹🇭 คำอธิบายเป็นภาษาไทย</li>
+    <li>🇬🇧 คำศัพท์เทคนิคเป็นภาษาอังกฤษ</li>
+  </ul>
+  <p><em>(This workshop is bilingual: Thai explanations with English technical terms)</em></p>
+</DocLayout>

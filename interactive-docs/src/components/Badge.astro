@@ -1,0 +1,20 @@
+---
+export interface Props {
+  text: string;
+  variant?: 'success' | 'note' | 'tip' | 'caution' | 'danger';
+}
+
+const { text, variant = 'note' } = Astro.props;
+
+const colors: Record<string, string> = {
+  success: 'bg-green-900/50 text-green-300 border-green-700',
+  note: 'bg-blue-900/50 text-blue-300 border-blue-700',
+  tip: 'bg-purple-900/50 text-purple-300 border-purple-700',
+  caution: 'bg-yellow-900/50 text-yellow-300 border-yellow-700',
+  danger: 'bg-red-900/50 text-red-300 border-red-700',
+};
+---
+
+<span class={`inline-block px-2 py-0.5 text-xs font-medium rounded border ${colors[variant]}`}>
+  {text}
+</span>

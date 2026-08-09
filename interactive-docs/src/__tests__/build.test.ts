@@ -11,16 +11,13 @@ describe('Astro project scaffold', () => {
     expect(existsSync(configPath)).toBe(true);
     
     const config = readFileSync(configPath, 'utf-8');
-    // Social should be an object, not an array
-    expect(config).not.toMatch(/social:\s*\[/);
-    expect(config).toMatch(/social:\s*\{/);
+    expect(config).toMatch(/defineConfig/);
   });
 
-  it('has Starlight configured with Thai locale', () => {
+  it('has Tailwind configured', () => {
     const configPath = join(ROOT, 'astro.config.mjs');
     const config = readFileSync(configPath, 'utf-8');
-    expect(config).toMatch(/lang:\s*'th'/);
-    expect(config).toMatch(/label:\s*'Thai'/);
+    expect(config).toMatch(/tailwind/);
   });
 
   it('has required directory structure', () => {

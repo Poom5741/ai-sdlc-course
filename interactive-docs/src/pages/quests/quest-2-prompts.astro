@@ -1,0 +1,84 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import Badge from '../../components/Badge.astro';
+import Steps from '../../components/Steps.astro';
+---
+
+<DocLayout
+  title="Quest 2.1 - Fix the Vague Prompt"
+  description="Transform a vague prompt into a specific one"
+  sidebar={true}
+>
+  <h1>Quest 2.1: Fix the Vague Prompt</h1>
+
+  <p>
+    <Badge text="🟢 Easy" variant="success" />
+    <Badge text="15 minutes" variant="note" />
+    <Badge text="Block 2: Prompt Engineering" variant="tip" />
+  </p>
+
+  <h2>🎯 Goal</h2>
+  <p>เปลี่ยน vague prompt ให้เป็น specific prompt ที่ได้ผลลัพธ์ดี</p>
+
+  <hr />
+
+  <h2>📋 Instructions</h2>
+
+  <Steps>
+    <li>
+      <strong>วิเคราะห์ bad prompt</strong>:
+      <pre><code>{`Make a function that handles users`}</code></pre>
+    </li>
+    <li>
+      <strong>หาว่าขาดอะไร</strong>:
+      <ul>
+        <li>"handle" หมายถึงอะไร?</li>
+        <li>user data 有什么?</li>
+        <li>validation ต้องการอะไร?</li>
+        <li>return อะไร?</li>
+      </ul>
+    </li>
+    <li>
+      <strong>เขียน improved prompt</strong>:
+      <pre><code>{`Create a function called createUser that:
+- Takes { name: string, email: string }
+- Validates email format
+- Returns { success, id, name, email }`}</code></pre>
+    </li>
+    <li>
+      <strong>ใช้ prompt กับ AI tool</strong>
+    </li>
+    <li>
+      <strong>ทดสอบ generated code</strong>
+    </li>
+  </Steps>
+
+  <hr />
+
+  <h2>🎮 Code Playground</h2>
+
+  <iframe
+    src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-2-prompt-engineering/quest-04-fix-prompt/index.js&view=editor"
+    style="width:100%;height:500px;border:0;border-radius:4px;"
+    allow="cross-origin-isolation"
+    title="Quest 2.1: Fix the Vague Prompt"
+  />
+
+  <hr />
+
+  <h2>✅ Verification</h2>
+
+  <pre><code class="language-bash">{`node test.js`}</code></pre>
+
+  <hr />
+
+  <h2>💡 Tips</h2>
+  <p>A good prompt includes:</p>
+  <ol>
+    <li><strong>Function name and purpose</strong></li>
+    <li><strong>Input parameters</strong> with types</li>
+    <li><strong>Output format</strong></li>
+    <li><strong>Validation rules</strong></li>
+    <li><strong>Error handling</strong></li>
+  </ol>
+</DocLayout>

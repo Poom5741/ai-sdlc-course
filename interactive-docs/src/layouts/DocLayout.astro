@@ -1,0 +1,46 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  sidebar?: boolean;
+  prev?: { label: string; url: string };
+  next?: { label: string; url: string };
+}
+
+const { title, description, sidebar = false, prev, next } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="flex min-h-screen">
+    {sidebar && (
+      <aside class="w-64 bg-[#0a0a1a] border-r border-gray-800 p-4 hidden md:block">
+        <nav class="space-y-2">
+          <slot name="sidebar" />
+        </nav>
+      </aside>
+    )}
+    
+    <main class="flex-1 max-w-4xl mx-auto px-6 py-12">
+      <article class="prose prose-invert max-w-none">
+        <slot />
+      </article>
+      
+      {(prev || next) && (
+        <nav class="flex justify-between mt-12 pt-6 border-t border-gray-800">
+          {prev ? (
+            <a href={prev.url} class="text-blue-400 hover:text-blue-300">
+              ← {prev.label}
+            </a>
+          ) : <span />}
+          {next ? (
+            <a href={next.url} class="text-blue-400 hover:text-blue-300">
+              {next.label} →
+            </a>
+          ) : <span />}
+        </nav>
+      )}
+    </main>
+  </div>
+</BaseLayout>
