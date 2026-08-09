@@ -23,7 +23,10 @@ const { sections, currentPath } = Astro.props;
               class="sidebar-toggle w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded transition-colors"
               data-section={section.url}
             >
-              <span>{section.title}</span>
+              <span class="flex items-center gap-2">
+                <span class="progress-check" data-url={section.url}></span>
+                {section.title}
+              </span>
               <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -32,14 +35,18 @@ const { sections, currentPath } = Astro.props;
               {section.items.map(item => (
                 <a
                   href={item.url}
+                  data-nav-url={item.url}
                   class:list={[
-                    "block px-3 py-1.5 text-sm rounded transition-colors",
+                    "sidebar-link block px-3 py-1.5 text-sm rounded transition-colors",
                     currentPath === item.url
                       ? "text-blue-400 bg-blue-500/10 border-l-2 border-blue-400 -ml-[2px]"
                       : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                   ]}
                 >
-                  {item.title}
+                  <span class="flex items-center gap-2">
+                    <span class="progress-check" data-url={item.url}></span>
+                    {item.title}
+                  </span>
                 </a>
               ))}
             </div>
@@ -47,14 +54,18 @@ const { sections, currentPath } = Astro.props;
         ) : (
           <a
             href={section.url}
+            data-nav-url={section.url}
             class:list={[
-              "block px-3 py-2 text-sm font-medium rounded transition-colors",
+              "sidebar-link block px-3 py-2 text-sm font-medium rounded transition-colors",
               currentPath === section.url
                 ? "text-blue-400 bg-blue-500/10 border-l-2 border-blue-400 -ml-[2px]"
                 : "text-gray-400 hover:text-white hover:bg-gray-800/50"
             ]}
           >
-            {section.title}
+            <span class="flex items-center gap-2">
+              <span class="progress-check" data-url={section.url}></span>
+              {section.title}
+            </span>
           </a>
         )}
       </div>
@@ -95,7 +106,10 @@ const { sections, currentPath } = Astro.props;
               class="sidebar-toggle w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded transition-colors"
               data-section={section.url}
             >
-              <span>{section.title}</span>
+              <span class="flex items-center gap-2">
+                <span class="progress-check" data-url={section.url}></span>
+                {section.title}
+              </span>
               <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -104,14 +118,18 @@ const { sections, currentPath } = Astro.props;
               {section.items.map(item => (
                 <a
                   href={item.url}
+                  data-nav-url={item.url}
                   class:list={[
-                    "block px-3 py-1.5 text-sm rounded transition-colors",
+                    "sidebar-link block px-3 py-1.5 text-sm rounded transition-colors",
                     currentPath === item.url
                       ? "text-blue-400 bg-blue-500/10 border-l-2 border-blue-400 -ml-[2px]"
                       : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                   ]}
                 >
-                  {item.title}
+                  <span class="flex items-center gap-2">
+                    <span class="progress-check" data-url={item.url}></span>
+                    {item.title}
+                  </span>
                 </a>
               ))}
             </div>
@@ -119,14 +137,18 @@ const { sections, currentPath } = Astro.props;
         ) : (
           <a
             href={section.url}
+            data-nav-url={section.url}
             class:list={[
-              "block px-3 py-2 text-sm font-medium rounded transition-colors",
+              "sidebar-link block px-3 py-2 text-sm font-medium rounded transition-colors",
               currentPath === section.url
                 ? "text-blue-400 bg-blue-500/10 border-l-2 border-blue-400 -ml-[2px]"
                 : "text-gray-400 hover:text-white hover:bg-gray-800/50"
             ]}
           >
-            {section.title}
+            <span class="flex items-center gap-2">
+              <span class="progress-check" data-url={section.url}></span>
+              {section.title}
+            </span>
           </a>
         )}
       </div>
@@ -135,12 +157,45 @@ const { sections, currentPath } = Astro.props;
 </aside>
 
 <script>
+  // Progress tracking with localStorage
+  const STORAGE_KEY = 'workshop-visited-pages';
+
+  function getVisitedPages(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  function markPageVisited(url: string) {
+    const visited = getVisitedPages();
+    if (!visited.includes(url)) {
+      visited.push(url);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(visited));
+    }
+  }
+
+  function updateProgressUI() {
+    const visited = getVisitedPages();
+    document.querySelectorAll('.progress-check').forEach(el => {
+      const url = el.getAttribute('data-url');
+      if (url && visited.includes(url)) {
+        el.innerHTML = '<svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>';
+      }
+    });
+  }
+
+  // Mark current page as visited
+  markPageVisited(window.location.pathname);
+  updateProgressUI();
+
   // Toggle sidebar sections
   document.querySelectorAll('.sidebar-toggle').forEach(button => {
     button.addEventListener('click', () => {
       const section = button.getAttribute('data-section');
       const items = document.querySelector(`[data-parent="${section}"]`);
-      const icon = button.querySelector('svg');
+      const icon = button.querySelector('svg:last-child');
       
       if (items) {
         items.classList.toggle('hidden');
@@ -176,7 +231,7 @@ const { sections, currentPath } = Astro.props;
     const hasActive = items.querySelector('.border-l-2');
     if (hasActive) {
       items.classList.remove('hidden');
-      const toggle = items.previousElementSibling?.querySelector('svg');
+      const toggle = items.previousElementSibling?.querySelector('svg:last-child');
       toggle?.classList.add('rotate-90');
     }
   });
