@@ -1,10 +1,201 @@
 ---
-title: Block 4 - Loop Engineering
-description: Build autonomous coding loops and feedback systems
+title: Block 4 - Agentic Workflows
+description: Create automated development loops and multi-agent systems
 ---
 
-# Block 4: Loop Engineering
+import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This block is planned but content has not been written yet.
-:::
+# Block 4: Agentic Workflows
+
+<Badge text="15:00 - 16:30" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+เมื่อจบบล็อกนี้ คุณจะ:
+- สร้าง automated development loops
+- ออกแบบ multi-agent pipelines
+- ใช้ Plan-Implement-Validate (PIV) framework
+
+---
+
+## 📖 Concept: Agentic Workflows (30 min)
+
+### What are Agentic Workflows?
+
+Agentic Workflows คือระบบที่ AI agents ทำงานร่วมกันอย่างอิสระ เพื่อบรรลุเป้าหมาย
+
+### The PIV Framework
+
+**Plan-Implement-Validate** เป็น pattern หลัก:
+
+```
+┌─────────────┐
+│    PLAN     │  วิเคราะห์งาน แบ่งเป็นขั้นตอน
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  IMPLEMENT  │  สร้าง code ตาม plan
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  VALIDATE   │  ทดสอบ ตรวจสอบคุณภาพ
+└──────┬──────┘
+       │
+       ▼
+   Pass? ──Yes──► Done
+       │
+       No
+       │
+       └──────► Back to PLAN
+```
+
+### Why Use Loops?
+
+- **Quality**: ตรวจสอบก่อน deploy
+- **Iteration**: ปรับปรุงทุกรอบ
+- **Automation**: ลดงาน manual
+- **Consistency: ได้ผลลัพธ์เดิมทุกครั้ง
+
+---
+
+## 🛠️ Loop Patterns
+
+### Pattern 1: Generate-Review-Fix
+
+```
+Generate Code → AI Review → Fix Issues → Repeat until quality
+```
+
+### Pattern 2: Test-Driven Loop
+
+```
+Write Test → Generate Code → Run Test → Fix → Repeat
+```
+
+### Pattern 3: Multi-Agent Pipeline
+
+```
+Planner → Coder → Reviewer → Tester → Deploy
+```
+
+### Convergence Criteria
+
+Loop ควรหยุดเมื่อ:
+- ผ่าน quality gate (เช่น 90% test coverage)
+- ไม่มี critical issues
+- ถึง max iterations
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 4.1: Set Up a Loop
+
+**Goal**: Create a basic PIV loop
+
+<Steps>
+
+1. **Understand the PIV framework**
+   - Plan: Analyze task, create steps
+   - Implement: Execute each step
+   - Validate: Check if result meets requirements
+
+2. **Implement the loop controller**
+   ```javascript
+   class PIVLoop {
+     async plan(task) { }
+     async implement(plan) { }
+     async validate(implementation) { }
+     async execute(task, maxIterations) { }
+   }
+   ```
+
+3. **Test with a simple task**
+
+4. **Verify convergence**
+
+</Steps>
+
+**Deliverable**: Working PIV loop with tests
+
+---
+
+### 🟡 Quest 4.2: Generate-Review-Fix Loop
+
+**Goal**: Create an iterative code improvement loop
+
+<Steps>
+
+1. **Design the loop**
+   ```
+   Generate → Review → Fix → Quality Check
+       ↑                      │
+       └──────────────────────┘
+   ```
+
+2. **Implement each phase**
+   - Generate: AI writes initial code
+   - Review: AI checks for issues
+   - Fix: AI fixes identified problems
+   - Quality Check: Verify standards met
+
+3. **Add convergence criteria**
+
+4. **Test with sample task**
+
+</Steps>
+
+**Deliverable**: Working GRF loop with quality gates
+
+---
+
+### 🔴 Quest 4.3: Multi-Agent Pipeline
+
+**Goal**: Create a pipeline with multiple AI agents
+
+<Steps>
+
+1. **Design agent roles**
+   | Agent | Role | Responsibility |
+   |-------|------|----------------|
+   | Planner | Task Analysis | Break tasks into steps |
+   | Coder | Implementation | Write code |
+   | Reviewer | Quality Check | Review code quality |
+   | Tester | Validation | Test code |
+
+2. **Implement the pipeline**
+   ```javascript
+   class Pipeline {
+     addAgent(agent) { }
+     async execute(task) { }
+   }
+   ```
+
+3. **Connect agents** in sequence
+
+4. **Test with complex task**
+
+</Steps>
+
+**Deliverable**: Working multi-agent pipeline
+
+---
+
+## ✅ Block 4 Checklist
+
+- [ ] Understand PIV framework
+- [ ] Quest 4.1 completed
+- [ ] Quest 4.2 completed
+- [ ] Quest 4.3 completed
+
+---
+
+## 🚀 Next Block
+
+**Block 5: Architecture** → Design complete AI-powered systems.
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard title="Continue to Block 5" href="/workshop/block-5-architecture" />

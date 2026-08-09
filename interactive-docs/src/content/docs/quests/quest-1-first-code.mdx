@@ -1,10 +1,80 @@
 ---
-title: Quest 1 - First AI Code
-description: Write your first AI-assisted code
+title: Quest 1.1 - First AI Completion
+description: Write a factorial function with AI help
 ---
 
-# Quest 1: First AI Code
+import { Badge, Steps, Card } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This quest is planned but content has not been written yet.
-:::
+# Quest 1.1: First AI Completion
+
+<Badge text="🟢 Easy" variant="success" /> <Badge text="15 minutes" variant="note" /> <Badge text="Block 1: AI Tools" variant="tip" />
+
+## 🎯 Goal
+
+ใช้ AI coding tool เขียน factorial function ตัวแรกของคุณ
+
+---
+
+## 📋 Instructions
+
+<Steps>
+
+1. **เปิด VS Code** และสร้างไฟล์ `factorial.js`
+
+2. **เขียน comment** บอก AI ว่าต้องการอะไร:
+   ```javascript
+   // Calculate factorial of n using recursion
+   ```
+
+3. **รอ AI suggest** และกด Tab เพื่อรับ
+
+4. **ทดสอบ function**:
+   ```javascript
+   console.log(factorial(5));   // 120
+   console.log(factorial(10));  // 3628800
+   ```
+
+</Steps>
+
+---
+
+## 🎮 Code Playground
+
+เปิดใน StackBlitz เพื่อเริ่มเขียนโค้ด:
+
+<iframe
+  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-1-ai-tools/quest-01-first-completion/index.js&view=editor"
+  style="width:100%;height:500px;border:0;border-radius:4px;"
+  allow="cross-origin-isolation"
+  title="Quest 1.1: First AI Completion"
+/>
+
+---
+
+## ✅ Verification
+
+รัน test suite เพื่อตรวจสอบ:
+
+```bash
+node test.js
+```
+
+ถ้าผ่านทุก test จะเห็น:
+```
+🎉 Quest 1.1 Complete! You've written your first AI-assisted function.
+```
+
+---
+
+## 💡 Hints
+
+- **Base case**: factorial(0) = 1, factorial(1) = 1
+- **Recursive case**: factorial(n) = n × factorial(n-1)
+- **Test**: ลอง test กับเลข 0, 1, 5, 10
+
+---
+
+## 📚 Resources
+
+- [GitHub Copilot Docs](https://docs.github.com/en/copilot)
+- [Claude Code Docs](https://docs.anthropic.com/claude-code)

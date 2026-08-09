@@ -1,10 +1,74 @@
 ---
-title: Quest 4 - Loop Engineering
-description: Build and debug autonomous coding loops
+title: Quest 4.1 - Set Up a Loop
+description: Create an automated development loop
 ---
 
-# Quest 4: Loop Engineering
+import { Badge, Steps } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This quest is planned but content has not been written yet.
-:::
+# Quest 4.1: Set Up a Loop
+
+<Badge text="🟢 Easy" variant="success" /> <Badge text="15 minutes" variant="note" /> <Badge text="Block 4: Agentic Workflows" variant="tip" />
+
+## 🎯 Goal
+
+สร้าง Plan-Implement-Validate (PIV) loop
+
+---
+
+## 📋 Instructions
+
+<Steps>
+
+1. **เข้าใจ PIV framework**
+   - Plan: วิเคราะห์งาน
+   - Implement: สร้าง code
+   - Validate: ตรวจสอบคุณภาพ
+
+2. **Implement loop controller**
+
+3. **Test กับ simple task**
+
+4. **Verify convergence**
+
+</Steps>
+
+---
+
+## 🎮 Code Playground
+
+<iframe
+  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-4-agentic-workflows/quest-10-setup-loop/index.js&view=editor"
+  style="width:100%;height:500px;border:0;border-radius:4px;"
+  allow="cross-origin-isolation"
+  title="Quest 4.1: Set Up a Loop"
+/>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+---
+
+## 🔄 PIV Loop Pattern
+
+```
+┌─────────────┐
+│    PLAN     │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  IMPLEMENT  │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  VALIDATE   │
+└──────┬──────┘
+       ▼
+   Pass? ──Yes──► Done
+       │
+       No ──► Back to PLAN
+```

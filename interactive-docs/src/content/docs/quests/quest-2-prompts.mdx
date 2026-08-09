@@ -1,10 +1,75 @@
 ---
-title: Quest 2 - Prompt Mastery
-description: Master prompt engineering through hands-on practice
+title: Quest 2.1 - Fix the Vague Prompt
+description: Transform a vague prompt into a specific one
 ---
 
-# Quest 2: Prompt Mastery
+import { Badge, Steps } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This quest is planned but content has not been written yet.
-:::
+# Quest 2.1: Fix the Vague Prompt
+
+<Badge text="🟢 Easy" variant="success" /> <Badge text="15 minutes" variant="note" /> <Badge text="Block 2: Prompt Engineering" variant="tip" />
+
+## 🎯 Goal
+
+เปลี่ยน vague prompt ให้เป็น specific prompt ที่ได้ผลลัพธ์ดี
+
+---
+
+## 📋 Instructions
+
+<Steps>
+
+1. **วิเคราะห์ bad prompt**:
+   ```
+   Make a function that handles users
+   ```
+
+2. **หาว่าขาดอะไร**:
+   - "handle" หมายถึงอะไร?
+   - user data 有什么?
+   - validation ต้องการอะไร?
+   - return อะไร?
+
+3. **เขียน improved prompt**:
+   ```
+   Create a function called createUser that:
+   - Takes { name: string, email: string }
+   - Validates email format
+   - Returns { success, id, name, email }
+   ```
+
+4. **ใช้ prompt กับ AI tool**
+
+5. **ทดสอบ generated code**
+
+</Steps>
+
+---
+
+## 🎮 Code Playground
+
+<iframe
+  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-2-prompt-engineering/quest-04-fix-prompt/index.js&view=editor"
+  style="width:100%;height:500px;border:0;border-radius:4px;"
+  allow="cross-origin-isolation"
+  title="Quest 2.1: Fix the Vague Prompt"
+/>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+---
+
+## 💡 Tips
+
+A good prompt includes:
+1. **Function name and purpose**
+2. **Input parameters** with types
+3. **Output format**
+4. **Validation rules**
+5. **Error handling**

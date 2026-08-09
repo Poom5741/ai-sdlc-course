@@ -1,10 +1,287 @@
 ---
-title: Block 3 - Security with AI
-description: Understand security considerations when using AI coding tools
+title: Block 3 - Security
+description: Identify and fix security vulnerabilities in AI-generated code
 ---
 
-# Block 3: Security with AI
+import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This block is planned but content has not been written yet.
-:::
+# Block 3: Security
+
+<Badge text="13:15 - 14:45" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+เมื่อจบบล็อกนี้ คุณจะ:
+- ระบุ security vulnerabilities ใน AI-generated code
+- แก้ไขปัญหาความปลอดภัยที่พบบ่อย
+- ออกแบบระบบ architecture ที่ปลอดภัย
+
+---
+
+## 📖 Concept: Security in AI-Generated Code (30 min)
+
+### Why AI Code Can Be Insecure
+
+AI models ถูกฝึกบนข้อมูลจำนวนมาก ซึ่งรวมถึง code ที่มี vulnerability:
+
+- **Training data**: มีทั้ง good และ bad patterns
+- **No security context**: AI ไม่รู้ว่า code นี้จะถูกใช้ที่ไหน
+- **Pattern matching**: AI อาจเลือก pattern ที่ไม่ปลอดภัย
+
+### OWASP Top 10 (Most Critical)
+
+<CardGrid>
+<Card title="1. Injection" icon="warning">
+SQL, NoSQL, OS command injection
+</Card>
+<Card title="2. Broken Auth" icon="lock">
+Weak passwords, session fixation
+</Card>
+<Card title="3. Sensitive Data" icon="document">
+Hardcoded secrets, weak encryption
+</Card>
+<Card title="4. XSS" icon="code">
+Cross-site scripting
+</Card>
+</CardGrid>
+
+### Common Vulnerabilities in AI Code
+
+#### 1. SQL Injection
+
+**Bad** (AI might generate):
+```javascript
+const query = `SELECT * FROM users WHERE id = ${userId}`;
+```
+
+**Good** (What you should use):
+```javascript
+const query = 'SELECT * FROM users WHERE id = ?';
+db.query(query, [userId]);
+```
+
+#### 2. Hardcoded Secrets
+
+**Bad**:
+```javascript
+const apiKey = 'sk-1234567890abcdef';
+const dbPassword = 'admin123';
+```
+
+**Good**:
+```javascript
+const apiKey = process.env.API_KEY;
+const dbPassword = process.env.DB_PASSWORD;
+```
+
+#### 3. Weak Password Hashing
+
+**Bad**:
+```javascript
+const hash = crypto.createHash('md5').update(password).digest('hex');
+```
+
+**Good**:
+```javascript
+const bcrypt = require('bcrypt');
+const hash = await bcrypt.hash(password, 12);
+```
+
+#### 4. No Input Validation
+
+**Bad**:
+```javascript
+function processPayment(amount) {
+  return charge(amount); // No validation!
+}
+```
+
+**Good**:
+```javascript
+function processPayment(amount) {
+  if (typeof amount !== 'number' || amount <= 0) {
+    throw new Error('Invalid amount');
+  }
+  return charge(amount);
+}
+```
+
+#### 5. Path Traversal
+
+**Bad**:
+```javascript
+const filePath = path.join('/uploads', filename);
+const content = fs.readFileSync(filePath);
+```
+
+**Good**:
+```javascript
+const safePath = path.normalize(filename).replace(/^(\.\.(\/|\\|$))+/, '');
+const filePath = path.join('/uploads', safePath);
+if (filePath.startsWith('/uploads')) {
+  const content = fs.readFileSync(filePath);
+}
+```
+
+#### 6. XSS (Cross-Site Scripting)
+
+**Bad**:
+```javascript
+return `<div>${userInput}</div>`;
+```
+
+**Good**:
+```javascript
+function sanitize(str) {
+  return str.replace(/[<>&"']/g, c => ({
+    '<': '&lt;', '>': '&gt;', '&': '&amp;',
+    '"': '&quot;', "'": '&#x27;'
+  }[c]));
+}
+return `<div>${sanitize(userInput)}</div>`;
+```
+
+---
+
+## 🛠️ Security Checklist
+
+### Before Running AI-Generated Code
+
+- [ ] Check for hardcoded secrets
+- [ ] Validate all inputs
+- [ ] Use parameterized queries
+- [ ] Hash passwords properly
+- [ ] Sanitize file paths
+- [ ] Escape HTML output
+- [ ] Use HTTPS
+- [ ] Implement rate limiting
+
+### Security Testing
+
+```bash
+# Run security linter
+npm audit
+
+# Check for vulnerabilities
+npx snyk test
+
+# Static analysis
+npx eslint --plugin security
+```
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 3.1: Spot the Vulnerability
+
+**Goal**: Find security issues in AI-generated code
+
+<Steps>
+
+1. **Review the vulnerable code** in `vulnerable.js`
+
+2. **Identify ALL vulnerabilities**
+   - SQL Injection
+   - Hardcoded Secrets
+   - Weak Hashing
+   - No Input Validation
+   - Path Traversal
+   - XSS
+
+3. **Document each vulnerability**
+   ```markdown
+   ## Vulnerability 1: SQL Injection
+   - Line: 10
+   - Severity: Critical
+   - Description: User input concatenated into SQL
+   - Fix: Use parameterized queries
+   ```
+
+4. **Run the test suite** to verify findings
+
+</Steps>
+
+**Deliverable**: Vulnerability report with all issues identified
+
+---
+
+### 🟡 Quest 3.2: Fix and Harden
+
+**Goal**: Fix security vulnerabilities
+
+<Steps>
+
+1. **Fix each vulnerability** from Quest 3.1
+
+2. **Apply security hardening**
+   - Add input validation
+   - Use environment variables
+   - Implement proper hashing
+
+3. **Test your fixes**
+   ```bash
+   npm test
+   ```
+
+4. **Document changes**
+   - What you fixed
+   - Why it was vulnerable
+   - How you fixed it
+
+</Steps>
+
+**Deliverable**: Secure code with all tests passing
+
+---
+
+### 🔴 Quest 3.3: Security Architecture
+
+**Goal**: Design a secure system
+
+<Steps>
+
+1. **Choose a system**: Chatbot, API, or Web App
+
+2. **Identify threats**
+   - What attacks are possible?
+   - What's the impact?
+
+3. **Design controls**
+   - Authentication mechanism
+   - Authorization model
+   - Encryption strategy
+
+4. **Document architecture**
+   ```markdown
+   # Security Architecture: [System Name]
+   
+   ## Threat Model
+   - Threat 1: [description]
+   
+   ## Controls
+   - Control 1: [implementation]
+   ```
+
+</Steps>
+
+**Deliverable**: Security architecture document
+
+---
+
+## ✅ Block 3 Checklist
+
+- [ ] Understand common vulnerabilities
+- [ ] Quest 3.1 completed
+- [ ] Quest 3.2 completed
+- [ ] Quest 3.3 completed
+
+---
+
+## 🚀 Next Block
+
+**Block 4: Agentic Workflows** → Learn to create automated development loops and multi-agent systems.
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard title="Continue to Block 4" href="/workshop/block-4-loops" />

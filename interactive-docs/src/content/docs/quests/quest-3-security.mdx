@@ -1,10 +1,67 @@
 ---
-title: Quest 3 - Security Challenge
-description: Apply security best practices with AI tools
+title: Quest 3.1 - Spot the Vulnerability
+description: Find security issues in AI-generated code
 ---
 
-# Quest 3: Security Challenge
+import { Badge, Steps } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This quest is planned but content has not been written yet.
-:::
+# Quest 3.1: Spot the Vulnerability
+
+<Badge text="🟢 Easy" variant="success" /> <Badge text="15 minutes" variant="note" /> <Badge text="Block 3: Security" variant="tip" />
+
+## 🎯 Goal
+
+ค้นหา security vulnerabilities ใน AI-generated code
+
+---
+
+## 📋 Instructions
+
+<Steps>
+
+1. **Review vulnerable code** ใน `vulnerable.js`
+
+2. **ระบุ vulnerabilities** ทั้งหมด:
+   - SQL Injection
+   - Hardcoded Secrets
+   - Weak Hashing
+   - No Input Validation
+   - Path Traversal
+   - XSS
+
+3. **Document** แต่ละ vulnerability
+
+4. **รัน tests** เพื่อตรวจสอบ
+
+</Steps>
+
+---
+
+## 🎮 Code Playground
+
+<iframe
+  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-3-security/quest-07-spot-vulnerability/vulnerable.js&view=editor"
+  style="width:100%;height:500px;border:0;border-radius:4px;"
+  allow="cross-origin-isolation"
+  title="Quest 3.1: Spot the Vulnerability"
+/>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+---
+
+## 🔍 Common Vulnerabilities
+
+| Vulnerability | Severity | Fix |
+|--------------|----------|-----|
+| SQL Injection | Critical | Parameterized queries |
+| Hardcoded Secrets | Critical | Environment variables |
+| Weak Hashing | High | bcrypt/argon2 |
+| Path Traversal | High | Sanitize paths |
+| XSS | High | Escape HTML |

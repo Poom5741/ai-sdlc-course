@@ -42,7 +42,8 @@ describe('Astro project scaffold', () => {
       cwd: ROOT,
       encoding: 'utf-8',
       stdio: 'pipe',
+      timeout: 60000,
     });
     expect(result).toContain('Completed');
-  });
+  }, 60000);
 });

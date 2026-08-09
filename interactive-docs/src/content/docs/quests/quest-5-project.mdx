@@ -1,10 +1,74 @@
 ---
-title: Quest 5 - Final Project
-description: Apply everything learned in a capstone project
+title: Quest 5.2 - Full System Design
+description: Design a complete AI-powered system
 ---
 
-# Quest 5: Final Project
+import { Badge, Steps } from '@astrojs/starlight/components';
 
-:::note[Under Construction]
-This quest is planned but content has not been written yet.
-:::
+# Quest 5.2: Full System Design
+
+<Badge text="🔴 Hard" variant="danger" /> <Badge text="25 minutes" variant="note" /> <Badge text="Block 5: Architecture" variant="tip" />
+
+## 🎯 Goal
+
+ออกแบบ AI-powered system ที่สมบูรณ์
+
+---
+
+## 📋 Instructions
+
+<Steps>
+
+1. **เลือกระบบ**: Chatbot, Code Reviewer, หรือ Content Generator
+
+2. **Define components**
+   | Component | Purpose |
+   |-----------|---------|
+   | Input Handler | Process user input |
+   | AI Engine | Generate responses |
+   | Data Store | Persist data |
+   | Output Formatter | Format responses |
+
+3. **Design interfaces**
+
+4. **Document architecture**
+
+</Steps>
+
+---
+
+## 🎮 Code Playground
+
+<iframe
+  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-5-architecture/quest-14-full-system/index.js&view=editor"
+  style="width:100%;height:500px;border:0;border-radius:4px;"
+  allow="cross-origin-isolation"
+  title="Quest 5.2: Full System Design"
+/>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+---
+
+## 📐 Architecture Patterns
+
+### RAG System
+```
+Documents → Embeddings → Vector Store → LLM → Answer
+```
+
+### Multi-Agent System
+```
+Planner → Coder → Reviewer → Tester
+```
+
+### Event-Driven
+```
+Event → Handler → Side Effects
+```
