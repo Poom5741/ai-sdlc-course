@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
 
 export interface Props {
   title: string;
@@ -10,19 +11,68 @@ export interface Props {
 }
 
 const { title, description, sidebar = false, prev, next } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navigation = [
+  {
+    title: 'Overview',
+    url: '/workshop/overview'
+  },
+  {
+    title: 'Block 1: AI Tools',
+    url: '/workshop/block-1-ai-tools',
+    items: [
+      { title: 'Overview', url: '/workshop/block-1-ai-tools' },
+      { title: 'Quest 1.1: First Completion', url: '/quests/quest-1-first-code' },
+      { title: 'Quest 1.2: Multi-file', url: '/quests/quest-2-prompts' },
+      { title: 'Quest 1.3: Compare Tools', url: '/quests/quest-3-security' }
+    ]
+  },
+  {
+    title: 'Block 2: Prompting',
+    url: '/workshop/block-2-prompting',
+    items: [
+      { title: 'Overview', url: '/workshop/block-2-prompting' },
+      { title: 'Quest 2.1: Fix Prompt', url: '/quests/quest-4-loops' },
+      { title: 'Quest 2.2: Multi-Step', url: '/quests/quest-5-project' }
+    ]
+  },
+  {
+    title: 'Block 3: Security',
+    url: '/workshop/block-3-security',
+    items: [
+      { title: 'Overview', url: '/workshop/block-3-security' }
+    ]
+  },
+  {
+    title: 'Block 4: Loops',
+    url: '/workshop/block-4-loops',
+    items: [
+      { title: 'Overview', url: '/workshop/block-4-loops' }
+    ]
+  },
+  {
+    title: 'Block 5: Architecture',
+    url: '/workshop/block-5-architecture',
+    items: [
+      { title: 'Overview', url: '/workshop/block-5-architecture' }
+    ]
+  },
+  {
+    title: 'Reference',
+    url: '/reference/github-copilot',
+    items: [
+      { title: 'GitHub Copilot', url: '/reference/github-copilot' }
+    ]
+  }
+];
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="flex min-h-screen">
-    {sidebar && (
-      <aside class="w-64 bg-[#0a0a1a] border-r border-gray-800 p-4 hidden md:block">
-        <nav class="space-y-2">
-          <slot name="sidebar" />
-        </nav>
-      </aside>
-    )}
+  <div class="flex min-h-screen pt-16">
+    {sidebar && <Sidebar sections={navigation} currentPath={currentPath} />}
     
-    <main class="flex-1 max-w-4xl mx-auto px-6 py-12">
+    <main class:list={["flex-1 px-6 py-12", sidebar ? "md:ml-64" : "max-w-4xl mx-auto"]}>
       <article class="prose prose-invert max-w-none">
         <slot />
       </article>
