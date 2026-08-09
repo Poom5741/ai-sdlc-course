@@ -1,12 +1,15 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../data/navigation';
 import Badge from '../../components/Badge.astro';
 import Steps from '../../components/Steps.astro';
 import Card from '../../components/Card.astro';
 import CardGrid from '../../components/CardGrid.astro';
+
+const { prev, next } = getPrevNext('/workshop/block-3-security');
 ---
 
-<DocLayout title="Block 3 - Security" description="Identify and fix security vulnerabilities in AI-generated code" sidebar={true}>
+<DocLayout title="Block 3 - Security" description="Identify and fix security vulnerabilities in AI-generated code" sidebar={true} prev={prev} next={next}>
   <h1>Block 3: Security</h1>
 
   <p>

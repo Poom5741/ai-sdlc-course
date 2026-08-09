@@ -1,10 +1,13 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../data/navigation';
 import Badge from '../../components/Badge.astro';
 import Steps from '../../components/Steps.astro';
+
+const { prev, next } = getPrevNext('/workshop/block-1-ai-tools');
 ---
 
-<DocLayout title="Block 1 - AI Tools Setup" description="Set up your AI development toolkit and complete your first AI-assisted coding tasks" sidebar={true}>
+<DocLayout title="Block 1 - AI Tools Setup" description="Set up your AI development toolkit and complete your first AI-assisted coding tasks" sidebar={true} prev={prev} next={next}>
   <h1>Block 1: AI Tools Setup</h1>
   
   <p>

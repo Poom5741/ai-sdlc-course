@@ -1,12 +1,15 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../data/navigation';
 import Badge from '../../components/Badge.astro';
 import Steps from '../../components/Steps.astro';
 import Card from '../../components/Card.astro';
 import CardGrid from '../../components/CardGrid.astro';
+
+const { prev, next } = getPrevNext('/workshop/block-2-prompting');
 ---
 
-<DocLayout title="Block 2 - Prompt Engineering" description="Master the art of writing effective prompts for AI coding assistants" sidebar={true}>
+<DocLayout title="Block 2 - Prompt Engineering" description="Master the art of writing effective prompts for AI coding assistants" sidebar={true} prev={prev} next={next}>
   <h1>Block 2: Prompt Engineering</h1>
 
   <p>

@@ -1,10 +1,13 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../data/navigation';
 import Badge from '../../components/Badge.astro';
 import Steps from '../../components/Steps.astro';
+
+const { prev, next } = getPrevNext('/workshop/block-4-loops');
 ---
 
-<DocLayout title="Block 4 - Agentic Workflows" description="Create automated development loops and multi-agent systems" sidebar={true}>
+<DocLayout title="Block 4 - Agentic Workflows" description="Create automated development loops and multi-agent systems" sidebar={true} prev={prev} next={next}>
   <h1>Block 4: Agentic Workflows</h1>
 
   <p>

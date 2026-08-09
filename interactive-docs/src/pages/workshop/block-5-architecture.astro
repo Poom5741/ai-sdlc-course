@@ -1,10 +1,13 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../data/navigation';
 import Badge from '../../components/Badge.astro';
 import Steps from '../../components/Steps.astro';
+
+const { prev, next } = getPrevNext('/workshop/block-5-architecture');
 ---
 
-<DocLayout title="Block 5 - Architecture" description="Design complete AI-powered systems with RAG and multi-component architecture" sidebar={true}>
+<DocLayout title="Block 5 - Architecture" description="Design complete AI-powered systems with RAG and multi-component architecture" sidebar={true} prev={prev} next={next}>
   <h1>Block 5: Architecture</h1>
 
   <p>

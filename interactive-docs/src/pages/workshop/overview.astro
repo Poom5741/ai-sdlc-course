@@ -3,9 +3,12 @@ import DocLayout from '../../layouts/DocLayout.astro';
 import Badge from '../../components/Badge.astro';
 import Card from '../../components/Card.astro';
 import CardGrid from '../../components/CardGrid.astro';
+import { getPrevNext } from '../../data/navigation';
+
+const { prev, next } = getPrevNext('/workshop/overview');
 ---
 
-<DocLayout title="AI SDLC Workshop - Overview" description="One-day intensive workshop on AI-assisted software development" sidebar={true}>
+<DocLayout title="AI SDLC Workshop - Overview" description="One-day intensive workshop on AI-assisted software development" sidebar={true} prev={prev} next={next}>
   <h1>🚀 AI SDLC Workshop</h1>
   
   <p><strong>หลักสูตรการพัฒนาซอฟต์แวร์ด้วย AI แบบเข้มข้น 1 วัน</strong></p>
