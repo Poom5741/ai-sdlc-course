@@ -1,0 +1,466 @@
+---
+title: Goal System Reference
+description: Complete reference for pi-goal-list-loop-audit - the execution layer of the AI Development Pipeline with anti-bamboozle architecture
+---
+
+import Badge from '../../components/Badge.astro';
+
+# Goal System Reference
+
+<Badge text="Execution Layer" variant="note" /> <Badge text="Maximum Depth" variant="success" />
+
+## Overview
+
+The Goal system (pi-goal-list-loop-audit) is the **execution layer** of the AI Development Pipeline. It takes GitHub issues and **automates implementation** with independent auditing.
+
+```
+GitHub Issues → [Goal System] → Implemented, Audited, Verified Work
+```
+
+**Key Insight**: You never manually orchestrate implementation. The Goal system does it for you.
+
+---
+
+## 🎯 Three Loop Types
+
+### Loop 1: /goal (Single Ordered Goal)
+
+**Purpose**: Execute one goal with independent verification.
+
+**When to Use**:
+- One clear task to complete
+- Need semantic judgment ("is this done?")
+- Want audit trail
+
+**Commands**:
+
+```bash
+/goal                                    # Drafting: agent grills you
+/goal "fix the login bug"                # No contract → agent grills first
+/goal "Step 1. Step 2. Done when: tests pass."  # Has contract → starts now
+/goal start "fix the flaky test"         # Skip draft, start immediately
+/goal status                             # Show state
+/goal pause                              # Pause
+/goal resume                             # Resume
+/goal cancel                             # Abort
+/goal tweak "<new objective>"            # Edit in place
+/goal archive                            # View archived goals
+```
+
+**Drafting Rules**:
+- No args → drafting interview
+- Args without `Done when:` → agent grills first
+- Args with `Done when:` → starts immediately
+- `/goal start` → skip interview
+
+**Example**:
+
+```bash
+/goal "Add dark mode toggle. Done when: user can toggle between light/dark themes"
+```
+
+### Loop 2: /list (Queue of Goals)
+
+**Purpose**: Execute multiple goals in sequence.
+
+**When to Use**:
+- Multiple tasks to complete
+- Bulk import from plan
+- Batch processing
+
+**Commands**:
+
+```bash
+/list                                          # Show active + waiting items
+/list fix the login bug, add dark mode         # Add multiple items
+/list plan.md                                  # Import from file
+/list <paste checklist>                        # Multi-line paste
+/list next                                     # Skip current, activate next
+/list remove <n>                               # Drop item n
+/list clear                                    # Empty the list
+/list cancel                                   # Stop the whole list
+```
+
+**Key Insight**: Order is the default, not the law. `/list next <n>` picks any item.
+
+**Example**:
+
+```bash
+/list fix login bug, add dark mode, write docs, update tests
+```
+
+### Loop 3: /loop (Metric-Driven Forever)
+
+**Purpose**: Continuous improvement until metric plateaus.
+
+**When to Use**:
+- "Keep improving until X"
+- No clear finish line
+- Process that never completes
+
+**Commands**:
+
+```bash
+/loop start "reduce TODOs" measure="grep -c TODO src.txt | head -1" direction=min
+/loop start "shrink bundle" measure="..." direction=min time=4 tokens=500000
+/loop start "keep polishing UI"                          # Metricless loop
+/loop start "reduce TODOs" measure=none max=20           # Metricless with cap
+/loop status                                             # Iteration, best, stall
+/loop stop                                               # Halt with summary
+/loop audit                                              # Project-audit loop
+```
+
+**Three Flavors**:
+1. **Metric loops**: Shell command prints honest number
+2. **Metricless spec loops**: No honest number exists
+3. **Audit loops**: Fresh audit passes each iteration
+
+**Key Insight**: No finish line. Runs until you stop it, metric plateaus, or bounds trip.
+
+---
+
+## 🛡️ Anti-Bamboozle Architecture
+
+### The Problem
+
+If the same AI that writes the code also says "I'm done", how do you know it's actually done?
+
+**The Bamboozle Trap**: Agent writes implementation → Agent says "I'm done" → Loop trusts them
+
+### The Solution: Independent Verification
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  EXECUTOR (writes code)                                        │
+│  ─────────────────────────────────────────────────────────────  │
+│  - Has all skills, extensions, context                         │
+│  - Implements the goal                                         │
+│  - Calls complete_goal when done                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  AUDITOR (verifies work)                                       │
+│  ─────────────────────────────────────────────────────────────  │
+│  - Runs in SEPARATE process (pi --mode rpc)                    │
+│  - Has NO extensions, skills, or context                       │
+│  - Only has read/grep/find/ls/bash                             │
+│  - Cannot see the implementation conversation                 │
+│  - Must quote raw evidence for each verification item          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Architectural Guarantees
+
+| Stage | Protection |
+|---|---|
+| Goal intake | Drafting + Confirm/Reject dialog; nothing activates unconfirmed |
+| Implementation | `agent_end`-driven continuation loop with 5-minute hard backoff cap |
+| Completion | Detached extension-less auditor process + regression_shield |
+
+### Regression Shield
+
+The auditor's report must contain **raw tool output** for each verification item.
+
+**Without shield**:
+```
+<approved/>
+```
+(Auditor says "looks good" - could be rubber-stamp)
+
+**With shield**:
+```
+<approved/>
+<evidence>
+$ cat src/auth.ts | grep "export function authenticate"
+export function authenticate(username: string, password: string): boolean {
+$ npm test -- --grep "authentication"
+  ✓ should authenticate valid user (12ms)
+  ✓ should reject invalid user (8ms)
+</evidence>
+```
+(Auditor must quote raw output - can't fake it)
+
+**Enforcement**: Orchestrator rejects `<approved/>` without complete evidence → becomes `<disapproved/>`
+
+### Why This Matters
+
+- Executor can't fool the auditor
+- Auditor has no context to be biased
+- Evidence is required, not just "looks good"
+- Two independent processes, two perspectives
+- **This is unique to Pi** - no other AI tool has this
+
+---
+
+## 📋 Drafting Protocol
+
+### How Goals Are Created
+
+1. **User invokes**: `/goal "do something"`
+2. **Agent grills**: Asks clarifying questions
+3. **Agent proposes**: `propose_goal_draft` opens Confirm dialog
+4. **User confirms**: Goal activates
+5. **No goal activates without confirmation**
+
+### Drafting Interview Example
+
+```
+User: /goal "add user authentication"
+
+Agent: Let me understand what you need:
+
+❓ **Q1** - **Auth Method**: What authentication method?
+   - OAuth (Google, GitHub)
+   - Password-based
+   - Both
+
+➡️ Recommended: Both
+
+❓ **Q2** - **Session Management**: How to manage sessions?
+   - JWT tokens
+   - Server-side sessions
+   - Cookies
+
+➡️ Recommended: JWT
+
+❓ **Q3** - **Security Requirements**: What security level?
+   - Basic (password hashing)
+   - Medium (+ rate limiting)
+   - High (+ 2FA, audit logging)
+
+➡️ Recommended: Medium
+
+[User answers questions]
+
+Agent: Here's the plan:
+
+propose_goal_draft({
+  objective: "Add user authentication with OAuth and password",
+  verificationContract: [
+    "User can register with email/password",
+    "User can login with OAuth (Google, GitHub)",
+    "Sessions managed with JWT tokens",
+    "Rate limiting on login attempts",
+    "Tests pass"
+  ]
+})
+
+[Confirm Dialog appears]
+[User confirms]
+[Goal activates]
+```
+
+---
+
+## 🔄 Status Machine
+
+### States
+
+```typescript
+type Status =
+  | "drafting"      // Interview in progress
+  | "active"        // Executing work
+  | "auditing"      // Auditor verifying
+  | "complete"      // Work done, archived
+  | "paused"        // User paused
+  | "aborted";      // User cancelled
+```
+
+### Transitions
+
+```
+drafting → active          (user confirms draft)
+active → active            (continue work)
+active → auditing          (complete_goal called)
+auditing → complete        (auditor <approved/>)
+auditing → active          (auditor <disapproved/>)
+active → paused            (pause_goal called)
+paused → active            (user /goal resume)
+active → aborted           (user /goal cancel)
+```
+
+### State Persistence
+
+- State stored in `.pi-glla/active.jsonl`
+- Each line is a state transition
+- Deterministic compaction from JSONL
+- Protects against model-generated summaries losing fidelity
+
+---
+
+## 🚨 Recovery Systems
+
+### Stall Detection
+
+**Self-watchdog** (15s heartbeat):
+- Active goal + idle session + nothing scheduled + 60s quiet → re-fire
+- Three consecutive no-tool turns → pause
+- No external watchdog plugin needed
+
+**Wedge Alert** (30 minutes):
+- Busy + no activity for 30 minutes → warning + notify
+- Tune in `/glla` settings (0 = off)
+
+### Quota Walls
+
+When provider hits limits:
+
+```
+glla: ⟦⏳ QUOTA WALL · next probe in 10m 48s⟧ · 1 queued
+├─ QUOTA WALL · Token Plan usage limit · 1 waiting in list
+├─ waiting — nothing for you to do · next probe in 10m 48s
+```
+
+**Recovery envelope**: 15m → 30m → 1h → 2h → 4h → 5h (cap 5h, automatic window 24h)
+
+**Knowledge-window escalation**: Quota/billing/auth failures escalate faster (3 minutes instead of 15)
+
+### Session Handoff
+
+**Recovery crosses pi's lifecycle**:
+
+1. `session_shutdown` → persists continuation debt
+2. Fresh `session_start` → consumes debt, continues
+3. Stale handles refuse mutations (fail closed)
+4. User quit = not implicit resume consent
+
+**Orphan handling**:
+- Dirty stacked states → most recent activity keeps slot
+- Loser archived (recoverable)
+- No picker, no arbitration chores
+
+### User Aborts
+
+**Aborted turn**:
+- Exempt from stall accounting
+- Stands chain down (no auto re-fire)
+- Stand-down survives heartbeat
+- 5 consecutive aborts → loud pause
+
+---
+
+## 📊 Status Display
+
+### Live TUI
+
+Persistent status segment shows current state:
+
+```text
+glla: [▁▂▄▆█▆ LIVE · WORKING] 1m 09s · last stream 11s ago · 3 queued
+glla: [QUEUED] 44s · 18 queued
+```
+
+### Activity Indicators
+
+| Indicator | Meaning |
+|---|---|
+| `LIVE · WORKING` | Fresh stream/tool activity arriving |
+| `BUSY` | pi occupied, no fresh stream evidence |
+| `QUEUED` | Continuation waiting to start |
+| `IDLE` | Active item, no recent work |
+| `auditor …` | Detached verifier queued/running |
+| `QUOTA WALL` | Provider rejected request |
+
+### Queue Trail
+
+For long-running `/list` work:
+
+```text
+● Fix the current issue · list item · active · 42m
+├─ ✓ bash tests/display.test.ts (35s) · next: update docs
+├─ ↳ 23 waiting · up next: refresh the release notes · waiting 12m 04s
+└─ 23 queued · /list · /glla
+```
+
+---
+
+## ⚙️ Configuration
+
+### /glla Settings
+
+Open `/glla` to edit:
+
+- Auditor model and thinking level
+- Auditor fallback model
+- Notify command and settings
+- Auto-resume, auto-accept drafts
+- Main session backups
+- Recovery cadence
+- Audit cap/report size
+
+### Resolution Order
+
+**Project > Global > Defaults**
+
+Exception: `autoResume` is **global-only** (per-project opt-ins silently overrode global hold)
+
+### Main Model Fallbacks
+
+Ordered list of backup models:
+
+```
+mainModelFallbacks: [
+  "anthropic/claude-sonnet-4-20250514",
+  "openai/gpt-4o",
+  "google/gemini-2.0-flash"
+]
+```
+
+Provider error → rotate through authenticated candidates → all fail → park and probe
+
+---
+
+## 🔧 Integration with Pipeline
+
+### Input: GitHub Issues
+
+Goals are created from GitHub issues:
+
+```
+/goal "Fix login bug. Done when: tests pass"
+```
+
+The issue provides:
+- Objective (what to do)
+- Verification contract (how to know it's done)
+- Context (background information)
+
+### Output: Verified Work
+
+Goals output:
+- Implemented code
+- Audit trail (evidence blocks)
+- Verification status (approved/disapproved)
+- Archived goal for history
+
+### Execution Skills
+
+Within goals, use:
+- **Impeccable**: UI/design work
+- **Ponytail**: Minimal solutions
+- **Pi Agent skills**: Platform-specific work
+
+---
+
+## 📁 Files
+
+```
+.pi-glla/
+├── active.jsonl              # Current state
+├── session-handoff.json      # Recovery data
+├── archive/                  # Completed goals
+├── audit-jobs/               # Auditor work
+└── continuation-dispatch.json # Dispatch tracking
+```
+
+---
+
+## 🎓 Best Practices
+
+1. **Always draft first**: Let the agent grill you
+2. **Write clear contracts**: "Done when: X, Y, Z"
+3. **Use /list for batches**: Multiple related tasks
+4. **Use /loop for continuous improvement**: No clear finish line
+5. **Trust the auditor**: Two perspectives are better than one
+6. **Check `/goal status`**: Know what's happening
+7. **Use `/glla` for configuration**: Tune to your workflow

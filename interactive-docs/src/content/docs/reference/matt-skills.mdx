@@ -1,0 +1,375 @@
+---
+title: Matt Pocock's Skills Reference
+description: Complete reference for Matt Pocock's productivity and engineering skills - the planning layer of the AI Development Pipeline
+---
+
+import Badge from '../../components/Badge.astro';
+
+# Matt Pocock's Skills Reference
+
+<Badge text="Planning Layer" variant="note" /> <Badge text="Maximum Depth" variant="success" />
+
+## Overview
+
+Matt Pocock's skills form the **planning engine** of the AI Development Pipeline. They transform loose ideas into clear, implementable decisions that become GitHub issues.
+
+```
+Loose Idea → [Matt's Skills] → GitHub Issues (decision tickets)
+```
+
+---
+
+## 🗣️ Grilling
+
+**Purpose**: Interview the user relentlessly about a plan, decision, or idea.
+
+**When to Use**:
+- Starting any new work
+- Requirements are unclear
+- Need to stress-test thinking
+- User says "grill me"
+
+**How It Works**:
+
+1. **Design Tree**: Every decision branches into sub-decisions
+2. **Rounds**: Ask the whole frontier in one round
+3. **Frontier**: Decisions whose prerequisites are settled
+4. **Wait for answers**: Reshape the tree based on responses
+
+**Example**:
+
+```
+❓ **Q1** - **Auth Method**: What authentication method?
+   - OAuth (Google, GitHub)
+   - Password-based
+   - Both
+
+➡️ Recommended: Both (OAuth for convenience, password for fallback)
+
+❓ **Q2** - **Session Management**: How to manage sessions?
+   - JWT tokens
+   - Server-side sessions
+   - Cookies
+
+➡️ Recommended: JWT (stateless, scalable)
+```
+
+**Key Rules**:
+- Finding facts is the agent's job, not the user's
+- Ask the whole frontier in one round
+- Wait for answers before next round
+- Session ends when frontier is empty
+
+**Files**: `CONTEXT.md` (glossary), `docs/adr/` (decisions)
+
+---
+
+## 🧠 Domain Modeling
+
+**Purpose**: Build and sharpen the project's domain model.
+
+**When to Use**:
+- Terms are unclear or overloaded
+- Need to pin down terminology
+- Recording architectural decisions
+- Another skill needs domain vocabulary
+
+**How It Works**:
+
+1. **Challenge against glossary**: "Your glossary defines 'X' as Y, but you seem to mean Z"
+2. **Sharpen fuzzy language**: "You're saying 'account' — do you mean Customer or User?"
+3. **Discuss concrete scenarios**: Stress-test with edge cases
+4. **Cross-reference with code**: Check if code agrees with statements
+5. **Update CONTEXT.md inline**: Capture terms as they resolve
+
+**Example**:
+
+```
+Agent: Your glossary defines 'cancellation' as terminating an order,
+but you just said 'partial cancellation is possible' — which is it?
+
+User: Oh, I mean canceling individual items, not the whole order.
+
+Agent: Got it. Let me update CONTEXT.md:
+- Order Cancellation: Terminating an entire order
+- Item Cancellation: Removing a single item from an order
+```
+
+**ADR Format** (when all three are true):
+1. Hard to reverse
+2. Surprising without context
+3. Result of a real trade-off
+
+**Files**: `CONTEXT.md` (glossary), `docs/adr/` (decisions)
+
+---
+
+## 🗺️ Wayfinder
+
+**Purpose**: Plan a huge chunk of work as a shared map of decision tickets.
+
+**When to Use**:
+- Too big for one agent session
+- Wrapped in fog (can't see the way)
+- Need to chart the way before charging
+
+**How It Works**:
+
+1. **Name the destination**: What does "done" look like?
+2. **Map the frontier**: Surface open decisions
+3. **Create the map**: Label `wayfinder:map`
+4. **Create tickets**: Child issues of the map
+5. **Wire blocking**: Dependencies between tickets
+6. **Fire research subagents**: Resolve research tickets in parallel
+
+**Map Format**:
+
+```markdown
+## Destination
+
+<what reaching the end looks like>
+
+## Notes
+
+<domain; skills to consult; standing preferences>
+
+## Decisions so far
+
+- [Closed ticket title](link) — one-line gist
+
+## Not yet specified
+
+<fog of war - suspected questions>
+
+## Out of scope
+
+<work ruled beyond destination>
+```
+
+**Ticket Types**:
+- `wayfinder:research` (AFK): Reading docs, APIs
+- `wayfinder:prototype` (HITL): Build throwaway artifact
+- `wayfinder:grilling` (HITL): Conversation
+- `wayfinder:task` (HITL/AFK): Manual work blocking decisions
+
+**Key Rules**:
+- Never resolve more than one ticket per session
+- Claim ticket by assigning to yourself
+- Reference by name, never bare id
+- Fog only gathers toward destination
+
+---
+
+## 🔬 Research
+
+**Purpose**: Investigate a question against high-trust primary sources.
+
+**When to Use**:
+- Need facts from documentation
+- API details required
+- Knowledge outside current directory
+- Another skill needs external info
+
+**How It Works**:
+
+1. **Spin up background agent**: Keeps working while it reads
+2. **Investigate primary sources**: Official docs, source code, specs
+3. **Write findings**: Single Markdown file with citations
+4. **Save where repo keeps notes**: Match existing convention
+
+**Example**:
+
+```
+Research Ticket: "What is the rate limit for GitHub API?"
+
+Background Agent:
+1. Reads GitHub API docs
+2. Finds rate limit section
+3. Writes findings to research/github-api-rate-limits.md
+4. Cites official docs
+```
+
+**Key Rules**:
+- Follow every claim back to source
+- Primary sources, not secondary write-ups
+- Cite each claim's source
+
+---
+
+## 🎨 Prototype
+
+**Purpose**: Build a throwaway prototype to answer a design question.
+
+**When to Use**:
+- "Does this logic / state model feel right?"
+- "What should this look like?"
+- Need cheap, rough, concrete artifact
+
+**How It Works**:
+
+1. **Pick a branch**:
+   - Logic question → LOGIC.md (HTML state machine demo)
+   - UI question → UI.md (multiple UI variations)
+
+2. **Follow rules**:
+   - Throwaway from day one
+   - Trivial to run
+   - No persistence by default
+   - Skip the polish
+   - Surface the state
+   - Capture it when done
+
+**Example**:
+
+```
+Prototype Ticket: "How should the checkout flow work?"
+
+Agent creates:
+- checkout-prototype.html
+- Free-play buttons for state transitions
+- Tabbed guided walkthroughs
+- Full state rendered after each action
+
+User clicks through, sees what works, what doesn't
+Decision captured, prototype archived to throwaway branch
+```
+
+**Key Rules**:
+- Throwaway code that answers a question
+- Question decides the shape (logic vs UI)
+- No tests, no error handling, no abstractions
+- Capture validated decisions in real code
+
+---
+
+## 🧪 TDD (Test-Driven Development)
+
+**Purpose**: Red → Green → Refactor loop.
+
+**When to Use**:
+- Building features test-first
+- Mentions "red-green-refactor"
+- Wants integration tests
+
+**How It Works**:
+
+1. **Write failing test first** (Red)
+2. **Write minimal code to pass** (Green)
+3. **Refactor** (not part of loop - belongs in review)
+
+**Key Concepts**:
+
+**Seams**: Public boundaries to test at
+- Test at pre-agreed seams
+- No test at unconfirmed seam
+- Ask: "What's the public interface?"
+
+**Anti-patterns**:
+- Implementation-coupled tests
+- Tautological assertions
+- Horizontal slicing (all tests first, then all implementation)
+
+**Rules**:
+- Red before green
+- One slice at a time
+- Refactoring is not part of the loop
+
+---
+
+## 🔍 Code Review
+
+**Purpose**: Review code for quality, correctness, and design.
+
+**When to Use**:
+- After implementation
+- Before merging
+- Need second opinion
+
+**Key Focus Areas**:
+- Correctness: Does it do what it should?
+- Design: Is it well-structured?
+- Security: Any vulnerabilities?
+- Performance: Any bottlenecks?
+- Readability: Can others understand it?
+
+---
+
+## 🐛 Diagnosing Bugs
+
+**Purpose**: Systematic approach to hard bugs.
+
+**When to Use**:
+- Bug is tricky
+- Need to understand root cause
+- Performance regressions
+
+**Process**:
+1. **Reproduce**: Can you make it happen reliably?
+2. **Isolate**: Where does it happen?
+3. **Hypothesize**: What could cause this?
+4. **Test**: Verify hypothesis
+5. **Fix**: Apply minimal fix
+6. **Verify**: Confirm fix works
+
+---
+
+## 🔀 Resolving Merge Conflicts
+
+**Purpose**: Guide through merge conflict resolution.
+
+**When to Use**:
+- Git merge conflicts
+- Need to understand both sides
+- Choose the right resolution
+
+---
+
+## 📝 Writing for Agents
+
+**Purpose**: Write documents that agents can follow.
+
+**When to Use**:
+- Creating skills
+- Modifying AGENTS.md or CLAUDE.md
+- Writing instructions for AI
+
+**Key Principles**:
+- Be explicit
+- Give examples
+- Define terms
+- Structure clearly
+
+---
+
+## 🧙 Wizard
+
+**Purpose**: Generate interactive bash wizard for human-only steps.
+
+**When to Use**:
+- Provisioning infrastructure
+- Setting up credentials
+- Walking unfamiliar dashboard
+- One-off migration
+
+**Key Insight**: Some steps require human judgment - the wizard guides them through it.
+
+---
+
+## Integration with Pipeline
+
+Matt's skills feed into the pipeline:
+
+```
+Grilling → Domain Modeling → Wayfinder → GitHub Issues
+    ↓           ↓              ↓            ↓
+"What do    "What do      "Here's     Decision
+ we want?"  these mean?"   the map"    tickets
+```
+
+**Output**: GitHub issues with:
+- Clear decision questions
+- Options and recommendations
+- Wayfinder labels
+- Blocking relationships
+
+**Next Layer**: GitHub Issues → Goal System (execution)

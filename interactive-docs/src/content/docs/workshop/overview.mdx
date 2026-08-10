@@ -3,7 +3,9 @@ title: AI SDLC Workshop - Overview
 description: One-day intensive workshop on AI-assisted software development
 ---
 
-import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+import Card from '../../components/Card.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import Steps from '../../components/Steps.astro';\import Badge from '../../components/Badge.astro';
 
 # 🚀 AI SDLC Workshop
 
@@ -25,6 +27,7 @@ import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
 4. **Loop**: ตั้งค่า automated development loops
 5. **Agent**: ออกแบบ agentic workflows
 6. **Architect**: ตัดสินใจเรื่อง AI integration
+7. **Pipeline**: ใช้ AI Development Pipeline ครบวงจร (Planning → Tracking → Execution)
 
 ---
 
@@ -60,11 +63,18 @@ import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
     **Quests**: 3
   </Card>
   <Card title="Block 5: Architecture" icon="star">
-    **16:45 - 18:00** (75 min)
+    **16:45 - 17:15** (30 min)
     
     System design + Final project
     
     **Quests**: 2
+  </Card>
+  <Card title="Block 6: AI Pipeline" icon="flow">
+    **17:30 - 18:30** (60 min)
+    
+    AI Development Pipeline (Planning → Tracking → Execution)
+    
+    **Skills**: Matt's Skills, Goal System, Impeccable, Ponytail
   </Card>
 </CardGrid>
 
@@ -144,14 +154,21 @@ import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
 - RAG architecture
 - Final project
 
+### Block 6: AI Development Pipeline
+- Matt Pocock's skills for planning
+- GitHub Issues as decision tickets
+- Goal system for autonomous execution
+- Anti-bamboozle architecture
+- Impeccable, Ponytail, and Pi Agent skills
+
 ---
 
 ## 🚀 Ready to Start?
 
-import { LinkCard } from '@astrojs/starlight/components';
 
-<LinkCard title="Start Block 1: AI Tools" href="/workshop/block-1-ai-tools" />
-<LinkCard title="View All Code Quests" href="/quests/quest-1-first-code" />
+
+<a href="/workshop/block-1-ai-tools" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">Start Block 1: AI Tools →</a>
+<a href="/quests/quest-1-first-code" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">View All Code Quests →</a>
 
 ---
 

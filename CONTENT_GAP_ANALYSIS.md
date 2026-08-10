@@ -10,6 +10,7 @@
 | Security | ✅ Good | Medium | - |
 | Testing & QA | ✅ Good | Medium | - |
 | Agentic Workflows | ✅ Good | Low | - |
+| AI Development Pipeline | ✅ Excellent | Low | - |
 | DevOps & CI/CD | ⚠️ Partial | High | 🔴 |
 | LLM Observability | ❌ Missing | Critical | 🔴 |
 | Cost Management | ⚠️ Partial | High | 🔴 |
@@ -174,6 +175,21 @@
 - MCP protocol
 - ReAct pattern
 - Multi-agent systems
+
+### AI Development Pipeline (Excellent) ✅ NEW
+- **3-Layer Architecture**: Planning → Tracking → Execution
+- **Planning Layer**: Matt Pocock's skills (Grilling, Domain Modeling, Wayfinder, Research, Prototype, TDD, Code Review)
+- **Tracking Layer**: GitHub Issues as decision tickets
+- **Execution Layer**: Goal System with anti-bamboozle architecture
+- **Execution Skills**: Impeccable (UI/design), Ponytail (minimal solutions), Pi Agent Skills (platform-specific)
+- **Key Insight**: Skills form a workflow pipeline, not independent tools
+- **Unique Value**: Anti-bamboozle architecture (independent verification)
+
+**New Content Created:**
+- Block 6: The AI Development Pipeline (workshop)
+- Matt Skills Reference (reference doc)
+- Goal System Reference (reference doc)
+- Execution Skills Reference (reference doc)
 
 ---
 

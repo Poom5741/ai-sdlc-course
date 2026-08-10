@@ -1,0 +1,415 @@
+---
+title: Block 6 - The AI Development Pipeline
+description: Master the complete workflow from planning to autonomous execution with Matt's skills, GitHub Issues, and the Goal system
+---
+
+import Card from '../../components/Card.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import Steps from '../../components/Steps.astro';
+import Badge from '../../components/Badge.astro';
+
+# Block 6: The AI Development Pipeline
+
+<Badge text="14:30 - 16:00" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="Pipeline Mastery" variant="success" />
+
+## 🎯 Learning Goals
+
+เมื่อจบบล็อกนี้ คุณจะ:
+- เข้าใจ AI Development Pipeline 3 ชั้น (Planning → Tracking → Execution)
+- ใช้ Matt Pocock's skills สำหรับ planning
+- สร้าง GitHub Issues เป็น decision tickets
+- ใช้ Goal system สำหรับ autonomous execution
+- เข้าใจ anti-bamboozle architecture
+
+---
+
+## 📖 Concept: The AI Development Pipeline (30 min)
+
+### The Problem: Manual Orchestration
+
+เดิม developer ต้อง:
+1. คิดว่าจะทำอะไร
+2. แบ่งงานเป็น tasks
+3. ทำทีละ task ด้วยมือ
+4. Review แต่ละ task เอง
+5. จัดการ dependencies เอง
+
+**ปัญหา**: เหนื่อย, ช้า, human error, context switching
+
+### The Solution: Automated Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 1: PLANNING (Matt's Skills)                             │
+│  ─────────────────────────────────────────────────────────────  │
+│  Input: Loose idea, requirements, problems                     │
+│  Tools: grilling → domain-modeling → wayfinder → research      │
+│  Output: GitHub issues with clear decision tickets             │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 2: TRACKING (GitHub Issues)                             │
+│  ─────────────────────────────────────────────────────────────  │
+│  Input: Decision tickets from planning                         │
+│  Format: Issues with wayfinder labels, blocking relationships  │
+│  Output: Ordered queue of implementable work                   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 3: EXECUTION (Goal System)                              │
+│  ─────────────────────────────────────────────────────────────  │
+│  Input: GitHub issues from queue                               │
+│  Tools: /goal, /list, /loop commands                           │
+│  Execution skills: Impeccable, Ponytail, Pi Agent skills       │
+│  Output: Implemented, audited, verified work                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Why This Matters: Vibe Coding vs Vibe Engineering
+
+| Vibe Coding | Vibe Engineering |
+|-------------|------------------|
+| "AI, write me a login page" | "Grill me on auth requirements → Create issues → Goal executes with auditing" |
+| No planning | Structured planning with Matt's skills |
+| Manual orchestration | Automated execution with Goal system |
+| No verification | Independent auditor verifies work |
+| Hope it works | Guaranteed quality through pipeline |
+
+---
+
+## 🛠️ Layer 1: Planning with Matt's Skills
+
+### The Planning Toolkit
+
+Matt Pocock's skills form a **planning engine** that transforms loose ideas into clear, implementable decisions.
+
+<Grid cols={3}>
+  <GridItem>
+    <Card title="🗣️ Grilling" icon="chat">
+      **Purpose**: Interview you relentlessly about your plan
+      **Input**: Loose idea, vague requirements
+      **Output**: Clear understanding of what to build
+      **When**: Start here for any new work
+    </Card>
+  </GridItem>
+  <GridItem>
+    <Card title="🧠 Domain Modeling" icon="brain">
+      **Purpose**: Pin down terminology and relationships
+      **Input**: Jargon, ambiguous terms
+      **Output**: Glossary in CONTEXT.md
+      **When**: Terms are unclear or overloaded
+    </Card>
+  </GridItem>
+  <GridItem>
+    <Card title="🗺️ Wayfinder" icon="map">
+      **Purpose**: Chart the way for complex efforts
+      **Input**: Big, foggy idea
+      **Output**: Map + decision tickets
+      **When**: Too big for one session
+    </Card>
+  </GridItem>
+</Grid>
+
+### The Planning Flow
+
+```
+Loose Idea
+    ↓
+[Grilling] ──→ "What exactly do you want?"
+    ↓
+[Domain Modeling] ──→ "What do these terms mean?"
+    ↓
+[Wayfinder] ──→ "Here's the map + tickets"
+    ↓
+GitHub Issues (decision tickets)
+```
+
+### Example: Planning a New Feature
+
+**User**: "I want to add user authentication"
+
+**Matt's Skills in Action**:
+
+1. **Grilling** asks:
+   - "What authentication methods? OAuth? Password? Both?"
+   - "What's the user flow? Registration → Login → Session?"
+   - "What are the security requirements?"
+
+2. **Domain Modeling** clarifies:
+   - "User" vs "Account" vs "Session" - which is which?
+   - "Authentication" vs "Authorization" - different things
+
+3. **Wayfinder** creates:
+   - Map: "Add User Authentication"
+   - Ticket 1: "Choose auth method (OAuth vs Password)"
+   - Ticket 2: "Design user flow"
+   - Ticket 3: "Implement auth middleware"
+
+**Output**: 3 GitHub issues, ready for execution
+
+---
+
+## 🛠️ Layer 2: Tracking with GitHub Issues
+
+### Decision Tickets
+
+Each GitHub issue is a **decision ticket** - a question that needs resolving before work can proceed.
+
+**Ticket Format**:
+```markdown
+## Question
+
+<The decision or investigation this ticket resolves>
+
+## Options
+1. Option A
+2. Option B
+3. Option C
+
+## Recommendation
+<What Matt's skills suggest>
+```
+
+### Wayfinder Labels
+
+Issues are labeled by type:
+- `wayfinder:research` - Need to investigate something
+- `wayfinder:grilling` - Need to discuss with human
+- `wayfinder:prototype` - Need to build a throwaway version
+- `wayfinder:task` - Manual work that blocks decisions
+
+### Blocking Relationships
+
+Tickets can block other tickets:
+- Ticket 2 is blocked by Ticket 1
+- Can't work on Ticket 2 until Ticket 1 is resolved
+- Creates a natural execution order
+
+---
+
+## 🛠️ Layer 3: Execution with Goal System
+
+### The Goal System
+
+The Goal system takes GitHub issues and **automates implementation** with independent auditing.
+
+**Key Insight**: You never manually orchestrate implementation. The Goal system does it for you.
+
+### Three Loop Types
+
+<Grid cols={3}>
+  <GridItem>
+    <Card title="/goal" icon="target">
+      **Single ordered goal
+      **Input**: One GitHub issue
+      **Process**: Execute → Audit → Verify
+      **Output**: Implemented, verified work
+      **When**: One clear task to complete
+    </Card>
+  </GridItem>
+  <GridItem>
+    <Card title="/list" icon="list">
+      **Queue of goals
+      **Input**: Multiple GitHub issues
+      **Process**: Execute in order, audit each
+      **Output**: Batch of implemented work
+      **When**: Multiple tasks to complete
+    </Card>
+  </GridItem>
+  <GridItem>
+    <Card title="/loop" icon="repeat">
+      **Metric-driven forever
+      **Input**: Continuous improvement task
+      **Process**: Iterate until metric plateaus
+      **Output**: Optimized work
+      **When**: "Keep improving until X"
+    </Card>
+  </GridItem>
+</Grid>
+
+### The Anti-Bamboozle Architecture
+
+**The Problem**: If the same AI that writes the code also says "I'm done", how do you know it's actually done?
+
+**The Solution**: Independent verification
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  EXECUTOR (writes code)                                        │
+│  - Has all skills, extensions, context                         │
+│  - Implements the goal                                         │
+│  - Calls complete_goal when done                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  AUDITOR (verifies work)                                       │
+│  - Runs in SEPARATE process                                    │
+│  - Has NO extensions, skills, or context                       │
+│  - Only has read/grep/find/ls/bash                             │
+│  - Cannot see the implementation conversation                 │
+│  - Must quote raw evidence for each verification item          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Why This Matters**:
+- Executor can't fool the auditor
+- Auditor has no context to be biased
+- Evidence is required, not just "looks good"
+- Two independent processes, two perspectives
+
+### Drafting Protocol
+
+Goals start with a **drafting interview**:
+
+```
+/goal "add user authentication"
+    ↓
+Agent grills you:
+- "What auth methods?"
+- "What's the user flow?"
+- "What are the security requirements?"
+    ↓
+propose_goal_draft opens Confirm dialog
+    ↓
+You confirm → Goal activates
+```
+
+**No goal activates without your confirmation.**
+
+---
+
+## 🎮 Pipeline Practice
+
+### 🟢 Exercise 6.1: Plan a Feature with Matt's Skills
+
+**Goal**: Use grilling to plan a simple feature
+
+<Steps>
+
+1. **Open Claude Code**
+   ```bash
+   claude
+   ```
+
+2. **Start grilling**
+   ```
+   /grilling
+   
+   I want to add a dark mode toggle to my website.
+   ```
+
+3. **Answer the agent's questions** about:
+   - Where should the toggle be?
+   - What colors for dark mode?
+   - Should it persist across sessions?
+
+4. **Watch the design tree grow**
+
+5. **Document the decisions made**
+
+</Steps>
+
+**Deliverable**: List of decisions from grilling session
+
+---
+
+### 🟡 Exercise 6.2: Create Decision Tickets
+
+**Goal**: Turn grilling decisions into GitHub issues
+
+<Steps>
+
+1. **Create a GitHub repository** (or use existing)
+
+2. **Create Issue 1**: "Choose dark mode toggle location"
+   ```markdown
+   ## Question
+   
+   Where should the dark mode toggle be placed?
+   
+   ## Options
+   1. Header (top-right)
+   2. Settings page
+   3. Footer
+   
+   ## Recommendation
+   Header (top-right) - most accessible
+   ```
+
+3. **Create Issue 2**: "Define dark mode color palette"
+   ```markdown
+   ## Question
+   
+   What colors should dark mode use?
+   
+   ## Options
+   1. System default (prefers-color-scheme)
+   2. Custom palette (specify colors)
+   3. Toggle between predefined themes
+   
+   ## Recommendation
+   System default with custom override option
+   ```
+
+4. **Add labels**: `wayfinder:grilling`
+
+5. **Add blocking**: Issue 2 blocked by Issue 1
+
+</Steps>
+
+**Deliverable**: 2 GitHub issues with proper formatting
+
+---
+
+### 🔴 Exercise 6.3: Execute with Goal System
+
+**Goal**: Use Goal system to implement from issues
+
+<Steps>
+
+1. **Start Pi with Goal system**
+   ```bash
+   pi
+   ```
+
+2. **Create a goal from Issue 1**
+   ```
+   /goal "Choose dark mode toggle location. Done when: decision documented in CONTEXT.md"
+   ```
+
+3. **Watch the drafting interview**
+
+4. **Confirm the goal**
+
+5. **Watch execution**:
+   - Agent researches options
+   - Agent makes recommendation
+   - Agent documents decision
+   - Auditor verifies work
+
+6. **Check the audit result**
+
+</Steps>
+
+**Deliverable**: Implemented decision with audit trail
+
+---
+
+## ✅ Block 6 Checklist
+
+- [ ] Understand the 3-layer pipeline
+- [ ] Exercise 6.1 completed (Matt's skills)
+- [ ] Exercise 6.2 completed (GitHub issues)
+- [ ] Exercise 6.3 completed (Goal system)
+- [ ] Understand anti-bamboozle architecture
+
+---
+
+## 🚀 Next Steps
+
+**Reference Docs**: Dive deeper into each layer
+- [Matt's Skills Reference](/reference/matt-skills)
+- [Goal System Reference](/reference/goal-system)
+- [Execution Skills Reference](/reference/execution-skills)
+
+<a href="/reference/matt-skills" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">View Matt's Skills Reference →</a>
