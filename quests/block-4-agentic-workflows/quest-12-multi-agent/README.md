@@ -4,59 +4,29 @@
 
 ## 🎯 Learning Objectives
 
-- Design multi-agent systems
-- Implement agent communication
-- Create pipeline orchestration
+- Orchestrate multi-role agents (code writer, test writer, test runner).
+- **Anti-bamboozle architecture** — the agent that writes the tests must be a DIFFERENT function object than the agent that runs them; otherwise the tests aren't independent and a sloppy implementation passes its own tests.
 
-## 📋 Instructions
+## 📋 Instructions (run on your machine)
 
-1. **Design agents**: Define roles and responsibilities
-2. **Implement communication**: How agents share data
-3. **Build orchestrator**: Coordinate agent execution
-4. **Test pipeline**: Run with complex task
-
-## 🚀 Getting Started
-
-### Agent Roles
-
-| Agent | Role | Responsibility |
-|-------|------|----------------|
-| Planner | Task Analysis | Break tasks into steps |
-| Coder | Implementation | Write code |
-| Reviewer | Quality Check | Review code quality |
-| Tester | Validation | Test code |
-
-### Pipeline Flow
-
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-4-agentic-workflows/quest-12-multi-agent my-quest
+cd my-quest
 ```
-Task → [Planner] → Plan → [Coder] → Code → [Reviewer] → Review → [Tester] → Result
-```
+
+1. Read the contract in `problem.js`: `buildPipeline({ codeWriter, testWriter, testRunner })` returns a pipeline with `writeCode`, `writeTests`, `runTests` stages plus the three role functions referenced.
+2. Prompt the AI for `buildPipeline`. Explicitly instruct: `testWriter` and `testRunner` must remain distinct objects — never collapse them into one reference.
+3. Verify:
+   ```bash
+   node test.js
+   ```
 
 ## ✅ Verification
 
-Run the test suite:
-
-```bash
-npm test
-```
+`node test.js` asserts: `pipeline.testWriter !== pipeline.testRunner` (anti-bamboozle), that the three stages are functions wired to the role functions the caller passed in (same references — no substitute agents), and that an end-to-end run (`writeCode → writeTests → runTests`) produces the expected object kinds. The stub collapses `testWriter` and `testRunner` into one reference → fails.
 
 ## 💡 Hints
 
-- **Single Responsibility**: Each agent does one thing well
-- **Loose Coupling**: Agents communicate through data, not direct calls
-- **Pipeline Pattern**: Data flows through the chain
-
-## 🔍 What You'll Learn
-
-- **Multi-Agent Systems**: How multiple agents work together
-- **Orchestration**: Coordinating agent execution
-- **Data Flow**: Passing data between agents
-
-## 📚 Resources
-
-- [Multi-Agent Systems](https://en.wikipedia.org/wiki/Multi-agent_system)
-- [Pipeline Pattern](https://en.wikipedia.org/wiki/Pipeline_(software))
-
-## ⏭️ Next Quest
-
-[Quest 5.1: RAG Design](../../block-5-architecture/quest-13-rag-design/)
+- Naive AI often assigns `testRunner = testWriter` "for simplicity" — that's the exact failure mode this quest teaches you to detect.
+- Also check: the pipeline must expose the role functions it wired in, so callers (and tests) can verify no agent was silently substituted with a fake that always passes.
+- The reference-equality checks (`pipeline.codeWriter === codeWriter`) catch a pipeline that ships its own "always-pass" agents.

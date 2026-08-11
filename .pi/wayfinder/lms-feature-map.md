@@ -18,7 +18,12 @@ Add a paywall-gated learning system where:
 
 ## Decisions so far
 
-<!-- No decisions yet - this is a fresh map -->
+- [Code Format Decision](https://github.com/Poom5741/ai-sdlc-course/issues/34) — **BBD-XXXX-XXXX** with alphanumeric characters
+- [Storage Backend Decision](https://github.com/Poom5741/ai-sdlc-course/issues/35) — **Cloudflare KV** for code storage
+- [Admin Panel Decision](https://github.com/Poom5741/ai-sdlc-course/issues/36) — **Separate route** `/admin` with password auth
+- [Content Protection Decision](https://github.com/Poom5741/ai-sdlc-course/issues/37) — **Workshop + Quests** protected, reference docs open
+- [Auth Flow Decision](https://github.com/Poom5741/ai-sdlc-course/issues/38) — **Modal popup** with localStorage persistence
+- [Implementation Approach Decision](https://github.com/Poom5741/ai-sdlc-course/issues/39) — **Cloudflare Pages Functions** + KV
 
 ## Open Tickets (Frontier)
 

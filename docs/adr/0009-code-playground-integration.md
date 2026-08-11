@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+**Superseded** by local folder approach (2026-08-12). StackBlitz embeds removed; quests now use `npx degit` to pull starter code to the learner's machine. Rationale: pivot to build-and-test-locally pattern; StackBlitz dependency eliminated.
 
 ## Context
 

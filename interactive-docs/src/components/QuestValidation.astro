@@ -92,22 +92,23 @@ const { questId, onComplete } = Astro.props;
 </style>
 
 <script>
-  document.querySelectorAll('.quest-validation').forEach(el => {
-    const questId = el.dataset.questId;
-    const submitBtn = el.querySelector('[data-action="submit"]');
-    const checkBtn = el.querySelector('[data-action="check"]');
-    const resultDiv = el.querySelector('.validation-result');
-    const scoreValue = el.querySelector('.score-value');
-    const feedback = el.querySelector('.feedback');
-    
+  document.querySelectorAll<HTMLElement>('.quest-validation').forEach(root => {
+    const submitBtn = root.querySelector<HTMLButtonElement>('[data-action="submit"]');
+    const checkBtn = root.querySelector<HTMLButtonElement>('[data-action="check"]');
+    const resultDiv = root.querySelector<HTMLElement>('.validation-result');
+    const scoreValue = root.querySelector<HTMLElement>('.score-value');
+    const feedback = root.querySelector<HTMLElement>('.feedback');
+
     submitBtn?.addEventListener('click', () => {
       // Simulate validation
       const score = Math.floor(Math.random() * 40) + 60; // 60-100
-      scoreValue.textContent = score.toString();
-      feedback.textContent = score >= 80 
-        ? 'Great job! Your solution is correct.'
-        : 'Good attempt. Review the requirements and try again.';
-      resultDiv.hidden = false;
+      scoreValue?.replaceChildren(String(score));
+      feedback?.replaceChildren(
+        score >= 80
+          ? 'Great job! Your solution is correct.'
+          : 'Good attempt. Review the requirements and try again.',
+      );
+      if (resultDiv) resultDiv.hidden = false;
     });
     
     checkBtn?.addEventListener('click', () => {

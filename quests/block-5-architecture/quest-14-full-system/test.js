@@ -1,99 +1,82 @@
 /**
- * Quest 5.2: Full System Design - Test Suite
+ * Quest 5.2: Full System Design — design-doc validator
+ *
+ * Tool skill: architect a complete system (components + interfaces + data flow).
+ * Engineering habit: SPECIFY INTERFACES BEFORE IMPLEMENTING — decide the
+ * component contracts and the data flow before writing any logic.
+ *
+ * This is NOT a code test. It validates that a design document
+ * (`system-design.md`) exists at the quest root and contains the required
+ * sections/keywords.
+ *
+ * Required in system-design.md:
+ *   1. component diagram  (a fenced ``` code block containing
+ *      "→" | "-->" | "graph")
+ *   2. interface contracts ("interface" | "contract" | "API")
+ *   3. data flow          ("data flow" | "dataflow" | "flow:")
+ *   4. named components    (>= 3 distinct component names)
+ *   5. at least 500 characters of substance
+ *
+ * Run: node test.js
  */
 
-const {
-  AISystem,
-  ChatbotSystem,
-  CodeReviewSystem,
-} = require('./index.js');
+const { existsSync, readFileSync } = require('fs');
+const path = require('path');
+
+const DOC_PATH = path.join(__dirname, 'system-design.md');
 
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 5.2: Full System Design\n");
-console.log("Running tests...\n");
+console.log('Quest 5.2: Full System Design — design-doc validator\n');
 
-function test(description, fn) {
-  try {
-    fn();
-    console.log(`✅ ${description}`);
+function check(label, condition) {
+  if (condition) {
+    console.log(`PASS ${label}`);
     passed++;
-  } catch (error) {
-    console.log(`❌ ${description}`);
-    console.log(`   ${error.message}`);
+  } else {
+    console.log(`FAIL ${label}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
-}
+check('system-design.md exists', existsSync(DOC_PATH));
 
-async function runTests() {
-  // AISystem tests
-  test('AISystem can be instantiated', () => {
-    const system = new AISystem('Test System', 'test');
-    assert(system instanceof AISystem);
-    assert(system.name === 'Test System');
-    assert(system.type === 'test');
-  });
-
-  test('AISystem has addComponent method', () => {
-    const system = new AISystem('Test System', 'test');
-    assert(typeof system.addComponent === 'function');
-  });
-
-  test('AISystem has process method', () => {
-    const system = new AISystem('Test System', 'test');
-    assert(typeof system.process === 'function');
-  });
-
-  test('AISystem has getStatus method', () => {
-    const system = new AISystem('Test System', 'test');
-    assert(typeof system.getStatus === 'function');
-  });
-
-  test('AISystem has toDocumentation method', () => {
-    const system = new AISystem('Test System', 'test');
-    assert(typeof system.toDocumentation === 'function');
-  });
-
-  // ChatbotSystem tests
-  test('ChatbotSystem extends AISystem', () => {
-    const chatbot = new ChatbotSystem();
-    assert(chatbot instanceof AISystem);
-    assert(chatbot.type === 'chatbot');
-  });
-
-  test('ChatbotSystem has chat method', () => {
-    const chatbot = new ChatbotSystem();
-    assert(typeof chatbot.chat === 'function');
-  });
-
-  // CodeReviewSystem tests
-  test('CodeReviewSystem extends AISystem', () => {
-    const reviewer = new CodeReviewSystem();
-    assert(reviewer instanceof AISystem);
-    assert(reviewer.type === 'code-review');
-  });
-
-  test('CodeReviewSystem has review method', () => {
-    const reviewer = new CodeReviewSystem();
-    assert(typeof reviewer.review === 'function');
-  });
-
+if (!existsSync(DOC_PATH)) {
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
-
-  if (failed === 0) {
-    console.log("\n🎉 Quest 5.2 Complete! You've designed a full AI system.");
-    process.exit(0);
-  } else {
-    console.log("\n💡 Hint: A complete system needs components, interfaces, and documentation.");
-    process.exit(1);
-  }
+  console.log('\nHint: create system-design.md describing your system architecture.');
+  process.exit(1);
 }
 
-runTests();
+const content = readFileSync(DOC_PATH, 'utf-8');
+
+// 1. Component diagram: a fenced code block containing an arrow or graph.
+const fencedBlocks = content.match(/```[\s\S]*?```/g) || [];
+const hasDiagram = fencedBlocks.some((block) => /(→|-->)|graph/i.test(block));
+check('component diagram (fenced block with → or --> or graph)', hasDiagram);
+
+// 2. Interface contracts.
+check('interface contracts (interface|contract|API)', /(interface|contract|api)/i.test(content));
+
+// 3. Data flow.
+check('data flow (data flow|dataflow|flow:)', /(data flow|dataflow|flow:)/i.test(content));
+
+// 4. At least 3 distinct named components (Capitalized words of length >= 3
+//    that look like component names, deduped). We use a simple Title Case
+//    heuristic and require >= 3 distinct.
+const candidates = (content.match(/\b([A-Z][a-zA-Z]{2,})\b/g) || []);
+const distinct = new Set(candidates);
+check('at least 3 distinct named components', distinct.size >= 3);
+
+// 5. Substance.
+check('at least 500 characters of substance', content.length >= 500);
+
+console.log(`\nResults: ${passed} passed, ${failed} failed`);
+
+if (failed === 0) {
+  console.log('\nQuest 5.2 complete. You specified interfaces before implementing them.');
+  process.exit(0);
+}
+
+console.log('\nHint: system-design.md must include a diagram, interface contracts, data flow, and >= 3 named components.');
+process.exit(1);

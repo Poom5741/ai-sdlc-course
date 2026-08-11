@@ -1,108 +1,69 @@
 /**
- * Quest 5.1: RAG Design - Test Suite
+ * Quest 5.1: RAG Design — design-doc validator
+ *
+ * Tool skill: design a RAG system (chunking, embedding, retrieval).
+ * Engineering habit: DESIGN FOR THE FAILURE MODE — plan what happens when
+ * retrieval returns nothing, when confidence is low, or when the query is
+ * out-of-corpus.
+ *
+ * This is NOT a code test. It validates that a design document
+ * (`rag-design.md`) exists at the quest root and contains the required
+ * sections/keywords.
+ *
+ * Required in rag-design.md:
+ *   1. chunking strategy  (keyword "chunk")
+ *   2. embedding strategy (keyword "embed")
+ *   3. retrieval quality metric ("metric" | "recall" | "precision" | "NDCG")
+ *   4. failure handling ("failure mode" | "fallback" | "graceful degradation")
+ *   5. the corpus being indexed ("corpus" | "workshop docs")
+ *   6. at least 400 characters of substance
+ *
+ * Run: node test.js
  */
 
-const {
-  DocumentStore,
-  EmbeddingService,
-  RAGPipeline,
-} = require('./index.js');
+const { existsSync, readFileSync } = require('fs');
+const path = require('path');
+
+const DOC_PATH = path.join(__dirname, 'rag-design.md');
 
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 5.1: RAG Design\n");
-console.log("Running tests...\n");
+console.log('Quest 5.1: RAG Design — design-doc validator\n');
 
-function test(description, fn) {
-  try {
-    fn();
-    console.log(`✅ ${description}`);
+function check(label, condition) {
+  if (condition) {
+    console.log(`PASS ${label}`);
     passed++;
-  } catch (error) {
-    console.log(`❌ ${description}`);
-    console.log(`   ${error.message}`);
+  } else {
+    console.log(`FAIL ${label}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
-}
+check('rag-design.md exists', existsSync(DOC_PATH));
 
-async function runTests() {
-  // DocumentStore tests
-  test('DocumentStore can be instantiated', () => {
-    const store = new DocumentStore();
-    assert(store instanceof DocumentStore);
-  });
-
-  test('DocumentStore has addDocument method', () => {
-    const store = new DocumentStore();
-    assert(typeof store.addDocument === 'function');
-  });
-
-  test('DocumentStore has search method', () => {
-    const store = new DocumentStore();
-    assert(typeof store.search === 'function');
-  });
-
-  // EmbeddingService tests
-  test('EmbeddingService can be instantiated', () => {
-    const service = new EmbeddingService();
-    assert(service instanceof EmbeddingService);
-  });
-
-  test('EmbeddingService has embed method', () => {
-    const service = new EmbeddingService();
-    assert(typeof service.embed === 'function');
-  });
-
-  test('EmbeddingService has similarity method', () => {
-    const service = new EmbeddingService();
-    assert(typeof service.similarity === 'function');
-  });
-
-  // RAGPipeline tests
-  test('RAGPipeline can be instantiated', () => {
-    const store = new DocumentStore();
-    const service = new EmbeddingService();
-    const pipeline = new RAGPipeline(store, service);
-    assert(pipeline instanceof RAGPipeline);
-  });
-
-  test('RAGPipeline has retrieve method', () => {
-    const store = new DocumentStore();
-    const service = new EmbeddingService();
-    const pipeline = new RAGPipeline(store, service);
-    assert(typeof pipeline.retrieve === 'function');
-  });
-
-  test('RAGPipeline has generate method', () => {
-    const store = new DocumentStore();
-    const service = new EmbeddingService();
-    const pipeline = new RAGPipeline(store, service);
-    assert(typeof pipeline.generate === 'function');
-  });
-
-  test('RAGPipeline has query method', () => {
-    const store = new DocumentStore();
-    const service = new EmbeddingService();
-    const pipeline = new RAGPipeline(store, service);
-    assert(typeof pipeline.query === 'function');
-  });
-
+if (!existsSync(DOC_PATH)) {
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
-
-  if (failed === 0) {
-    console.log("\n🎉 Quest 5.1 Complete! You've designed a RAG system.");
-    process.exit(0);
-  } else {
-    console.log("\n💡 Hint: RAG combines retrieval (finding relevant docs) with generation (creating answers).");
-    process.exit(1);
-  }
+  console.log('\nHint: create rag-design.md describing your RAG system over the workshop docs.');
+  process.exit(1);
 }
 
-runTests();
+const content = readFileSync(DOC_PATH, 'utf-8');
+
+check('chunking strategy (chunk)', /chunk/i.test(content));
+check('embedding strategy (embed)', /embed/i.test(content));
+check('retrieval quality metric (metric|recall|precision|NDCG)', /(metric|recall|precision|ndcg)/i.test(content));
+check('failure handling (failure mode|fallback|graceful degradation)', /(failure mode|fallback|graceful degradation)/i.test(content));
+check('corpus identified (corpus|workshop docs)', /(corpus|workshop docs)/i.test(content));
+check('at least 400 characters of substance', content.length >= 400);
+
+console.log(`\nResults: ${passed} passed, ${failed} failed`);
+
+if (failed === 0) {
+  console.log('\nQuest 5.1 complete. You designed a RAG system for the failure mode.');
+  process.exit(0);
+}
+
+console.log('\nHint: rag-design.md must cover chunking, embedding, a retrieval metric, failure handling, and the corpus.');
+process.exit(1);

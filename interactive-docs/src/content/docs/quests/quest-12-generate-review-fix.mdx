@@ -1,0 +1,64 @@
+---
+title: Quest 4.2 - Generate-Review-Fix
+description: Add a review step to the generate loop
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Quest 4.2: Generate-Review-Fix
+
+<Badge text="🟡 Medium" variant="note" /> <Badge text="20 minutes" variant="note" /> <Badge text="Block 4: Agentic Workflows" variant="tip" />
+
+## 🎯 Goal
+
+เพิ่ม **review step** ให้กับ generate loop — เรียนรู้การ **แยก generation ออกจาก review**: "agent" ที่ต่างกันต้อง critique output ของ generator; generator ต้องไม่ grade ตัวเอง
+
+---
+
+## 📋 Instructions (รันบนเครื่องของคุณ)
+
+<Steps>
+
+1. **ดึง quest ลงเครื่อง:**
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-4-agentic-workflows/quest-11-generate-review-fix my-quest
+   cd my-quest
+   ```
+
+2. **อ่าน contract ใน `problem.js`**: `runGenerateOnly({generator, qualityTest, seed})` รัน generator ครั้งเดียว `runGrfLoop({generator, reviewer, fixer, qualityTest, maxIterations, seed})` loop generate→review→fix จนกว่า issues จะว่าง
+
+3. **Prompt ให้ `runGenerateOnly`** (ง่าย)
+
+4. **Prompt ให้ `runGrfLoop`** ที่เรียก `reviewer(draft)` และ `fixer(draft, issues)` จริงๆ
+
+5. **ตรวจสอบ:**
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+`node test.js` ยืนยันว่า `runGrfLoop(...).finalScore` **มากกว่า** `runGenerateOnly(...).finalScore` อย่างเคร่งครัด, draft ของ GRF ไม่มี defect เหลือ, และ `maxIterations:0` ไม่ crash stub ที่เป็น pass-through (return draft ดิบของ generator) จะ tie กับ generate-only → fail
+
+---
+
+## 💡 Hints
+
+- Reviewer และ fixer ถูกส่งเข้ามาโดย test — orchestrator ของคุณแค่ wire พวกมันเข้าด้วยกัน อย่า bake roles ลงใน loop
+- หยุด loop ทันทีที่ `reviewer` return issues เป็น 0 — อย่า iterate ถึง `maxIterations` เสมอ
+- test จับ AI ที่ return draft ของ generator ไม่เปลี่ยนใน `runGrfLoop` (ไม่แยก generation ออกจาก review)
+
+---
+
+## 📚 Resources
+
+- [Chain-of-thought / GRF patterns](https://en.wikipedia.org/wiki/Self-refine)

@@ -4,88 +4,33 @@
 
 ## 🎯 Learning Objectives
 
-- Design secure system architectures
-- Implement security controls
-- Document security decisions
+- Use AI to design security controls.
+- **Threat-model before building** — threats first, then a control per threat, then each control's failure mode.
 
-## 📋 Instructions
+## 📋 Instructions (run on your machine)
 
-1. **Choose a system**: Chatbot, API, or web application
-2. **Identify threats**: What attacks are possible?
-3. **Design controls**: How to prevent each threat
-4. **Document architecture**: Record your security decisions
-
-## 🚀 Getting Started
-
-### Security Controls to Implement
-
-| Control | Purpose | Example |
-|---------|---------|---------|
-| Authentication | Verify identity | JWT, OAuth |
-| Authorization | Check permissions | RBAC, ABAC |
-| Encryption | Protect data | AES, RSA |
-| Input Validation | Prevent injection | Whitelist, Sanitize |
-| Logging | Detect attacks | Audit trails |
-
-### Architecture Document Structure
-
-```markdown
-# Security Architecture: [System Name]
-
-## Overview
-- System description
-- Security requirements
-
-## Threat Model
-- Potential attacks
-- Risk assessment
-
-## Security Controls
-- Authentication mechanism
-- Authorization model
-- Encryption strategy
-
-## Implementation
-- Code examples
-- Configuration
-
-## Testing
-- Security tests
-- Penetration testing
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-3-security/quest-09-security-architecture my-quest
+cd my-quest
 ```
+
+1. Pick the system: an API auth flow (API key + rate limiting), per the spec.
+2. Create `design.md` in this folder with these sections:
+   - **System**: the API auth flow you're securing
+   - **Threats**: at least 3 threats
+   - **Controls**: a control per threat (incl. API key + rate limiting)
+   - **Failure Modes**: what happens when each control fails
+3. Verify:
+   ```bash
+   node test.js
+   ```
 
 ## ✅ Verification
 
-Run the test suite:
-
-```bash
-npm test
-```
+`node test.js` is a **design-doc validator** — it checks `design.md` has the required sections (Threats, Controls incl. API key + rate limiting, Failure Modes), mentions the API/auth system, and is ≥400 characters. It does NOT run code.
 
 ## 💡 Hints
 
-- **Defense in Depth**: Multiple layers of security
-- **Least Privilege**: Minimal permissions needed
-- **Fail Securely**: Default to deny
-- **Separation of Duties**: No single point of compromise
-
-## 🔍 What You'll Learn
-
-- **Threat Modeling**: Identifying security risks
-- **Security Controls**: Implementing protections
-- **Architecture Documentation**: Recording security decisions
-
-## 📚 Resources
-
-- [OWASP Security Architecture](https://owasp.org/www-project-security-architecture/)
-- [Microsoft Security Architecture](https://learn.microsoft.com/en-us/security/architecture/)
-- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-
-## 🎓 Block 3 Complete!
-
-You've completed the Security block:
-- ✅ Quest 3.1: Spot the Vulnerability
-- ✅ Quest 3.2: Fix and Harden
-- ✅ Quest 3.3: Security Architecture
-
-Next: [Block 4: Agentic Workflows](../../block-4-agentic-workflows/quest-10-setup-loop/)
+- Start with threats — a control with no threat is decoration.
+- Every control must have a failure mode and a fallback.
+- Examples: credential theft → API key + rotation; abuse → rate limiting; brute force → uniform 401 + escalation.

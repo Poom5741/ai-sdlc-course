@@ -2,32 +2,33 @@ import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-const PAGES_DIR = join(__dirname, '..', 'pages', 'workshop');
+const DOCS_DIR = join(__dirname, '..', '..', 'src', 'content', 'docs');
 
-describe('Workshop pages', () => {
+describe('Workshop MDX content files', () => {
   const pages = [
-    'overview.astro',
-    'block-1-ai-tools.astro',
-    'block-2-prompting.astro',
-    'block-3-security.astro',
-    'block-4-loops.astro',
-    'block-5-architecture.astro',
+    'overview.mdx',
+    'block-1-ai-tools.mdx',
+    'block-2-prompting.mdx',
+    'block-3-security.mdx',
+    'block-4-loops.mdx',
+    'block-5-architecture.mdx',
+    'block-6-ai-pipeline.mdx',
   ];
 
-  for (const page of pages) {
-    it(`${page} exists`, () => {
-      expect(existsSync(join(PAGES_DIR, page))).toBe(true);
+  for (const file of pages) {
+    it(`${file} exists in content/docs/workshop/`, () => {
+      expect(existsSync(join(DOCS_DIR, 'workshop', file))).toBe(true);
     });
 
-    it(`${page} imports from local components, not Starlight`, () => {
-      const content = readFileSync(join(PAGES_DIR, page), 'utf-8');
-      expect(content).not.toMatch(/@astrojs\/starlight/);
-      expect(content).toMatch(/import.*from.*\.\.\/\.\.\/components/);
+    it(`${file} has valid frontmatter with title`, () => {
+      const content = readFileSync(join(DOCS_DIR, 'workshop', file), 'utf-8');
+      expect(content).toMatch(/^---[\s\S]*?title:/m);
     });
 
-    it(`${page} uses DocLayout`, () => {
-      const content = readFileSync(join(PAGES_DIR, page), 'utf-8');
-      expect(content).toMatch(/DocLayout/);
+    it(`${file} uses Starlight component imports (not custom)`, () => {
+      const content = readFileSync(join(DOCS_DIR, 'workshop', file), 'utf-8');
+      // Should NOT import from ../../components/ for Card, Badge, Steps, CardGrid
+      expect(content).not.toMatch(/from '\.\.\/\.\.\/components\/(Card|Badge|Steps|CardGrid)/);
     });
   }
 });

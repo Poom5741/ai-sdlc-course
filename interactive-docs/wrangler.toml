@@ -1,3 +1,9 @@
 name = "ai-sdlc-course"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "./dist"
+
+# KV Namespace binding for LMS
+[[kv_namespaces]]
+binding = "KV_NAMESPACE"
+id = "01da0f401560496f89d9b5686567024e"
+preview_id = "df42168648154d0bbaba9021b86e92ce"

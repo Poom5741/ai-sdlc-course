@@ -16,74 +16,105 @@ const { title, description = 'BlueBeltDojo — Train Your AI Coding Like You Tra
   <title>{title}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;700;900&family=Noto+Serif+JP:wght@300;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-surface text-on-surface font-body-base antialiased">
+  <!-- impeccable-decision-contract
+    THESIS: A clear path through complex terrain — elevation markers show difficulty, waypoints mark achievements, and the full journey is visible at a glance. Clean, functional, and confidence-inspiring.
+    OWN-WORLD: Warm off-white ground with stone-dark text. Forest green for progress/completion, amber for warnings/highlights. Clean topographic wayfinding with generous whitespace. Typography: clear sans-serif for navigation, readable body for content.
+    STORY: The learner opens the docs and immediately sees where they are in the journey. Each module is a waypoint on a clear path. The design says: you are building something real, one step at a time, and every step counts.
+    FIRST VIEWPORT: Clean header with course title, horizontal path showing module progression with current position marked, and a grid of module cards below — each showing status, title, and quest count.
+    FORM: Topographic trail map — clear path, elevation markers, waypoints, journey visible at a glance.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
   <slot />
+<!-- impeccable-live-start -->
+<script is:inline src="http://localhost:8400/live.js?token=b832870d-0727-400e-9b0d-3149a4d2921c"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>
 
 <style is:global>
-  /* Dojo Design System Base Styles */
+  /* Trail Map Design System */
 
-  /* Tatami Grid */
-  .tatami-container {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 2px;
-    background-color: #1C1C1C;
-    border: 2px solid #1C1C1C;
+  :root {
+    /* Ground & Text */
+    --ground: #FAFAF9;
+    --ground-warm: #F5F5F4;
+    --ground-cool: #E7E5E4;
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+
+    /* Trail Colors */
+    --trail-green: #059669;
+    --trail-green-light: #D1FAE5;
+    --trail-amber: #D97706;
+    --trail-amber-light: #FEF3C7;
+    --trail-stone: #78716C;
+    --trail-stone-light: #E7E5E4;
+
+    /* Elevation (difficulty) */
+    --elevation-easy: #059669;
+    --elevation-medium: #D97706;
+    --elevation-hard: #DC2626;
+
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Typography */
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
   }
 
-  .tatami-mat {
-    background-color: #131313;
-    padding: 4rem;
-    position: relative;
+  /* Base resets */
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
 
-  /* Scroll Reveal */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+  html {
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background: var(--ground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  .reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Vertical Text */
-  .vertical-text {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-  }
-
-  /* Noise Overlay */
-  .noise-overlay::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  }
-
-  /* Tatami Grid Background (faint) */
-  .tatami-bg {
-    background-image:
-      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
   }
 
   /* Scrollbar */
   ::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--ground-warm);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--trail-stone-light);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--trail-stone);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--trail-green-light);
+    color: var(--text-primary);
   }
 </style>

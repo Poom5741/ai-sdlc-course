@@ -1,10 +1,105 @@
 ---
 title: Claude Code Reference
-description: Quick reference for using Claude Code
+description: Quick reference for using Claude Code, Anthropic's terminal-based AI coding agent
 ---
+
+import { Badge } from '@astrojs/starlight/components';
 
 # Claude Code Reference
 
-:::note[Under Construction]
-This reference page is planned but content has not been written yet.
-:::
+<Badge text="Terminal Agent" variant="note" /> <Badge text="Anthropic" variant="tip" />
+
+## Overview
+
+**Claude Code** เป็น AI coding agent ที่รันใน terminal ของ Anthropic — มันอ่าน/เขียนไฟล์, รันคำสั่ง, และทำงานหลายขั้นตอนให้เสร็จภายใน repository ของคุณ โดยใช้ Claude models
+
+```
+You → Claude Code CLI → files, commands, tests, git
+```
+
+---
+
+## When to Use
+
+- งานที่ต้องแก้หลายไฟล์พร้อมกัน (multi-file refactor)
+- งาน autonomous ที่ต้องรัน test / build / git เอง
+- งานที่ต้องการ agentic loop (อ่าน → แก้ → verify → retry)
+- งานที่ต้องการ integ/กับ MCP servers หรือ subagents
+
+**When NOT to Use**:
+- แค่ autocomplete สั้นๆ (ใช้ IDE inline completion ก็พอ)
+- งานที่ต้อง transaction กับระบบภายนอกโดยไม่มีการ review
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Terminal-based** | ทำงานใน CLI, ยึดกับ current directory (working directory) |
+| **File I/O** | อ่าน/เขียนไฟล์ใน repo ได้โดยตรง |
+| **Command execution** | รัน shell commands, tests, builds |
+| **Agentic loop** | วางแผน → ลงมือ → ตรวจสอบ → retry เอง |
+| **MCP support** | เชื่อมต่อ tools ภายนอกผ่าน Model Context Protocol |
+| **Subagents** | เรียก agent ย่อยเฉพาะทาง (เช่น Explore, Plan) |
+| **Plan mode** | วางแผนก่อนแก้ โดยไม่เขียน code จนกว่าจะ approve |
+| **Hooks** | trigger scripts ตามเหตุการณ์ (pre-tool, post-tool, ...) |
+
+---
+
+## Basic Usage
+
+```bash
+# เริ่มใน directory ของโปรเจกต์
+claude
+
+# รัน command เดียวแบบ non-interactive
+claude -p "Add a /health endpoint to the server"
+
+# เปิดโหมด Plan (วางแผนก่อนแก้)
+claude --plan "Design the auth flow"
+```
+
+---
+
+## Common Workflows
+
+### 1. Fresh Task in a Repo
+```bash
+cd my-project
+claude
+# > Add error handling to the fetch wrapper
+```
+
+### 2. Plan-First (recommended for big changes)
+```bash
+claude --plan "Add a dark-mode toggle"
+# Review the plan, then approve before any code is written
+```
+
+### 3. Delegating to a Subagent
+```text
+Use the Explore agent to find every place we read process.env,
+then propose a config module.
+```
+
+### 4. Verify-Before-Trust
+```text
+After generating the function, run the test suite and fix any failures.
+Quote the test output when you're done.
+```
+
+---
+
+## Tips
+
+- **Be explicit about the working directory and scope** — Claude Code acts on the current directory.
+- **Ask for verification output** — instruct it to run `node test.js` / your gate and quote the result.
+- **Use Plan mode for reversible decisions** — approve before it mutates files.
+- **Guard verbs** — "read X, change Y, run Z, stop" keeps the agent bounded.
+
+---
+
+## 📚 Resources
+
+- [Claude Code docs](https://docs.anthropic.com/claude-code)

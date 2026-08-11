@@ -34,3 +34,16 @@ tmp/
 
 # Package lock (optional - keep if you want)
 # package-lock.json
+
+# Python test cache
+.pytest_cache/
+__pycache__/
+
+# Agent / tool runtime state (not part of the product)
+.until-done/
+.agents/
+.impeccable/
+interactive-docs/.impeccable/
+.pi-glla/audit-jobs/
+.pi-glla/archive/
+.pi-glla/reviews/

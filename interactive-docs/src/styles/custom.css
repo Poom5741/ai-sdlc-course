@@ -1,110 +1,311 @@
-/* Custom styles for AI SDLC Workshop — Dojo Design System */
+/* Trail Map Design System — Starlight Integration */
 
-/* Color palette */
+/* ============================================
+   Design System Variables (shared with BaseLayout)
+   These are available on all pages for custom components.
+   ============================================ */
 :root {
-  --dojo-primary: #a7c8ff;
-  --dojo-primary-container: #1a6cc4;
-  --dojo-surface: #131313;
-  --dojo-surface-container: #201f1f;
-  --dojo-on-surface: #e5e2e1;
-  --dojo-on-surface-variant: #c1c6d4;
-  --dojo-outline: #8b919d;
-  --dojo-outline-variant: #414752;
+  /* Ground & Text */
+  --ground: #FAFAF9;
+  --ground-warm: #F5F5F4;
+  --ground-cool: #E7E5E4;
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-muted: #A8A29E;
 
-  /* Challenge colors */
-  --challenge-easy: #22c55e;
-  --challenge-medium: #eab308;
-  --challenge-hard: #ef4444;
+  /* Trail Colors */
+  --trail-green: #059669;
+  --trail-green-light: #D1FAE5;
+  --trail-amber: #D97706;
+  --trail-amber-light: #FEF3C7;
+  --trail-stone: #78716C;
+  --trail-stone-light: #E7E5E4;
 
-  /* Status colors */
-  --status-completed: #22c55e;
-  --status-pending: #94a3b8;
-  --status-failed: #ef4444;
+  /* Elevation (difficulty) */
+  --elevation-easy: #059669;
+  --elevation-medium: #D97706;
+  --elevation-hard: #DC2626;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Typography (for custom components only) */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* Challenge card styles */
-.challenge-card {
-  border: 1px solid var(--dojo-outline-variant);
-  border-radius: 0px;
-  padding: 1rem;
-  margin: 1rem 0;
-  transition: border-color 0.2s;
+[data-theme='dark'] {
+  --ground: #1C1917;
+  --ground-warm: #292524;
+  --ground-cool: #44403C;
+  --text-primary: #F5F5F4;
+  --text-secondary: #D6D3D1;
+  --text-muted: #78716C;
+  --trail-green: #34D399;
+  --trail-green-light: #064E3B;
+  --trail-amber: #FBBF24;
+  --trail-amber-light: #78350F;
+  --trail-stone: #A8A29E;
+  --trail-stone-light: #44403C;
 }
 
-.challenge-card:hover {
-  border-color: var(--dojo-primary);
+/* ============================================
+   Starlight Theme — Accent Color Override
+   Use our trail-green as the accent color.
+   Trail green: #059669 = hsl(160, 92%, 37%)
+   Must override with same selector specificity as Starlight's props.css
+   ============================================ */
+:root,
+::backdrop {
+  --sl-color-accent-low: hsl(160, 92%, 20%);
+  --sl-color-accent: hsl(160, 92%, 37%);
+  --sl-color-accent-high: hsl(160, 92%, 50%);
 }
 
-.challenge-card.easy {
-  border-left: 4px solid var(--challenge-easy);
+:root[data-theme='light'],
+[data-theme='light'] ::backdrop {
+  --sl-color-accent-high: hsl(160, 92%, 25%);
+  --sl-color-accent: hsl(160, 92%, 37%);
+  --sl-color-accent-low: hsl(160, 92%, 88%);
 }
 
-.challenge-card.medium {
-  border-left: 4px solid var(--challenge-medium);
+[data-theme='dark'] {
+  --sl-color-accent-low: hsl(160, 92%, 20%);
+  --sl-color-accent: hsl(160, 92%, 50%);
+  --sl-color-accent-high: hsl(160, 92%, 80%);
 }
 
-.challenge-card.hard {
-  border-left: 4px solid var(--challenge-hard);
-}
+/* ============================================
+   Custom Component Styles
+   These target specific classes, NOT global elements,
+   so they don't conflict with Starlight's built-in styling.
+   ============================================ */
 
-/* Code block styling — Dojo blue on dark */
-pre, code {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-pre {
-  background: #0A1628;
-  border: 1px solid var(--dojo-outline-variant);
-  border-radius: 0px;
-  padding: 1rem;
-  overflow-x: auto;
-}
-
-pre code {
-  color: #a7c8ff;
-}
-
-/* Block header */
 .block-header {
-  background: var(--dojo-primary-container);
+  background: linear-gradient(135deg, var(--trail-green) 0%, #047857 100%);
   color: white;
-  padding: 2rem;
-  border-radius: 0px;
-  margin: 2rem 0;
+  padding: var(--space-2xl);
+  border-radius: 12px;
+  margin: var(--space-2xl) 0;
 }
 
 .block-header h1 {
   color: white;
-  margin: 0;
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .block-header p {
-  opacity: 0.9;
-  margin: 0.5rem 0 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  max-width: none;
 }
 
-/* Contrast box (vibe coding vs proper engineering) */
+.challenge-card {
+  border: 1px solid var(--trail-stone-light);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  margin: var(--space-lg) 0;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.challenge-card:hover {
+  border-color: var(--trail-stone);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.challenge-card.easy {
+  border-left: 2px solid var(--elevation-easy);
+}
+
+.challenge-card.medium {
+  border-left: 2px solid var(--elevation-medium);
+}
+
+.challenge-card.hard {
+  border-left: 2px solid var(--elevation-hard);
+}
+
 .contrast-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
 }
 
 .contrast-box .bad {
-  border: 1px solid var(--challenge-hard);
-  border-radius: 0px;
-  padding: 1rem;
+  border: 1px solid #FCA5A5;
+  border-radius: 8px;
+  padding: var(--space-lg);
+  background: #FEF2F2;
 }
 
 .contrast-box .good {
-  border: 1px solid var(--challenge-easy);
-  border-radius: 0px;
-  padding: 1rem;
+  border: 1px solid #6EE7B7;
+  border-radius: 8px;
+  padding: var(--space-lg);
+  background: #ECFDF5;
 }
 
 @media (max-width: 768px) {
   .contrast-box {
     grid-template-columns: 1fr;
+  }
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--trail-stone-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--trail-green);
+  border-radius: 3px;
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.waypoint-card {
+  background: white;
+  border: 1px solid var(--trail-stone-light);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.waypoint-card:hover {
+  border-color: var(--trail-stone);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.waypoint-card::before {
+  content: '';
+  position: absolute;
+  top: var(--space-lg);
+  left: 0;
+  width: 4px;
+  height: 24px;
+  background: var(--trail-stone-light);
+  border-radius: 0 2px 2px 0;
+}
+
+.waypoint-card.completed::before {
+  background: var(--trail-green);
+}
+
+.waypoint-card.active::before {
+  background: var(--trail-amber);
+}
+
+.waypoint-card.locked {
+  opacity: 0.6;
+}
+
+.waypoint-card.locked::before {
+  background: var(--trail-stone-light);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.completed {
+  background: var(--trail-green-light);
+  color: var(--trail-green);
+}
+
+.status-badge.in-progress {
+  background: var(--trail-amber-light);
+  color: var(--trail-amber);
+}
+
+.status-badge.locked {
+  background: var(--trail-stone-light);
+  color: var(--trail-stone);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+  background: var(--ground-warm);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  background: var(--trail-green-light);
+  color: var(--trail-green);
+  font-weight: 500;
+}
+
+/* ============================================
+   Utility Classes (for custom pages only)
+   ============================================ */
+
+.text-trail-green { color: var(--trail-green); }
+.text-trail-amber { color: var(--trail-amber); }
+.text-trail-stone { color: var(--trail-stone); }
+.text-muted { color: var(--text-muted); }
+
+.bg-trail-green-light { background: var(--trail-green-light); }
+.bg-trail-amber-light { background: var(--trail-amber-light); }
+
+/* ============================================
+   Focus Styles
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--trail-green);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--trail-green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

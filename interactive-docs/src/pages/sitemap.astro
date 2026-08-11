@@ -1,37 +1,46 @@
 ---
-import DocLayout from '../layouts/DocLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<DocLayout title="Sitemap - AI SDLC Course" description="All pages in the AI SDLC Course">
-  <h1>📋 Sitemap</h1>
-  <p>All available pages in the AI SDLC Course.</p>
+<BaseLayout title="Sitemap - AI SDLC Course">
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-3xl font-bold mb-4">📋 Sitemap</h1>
+    <p class="text-gray-600 mb-8">All available pages in the AI SDLC Course.</p>
 
-  <h2>🏠 Home</h2>
-  <ul>
-    <li><a href="/">Landing Page</a></li>
-  </ul>
+    <h2 class="text-xl font-semibold mt-8 mb-3">🏠 Home</h2>
+    <ul class="list-disc pl-6 mb-4">
+      <li><a href="/" class="text-emerald-600 hover:underline">Landing Page</a></li>
+    </ul>
 
-  <h2>📚 Workshop</h2>
-  <ul>
-    <li><a href="/workshop/overview">Workshop Overview</a></li>
-    <li><a href="/workshop/block-1-ai-tools">Block 1: AI Tools Setup</a></li>
-    <li><a href="/workshop/block-2-prompting">Block 2: Prompt Engineering</a></li>
-    <li><a href="/workshop/block-3-security">Block 3: Security</a></li>
-    <li><a href="/workshop/block-4-loops">Block 4: Agentic Workflows</a></li>
-    <li><a href="/workshop/block-5-architecture">Block 5: Architecture</a></li>
-  </ul>
+    <h2 class="text-xl font-semibold mt-8 mb-3">📚 Workshop</h2>
+    <ul class="list-disc pl-6 mb-4">
+      <li><a href="/workshop/overview" class="text-emerald-600 hover:underline">Workshop Overview</a></li>
+      <li><a href="/workshop/block-1-ai-tools" class="text-emerald-600 hover:underline">Block 1: AI Tools Setup</a></li>
+      <li><a href="/workshop/block-2-prompting" class="text-emerald-600 hover:underline">Block 2: Prompt Engineering</a></li>
+      <li><a href="/workshop/block-3-security" class="text-emerald-600 hover:underline">Block 3: Security</a></li>
+      <li><a href="/workshop/block-4-loops" class="text-emerald-600 hover:underline">Block 4: Agentic Workflows</a></li>
+      <li><a href="/workshop/block-5-architecture" class="text-emerald-600 hover:underline">Block 5: Architecture</a></li>
+      <li><a href="/workshop/block-6-ai-pipeline" class="text-emerald-600 hover:underline">Block 6: AI Pipeline</a></li>
+    </ul>
 
-  <h2>🎮 Code Quests</h2>
-  <ul>
-    <li><a href="/quests/quest-1-first-code">Quest 1: First AI Completion</a></li>
-    <li><a href="/quests/quest-2-prompts">Quest 2: Fix the Vague Prompt</a></li>
-    <li><a href="/quests/quest-3-security">Quest 3: Spot the Vulnerability</a></li>
-    <li><a href="/quests/quest-4-loops">Quest 4: Set Up a Loop</a></li>
-    <li><a href="/quests/quest-5-project">Quest 5: Full System Design</a></li>
-  </ul>
+    <h2 class="text-xl font-semibold mt-8 mb-3">🎮 Code Quests</h2>
+    <ul class="list-disc pl-6 mb-4">
+      <li><a href="/quests/quest-1-first-code" class="text-emerald-600 hover:underline">Quest 1: First AI Completion</a></li>
+      <li><a href="/quests/quest-2-prompts" class="text-emerald-600 hover:underline">Quest 2: Fix the Vague Prompt</a></li>
+      <li><a href="/quests/quest-3-security" class="text-emerald-600 hover:underline">Quest 3: Spot the Vulnerability</a></li>
+      <li><a href="/quests/quest-4-loops" class="text-emerald-600 hover:underline">Quest 4: Set Up a Loop</a></li>
+      <li><a href="/quests/quest-5-project" class="text-emerald-600 hover:underline">Quest 5: Full System Design</a></li>
+    </ul>
 
-  <h2>📖 Reference</h2>
-  <ul>
-    <li><a href="/reference/github-copilot">GitHub Copilot Reference</a></li>
-  </ul>
-</DocLayout>
+    <h2 class="text-xl font-semibold mt-8 mb-3">📖 Reference</h2>
+    <ul class="list-disc pl-6 mb-4">
+      <li><a href="/reference/setup-guide" class="text-emerald-600 hover:underline">Pre-Workshop Setup Guide</a></li>
+      <li><a href="/reference/github-copilot" class="text-emerald-600 hover:underline">GitHub Copilot Reference</a></li>
+      <li><a href="/reference/claude-code" class="text-emerald-600 hover:underline">Claude Code Reference</a></li>
+      <li><a href="/reference/code-rabbit" class="text-emerald-600 hover:underline">CodeRabbit Reference</a></li>
+      <li><a href="/reference/matt-skills" class="text-emerald-600 hover:underline">Matt Pocock's Skills Reference</a></li>
+      <li><a href="/reference/execution-skills" class="text-emerald-600 hover:underline">Execution Skills Reference</a></li>
+      <li><a href="/reference/goal-system" class="text-emerald-600 hover:underline">Goal System Reference</a></li>
+    </ul>
+  </main>
+</BaseLayout>

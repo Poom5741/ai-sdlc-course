@@ -1,11 +1,10 @@
 {
   "name": "quest-02-multi-file",
   "version": "1.0.0",
-  "description": "Quest 1.2: Multi-file Generation - Generate multiple related files with AI",
-  "main": "index.js",
+  "description": "Quest 1.2: Multi-file Generation - specify the interface before generating",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
   "keywords": ["ai-sdlc", "workshop", "quest", "block-1"],
   "author": "AI SDLC Workshop",

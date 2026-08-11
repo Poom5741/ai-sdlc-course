@@ -4,56 +4,29 @@
 
 ## 🎯 Learning Objectives
 
-- Fix common security vulnerabilities
-- Apply security hardening techniques
-- Write secure code
+- Ask AI to fix + harden vulnerable code.
+- **Fix the class, not the instance** — patch the vulnerability pattern, not just one example.
 
-## 📋 Instructions
+## 📋 Instructions (run on your machine)
 
-1. **Review vulnerable code**: Look at the previous quest's findings
-2. **Fix each vulnerability**: Apply secure coding practices
-3. **Test your fixes**: Verify vulnerabilities are resolved
-4. **Document changes**: Record what you fixed and why
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-3-security/quest-08-fix-harden my-quest
+cd my-quest
+```
 
-## 🚀 Getting Started
-
-### Vulnerabilities to Fix
-
-1. **SQL Injection**: Use parameterized queries
-2. **Hardcoded Secrets**: Use environment variables
-3. **Weak Hashing**: Use bcrypt or argon2
-4. **Input Validation**: Validate all inputs
-5. **Path Traversal**: Sanitize file paths
-6. **XSS**: Sanitize HTML output
+1. Recall the SQL injection from Quest 3.1.
+2. Write a prompt that fixes the *class*: parameterized query + input validation on the boundary.
+3. Generate `safeQuery(id)` (returns `{ query, params }` with `?` placeholder) and `validateUserId(s)` (rejects non-numeric / empty / null / negative / injection payloads).
+4. Verify:
+   ```bash
+   node test.js
+   ```
 
 ## ✅ Verification
 
-Run the test suite:
-
-```bash
-npm test
-```
+`node test.js` checks: `safeQuery("1 OR 1=1")` returns a parameterized shape (query has `?`, payload only in `params`, never in query text); `validateUserId` accepts valid numerics and rejects empty/null/non-numeric/negative/injection.
 
 ## 💡 Hints
 
-- **Parameterized Queries**: Use `?` placeholders instead of string concatenation
-- **Environment Variables**: Use `process.env.SECRET_KEY`
-- **Password Hashing**: Use `bcrypt.hash()` instead of MD5
-- **Input Validation**: Check types, ranges, and formats
-- **Path Sanitization**: Use `path.normalize()` and validate against allowed directories
-- **HTML Sanitization**: Use a library like `DOMPurify`
-
-## 🔍 What You'll Learn
-
-- **Secure Coding**: How to write code that resists attacks
-- **Defense in Depth**: Multiple layers of protection
-- **Input Validation**: Never trust user input
-
-## 📚 Resources
-
-- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)
-- [Node.js Security Best Practices](https://nodejs.org/en/docs/guides/security/)
-
-## ⏭️ Next Quest
-
-[Quest 3.3: Security Architecture](../quest-09-security-architecture/)
+- Don't just escape the one bad string — fix the pattern: placeholder + params.
+- Validation happens at the boundary (before the query), not inside it.

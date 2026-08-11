@@ -1,0 +1,273 @@
+---
+// Access Code Modal Component
+// Shows when user tries to access protected content without a valid code
+
+interface Props {
+  protectedPaths?: string[];
+}
+
+const { protectedPaths = ['/workshop/block-', '/quests/'] } = Astro.props;
+---
+
+<div id="code-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative">
+    <!-- Close button -->
+    <button 
+      id="modal-close" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+      aria-label="Close modal"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 bg-trail-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-trail-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Enter Access Code</h2>
+      <p class="text-gray-600">Enter your access code to unlock the workshop content</p>
+    </div>
+
+    <!-- Code Input Form -->
+    <form id="code-form" class="space-y-4">
+      <div>
+        <label for="code-input" class="block text-sm font-medium text-gray-700 mb-2">
+          Access Code
+        </label>
+        <input
+          type="text"
+          id="code-input"
+          name="code"
+          placeholder="BBD-XXXX-XXXX"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-center text-lg font-mono tracking-wider focus:border-trail-green focus:outline-none transition-colors"
+          maxlength="13"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p id="code-error" class="mt-2 text-sm text-red-600 hidden"></p>
+      </div>
+
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full bg-trail-green text-white py-3 px-6 rounded-lg font-semibold hover:bg-trail-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Validate Code
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="relative my-6">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-200"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-4 bg-white text-gray-500">OR</span>
+      </div>
+    </div>
+
+    <!-- Continue without code -->
+    <button
+      id="continue-without-code"
+      class="w-full text-gray-600 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors"
+    >
+      Continue without code (limited access)
+    </button>
+
+    <!-- Get access link -->
+    <p class="text-center text-sm text-gray-500 mt-4">
+      Don't have a code? 
+      <a href="#" class="text-trail-green hover:underline">Get access →</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  // Code Modal Logic
+  const modal = document.getElementById('code-modal') as HTMLElement;
+  const form = document.getElementById('code-form') as HTMLFormElement;
+  const input = document.getElementById('code-input') as HTMLInputElement;
+  const errorEl = document.getElementById('code-error') as HTMLElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const closeBtn = document.getElementById('modal-close') as HTMLElement;
+  const continueBtn = document.getElementById('continue-without-code') as HTMLElement;
+
+  // Protected paths
+  const protectedPaths = ['/workshop/block-', '/quests/'];
+
+  // Check if current path is protected
+  function isProtectedPath(): boolean {
+    const path = window.location.pathname;
+    return protectedPaths.some(p => path.includes(p));
+  }
+
+  // Check if user has valid code
+  function hasValidCode(): boolean {
+    const code = localStorage.getItem('bbt_access_code');
+    const expires = localStorage.getItem('bbt_code_expires');
+    
+    if (!code || !expires) return false;
+    
+    // Check if code has expired
+    if (new Date(expires) < new Date()) {
+      localStorage.removeItem('bbt_access_code');
+      localStorage.removeItem('bbt_code_expires');
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Show modal
+  function showModal(): void {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    input.focus();
+  }
+
+  // Hide modal
+  function hideModal(): void {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // Format code input (BBD-XXXX-XXXX)
+  function formatCodeInput(value: string): string {
+    // Remove non-alphanumeric characters
+    let cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    
+    // Add hyphens
+    if (cleaned.length > 3) {
+      cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
+    }
+    if (cleaned.length > 8) {
+      cleaned = cleaned.slice(0, 8) + '-' + cleaned.slice(8);
+    }
+    
+    // Limit length
+    return cleaned.slice(0, 13);
+  }
+
+  // Show error message
+  function showError(message: string): void {
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+    input.classList.add('border-red-500');
+    input.classList.remove('border-gray-200');
+  }
+
+  // Hide error message
+  function hideError(): void {
+    errorEl.classList.add('hidden');
+    input.classList.remove('border-red-500');
+    input.classList.add('border-gray-200');
+  }
+
+  // Validate code via API
+  async function validateCode(code: string): Promise<boolean> {
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Validating...';
+      
+      const response = await fetch('/api/validate-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      
+      const result = await response.json();
+      
+      if (result.valid) {
+        // Store code in localStorage
+        localStorage.setItem('bbt_access_code', result.code);
+        localStorage.setItem('bbt_code_expires', result.expires);
+        localStorage.setItem('bbt_code_plan', result.plan);
+        
+        hideModal();
+        // Reload page to show content
+        window.location.reload();
+        return true;
+      } else {
+        showError(result.error || 'Invalid code');
+        return false;
+      }
+    } catch (error) {
+      showError('Network error. Please try again.');
+      return false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Validate Code';
+    }
+  }
+
+  // Event Listeners
+  if (input) {
+    // Auto-format input
+    input.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      target.value = formatCodeInput(target.value);
+      hideError();
+    });
+
+    // Handle form submit
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = input.value.trim();
+      if (code) {
+        await validateCode(code);
+      }
+    });
+  }
+
+  // Close modal
+  closeBtn?.addEventListener('click', () => {
+    hideModal();
+  });
+
+  // Continue without code
+  continueBtn?.addEventListener('click', () => {
+    hideModal();
+  });
+
+  // Close on backdrop click
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
+      hideModal();
+    }
+  });
+
+  // Initialize: check if we need to show modal
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isProtectedPath() && !hasValidCode()) {
+      showModal();
+    }
+  });
+</script>
+
+<style>
+  /* Custom styles for the modal */
+  #code-modal {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  #code-input {
+    letter-spacing: 0.1em;
+  }
+  
+  #code-input::placeholder {
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+  }
+</style>

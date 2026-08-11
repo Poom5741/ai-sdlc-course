@@ -4,80 +4,57 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Dojo surface system
-        'surface': '#131313',
-        'surface-dim': '#131313',
-        'surface-bright': '#3a3939',
-        'surface-container-lowest': '#0e0e0e',
-        'surface-container-low': '#1c1b1b',
-        'surface-container': '#201f1f',
-        'surface-container-high': '#2a2a2a',
-        'surface-container-highest': '#353534',
-        'on-surface': '#e5e2e1',
-        'on-surface-variant': '#c1c6d4',
-        'inverse-surface': '#e5e2e1',
-        'inverse-on-surface': '#313030',
+        // Ground (backgrounds)
+        'ground': '#FAFAF9',
+        'ground-warm': '#F5F5F4',
+        'ground-cool': '#E7E5E4',
 
-        // Dojo outline system
-        'outline': '#8b919d',
-        'outline-variant': '#414752',
+        // Text
+        'text-primary': '#1C1917',
+        'text-secondary': '#57534E',
+        'text-muted': '#A8A29E',
 
-        // Primary - Belt Blue
-        'primary': '#a7c8ff',
-        'on-primary': '#003060',
-        'primary-container': '#1a6cc4',
-        'on-primary-container': '#e8eeff',
-        'inverse-primary': '#005eb2',
-        'surface-tint': '#a7c8ff',
+        // Trail colors
+        'trail-green': '#059669',
+        'trail-green-light': '#D1FAE5',
+        'trail-amber': '#D97706',
+        'trail-amber-light': '#FEF3C7',
+        'trail-stone': '#78716C',
+        'trail-stone-light': '#E7E5E4',
 
-        // Secondary
-        'secondary': '#a5c8ff',
-        'on-secondary': '#00315e',
-        'secondary-container': '#3792f7',
-        'on-secondary-container': '#002a52',
+        // Elevation (difficulty)
+        'elevation-easy': '#059669',
+        'elevation-medium': '#D97706',
+        'elevation-hard': '#DC2626',
 
-        // Tertiary - Purple Belt
-        'tertiary': '#d2bbff',
-        'on-tertiary': '#3f008e',
-        'tertiary-container': '#8141f3',
-        'on-tertiary-container': '#f4eaff',
-
-        // Error
-        'error': '#ffb4ab',
-        'on-error': '#690005',
-        'error-container': '#93000a',
-        'on-error-container': '#ffdad6',
-
-        // Semantic aliases
-        'wabi-ink': '#2C2C2C',
-        'wabi-paper': '#F5F5F5',
-        'wabi-accent': '#1a6cc4',
-        'belt-blue': '#1a6cc4',
-        'electric-blue': '#3792f7',
-        'purple-belt': '#8141f3',
-        'white-belt': '#e5e2e1',
-        'tap-out-green': '#22c55e',
+        // Semantic aliases for backward compatibility
+        'surface': '#FAFAF9',
+        'on-surface': '#1C1917',
+        'primary': '#059669',
+        'secondary': '#D97706',
+        'error': '#DC2626',
       },
       fontFamily: {
-        'headline-xl': ['Space Grotesk'],
-        'headline-lg': ['Space Grotesk'],
-        'headline-lg-mobile': ['Space Grotesk'],
-        'headline-md': ['Space Grotesk'],
-        'body-base': ['Inter'],
-        'body-sm': ['Inter'],
-        'code-block': ['JetBrains Mono'],
-        'label-caps': ['Space Grotesk'],
-        'serif': ['Noto Serif JP', 'serif'],
+        'display': ['"DM Serif Display"', 'Georgia', 'serif'],
+        'body': ['"DM Sans"', 'system-ui', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+        // Legacy aliases
+        'headline-xl': ['"DM Serif Display"', 'Georgia', 'serif'],
+        'headline-lg': ['"DM Serif Display"', 'Georgia', 'serif'],
+        'headline-md': ['"DM Sans"', 'system-ui', 'sans-serif'],
+        'body-base': ['"DM Sans"', 'system-ui', 'sans-serif'],
+        'body-sm': ['"DM Sans"', 'system-ui', 'sans-serif'],
+        'code-block': ['"JetBrains Mono"', 'monospace'],
+        'label-caps': ['"DM Sans"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        'headline-xl': ['72px', { lineHeight: '72px', letterSpacing: '-2.5px', fontWeight: '900' }],
-        'headline-lg': ['48px', { lineHeight: '52px', letterSpacing: '-1.5px', fontWeight: '900' }],
-        'headline-lg-mobile': ['32px', { lineHeight: '36px', letterSpacing: '-1px', fontWeight: '900' }],
-        'headline-md': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '800' }],
-        'body-base': ['15px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
-        'body-sm': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
-        'code-block': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
-        'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '1px', fontWeight: '700' }],
+        'headline-xl': ['clamp(2rem, 5vw, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '400' }],
+        'headline-lg': ['clamp(1.5rem, 3vw, 2rem)', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '400' }],
+        'headline-md': ['1.25rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'body-base': ['1rem', { lineHeight: '1.7', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.6', letterSpacing: '0px', fontWeight: '400' }],
+        'code-block': ['0.875rem', { lineHeight: '1.6', letterSpacing: '0px', fontWeight: '400' }],
+        'label-caps': ['0.75rem', { lineHeight: '1', letterSpacing: '0.05em', fontWeight: '500' }],
       },
       spacing: {
         'gutter': '24px',
@@ -86,13 +63,21 @@ export default {
       },
       maxWidth: {
         'container': '1100px',
+        'prose': '65ch',
       },
       borderRadius: {
-        'DEFAULT': '0px',
-        'lg': '0px',
-        'xl': '0px',
-        '2xl': '0px',
+        'DEFAULT': '8px',
+        'sm': '4px',
+        'md': '8px',
+        'lg': '12px',
+        'xl': '16px',
         'full': '9999px',
+      },
+      boxShadow: {
+        'sm': '0 1px 2px rgba(0, 0, 0, 0.05)',
+        'DEFAULT': '0 4px 12px rgba(0, 0, 0, 0.05)',
+        'md': '0 8px 24px rgba(0, 0, 0, 0.08)',
+        'lg': '0 12px 32px rgba(0, 0, 0, 0.1)',
       },
     },
   },

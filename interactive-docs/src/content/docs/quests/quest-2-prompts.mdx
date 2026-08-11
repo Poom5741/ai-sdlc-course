@@ -3,7 +3,8 @@ title: Quest 2.1 - Fix the Vague Prompt
 description: Transform a vague prompt into a specific one
 ---
 
-import { Badge, Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 # Quest 2.1: Fix the Vague Prompt
 
@@ -11,49 +12,40 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 
 ## 🎯 Goal
 
-เปลี่ยน vague prompt ให้เป็น specific prompt ที่ได้ผลลัพธ์ดี
+เปลี่ยน vague prompt ให้เป็น specific prompt ที่ระบุ constraints ครบ แล้วเรียนรู้การ **specify before generate**
 
 ---
 
-## 📋 Instructions
+## 📋 Instructions (รันบนเครื่องของคุณ)
 
 <Steps>
 
-1. **วิเคราะห์ bad prompt**:
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-04-fix-prompt my-quest
+   cd my-quest
+   ```
+
+2. **วิเคราะห์ bad prompt** ใน `problem.js`:
    ```
    Make a function that handles users
    ```
 
-2. **หาว่าขาดอะไร**:
-   - "handle" หมายถึงอะไร?
-   - user data 有什么?
-   - validation ต้องการอะไร?
-   - return อะไร?
-
-3. **เขียน improved prompt**:
+3. **เขียน improved prompt** ระบุ constraints ครบ (input shape, email format, empty/null handling, success/error return shape):
    ```
-   Create a function called createUser that:
-   - Takes { name: string, email: string }
-   - Validates email format
-   - Returns { success, id, name, email }
+   Create a function createUser(userData) that:
+   - Takes { name: string, email: string }; handles {} and null
+   - Validates email against user@domain.tld
+   - Returns { success: false, error } on failure (never throws)
+   - Returns { success: true, id, name, email } on success
    ```
 
-4. **ใช้ prompt กับ AI tool**
-
-5. **ทดสอบ generated code**
+4. **ใช้ AI generate** ตาม prompt แล้ว **ตรวจสอบ**:
+   ```bash
+   node test.js
+   ```
 
 </Steps>
-
----
-
-## 🎮 Code Playground
-
-<iframe
-  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-2-prompt-engineering/quest-04-fix-prompt/index.js&view=editor"
-  style="width:100%;height:500px;border:0;border-radius:4px;"
-  allow="cross-origin-isolation"
-  title="Quest 2.1: Fix the Vague Prompt"
-/>
 
 ---
 
@@ -63,13 +55,20 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 node test.js
 ```
 
+กรอบข้อกำหนดที่ต้องผ่านทุกข้อ:
+- input สมบูรณ์ → `{success:true,id,name,email}`
+- `{}` และ `null` → ไม่ throw, คืน `{success:false,error}`
+- email ผิดรูปแบบ → `{success:false,error}`
+
+> ติดขัด? แอบดู `_solution/solution.js` ได้ แต่ลองเขียน prompt เองก่อน
+
 ---
 
 ## 💡 Tips
 
-A good prompt includes:
+A good prompt specifies, before generating:
 1. **Function name and purpose**
-2. **Input parameters** with types
-3. **Output format**
+2. **Input shape** with types
+3. **Output shape** (success + error)
 4. **Validation rules**
-5. **Error handling**
+5. **Error handling** (returns, never throws)

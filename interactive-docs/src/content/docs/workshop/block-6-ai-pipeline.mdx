@@ -3,10 +3,10 @@ title: Block 6 - The AI Development Pipeline
 description: Master the complete workflow from planning to autonomous execution with Matt's skills, GitHub Issues, and the Goal system
 ---
 
-import Card from '../../components/Card.astro';
-import CardGrid from '../../components/CardGrid.astro';
-import Steps from '../../components/Steps.astro';
-import Badge from '../../components/Badge.astro';
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
 # Block 6: The AI Development Pipeline
 
@@ -83,32 +83,26 @@ import Badge from '../../components/Badge.astro';
 
 Matt Pocock's skills form a **planning engine** that transforms loose ideas into clear, implementable decisions.
 
-<Grid cols={3}>
-  <GridItem>
-    <Card title="🗣️ Grilling" icon="chat">
-      **Purpose**: Interview you relentlessly about your plan
-      **Input**: Loose idea, vague requirements
-      **Output**: Clear understanding of what to build
-      **When**: Start here for any new work
-    </Card>
-  </GridItem>
-  <GridItem>
-    <Card title="🧠 Domain Modeling" icon="brain">
-      **Purpose**: Pin down terminology and relationships
-      **Input**: Jargon, ambiguous terms
-      **Output**: Glossary in CONTEXT.md
-      **When**: Terms are unclear or overloaded
-    </Card>
-  </GridItem>
-  <GridItem>
-    <Card title="🗺️ Wayfinder" icon="map">
-      **Purpose**: Chart the way for complex efforts
-      **Input**: Big, foggy idea
-      **Output**: Map + decision tickets
-      **When**: Too big for one session
-    </Card>
-  </GridItem>
-</Grid>
+<CardGrid>
+  <Card title="🗣️ Grilling" icon="chat">
+    **Purpose**: Interview you relentlessly about your plan
+    **Input**: Loose idea, vague requirements
+    **Output**: Clear understanding of what to build
+    **When**: Start here for any new work
+  </Card>
+  <Card title="🧠 Domain Modeling" icon="brain">
+    **Purpose**: Pin down terminology and relationships
+    **Input**: Jargon, ambiguous terms
+    **Output**: Glossary in CONTEXT.md
+    **When**: Terms are unclear or overloaded
+  </Card>
+  <Card title="🗺️ Wayfinder" icon="map">
+    **Purpose**: Chart the way for complex efforts
+    **Input**: Big, foggy idea
+    **Output**: Map + decision tickets
+    **When**: Too big for one session
+  </Card>
+</CardGrid>
 
 ### The Planning Flow
 
@@ -197,35 +191,29 @@ The Goal system takes GitHub issues and **automates implementation** with indepe
 
 ### Three Loop Types
 
-<Grid cols={3}>
-  <GridItem>
-    <Card title="/goal" icon="target">
-      **Single ordered goal
-      **Input**: One GitHub issue
-      **Process**: Execute → Audit → Verify
-      **Output**: Implemented, verified work
-      **When**: One clear task to complete
-    </Card>
-  </GridItem>
-  <GridItem>
-    <Card title="/list" icon="list">
-      **Queue of goals
-      **Input**: Multiple GitHub issues
-      **Process**: Execute in order, audit each
-      **Output**: Batch of implemented work
-      **When**: Multiple tasks to complete
-    </Card>
-  </GridItem>
-  <GridItem>
-    <Card title="/loop" icon="repeat">
-      **Metric-driven forever
-      **Input**: Continuous improvement task
-      **Process**: Iterate until metric plateaus
-      **Output**: Optimized work
-      **When**: "Keep improving until X"
-    </Card>
-  </GridItem>
-</Grid>
+<CardGrid>
+  <Card title="/goal" icon="target">
+    **Single ordered goal**
+    **Input**: One GitHub issue
+    **Process**: Execute → Audit → Verify
+    **Output**: Implemented, verified work
+    **When**: One clear task to complete
+  </Card>
+  <Card title="/list" icon="list">
+    **Queue of goals**
+    **Input**: Multiple GitHub issues
+    **Process**: Execute in order, audit each
+    **Output**: Batch of implemented work
+    **When**: Multiple tasks to complete
+  </Card>
+  <Card title="/loop" icon="repeat">
+    **Metric-driven forever**
+    **Input**: Continuous improvement task
+    **Process**: Iterate until metric plateaus
+    **Output**: Optimized work
+    **When**: "Keep improving until X"
+  </Card>
+</CardGrid>
 
 ### The Anti-Bamboozle Architecture
 

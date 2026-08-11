@@ -3,7 +3,8 @@ title: Quest 3.1 - Spot the Vulnerability
 description: Find security issues in AI-generated code
 ---
 
-import { Badge, Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 # Quest 3.1: Spot the Vulnerability
 
@@ -11,40 +12,30 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 
 ## 🎯 Goal
 
-ค้นหา security vulnerabilities ใน AI-generated code
+ตรวจหา security vulnerabilities ในโค้ดที่ AI generate แล้วเรียนรู้การ **assume AI code is insecure**
 
 ---
 
-## 📋 Instructions
+## 📋 Instructions (รันบนเครื่องของคุณ)
 
 <Steps>
 
-1. **Review vulnerable code** ใน `vulnerable.js`
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-3-security/quest-07-spot-vulnerability my-quest
+   cd my-quest
+   ```
 
-2. **ระบุ vulnerabilities** ทั้งหมด:
-   - SQL Injection
-   - Hardcoded Secrets
-   - Weak Hashing
-   - No Input Validation
-   - Path Traversal
-   - XSS
+2. **อ่าน `vulnerable.js`** — โค้ดที่ต้องตรวจสอบ (ใช้ AI ช่วย audit ได้)
 
-3. **Document** แต่ละ vulnerability
+3. **ระบุ vulnerabilities ทั้งหมด** แล้วเขียนลงใน `problem.js` เป็น array ของ `{ type, severity, description, fix }`
 
-4. **รัน tests** เพื่อตรวจสอบ
+4. **ตรวจสอบ**:
+   ```bash
+   node test.js
+   ```
 
 </Steps>
-
----
-
-## 🎮 Code Playground
-
-<iframe
-  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-3-security/quest-07-spot-vulnerability/vulnerable.js&view=editor"
-  style="width:100%;height:500px;border:0;border-radius:4px;"
-  allow="cross-origin-isolation"
-  title="Quest 3.1: Spot the Vulnerability"
-/>
 
 ---
 
@@ -54,14 +45,20 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 node test.js
 ```
 
+`test.js` ตรวจว่าคุณระบุ vuln type ครบ (SQL Injection, Hardcoded Secrets, Weak Password Hashing, Path Traversal, XSS) พร้อม severity/description/fix
+
+> คุณต้อง **ระบุ** ไม่ใช่แก้ — อย่าแก้ `vulnerable.js`
+
+> ติดขัด? แอบดู `_solution/solution.js` ได้ แต่ลอง audit เองก่อน
+
 ---
 
 ## 🔍 Common Vulnerabilities
 
 | Vulnerability | Severity | Fix |
 |--------------|----------|-----|
-| SQL Injection | Critical | Parameterized queries |
-| Hardcoded Secrets | Critical | Environment variables |
-| Weak Hashing | High | bcrypt/argon2 |
-| Path Traversal | High | Sanitize paths |
-| XSS | High | Escape HTML |
+| SQL Injection | critical | Parameterized queries |
+| Hardcoded Secrets | critical | Environment variables |
+| Weak Hashing | high | bcrypt/argon2 |
+| Path Traversal | high | Sanitize paths |
+| XSS | high | Escape HTML |

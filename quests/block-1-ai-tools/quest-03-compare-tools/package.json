@@ -1,11 +1,10 @@
 {
   "name": "quest-03-compare-tools",
   "version": "1.0.0",
-  "description": "Quest 1.3: Compare Tools - Compare different AI coding tools",
-  "main": "index.js",
+  "description": "Quest 1.3: Compare Tools - calibrate your tools via a comparison doc",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
   "keywords": ["ai-sdlc", "workshop", "quest", "block-1"],
   "author": "AI SDLC Workshop",

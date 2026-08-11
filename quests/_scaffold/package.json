@@ -1,0 +1,12 @@
+{
+  "name": "quest-scaffold",
+  "version": "1.0.0",
+  "description": "Local-runnable quest scaffold template (issue #63). Copy this folder to start a new quest.",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "scaffold", "template"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT"
+}

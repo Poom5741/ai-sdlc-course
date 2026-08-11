@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+**Superseded** by local folder approach (2026-08-12). StackBlitz distribution removed; quests now use `npx degit` to pull starter code locally. Partial solutions format and hybrid validation approach remain unchanged.
 
 ## Context
 
@@ -12,7 +12,7 @@ Key constraints:
 - 14 code quests across 5 blocks
 - Mix of difficulty levels (Easy/Medium/Hard)
 - Workshop setting (8 hours)
-- Must align with Code Playground decision (StackBlitz embeds)
+- Must align with Code Playground decision (local folders via npx degit)
 
 ## Decision
 
@@ -28,18 +28,18 @@ We will use **partial solutions** (scaffolding + tasks) for all quests, distribu
 Learners focus on the specific task, not project setup. Easy/hard refers to TASK complexity, not scaffolding.
 
 ### Distribution Method
-**StackBlitz embed** — Primary method:
-- One-click to open in browser
-- Aligned with Code Playground decision (#009)
-- No local setup required
+**`npx degit`** — Primary method:
+- One command to pull quest files locally
+- Aligned with Code Playground decision (#009, superseded)
+- Build and test on learner's machine
 
-**Fallback**: Git clone from template repo for offline/backup.
+**Fallback**: Direct git clone from the course repo.
 
 ### Code Correctness
 **Hybrid approach**:
 - **Automated tests**: CI/CD on template repo catches regressions
 - **Manual QA**: Instructor tests before each workshop
-- **Learner validation**: Code runs in StackBlitz = it's correct
+- **Learner validation**: `node test.js` passes = it's correct
 
 ### Quest Complexity Strategy
 All quests use partial solutions regardless of difficulty:
@@ -68,7 +68,7 @@ ai-sdlc-quests/
 ### Positive
 - Consistent experience across all quests
 - Reduced cognitive load (learners focus on task, not setup)
-- Aligns with StackBlitz embed approach
+- Aligns with local folder approach
 - Easy to maintain (single template repo)
 
 ### Negative

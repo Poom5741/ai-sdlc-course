@@ -1,0 +1,35 @@
+[tools]
+node = "22"
+
+[tasks.dev]
+description = "Start Astro dev server"
+run = "npx astro dev"
+# NOTE: This is a long-running watcher; use `mise watch dev` for file-change restarts.
+
+[tasks.build]
+description = "Build the Astro site"
+# Clean dist first so a stale/incomplete output from an interrupted build can
+# never poison the next build. Astro does not incrementally reuse pages, so the
+# full-rebuild cost is unchanged while determinism is guaranteed.
+run = "rm -rf dist && npx astro build"
+
+[tasks.preview]
+description = "Preview the built site"
+run = "npx astro preview"
+depends = ["build"]
+
+[tasks.test]
+description = "Run Vitest unit tests"
+run = "npx vitest run"
+
+[tasks.test-watch]
+description = "Run Vitest in watch mode"
+run = "npx vitest"
+
+[tasks.test-e2e]
+description = "Run Playwright e2e tests"
+run = "npx playwright test"
+
+[tasks.lint]
+description = "Run astro check for type/lint errors"
+run = "npx astro check"

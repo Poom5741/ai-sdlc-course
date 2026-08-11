@@ -2,12 +2,16 @@
   "name": "quest-08-fix-harden",
   "version": "1.0.0",
   "description": "Quest 3.2: Fix and Harden - Fix security vulnerabilities in code",
-  "main": "index.js",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-3"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-3"
+  ],
   "author": "AI SDLC Workshop",
   "license": "MIT"
 }

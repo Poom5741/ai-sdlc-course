@@ -1,0 +1,69 @@
+---
+title: Quest 1.2 - Multi-File Generation
+description: Generate multiple related files with AI
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Quest 1.2: Multi-File Generation
+
+<Badge text="🟡 Medium" variant="note" /> <Badge text="20 minutes" variant="note" /> <Badge text="Block 1: AI Tools" variant="tip" />
+
+## 🎯 Goal
+
+generate หลายไฟล์ที่เกี่ยวข้องกันด้วย AI และเรียนรู้การ **decompose ก่อน generate** — ระบุ public interface ก่อน แล้วให้ AI เติมแต่ละไฟล์
+
+---
+
+## 📋 Instructions (รันบนเครื่องของคุณ)
+
+<Steps>
+
+1. **ดึง quest ลงเครื่อง:**
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-02-multi-file my-quest
+   cd my-quest
+   ```
+
+2. **ระบุ interface** (เขียนเป็น comment ใน `problem.js`):
+   ```js
+   // add(a,b), subtract(a,b), multiply(a,b), divide(a,b), calculate(op,a,b)
+   ```
+
+3. **Decompose**: วางแผน `math.js`, `validators.js`, `index.js`
+
+4. **Generate แต่ละไฟล์** ด้วย AI tool ของคุณตาม interface
+
+5. **Wire เข้าด้วยกัน** ด้วย `require()` / `module.exports`
+
+6. **ตรวจสอบ:**
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+test จะเช็คว่า public API ตรงกับ interface ที่ระบุ พร้อม edge case: `divide(10, 0)` ต้อง return `Infinity` (ไม่ใช่ `NaN`) และ unknown op ต้อง `throw`
+
+---
+
+## 💡 Hints
+
+- **Specify before generate**: เขียน interface ก่อน แล้วให้ AI เติม — อย่าขอแค่ "some utils"
+- **Modularity**: เก็บ function ที่เกี่ยวข้องกันไว้ในไฟล์แยก
+- **Verify before trust**: ลองเช็ค `divide(10, 0)` เอง
+
+---
+
+## 📚 Resources
+
+- [Node.js CommonJS Modules](https://nodejs.org/api/modules.html)

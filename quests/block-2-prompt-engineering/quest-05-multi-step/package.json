@@ -2,12 +2,16 @@
   "name": "quest-05-multi-step",
   "version": "1.0.0",
   "description": "Quest 2.2: Multi-Step Prompting - Break complex tasks into steps",
-  "main": "index.js",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-2"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-2"
+  ],
   "author": "AI SDLC Workshop",
   "license": "MIT"
 }

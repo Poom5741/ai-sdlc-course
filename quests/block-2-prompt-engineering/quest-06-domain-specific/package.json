@@ -2,12 +2,16 @@
   "name": "quest-06-domain-specific",
   "version": "1.0.0",
   "description": "Quest 2.3: Domain-Specific Prompting - Write prompts for specialized domains",
-  "main": "index.js",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-2"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-2"
+  ],
   "author": "AI SDLC Workshop",
   "license": "MIT"
 }

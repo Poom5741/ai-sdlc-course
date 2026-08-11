@@ -1,107 +1,75 @@
 /**
- * Quest 2.2: Multi-Step Prompting - Test Suite
+ * Quest 2.2: Multi-Step Prompting — test suite
+ *
+ * Tool skill: break a task into sequential prompts.
+ * Engineering habit: DECOMPOSE BEFORE CODING — core layer first, edge-case
+ * layer second.
+ *
+ * Build a URL validator in 2 layers:
+ *   Layer 1 (core): valid URLs pass, obviously invalid ones fail.
+ *   Layer 2 (edge): empty/whitespace/missing-protocol/edge cases handled.
+ *
+ * Requires ./problem.js exporting `isValidUrl(url)`. Run: node test.js
  */
 
-const TodoManager = require('./index.js');
+const { isValidUrl } = require('./problem.js');
 
-let manager;
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 2.2: Multi-Step Prompting\n");
-console.log("Running tests...\n");
+console.log('Quest 2.2: Multi-Step Prompting\n');
 
-// Setup
-function resetManager() {
-  manager = new TodoManager();
-}
-
-function test(description, fn) {
-  try {
-    fn();
-    console.log(`✅ ${description}`);
+function check(label, cond, detail) {
+  if (cond) {
+    console.log(`PASS ${label}`);
     passed++;
-  } catch (error) {
-    console.log(`❌ ${description}`);
-    console.log(`   ${error.message}`);
+  } else {
+    console.log(`FAIL ${label}`);
+    if (detail) console.log(`   ${detail}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
-}
+// Layer 1 — core: well-formed URLs.
+const valid = [
+  'https://example.com',
+  'http://localhost:3000/path',
+  'https://api.example.com/v1/users?id=1',
+];
 
-function assertEqual(actual, expected, message) {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${expected}, got ${actual}`);
-  }
-}
-
-// Tests
-test('addTodo creates a todo', () => {
-  resetManager();
-  manager.addTodo('Test todo');
-  const todos = manager.listTodos();
-  assertEqual(todos.length, 1);
-  assertEqual(todos[0].title, 'Test todo');
+valid.forEach((url) => {
+  check(`Layer1 valid: ${url}`, isValidUrl(url) === true, `got ${isValidUrl(url)}`);
 });
 
-test('addTodo with due date', () => {
-  resetManager();
-  manager.addTodo('Test todo', '2024-12-31');
-  const todos = manager.listTodos();
-  assertEqual(todos[0].dueDate, '2024-12-31');
+const obviouslyInvalid = [
+  'not a url at all',
+  'ftp://example.com',
+];
+
+obviouslyInvalid.forEach((url) => {
+  check(`Layer1 rejects invalid: ${url}`, isValidUrl(url) === false, `got ${isValidUrl(url)}`);
 });
 
-test('removeTodo removes a todo', () => {
-  resetManager();
-  manager.addTodo('Test todo');
-  const todo = manager.listTodos()[0];
-  manager.removeTodo(todo.id);
-  assertEqual(manager.listTodos().length, 0);
-});
+// Layer 2 — edge cases. Naive impl uses `new URL()` only, which accepts
+// 'javascript:void(0)' and '//example.com' as valid — the edge layer must
+// reject these and accept the protocol-less form when prefixed.
+const edgeCases = [
+  { url: '', expect: false, description: 'empty string rejected' },
+  { url: '   ', expect: false, description: 'whitespace rejected' },
+  { url: 'javascript:alert(1)', expect: false, description: 'javascript: scheme rejected (XSS vector)' },
+  { url: 'example.com', expect: false, description: 'no-protocol rejected' },
+  { url: 'https://', expect: false, description: 'https:// with no host rejected' },
+];
 
-test('completeTodo marks todo as complete', () => {
-  resetManager();
-  manager.addTodo('Test todo');
-  const todo = manager.listTodos()[0];
-  manager.completeTodo(todo.id);
-  const updated = manager.listTodos()[0];
-  assertEqual(updated.completed, true);
-});
-
-test('listTodos with filter', () => {
-  resetManager();
-  manager.addTodo('Todo 1');
-  manager.addTodo('Todo 2');
-  const todo1 = manager.listTodos()[0];
-  manager.completeTodo(todo1.id);
-  
-  const completed = manager.listTodos('completed');
-  const pending = manager.listTodos('pending');
-  
-  assertEqual(completed.length, 1);
-  assertEqual(pending.length, 1);
-});
-
-test('updateTodo updates fields', () => {
-  resetManager();
-  manager.addTodo('Original title');
-  const todo = manager.listTodos()[0];
-  manager.updateTodo(todo.id, { title: 'Updated title' });
-  const updated = manager.listTodos()[0];
-  assertEqual(updated.title, 'Updated title');
+edgeCases.forEach(({ url, expect, description }) => {
+  check(`Layer2 edge: ${description}`, isValidUrl(url) === expect, `got ${isValidUrl(url)} for ${JSON.stringify(url)}`);
 });
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 
 if (failed === 0) {
-  console.log("\n🎉 Quest 2.2 Complete! You've mastered multi-step prompting.");
+  console.log('\nQuest 2.2 complete. Both layers (core + edge) validated.');
   process.exit(0);
-} else {
-  console.log("\n💡 Hint: Break the complex task into smaller, manageable pieces.");
-  process.exit(1);
 }
+console.log('\nHint: prompt Layer 1 first ("validate a URL"), then prompt Layer 2 ("handle these edge cases: empty, javascript:, no-protocol, https:// with no host").');
+process.exit(1);

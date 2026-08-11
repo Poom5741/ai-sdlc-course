@@ -3,7 +3,10 @@ title: Block 5 - Architecture
 description: Design complete AI-powered systems with RAG and multi-component architecture
 ---
 
-import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
 # Block 5: Architecture
 
@@ -147,71 +150,54 @@ Accepted
 
 ### 🟡 Quest 5.1: RAG Design
 
-**Goal**: Design a Retrieval-Augmented Generation system
+**Goal**: Design a Retrieval-Augmented Generation system โดยออกแบบให้รองรับ failure mode
 
-<Steps>
+ดึง quest ลงเครื่องแล้วทำตามในเครื่องของคุณ:
 
-1. **Understand RAG components**
-   - Document Store: เก็บเอกสาร
-   - Embedding Service: แปลงข้อความเป็น vector
-   - Vector Store: เก็บ embeddings
-   - LLM: สร้างคำตอบ
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-13-rag-design my-quest
+cd my-quest
+node test.js
+```
 
-2. **Design the system**
-   ```javascript
-   class RAGPipeline {
-     constructor(documentStore, embeddingService) { }
-     async retrieve(query) { }
-     async generate(query, context) { }
-     async query(question) { }
-   }
-   ```
+สิ่งที่ต้องมีใน `rag-design.md` (อยู่ในโฟลเดอร์ quest):
 
-3. **Implement core components**
+1. **Chunking strategy** — แบ่ง documents ยังไง (ตาม heading + ขนาด window)
+2. **Embedding strategy** — ใช้ model อะไร ฝัง chunk/query ยังไง
+3. **Retrieval quality metric** — recall@5 / precision / NDCG เพื่อวัดคุณภาพการ retrieve
+4. **Failure handling** — ทำอะไรเมื่อ retrieve ว่าง / confidence ต่ำ / query นอก corpus (fallback, graceful degradation)
+5. **Corpus** — ระบุว่าจะ index ส่วนไหนของ workshop docs
 
-4. **Test with sample documents**
+วัฒนธรรมที่จะได้เรียนรู้: **Design for the failure mode** — อย่าปล่อยให้ระบบ hallucinate เมื่อข้อมูลไม่พอ
 
-</Steps>
-
-**Deliverable**: Working RAG pipeline
+**Deliverable**: `rag-design.md` ที่ผ่าน `node test.js`
 
 ---
 
 ### 🔴 Quest 5.2: Full System Design
 
-**Goal**: Design a complete AI-powered system
+**Goal**: ออกแบบระบบ AI ที่สมบูรณ์ — ระบุ interface ก่อน implementation
 
-<Steps>
+ดึง quest ลงเครื่องแล้วทำตามในเครื่องของคุณ:
 
-1. **Choose a system**: Chatbot, Code Reviewer, or Content Generator
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-14-full-system my-quest
+cd my-quest
+node test.js
+```
 
-2. **Define components**
-   | Component | Purpose |
-   |-----------|---------|
-   | Input Handler | Process user input |
-   | AI Engine | Generate responses |
-   | Data Store | Persist data |
-   | Output Formatter | Format responses |
+ตัวอย่างระบบใน reference คือ **automated PR reviewer** (PR webhook → fetch diff → analyze → LLM review → post comment) คุณเลือกระบบตัวเองหรือใช้ตัวอย่างนี้ก็ได้
 
-3. **Design interfaces**
-   ```javascript
-   class AISystem {
-     addComponent(name, component) { }
-     async process(input) { }
-     getStatus() { }
-     toDocumentation() { }
-   }
-   ```
+สิ่งที่ต้องมีใน `system-design.md` (อยู่ในโฟลเดอร์ quest):
 
-4. **Document architecture**
-   - Overview
-   - Components
-   - Data Flow
-   - Security
+1. **Component diagram** — กล่อง ``` ใน markdown ที่มีลูกศร (`→` หรือ `-->` หรือ Mermaid `graph`)
+2. **Interface contracts** — `interface` / `contract` / `API` พร้อม function signature + I/O types ของทุก component
+3. **Data flow** — data flow / flow: จาก input สู่ output
+4. **Named components** — ชื่อ component ที่แตกต่างกันอย่างน้อย 3 ตัว
 
-</Steps>
+วัฒนธรรมที่จะได้เรียนรู้: **Specify interfaces before implementing** — ล็อค contract ก่อนแล้วแต่ละ component ถึงทำและ test แยกกันได้
 
-**Deliverable**: Complete system design with documentation
+**Deliverable**: `system-design.md` ที่ผ่าน `node test.js`
 
 ---
 
@@ -247,6 +233,6 @@ Congratulations! You've completed all 5 blocks:
 2. **Share**: Teach others what you've learned
 3. **Iterate**: Continuously improve your workflow
 
-import { LinkCard } from '@astrojs/starlight/components';
 
-<LinkCard title="View All Code Quests" href="/quests/quest-1-first-code" />
+
+<a href="/quests/quest-1-first-code" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">View All Code Quests →</a>

@@ -1,116 +1,62 @@
 /**
- * Quest 3.3: Security Architecture - Test Suite
+ * Quest 3.3: Security Architecture — design-doc validator
+ *
+ * Tool skill: use AI to design security controls.
+ * Engineering habit: THREAT-MODEL BEFORE BUILDING — threats first, then a
+ * control for each, then the failure mode of each control.
+ *
+ * This is NOT a code test. It validates that `design.md` in THIS folder has
+ * the required sections: a threat list, a control per threat, and a failure
+ * mode per control.
+ *
+ * Run: node test.js
  */
 
-const {
-  SecurityArchitect,
-  AuthenticationControl,
-  AuthorizationControl,
-  EncryptionControl,
-} = require('./index.js');
+const { existsSync, readFileSync } = require('fs');
+const path = require('path');
+
+const DOC = path.join(__dirname, 'design.md');
 
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 3.3: Security Architecture\n");
-console.log("Running tests...\n");
+console.log('Quest 3.3: Security Architecture — design-doc validator\n');
 
-function test(description, fn) {
-  try {
-    fn();
-    console.log(`✅ ${description}`);
+function check(label, cond, detail) {
+  if (cond) {
+    console.log(`PASS ${label}`);
     passed++;
-  } catch (error) {
-    console.log(`❌ ${description}`);
-    console.log(`   ${error.message}`);
+  } else {
+    console.log(`FAIL ${label}`);
+    if (detail) console.log(`   ${detail}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
-}
+check('design.md exists', existsSync(DOC));
 
-async function runTests() {
-  // SecurityArchitect tests
-  test('SecurityArchitect can be instantiated', () => {
-    const architect = new SecurityArchitect('Test System');
-    assert(architect instanceof SecurityArchitect);
-    assert(architect.systemName === 'Test System');
-  });
-
-  test('SecurityArchitect has addControl method', () => {
-    const architect = new SecurityArchitect('Test System');
-    assert(typeof architect.addControl === 'function');
-  });
-
-  test('SecurityArchitect has addThreat method', () => {
-    const architect = new SecurityArchitect('Test System');
-    assert(typeof architect.addThreat === 'function');
-  });
-
-  test('SecurityArchitect has generateDocument method', () => {
-    const architect = new SecurityArchitect('Test System');
-    assert(typeof architect.generateDocument === 'function');
-  });
-
-  test('SecurityArchitect has validateRequirements method', () => {
-    const architect = new SecurityArchitect('Test System');
-    assert(typeof architect.validateRequirements === 'function');
-  });
-
-  // AuthenticationControl tests
-  test('AuthenticationControl can be instantiated', () => {
-    const auth = new AuthenticationControl();
-    assert(auth instanceof AuthenticationControl);
-    assert(auth.type === 'authentication');
-  });
-
-  test('AuthenticationControl has authenticate method', () => {
-    const auth = new AuthenticationControl();
-    assert(typeof auth.authenticate === 'function');
-  });
-
-  // AuthorizationControl tests
-  test('AuthorizationControl can be instantiated', () => {
-    const authz = new AuthorizationControl();
-    assert(authz instanceof AuthorizationControl);
-    assert(authz.type === 'authorization');
-  });
-
-  test('AuthorizationControl has authorize method', () => {
-    const authz = new AuthorizationControl();
-    assert(typeof authz.authorize === 'function');
-  });
-
-  // EncryptionControl tests
-  test('EncryptionControl can be instantiated', () => {
-    const encryption = new EncryptionControl();
-    assert(encryption instanceof EncryptionControl);
-    assert(encryption.type === 'encryption');
-  });
-
-  test('EncryptionControl has encrypt method', () => {
-    const encryption = new EncryptionControl();
-    assert(typeof encryption.encrypt === 'function');
-  });
-
-  test('EncryptionControl has decrypt method', () => {
-    const encryption = new EncryptionControl();
-    assert(typeof encryption.decrypt === 'function');
-  });
-
+if (!existsSync(DOC)) {
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
-
-  if (failed === 0) {
-    console.log("\n🎉 Quest 3.3 Complete! You've designed a secure architecture.");
-    process.exit(0);
-  } else {
-    console.log("\n💡 Hint: Security architecture requires authentication, authorization, and encryption controls.");
-    process.exit(1);
-  }
+  console.log('\nHint: create design.md covering threats, controls, and failure modes for an API auth flow (API key + rate limiting).');
+  process.exit(1);
 }
 
-runTests();
+const content = readFileSync(DOC, 'utf-8');
+
+check('has a Threats section', /threats?[:\s]/i.test(content));
+check('lists at least 3 threats', (content.match(/threat[:\s]/gi) || []).length >= 3 || /threat/i.test(content) === false ? (content.match(/threat/gi) || []).length >= 3 : (content.match(/threat/gi) || []).length >= 3);
+check('has a Controls section', /controls?[:\s]/i.test(content));
+check('has the system being secured (API/auth)', /(api|auth|authentication|authorization)/i.test(content));
+check('mentions API key (per #67 spec)', /api\s*key/i.test(content));
+check('mentions rate limiting (per #67 spec)', /rate\s*limit/i.test(content));
+check('has Failure Modes section', /failure\s*modes?[:\s]/i.test(content));
+check('at least 400 characters of substance', content.length >= 400);
+
+console.log(`\nResults: ${passed} passed, ${failed} failed`);
+
+if (failed === 0) {
+  console.log('\nQuest 3.3 complete. You threat-modeled before building.');
+  process.exit(0);
+}
+console.log('\nHint: design.md must cover the system, ≥3 threats, a control per threat (incl. API key + rate limiting), and the failure mode of each control.');
+process.exit(1);

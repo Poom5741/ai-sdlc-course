@@ -1,0 +1,76 @@
+---
+title: Quest 2.3 - Domain-Specific Prompting
+description: Encode domain rules into your prompts
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Quest 2.3: Domain-Specific Prompting (Thai formats)
+
+<Badge text="🔴 Hard" variant="danger" /> <Badge text="25 minutes" variant="note" /> <Badge text="Block 2: Prompt Engineering" variant="tip" />
+
+## 🎯 Goal
+
+เขียน prompt ที่ **encode domain rules** — AI จะไม่เดา rule รูปแบบภาษาไทยเอง
+
+---
+
+## 📋 Instructions (รันบนเครื่องของคุณ)
+
+<Steps>
+
+1. **ดึง quest ลงเครื่อง:**
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-06-domain-specific my-quest
+   cd my-quest
+   ```
+
+2. **อ่าน domain rules** ใน `problem.js` (เบอร์โทรไทย + เลขบัตรประชาชนไทย)
+
+3. **เขียน prompt ที่รวม rule ทั้งสองชุดแบบ verbatim**
+
+4. **Generate `isValidThaiPhone(s)` และ `isValidThaiId(s)`**
+
+5. **ตรวจสอบ:**
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+---
+
+## Domain rules (อย่าให้ AI เดา)
+
+**เบอร์โทรศัพท์ไทย:**
+- 10 หลักพอดี
+- ต้องเริ่มด้วย `06`, `08`, หรือ `09`
+- Normalize รูปแบบมีขีด (`0X-XXXX-XXXX`) โดย strip non-digits ก่อน
+
+**เลขบัตรประชาชนไทย (13 หลัก):**
+- 13 หลักพอดี
+- Checksum: `sum = Σ_{i=1..12} digit_i × (14 − i)`, `check = (11 − (sum mod 11)) mod 10`; `check` ต้องเท่ากับ digit 13
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+`node test.js` เช็ค phone ที่ valid (prefix 06/08/09, รูปแบบมีขีด), invalid (9 หลัก, prefix ผิด, มีตัวอักษร, ว่าง), ID ที่ valid ด้วย checksum ถูกต้อง และ reject ID ที่ length ผิด / checksum ผิด / ไม่ใช่ตัวเลข
+
+---
+
+## 💡 Hints
+
+- prompt "validate a phone number" แบบทั่วไป ให้ regex ที่ fail บน edge case ไทย
+- ใส่ rule ลงใน prompt **อย่างชัดเจน** — และ verify ด้วย `node test.js` (test checksum ที่ผิด คือตัวจับ AI ที่ปลอม checksum)
+
+---
+
+## 📚 Resources
+
+- [Thai national identification number](https://en.wikipedia.org/wiki/Thai_identity_card)

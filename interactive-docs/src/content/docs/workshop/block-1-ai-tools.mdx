@@ -3,7 +3,10 @@ title: Block 1 - AI Tools Setup
 description: Set up your AI development toolkit and complete your first AI-assisted coding tasks
 ---
 
-import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
 # Block 1: AI Tools Setup
 
@@ -107,74 +110,55 @@ AI-assisted development คือการใช้ AI tools เพื่อช�
 
 ### 🟡 Quest 1.2: Multi-file Generation
 
-**Goal**: Generate a complete API endpoint
+**Goal**: Generate a complete utility library with AI — specify the interface first.
 
 <Steps>
 
-1. **Create a new file**
-   ```javascript
-   // user-api.js
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-02-multi-file my-quest
+   cd my-quest
    ```
 
-2. **Write a detailed comment**
-   ```javascript
-   // Create a REST API endpoint for user management
-   // GET /users - list all users
-   // POST /users - create new user
-   // Include input validation and error handling
+2. **เขียน interface ใน `problem.js`** ก่อน (add/subtract/multiply/divide/calculate)
+
+3. **ให้ AI generate แต่ละ file** (math.js, validators.js, index.js) ตาม interface
+
+4. **ตรวจสอบ**:
+   ```bash
+   node test.js
    ```
-
-3. **Let Copilot generate the code**
-
-4. **Review and refine** the generated code
-
-5. **Add validation** for email format
 
 </Steps>
 
-**Deliverable**: Working API endpoint with validation
+**Deliverable**: ไลบราตี multi-file ที่ส่ง interface ตรงกับที่กำหนด + ทดสอบผ่าน
 
 ---
 
 ### 🟡 Quest 1.3: Compare Tools
 
-**Goal**: Compare Copilot vs Claude Code
+**Goal**: รัน prompt เดียวกันใน 2+ AI tools และเปรียบเทียบ (calibrate your tools)
 
 <Steps>
 
-1. **Open Claude Code in terminal**
+1. **ดึงไฟล์ quest ลงเครื่อง**:
    ```bash
-   claude
+   npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-03-compare-tools my-quest
+   cd my-quest
    ```
 
-2. **Ask Claude to write the same factorial function**
-   ```
-   Write a JavaScript function to calculate factorial using recursion
-   ```
+2. **รัน prompt เดียวกัน** ใน 2+ AI tools เช่น `sortByKey(array, key, ascending)`
 
-3. **Compare the outputs**
+3. **เขียน `comparison.md`** ในโฟลเดอร์ พร้อม sections: Tool, Output, Better, Why
 
-4. **Document differences**
-   ```markdown
-   # Copilot vs Claude Code Comparison
-   
-   ## Copilot Output
-   [Copy code here]
-   
-   ## Claude Code Output
-   [Copy code here]
-   
-   ## Differences
-   - Difference 1
-   - Difference 2
-   
-   ## Which is better? Why?
-   [Your analysis]
+4. **ตรวจสอบ**:
+   ```bash
+   node test.js
    ```
 
 </Steps>
 
-**Deliverable**: Comparison document
+**Deliverable**: `comparison.md` ที่ผ่าน checklist validator (sections ครบ + ≥200 ตัวอักษร)
 
 ---
 
@@ -191,6 +175,6 @@ AI-assisted development คือการใช้ AI tools เพื่อช�
 
 **Block 2: Prompt Engineering + Loops** → Learn to write better prompts and set up iterative workflows.
 
-import { LinkCard } from '@astrojs/starlight/components';
 
-<LinkCard title="Continue to Block 2" href="/workshop/block-2-prompting" />
+
+<a href="/workshop/block-2-prompting" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">Continue to Block 2 →</a>

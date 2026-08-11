@@ -1,0 +1,61 @@
+---
+title: Quest 2.2 - Multi-Step Prompting
+description: Break a task into sequential prompts
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Quest 2.2: Multi-Step Prompting
+
+<Badge text="🟡 Medium" variant="note" /> <Badge text="20 minutes" variant="note" /> <Badge text="Block 2: Prompt Engineering" variant="tip" />
+
+## 🎯 Goal
+
+แบ่งงานใหญ่เป็น **prompt หลายขั้นตอน** — ทำ core layer ก่อน แล้วค่อยจัดการ edge-case layer
+
+---
+
+## 📋 Instructions (รันบนเครื่องของคุณ)
+
+<Steps>
+
+1. **ดึง quest ลงเครื่อง:**
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-05-multi-step my-quest
+   cd my-quest
+   ```
+
+2. **Step 1 (core)** — เขียน `isValidUrl(url)` ให้ return true สำหรับ http/https URL ที่มี host
+   แล้วรัน `node test.js` — Layer 1 ผ่าน
+
+3. **Step 2 (edge)** — "Now handle: empty, whitespace-only, `javascript:` scheme,
+   no-protocol (`example.com` → false), `https://` with no host. Reject all."
+   แล้วรัน `node test.js` — ผ่านทั้งหมด
+
+4. **Implement `isValidUrl(url)`** ใน `problem.js` จากสอง prompt นั้น
+
+</Steps>
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+`node test.js` เช็ค Layer 1 (3 ตัวที่ valid + 2 ที่ invalid) และ Layer 2 (5 edge cases)
+
+---
+
+## 💡 Hints
+
+- อย่าขอ prompt ยักษ์เดียว "validate a URL with all edge cases" — นั่นคือที่ AI เดาผิด
+- Prompt core ให้เขียวก่อน แล้วค่อย prompt ชั้น edge
+
+---
+
+## 📚 Resources
+
+- [URL API](https://developer.mozilla.org/docs/Web/API/URL)

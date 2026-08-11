@@ -1,0 +1,61 @@
+---
+title: Quest 1.3 - Compare AI Tools
+description: Run the same prompt in multiple AI tools and compare
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+# Quest 1.3: Compare AI Tools
+
+<Badge text="🟡 Medium" variant="note" /> <Badge text="20 minutes" variant="note" /> <Badge text="Block 1: AI Tools" variant="tip" />
+
+## 🎯 Goal
+
+รัน **prompt เดียวกัน** ใน AI tool อย่างน้อย 2 ตัว แล้วเปรียบเทียบผลลัพธ์ — เพื่อ **calibrate เครื่องมือ** รู้ว่า tool ไหนเหมาะกับงานไหนและเพราะอะไร
+
+---
+
+## 📋 Instructions
+
+ดึง quest ลงเครื่องแล้วทำตามในเครื่องของคุณ:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-03-compare-tools my-quest
+cd my-quest
+```
+
+1. **เลือก prompt เดียว** เช่น:
+   ```
+   Write a sortByKey(array, key, ascending) function in JavaScript that returns a new sorted array without mutating the input.
+   ```
+2. **รันในอย่างน้อย 2 tool** (GitHub Copilot vs Claude Code, ChatGPT vs Gemini, …)
+3. **สร้าง `comparison.md`** ในโฟลเดอร์ quest โดยมี sections:
+   - **Tool**: tool ที่ใช้
+   - **Output**: แต่ละ tool สร้างอะไร
+   - **Better**: อันไหนดีกว่า
+   - **Why**: เหตุผล
+
+---
+
+## ✅ Verification
+
+```bash
+node test.js
+```
+
+`node test.js` เป็น **checklist validator** — เช็คว่า `comparison.md` มี sections (Tool, Output, Better, Why) ครบ และ substance ≥ 200 ตัวอักษร มันไม่รัน code
+
+---
+
+## 💡 Hints
+
+- ใช้ prompt เดียวกัน **verbatim** ทั้งสอง tool — ให้แค่ tool ต่างกัน
+- "Better" ต้องเป็น **verdict** ไม่ใช่ "ทั้งคู่ก็โอเค" — เลือกอันหนึ่งและ justify
+- จับความต่างที่เป็นรูปธรรม (ความยาว, การจัดการ edge case, defensiveness)
+
+---
+
+## 📚 Resources
+
+- [GitHub Copilot](https://docs.github.com/en/copilot)
+- [Claude Code](https://docs.anthropic.com/claude-code)

@@ -1,13 +1,17 @@
 {
   "name": "quest-10-setup-loop",
   "version": "1.0.0",
-  "description": "Quest 4.1: Set Up a Loop - Create an automated development loop",
-  "main": "index.js",
+  "description": "Quest 4.1: Set Up a Loop - Automate the verify step in a dev loop",
+  "main": "problem.js",
   "scripts": {
-    "test": "node test.js",
-    "start": "node index.js"
+    "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-4"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-4"
+  ],
   "author": "AI SDLC Workshop",
   "license": "MIT"
 }

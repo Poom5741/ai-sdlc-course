@@ -3,7 +3,7 @@ title: Quest 5.2 - Full System Design
 description: Design a complete AI-powered system
 ---
 
-import { Badge, Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
 # Quest 5.2: Full System Design
 
@@ -11,40 +11,30 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 
 ## 🎯 Goal
 
-ออกแบบ AI-powered system ที่สมบูรณ์
+ออกแบบ AI-powered system ที่สมบูรณ์ — ระบุ interface ก่อน implementation
 
 ---
 
 ## 📋 Instructions
 
-<Steps>
+ดึง quest ลงเครื่องแล้วทำตามในเครื่องของคุณ:
 
-1. **เลือกระบบ**: Chatbot, Code Reviewer, หรือ Content Generator
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-14-full-system my-quest
+cd my-quest
+node test.js
+```
 
-2. **Define components**
-   | Component | Purpose |
-   |-----------|---------|
-   | Input Handler | Process user input |
-   | AI Engine | Generate responses |
-   | Data Store | Persist data |
-   | Output Formatter | Format responses |
+ตัวอย่างระบบใน reference คือ **automated PR reviewer** (PR webhook → fetch diff → analyze → LLM review → post comment) คุณเลือกระบบตัวเองหรือใช้ตัวอย่างนี้ก็ได้
 
-3. **Design interfaces**
+สิ่งที่ต้องมีใน `system-design.md` (อยู่ในโฟลเดอร์ quest):
 
-4. **Document architecture**
+1. **Component diagram** — กล่อง ``` ใน markdown ที่มีลูกศร (`→` หรือ `-->` หรือ Mermaid `graph`)
+2. **Interface contracts** — `interface` / `contract` / `API` พร้อม function signature + I/O types ของทุก component
+3. **Data flow** — data flow / flow: จาก input สู่ output
+4. **Named components** — ชื่อ component ที่แตกต่างกันอย่างน้อย 3 ตัว
 
-</Steps>
-
----
-
-## 🎮 Code Playground
-
-<iframe
-  src="https://stackblitz.com/edit/Poom5741-ai-sdlc-quests?embed=1&file=block-5-architecture/quest-14-full-system/index.js&view=editor"
-  style="width:100%;height:500px;border:0;border-radius:4px;"
-  allow="cross-origin-isolation"
-  title="Quest 5.2: Full System Design"
-/>
+วัฒนธรรมที่จะได้เรียนรู้: **Specify interfaces before implementing** — ล็อค contract ก่อนแล้วแต่ละ component ถึงทำและ test แยกกันได้
 
 ---
 
@@ -53,6 +43,8 @@ import { Badge, Steps } from '@astrojs/starlight/components';
 ```bash
 node test.js
 ```
+
+`node test.js` คือ design-doc validator — มันเช็คว่า `system-design.md` มี diagram, interface contracts, data flow, named components ≥ 3 ตัว และ substance ≥ 500 ตัวอักษร
 
 ---
 

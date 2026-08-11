@@ -21,7 +21,7 @@ const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 1
   <div class="progress-header">
     <h3>Progress: {completedCount}/{totalCount} ({percentage}%)</h3>
     <div class="progress-bar">
-      <div class="progress-fill" style={`width: ${percentage}%`} />
+      <div class="progress-fill" style={`transform: scaleX(${percentage / 100})`} />
     </div>
   </div>
   
@@ -62,7 +62,8 @@ const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 1
   .progress-fill {
     height: 100%;
     background: var(--sl-color-green-high);
-    transition: width 0.3s ease;
+    transform-origin: left;
+    transition: transform 0.3s ease;
   }
   
   .quest-list {

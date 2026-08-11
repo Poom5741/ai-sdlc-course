@@ -4,73 +4,30 @@
 
 ## 🎯 Learning Objectives
 
-- Understand the Plan-Implement-Validate (PIV) framework
-- Create an automated development loop
-- Handle iterations and convergence
+- Configure an automated dev loop (generate → verify → retry).
+- **Automate the verify step** — the loop must call a deterministic check every iteration, not eyeball results.
 
-## 📋 Instructions
+## 📋 Instructions (run on your machine)
 
-1. **Understand PIV**: Learn the three phases
-2. **Implement the controller**: Build the loop logic
-3. **Add validation**: Ensure quality checks
-4. **Test with a task**: Run the loop on a simple problem
-
-## 🚀 Getting Started
-
-### The PIV Framework
-
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-4-agentic-workflows/quest-10-setup-loop my-quest
+cd my-quest
 ```
-┌─────────────┐
-│    PLAN     │
-│  (Analyze)  │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  IMPLEMENT  │
-│   (Build)   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  VALIDATE   │
-│   (Test)    │
-└──────┬──────┘
-       │
-       ▼
-   Pass? ──Yes──► Done
-       │
-       No
-       │
-       └──────► Back to PLAN
-```
+
+1. Read the contract in `problem.js`: `generate(iteration)` returns a draft number; the working `generate` returns `42` from iteration 3 onward (wrong before). `runLoop({ maxIterations })` must loop `generate` + `verify` and stop as soon as `verify` passes.
+2. Prompt the AI for `generate` that varies by iteration.
+3. Prompt the AI for `runLoop` that loops + auto-verifies + handles `maxIterations < 1`.
+4. Verify:
+   ```bash
+   node test.js
+   ```
 
 ## ✅ Verification
 
-Run the test suite:
-
-```bash
-npm test
-```
+`node test.js` checks: `generate` is a function returning numbers, `runLoop({maxIterations:5})` converges within 3 iterations, `runLoop({maxIterations:2})` does NOT converge (too small), and `maxIterations < 1` is rejected without crashing.
 
 ## 💡 Hints
 
-- **Plan**: Break the task into smaller steps
-- **Implement**: Execute each step
-- **Validate**: Check if the result meets requirements
-- **Iterate**: If validation fails, go back to planning
-
-## 🔍 What You'll Learn
-
-- **Automation**: How to automate development workflows
-- **Convergence**: How loops reach a solution
-- **Error Handling**: Managing failures in automated systems
-
-## 📚 Resources
-
-- [Plan-Implement-Validate](https://martinfowler.com/articles/enterprise-patterns.html)
-- [Loop Invariants](https://en.wikipedia.org/wiki/Loop_invariant)
-
-## ⏭️ Next Quest
-
-[Quest 4.2: Generate-Review-Fix Loop](../quest-11-generate-review-fix/)
+- A loop that calls `generate` once and calls it a day is not a loop — iterate.
+- `maxIterations < 1` must return `{ converged:false }`, not throw (the test catches AI that forgets the guard).
+- Stop iterating the moment `verify` passes; don't always run to the max.

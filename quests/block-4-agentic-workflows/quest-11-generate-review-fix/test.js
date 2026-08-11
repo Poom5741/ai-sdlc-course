@@ -1,95 +1,159 @@
 /**
- * Quest 4.2: Generate-Review-Fix Loop - Test Suite
+ * Quest 4.2: Generate-Review-Fix — test suite
+ *
+ * Tool skill: add a review step to the loop.
+ * Engineering habit: SEPARATE GENERATION FROM REVIEW — a different "agent"
+ * must critique the generator's output, never the generator grading itself.
+ *
+ * Contract:
+ *   problem.js exports { runGrfLoop, runGenerateOnly }.
+ *
+ *   Draft shape: { value: number, defects: string[] }.
+ *
+ *   Roles (provided by THIS test, passed into the loop):
+ *     generator(seed)            -> draft with deliberate defects
+ *     reviewer(draft)            -> issues[] derived from draft.defects
+ *     fixer(draft, issues)       -> draft with values bumped and defects fixed
+ *     qualityTest(draft)         -> number 0..100 (here: draft.value)
+ *
+ *   runGenerateOnly({ generator, qualityTest, seed })
+ *     -> { finalScore, draft, iterations }  (generator run once, no review/fix)
+ *
+ *   runGrfLoop({ generator, reviewer, fixer, qualityTest, maxIterations, seed })
+ *     -> { finalScore, draft, iterations }
+ *     Must loop generate → review → fix, stopping when issues is empty or the
+ *     iteration budget is exhausted.
+ *
+ * Determinism: every role here is a pure function. No AI calls, no network.
+ * The ASSERTION: runGrfLoop(...).finalScore > runGenerateOnly(...).finalScore.
+ * The stub's runGrfLoop must drop the review+fix steps (pass-through) so the
+ * inequality is NOT satisfied — that's the learner's red.
+ *
+ * Run: node test.js
  */
 
-const GRFLoop = require('./index.js');
+const { runGrfLoop, runGenerateOnly } = require('./problem.js');
 
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 4.2: Generate-Review-Fix Loop\n");
-console.log("Running tests...\n");
+console.log('Quest 4.2: Generate-Review-Fix\n');
 
-function test(description, fn) {
-  try {
-    fn();
-    console.log(`✅ ${description}`);
+function check(label, cond, detail) {
+  if (cond) {
+    console.log(`PASS ${label}`);
     passed++;
-  } catch (error) {
-    console.log(`❌ ${description}`);
-    console.log(`   ${error.message}`);
+  } else {
+    console.log(`FAIL ${label}`);
+    if (detail) console.log(`   ${detail}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
+// Deterministic, deliberately-flawed roles.
+const SEED = 50;
+function generator(seed) {
+  return { value: seed, defects: ['typo', 'bug', 'missing-test'] };
+}
+function reviewer(draft) {
+  return (draft.defects || []).map((d) => ({ type: d, severity: 'high' }));
+}
+function fixer(draft, issues) {
+  // Each fix raises the value AND clears the defect list once.
+  return {
+    value: draft.value + issues.length,
+    defects: draft.defects.slice(issues.length),
+  };
+}
+function qualityTest(draft) {
+  return draft.value;
 }
 
-async function runTests() {
-  const loop = new GRFLoop();
+// Both loops must be functions.
+check('runGrfLoop is a function', typeof runGrfLoop === 'function');
+check('runGenerateOnly is a function', typeof runGenerateOnly === 'function');
 
-  test('GRFLoop can be instantiated', () => {
-    assert(loop instanceof GRFLoop);
-  });
+// Control: generate-only produces a known score.
+const only = runGenerateOnly({ generator, qualityTest, seed: SEED });
+check(
+  'runGenerateOnly returns finalScore',
+  only && typeof only.finalScore === 'number',
+  `got ${JSON.stringify(only)}`,
+);
+check(
+  'runGenerateOnly.finalScore === seed (no fix applied)',
+  only && only.finalScore === SEED,
+  `got ${only && only.finalScore} expected ${SEED}`,
+);
 
-  test('generate method exists', () => {
-    assert(typeof loop.generate === 'function');
-  });
+// Treatment: GRF loop must beat generate-only.
+const grf = runGrfLoop({
+  generator,
+  reviewer,
+  fixer,
+  qualityTest,
+  maxIterations: 3,
+  seed: SEED,
+});
 
-  test('review method exists', () => {
-    assert(typeof loop.review === 'function');
-  });
+check(
+  'runGrfLoop returns finalScore',
+  grf && typeof grf.finalScore === 'number',
+  `got ${JSON.stringify(grf)}`,
+);
+check(
+  'runGrfLoop returns iterations',
+  grf && typeof grf.iterations === 'number',
+  `got ${JSON.stringify(grf)}`,
+);
 
-  test('fix method exists', () => {
-    assert(typeof loop.fix === 'function');
-  });
+const improved =
+  grf && only && typeof grf.finalScore === 'number' && grf.finalScore > only.finalScore;
+check(
+  'GRF beats generate-only (finalScore strictly greater)',
+  improved === true,
+  `runGrfLoop.finalScore=${grf && grf.finalScore} <= runGenerateOnly.finalScore=${only && only.finalScore}`,
+);
 
-  test('qualityCheck method exists', () => {
-    assert(typeof loop.qualityCheck === 'function');
-  });
+// Separation-of-duties: the loop must actually CALL reviewer+fixer. The stub
+// returns the generator's draft unchanged → finalScore === seed → not greater.
+// We additionally assert the draft's defects were cleared by the fix steps.
+check(
+  'GRF draft has no remaining defects after fix steps',
+  grf && Array.isArray(grf.draft && grf.draft.defects) && grf.draft.defects.length === 0,
+  `got defects=${JSON.stringify(grf && grf.draft && grf.draft.defects)}`,
+);
 
-  test('run method exists', () => {
-    assert(typeof loop.run === 'function');
-  });
+// The loop must converge (issues drop to 0) within the budget — not iterate
+// uselessly to maxIterations. With 3 defects and fix removing all each pass,
+// the loop should converge in 1 iteration.
+check(
+  'GRF converges before exhausting maxIterations',
+  grf && grf.iterations <= 3,
+  `got iterations=${grf && grf.iterations}`,
+);
 
-  test('generate returns code object', async () => {
-    const result = await loop.generate('test task');
-    assert(typeof result.code === 'string');
-    assert(result.task === 'test task');
-  });
+// Edge: maxIterations < 1 — loop must still return a coherent result (don't
+// crash, just run the generator once and skip the review/fix phase).
+const zero = runGrfLoop({
+  generator,
+  reviewer,
+  fixer,
+  qualityTest,
+  maxIterations: 0,
+  seed: SEED,
+});
+check(
+  'runGrfLoop({maxIterations:0}) returns without crashing',
+  zero && typeof zero.finalScore === 'number',
+  `got ${JSON.stringify(zero)}`,
+);
 
-  test('review returns issues array', async () => {
-    const result = await loop.review('test code');
-    assert(Array.isArray(result.issues));
-    assert(typeof result.score === 'number');
-  });
+console.log(`\nResults: ${passed} passed, ${failed} failed`);
 
-  test('qualityCheck returns quality result', async () => {
-    const result = await loop.qualityCheck('test code');
-    assert(typeof result.passed === 'boolean');
-    assert(typeof result.score === 'number');
-    assert(Array.isArray(result.suggestions));
-  });
-
-  test('run returns final result', async () => {
-    const result = await loop.run('test task');
-    assert(typeof result.success === 'boolean');
-    assert(typeof result.iterations === 'number');
-    assert(typeof result.finalCode === 'string');
-  });
-
-  console.log(`\nResults: ${passed} passed, ${failed} failed`);
-
-  if (failed === 0) {
-    console.log("\n🎉 Quest 4.2 Complete! You've created a Generate-Review-Fix loop.");
-    process.exit(0);
-  } else {
-    console.log("\n💡 Hint: The GRF loop generates code, reviews it for issues, and fixes problems iteratively.");
-    process.exit(1);
-  }
+if (failed === 0) {
+  console.log('\nQuest 4.2 complete. Review+fix beats generate-only — generation is separated from review.');
+  process.exit(0);
 }
-
-runTests();
+console.log('\nHint: runGrfLoop must actually CALL reviewer(draft) and fixer(draft, issues), then re-check. A pass-through stub returns the generator\'s draft unchanged and ties generate-only.');
+process.exit(1);

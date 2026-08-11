@@ -89,15 +89,15 @@
 - Start with workshop materials + tool docs
 - Expand based on user feedback
 
-### Code Playground: StackBlitz Embeds
-- Custom Astro component (<StackBlitzEmbed.astro>)
-- Template repo with quest code organized by block/quest
-- Pre-configured (no setup friction)
-- Local instructions fallback if StackBlitz unavailable
+### Code Playground: Local Folders (npx degit)
+- Quest code distributed via `npx degit Poom5741/ai-sdlc-course/quests/...`
+- Learners build and test on their own machine (`node test.js`)
+- No browser-based dependency; works offline
+- StackBlitz approach superseded (2026-08-12)
 
 ### Quest Starter Code: Partial Solutions
 - Scaffolding + tasks for all quests (easy/medium/hard)
-- Distributed via StackBlitz embeds
+- Distributed via `npx degit` (local folders)
 - Automated tests + manual QA for correctness
 - Template repo: ai-sdlc-quests
 

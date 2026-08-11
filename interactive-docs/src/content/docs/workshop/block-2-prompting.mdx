@@ -3,7 +3,10 @@ title: Block 2 - Prompt Engineering
 description: Master the art of writing effective prompts for AI coding assistants
 ---
 
-import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
 
 # Block 2: Prompt Engineering
 
@@ -131,100 +134,102 @@ Iteration 4: Add documentation
 
 ---
 
+## 💰 Token Cost Management
+
+### รู้ Token Economics
+
+AI เรียกเก็บเงิน per **token** (หน่วยของข้อความที่ model อ่าน/สร้าง) — ยิ่ง prompt ยาวและ output ยาว
+เท่าไหร่ ยิ่งมีค่าใช้จ่ายมากขึ้น การเข้าใจว่าอะไร cost มากจึงช่วย control budget ได้
+
+### เลือก Model ระหว่าง Cost กับ Quality
+
+- **Model ใหญ่** (เช่น high-capability frontier model) — quality ดี แต่ cost ต่อ token สูง เหมาะกับงานซับซ้อน
+- **Model เล็ก/เร็ว** — ถูกกว่า เหมาะกับงาน routine เช่น formatting, refactor เล็กๆ, auto-complete
+- **Strategy:** ใช้ model ใหญ่เฉพาะขั้นตอนที่ต้อง reasoning ลึก ใช้ model เล็กกับงานที่ซ้ำๆ
+
+### Basic Optimization
+
+- **Trim context** — ตัดส่วนที่ไม่เกี่ยวข้องออกจาก prompt เพื่อลด token ที่ model ต้องอ่าน
+- **Fewer round-trips** — รวมคำถามหลายข้อใน prompt เดียวแทนการถามทีละข้อ
+- **Cache/reuse** — อย่า re-generate อะไรที่ได้ผลดีแล้วซ้ำๆ
+
+---
+
 ## 🎮 Code Quests
 
 ### 🟢 Quest 2.1: Fix the Vague Prompt
 
-**Goal**: Transform a vague prompt into a specific one
+**Goal**: เขียน prompt ให้ระบุ constraints ครบ แล้ว generate `createUser`
 
 <Steps>
 
-1. **Analyze the bad prompt**
-   ```
-   Make a function that handles users
-   ```
-
-2. **Identify what's missing**
-   - What does "handle" mean?
-   - What data does a user have?
-   - What validation is needed?
-   - What should it return?
-
-3. **Write an improved prompt**
-   ```
-   Create a function called createUser that:
-   - Takes { name: string, email: string }
-   - Validates email format (user@domain.com)
-   - Returns { success: true, id, name, email } on success
-   - Returns { success: false, error: 'message' } on failure
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-04-fix-prompt my-quest
+   cd my-quest
    ```
 
-4. **Use your prompt with an AI tool**
+2. **วิเคราะห์ bad prompt** ใน `problem.js` — “Make a function that handles users”
 
-5. **Test the generated code**
+3. **เขียน improved prompt** ระบุ constraints ครบ (input shape, email format, empty/null handling, success/error return shape) แล้วใช้ AI generate
+
+4. **ตรวจสอบ**:
+   ```bash
+   node test.js
+   ```
 
 </Steps>
 
-**Deliverable**: Improved prompt + working code
+**Deliverable**: `createUser` ที่ผ่านทุกข้อ constraint (handles {} / null / invalid email) + improved prompt ที่เขียนเอง
 
 ---
 
 ### 🟡 Quest 2.2: Multi-Step Prompting
 
-**Goal**: Break a complex task into steps
+**Goal**: สร้าง URL validator สองชั้น (core + edge) ด้วยสอง prompts
 
 <Steps>
 
-1. **The complex task**: Build a todo list manager
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-05-multi-step my-quest
+   cd my-quest
+   ```
 
-2. **Break it down**:
-   - Step 1: Define data structure
-   - Step 2: Implement CRUD operations
-   - Step 3: Add filtering
-   - Step 4: Implement file storage
-   - Step 5: Create CLI interface
+2. **Step 1 prompt (core)**: “Write `isValidUrl(url)` returning true for well-formed http/https URLs with a host, false otherwise.” → implement → `node test.js` (Layer 1 ผ่าน)
 
-3. **Write prompts for each step**
-
-4. **Implement incrementally**
-
-5. **Test after each step**
+3. **Step 2 prompt (edge)**: “Now handle: empty, whitespace, `javascript:` scheme, no-protocol, `https://` ไม่มี host → reject all.” → implement → `node test.js` (ผ่านครบ)
 
 </Steps>
 
-**Deliverable**: Working todo manager with all features
+**Deliverable**: `isValidUrl` สองชั้นผ่าน Layer 1 + Layer 2 edge cases
 
 ---
 
 ### 🔴 Quest 2.3: Domain-Specific Prompting
 
-**Goal**: Write prompts for specialized domains
+**Goal**: Validate เบอร์โทรและบัตรประชาชนไทย โดยใส่ domain rules ลงใน prompt
 
 <Steps>
 
-1. **Choose a domain**: E-commerce, Healthcare, or Finance
-
-2. **Research domain rules**
-   - E-commerce: product validation, tax calculation
-   - Healthcare: HIPAA compliance, patient data
-   - Finance: transaction validation, interest calculation
-
-3. **Write domain-specific prompts**
-   ```
-   Create a healthcare patient validator:
-   - Validates HIPAA-compliant fields
-   - Checks insurance ID format (XXX-XXXX-XXX)
-   - Validates DOB (past date, max age 150)
-   - Returns validation errors with compliance codes
+1. **ดึงไฟล์ quest ลงเครื่อง**:
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-06-domain-specific my-quest
+   cd my-quest
    ```
 
-4. **Implement the validator**
+2. **อ่าน domain rules** ใน `problem.js` (เบอร์ 10 หลัก prefix 06/08/09; บัตร 13 หลัก checksum)
 
-5. **Test with domain-specific cases**
+3. **เขียน prompt** ที่ใส่ rules ทั้งสองชุด verbatim แล้ว generate `isValidThaiPhone` + `isValidThaiId`
+
+4. **ตรวจสอบ**:
+   ```bash
+   node test.js
+   ```
 
 </Steps>
 
-**Deliverable**: Domain-specific validator with tests
+**Deliverable**: validator สองตัวที่ผ่าน edge cases ของ format ไทย (รวม checksum ที่ AI ตัุงไม่ได้)
 
 ---
 
@@ -241,6 +246,6 @@ Iteration 4: Add documentation
 
 **Block 3: Security** → Learn to identify and fix security vulnerabilities in AI-generated code.
 
-import { LinkCard } from '@astrojs/starlight/components';
 
-<LinkCard title="Continue to Block 3" href="/workshop/block-3-security" />
+
+<a href="/workshop/block-3-security" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">Continue to Block 3 →</a>

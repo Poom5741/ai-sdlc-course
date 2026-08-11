@@ -1,10 +1,15 @@
 /**
- * Quest 1.1: First AI Code Completion - Test Suite
+ * Quest 1.1: First AI Code Completion — test suite
+ *
+ * Requires ./problem.js (the learner's work), never ./index.js or
+ * ./_solution/solution.js.
+ *
+ * Run: node test.js
  */
 
-const factorial = require('./index.js');
+const factorial = require('./problem.js');
 
-const tests = [
+const cases = [
   { input: 0, expected: 1, description: 'factorial(0) = 1' },
   { input: 1, expected: 1, description: 'factorial(1) = 1' },
   { input: 2, expected: 2, description: 'factorial(2) = 2' },
@@ -16,34 +21,46 @@ const tests = [
 let passed = 0;
 let failed = 0;
 
-console.log("Quest 1.1: First AI Code Completion\n");
-console.log("Running tests...\n");
+console.log('Quest 1.1: First AI Code Completion\n');
 
-tests.forEach((test, index) => {
+cases.forEach((test, index) => {
   try {
     const result = factorial(test.input);
     if (result === test.expected) {
-      console.log(`✅ Test ${index + 1}: ${test.description}`);
+      console.log(`PASS Test ${index + 1}: ${test.description}`);
       passed++;
     } else {
-      console.log(`❌ Test ${index + 1}: ${test.description}`);
+      console.log(`FAIL Test ${ index + 1 }: ${test.description}`);
       console.log(`   Expected: ${test.expected}`);
       console.log(`   Got: ${result}`);
       failed++;
     }
   } catch (error) {
-    console.log(`❌ Test ${index + 1}: ${test.description}`);
+    console.log(`FAIL Test ${index + 1}: ${test.description}`);
     console.log(`   Error: ${error.message}`);
     failed++;
   }
 });
 
+// Edge case: negative input. The naive AI suggestion `if (n <= 1) return 1`
+// silently returns 1 for factorial(-1) — which is wrong. The correct function
+// must reject negatives (throw). This is the "verify before trust" lesson.
+try {
+  const got = factorial(-1);
+  console.log(`FAIL Test ${cases.length + 1}: factorial(-1) must throw on negative input`);
+  console.log(`   Expected: throw`);
+  console.log(`   Got: ${got}`);
+  failed++;
+} catch (error) {
+  console.log(`PASS Test ${cases.length + 1}: factorial(-1) throws on negative input`);
+  passed++;
+}
+
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 
 if (failed === 0) {
-  console.log("\n🎉 Quest 1.1 Complete! You've written your first AI-assisted function.");
+  console.log('\nQuest 1.1 complete. You verified AI output before trusting it.');
   process.exit(0);
-} else {
-  console.log("\n💡 Hint: Make sure your factorial function handles both base cases (0 and 1) and uses recursion for larger numbers.");
-  process.exit(1);
 }
+console.log('\nHint: check the negative-input edge case. Naive AI output gets it wrong.');
+process.exit(1);

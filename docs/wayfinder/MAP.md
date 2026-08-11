@@ -23,8 +23,8 @@ Create a working one-day AI SDLC workshop with interactive docs platform, 14 cod
 - [Deployment Decision](../adr/0006-deployment-decision.md) — Vercel free tier, auto-deploy on push, preview deployments
 - [Thai Translation Workflow](../adr/0007-thai-translation-workflow.md) — Bilingual content (Thai + inline English), AI-assisted translation + human review
 - [Pilot Workshop Planning](../adr/0008-pilot-workshop-planning.md) — Beta user group within 1 month, 10-20 participants, Blocks 1-3 ready
-- [Code Playground Integration](../adr/0009-code-playground-integration.md) — StackBlitz embeds via custom Astro component, template repo, pre-configured
-- [Quest Starter Code](../adr/0010-quest-starter-code.md) — Partial solutions (scaffolding + tasks) for all quests, distributed via StackBlitz
+- [Code Playground Integration](../adr/0009-code-playground-integration.md) — Local folders via `npx degit` (StackBlitz superseded 2026-08-12)
+- [Quest Starter Code](../adr/0010-quest-starter-code.md) — Partial solutions (scaffolding + tasks) for all quests, distributed via `npx degit`
 - [Progress Tracking System](../adr/0011-progress-tracking-system.md) — File-based tracking (completion + scores), CSV export, simple checklist
 
 ## Active Tickets
@@ -47,3 +47,11 @@ Create a working one-day AI SDLC workshop with interactive docs platform, 14 cod
 - Multi-week course format (decided on 1-day workshop)
 - Security-focused CTF (revised to Code Quest coding challenges)
 - Full certification program (workshop + docs only for now)
+
+---
+
+## Next Map
+
+This map is complete. The next effort continues at:
+
+**[Map 2: Pilot Readiness](https://github.com/Poom5741/ai-sdlc-course/issues/40)** — Complete missing content, deploy LMS, prepare for pilot workshop.
