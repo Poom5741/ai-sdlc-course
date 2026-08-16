@@ -32,14 +32,14 @@
     "title": "Token Counter",
     "difficulty": "easy",
     "block": "module-1/block-a",
-    "slug": "quest-4"
+    "slug": "quest-04-token-counter"
   },
   {
     "id": "quest-05-context-budget",
     "title": "Context Window Budget Calculator",
     "difficulty": "medium",
     "block": "module-1/block-a",
-    "slug": "quest-5"
+    "slug": "quest-05-context-budget"
   },
   {
     "id": "quest-05-multi-step",
@@ -60,7 +60,7 @@
     "title": "Hallucination Detector",
     "difficulty": "medium",
     "block": "module-1/block-a",
-    "slug": "quest-6"
+    "slug": "quest-06-hallucination-detector"
   },
   {
     "id": "quest-07-spot-vulnerability",
@@ -74,7 +74,7 @@
     "title": "Vibe Coding vs Vibe Engineering Analysis",
     "difficulty": "medium",
     "block": "module-1/block-a",
-    "slug": "quest-7"
+    "slug": "quest-07-vibe-coding-analysis"
   },
   {
     "id": "quest-08-fix-harden",
@@ -88,7 +88,7 @@
     "title": "AI Tool Selection Matrix",
     "difficulty": "medium",
     "block": "module-1/block-a",
-    "slug": "quest-8"
+    "slug": "quest-08-tool-selection"
   },
   {
     "id": "quest-09-security-architecture",
@@ -102,14 +102,14 @@
     "title": "Self-Attention Implementation",
     "difficulty": "medium",
     "block": "module-1/block-b",
-    "slug": "quest-9"
+    "slug": "quest-09-self-attention"
   },
   {
     "id": "quest-10-position-encoding",
     "title": "Position Encoding Explorer",
     "difficulty": "medium",
     "block": "module-1/block-b",
-    "slug": "quest-10"
+    "slug": "quest-10-position-encoding"
   },
   {
     "id": "quest-10-setup-loop",
@@ -130,7 +130,7 @@
     "title": "Model Architecture Classifier",
     "difficulty": "hard",
     "block": "module-1/block-b",
-    "slug": "quest-11"
+    "slug": "quest-11-model-arch-classifier"
   },
   {
     "id": "quest-12-multi-agent",
@@ -144,7 +144,7 @@
     "title": "Transformer From Scratch",
     "difficulty": "hard",
     "block": "module-1/block-b",
-    "slug": "quest-12"
+    "slug": "quest-12-transformer-scratch"
   },
   {
     "id": "quest-13-next-token-predictor",
@@ -154,18 +154,18 @@
     "slug": "quest-13"
   },
   {
-    "id": "quest-13-rag-design",
+    "id": "quest-137-rag-design",
     "title": "quest-13-rag-design",
     "difficulty": "hard",
     "block": "block-5-architecture",
-    "slug": "quest-13"
+    "slug": "quest-137"
   },
   {
-    "id": "quest-14-full-system",
+    "id": "quest-138-full-system",
     "title": "quest-14-full-system",
     "difficulty": "hard",
     "block": "block-5-architecture",
-    "slug": "quest-14"
+    "slug": "quest-138"
   },
   {
     "id": "quest-14-scaling-laws",
