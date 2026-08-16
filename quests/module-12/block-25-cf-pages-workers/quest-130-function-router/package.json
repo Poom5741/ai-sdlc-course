@@ -1,0 +1,17 @@
+{
+  "name": "quest-130-function-router",
+  "version": "1.0.0",
+  "description": "Quest 25.2: Pages Function Router - request routing with CORS",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-130-function-router",
+    "block": "module-12/block-25",
+    "slug": "quest-130",
+    "difficulty": "medium",
+    "title": "Pages Function Router"
+  }
+}

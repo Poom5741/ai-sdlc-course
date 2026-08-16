@@ -1,0 +1,317 @@
+---
+title: Block 5 - Architecture
+description: Design complete AI-powered systems with RAG and multi-component architecture
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 5: Architecture
+
+<Badge text="16:45 - 18:00" variant="note" /> <Badge text="75 minutes" variant="note" /> <Badge text="2 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+By the end of this block, you will:
+
+- Design AI-powered system architecture
+- Build a RAG (Retrieval-Augmented Generation) system
+- Document architectural decisions
+
+---
+
+## 📖 Concept: System Architecture (30 min)
+
+### What is System Architecture?
+
+System Architecture is designing the structure of a system, including:
+
+- **Components**: System components
+- **Interfaces**: Connections between components
+- **Data Flow**: Data flow
+- **Security**: System security
+
+### AI-Powered System Patterns
+
+#### Pattern 1: RAG (Retrieval-Augmented Generation)
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Documents  │────▶│  Embeddings │────▶│ Vector Store│
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+┌─────────────┐     ┌─────────────┐           │
+│   Query     │────▶│  Embeddings │───────────┘
+└─────────────┘     └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │     LLM     │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   Answer    │
+                    └─────────────┘
+```
+
+**Use Cases**:
+
+- Chat with your documents
+- Knowledge base Q&A
+- Document search
+
+#### Pattern 2: Multi-Agent System
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Planner  │───▶│  Coder   │───▶│ Reviewer │
+└──────────┘    └──────────┘    └────┬─────┘
+                                     │
+                    ┌────────────────┘
+                    ▼
+              ┌──────────┐
+              │  Tester  │
+              └──────────┘
+```
+
+**Use Cases**:
+
+- Complex code generation
+- Automated workflows
+- Quality assurance
+
+#### Pattern 3: Event-Driven Architecture
+
+```
+┌─────────┐     ┌─────────┐     ┌─────────┐
+│ Event   │────▶│ Handler │────▶│ Side    │
+│ Source  │     │         │     │ Effects │
+└─────────┘     └─────────┘     └─────────┘
+```
+
+**Use Cases**:
+
+- Microservices
+- Real-time systems
+- Scalable applications
+
+---
+
+## 🛠️ Architecture Documentation
+
+### Architecture Decision Records (ADR)
+
+Document architectural decisions:
+
+```markdown
+# ADR-001: [Decision Title]
+
+## Status
+Accepted
+
+## Context
+[Decision to make]
+
+## Decision
+[Decision made]
+
+## Consequences
+- [Pros]
+- [Cons]
+```
+
+### System Design Document
+
+```markdown
+# System Design: [System Name]
+
+## Overview
+- Purpose
+- Users
+- Key Features
+
+## Architecture
+- Components
+- Interfaces
+- Data Flow
+
+## Security
+- Authentication
+- Authorization
+- Encryption
+
+## Deployment
+- Infrastructure
+- CI/CD
+- Monitoring
+```
+
+---
+
+## 🎯 Responsible AI & Ethics
+
+### Data Privacy Basics (GDPR)
+
+**GDPR Principles for AI:**
+
+1. **Lawfulness** — Legal basis for data processing
+2. **Purpose Limitation** — Use data only for specified purposes
+3. **Data Minimization** — Collect only necessary data
+4. **Accuracy** — Maintain data accuracy
+5. **Storage Limitation** — Don't retain data longer than needed
+6. **Integrity** — Prevent unauthorized access
+
+**Best Practices for AI:**
+
+- Don't send PII to LLM APIs without consent
+- Anonymize data before processing
+- Record what data is processed when
+- Use data retention policies
+
+---
+
+### Bias Awareness
+
+**Types of AI Bias:**
+
+| Type | Description | Example |
+| ------ | ------------- | ---------- |
+| Historical bias | Training data reflects historical discrimination | Resume screening biased |
+| Representation bias | Underrepresented groups | Fails to recognize foreign names |
+| Measurement bias | Inconsistent data collection | BMI values differ by ethnicity |
+| Agestion bias | Assuming one model works for everyone | Doesn't adapt to needs |
+
+**How to Reduce Bias:**
+
+- Test with diverse inputs
+- Audit outputs for disparate impact
+- Document known limitations
+- Human review for sensitive decisions
+
+---
+
+### AI-Generated Code Licensing
+
+**Key Questions:**
+
+- Who owns AI-generated code?
+- Can it be used commercially?
+- Must AI usage be disclosed?
+
+**Current Legal Status:**
+
+- **US**: AI-generated code may not be copyrightable
+- **EU**: Stricter, may require disclosure
+- **Company policies**: Vary
+
+**Best Practices:**
+
+- Document AI usage in codebase
+- Check AI output for copyright issues
+- Follow company AI policy
+- Unsure? Consult legal team
+
+---
+
+### Transparency & Explainability
+
+**Principles:**
+
+- Disclose when using AI
+- Explain how decisions were made
+- Provide options for poor results
+- Always have human oversight
+
+---
+
+## 🎮 Code Quests
+
+### 🟡 Quest 5.1: RAG Design
+
+**Goal**: Design a Retrieval-Augmented Generation system that handles failure modes
+
+Download the quest and follow instructions on your machine:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-13-rag-design my-quest
+cd my-quest
+node test.js
+```
+
+Required in `rag-design.md` (in the quest folder):
+
+1. **Chunking strategy** — How to split documents (by heading + window size)
+2. **Embedding strategy** — Which model, how to embed chunks/queries
+3. **Retrieval quality metric** — recall@5 / precision / NDCG to measure retrieval quality
+4. **Failure handling** — What to do when retrieval is empty / confidence is low / query is out of corpus (fallback, graceful degradation)
+5. **Corpus** — Specify which parts of workshop docs to index
+
+Culture to learn: **Design for the failure mode** — don't let the system hallucinate when data is insufficient
+
+**Deliverable**: `rag-design.md` passing `node test.js`
+
+---
+
+### 🔴 Quest 5.2: Full System Design
+
+**Goal**: Design a complete AI system — specify interfaces before implementation
+
+Download the quest and follow instructions on your machine:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-14-full-system my-quest
+cd my-quest
+node test.js
+```
+
+Example system in reference is **automated PR reviewer** (PR webhook → fetch diff → analyze → LLM review → post comment). Choose your own system or use the example
+
+Required in `system-design.md` (in the quest folder):
+
+1. **Component diagram** — Boxes in markdown with arrows (`→` or `-->` or Mermaid `graph`)
+2. **Interface contracts** — `interface` / `contract` / `API` with function signatures + I/O types for all components
+3. **Data flow** — data flow: from input to output
+4. **Named components** — at least 3 different component names
+
+Culture to learn: **Specify interfaces before implementing** — lock contracts first so each component can be built and tested independently
+
+**Deliverable**: `system-design.md` passing `node test.js`
+
+---
+
+## ✅ Block 5 Checklist
+
+- [ ] Understand AI architecture patterns
+- [ ] Quest 5.1 completed
+- [ ] Quest 5.2 completed
+
+---
+
+## 🎉 Workshop Complete
+
+Congratulations! You've completed all 5 blocks:
+
+1. ✅ **Block 1**: AI Tools Setup
+2. ✅ **Block 2**: Prompt Engineering
+3. ✅ **Block 3**: Security
+4. ✅ **Block 4**: Agentic Workflows
+5. ✅ **Block 5**: Architecture
+
+### What You've Learned
+
+- Setting up and using AI coding tools
+- Writing effective prompts
+- Identifying and fixing security vulnerabilities
+- Creating automated development loops
+- Designing AI-powered systems
+
+### Next Steps
+
+1. **Apply**: Use these skills in your real projects
+2. **Share**: Teach others what you've learned
+3. **Iterate**: Continuously improve your workflow
+
+<a href="/quests/quest-1-first-code" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">View All Code Quests →</a>

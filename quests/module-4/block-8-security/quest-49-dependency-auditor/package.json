@@ -1,0 +1,17 @@
+{
+  "name": "quest-49-dependency-auditor",
+  "version": "1.0.0",
+  "description": "Quest 4.7: Dependency Vulnerability Auditor - audit packages for vulnerabilities",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-49-dependency-auditor",
+    "block": "module-4/block-8",
+    "slug": "quest-49",
+    "difficulty": "medium",
+    "title": "Dependency Vulnerability Auditor"
+  }
+}

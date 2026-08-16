@@ -1,0 +1,17 @@
+{
+  "name": "quest-65-agent-debate",
+  "version": "1.0.0",
+  "description": "Quest 5.3: Multi-Agent Debate System",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-65-agent-debate",
+    "block": "module-5/block-11",
+    "slug": "quest-65",
+    "difficulty": "hard",
+    "title": "Multi-Agent Debate System"
+  }
+}

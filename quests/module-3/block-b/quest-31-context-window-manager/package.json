@@ -1,0 +1,11 @@
+{
+  "name": "quest-31-context-window-manager",
+  "version": "1.0.0",
+  "description": "Quest 3.9: Context Window Manager",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-31-context-window-manager", "block": "module-3/block-b", "slug": "quest-31", "difficulty": "medium", "title": "Context Window Manager" }
+}

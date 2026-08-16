@@ -1,0 +1,17 @@
+{
+  "name": "quest-50-ai-review-policy",
+  "version": "1.0.0",
+  "description": "Quest 4.8: AI Code Review Policy Writer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-50-ai-review-policy",
+    "block": "module-4/block-9",
+    "slug": "quest-50",
+    "difficulty": "medium",
+    "title": "AI Code Review Policy Writer"
+  }
+}

@@ -1,0 +1,299 @@
+---
+title: Block 7 - LLM Observability
+description: Monitor, trace, and debug LLM applications in production
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 7: LLM Observability
+
+<Badge text="New Module" variant="note" /> <Badge text="60 minutes" variant="note" /> <Badge text="2 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+By the end of this block, you will:
+
+- Understand what LLM Observability is and why it matters
+- Set up basic tracing for LLM calls
+- Detect hallucination in LLM output
+- Monitor token usage and cost
+
+---
+
+## 📖 Concept: LLM Observability (25 min)
+
+### What is LLM Observability?
+
+LLM Observability is monitoring, tracing, and debugging what happens inside LLM applications:
+
+<CardGrid>
+<Card title="Tracing" icon="search">
+Track requests through the system
+</Card>
+<Card title="Metrics" icon="chart">
+Measure latency, cost, quality
+</Card>
+<Card title="Logs" icon="document">
+Log inputs, outputs, errors
+</Card>
+<Card title="Alerts" icon="warning">
+Alert when issues occur
+</Card>
+</CardGrid>
+
+### Why Observability Matters for LLMs
+
+**LLM-specific challenges:**
+
+- **Non-deterministic** — different results even with same input
+- **Hallucination** — generates false information
+- **Token costs** — expensive and unpredictable
+- **Latency** — slower than typical APIs
+- **Quality drift** — quality changes with model updates
+
+### Key Metrics for LLM Apps
+
+```
+Performance:
+├── Latency (time to first token, total)
+├── Throughput (requests per second)
+└── Error rate (failed requests)
+
+Cost:
+├── Tokens per request
+├── Cost per request
+└── Cost per user/project
+
+Quality:
+├── User satisfaction scores
+├── Hallucination rate
+└── Task completion rate
+```
+
+---
+
+## 🛠️ Basic Tracing Setup
+
+### Simple Trace Structure
+
+```javascript
+const trace = {
+  id: generateId(),
+  timestamp: Date.now(),
+  input: {
+    prompt: userPrompt,
+    model: 'gpt-4o',
+    temperature: 0.7,
+    maxTokens: 1000
+  },
+  output: {
+    completion: llmResponse,
+    tokensUsed: 450,
+    latencyMs: 1200
+  },
+  metadata: {
+    userId: 'user_123',
+    projectId: 'project_abc',
+    cost: 0.0045
+  }
+};
+
+// Log to observability platform
+await logTrace(trace);
+```
+
+### What to Trace
+
+<CardGrid>
+<Card title="Inputs" icon="input">
+- User prompt
+- System prompt
+- Model parameters
+- Context length
+</Card>
+<Card title="Outputs" icon="output">
+- LLM response
+- Tokens used
+- Finish reason
+- Confidence scores
+</Card>
+<Card title="Metadata" icon="document">
+- User ID
+- Session ID
+- Timestamp
+- Cost estimate
+</Card>
+</CardGrid>
+
+---
+
+## 🔍 Hallucination Detection
+
+### What is Hallucination?
+
+LLM generates false or inconsistent information compared to provided data
+
+**Signs of Hallucination:**
+
+- Contradicts the provided context
+- Fabricates facts not in source material
+- Overconfident about uncertain topics
+- References non-existent sources
+
+### Detection Strategies
+
+```javascript
+function detectHallucination(output, sources) {
+  const issues = [];
+  
+  // 1. Source verification
+  const claims = extractClaims(output);
+  for (const claim of claims) {
+    if (!isSupportedBySources(claim, sources)) {
+      issues.push({
+        type: 'unsupported_claim',
+        claim,
+        confidence: 0.8
+      });
+    }
+  }
+  
+  // 2. Consistency check
+  if (containsContradictions(output)) {
+    issues.push({
+      type: 'contradiction',
+      confidence: 0.7
+    });
+  }
+  
+  // 3. Confidence scoring
+  const confidenceScore = calculateConfidence(output, sources);
+  
+  return {
+    hasHallucination: issues.length > 0,
+    issues,
+    confidenceScore
+  };
+}
+```
+
+### Tools for Observability
+
+| Tool | Purpose | Complexity |
+| ------ | --------- | ------------ |
+| LangSmith | Tracing + evaluation | Medium |
+| Arize Phoenix | Observability platform | High |
+| PromptFlow | Azure-based | High |
+| Custom logging | DIY approach | Low |
+
+---
+
+## 💰 Cost Monitoring
+
+### Track Token Usage
+
+```javascript
+async function callWithTracking(prompt, model) {
+  const start = Date.now();
+  
+  const response = await llm.complete(prompt, { model });
+  
+  const tokens = countTokens(prompt) + countTokens(response);
+  const cost = calculateCost(model, tokens);
+  const latency = Date.now() - start;
+  
+  // Log for monitoring
+  await logMetric({
+    model,
+    tokens,
+    cost,
+    latency,
+    timestamp: Date.now()
+  });
+  
+  return response;
+}
+```
+
+### Cost Optimization Tips
+
+1. **Cache common queries** — avoid repeated LLM calls
+2. **Use smaller models for simple tasks** — routing
+3. **Trim context** — reduce input tokens
+4. **Set token limits** — prevent runaway outputs
+
+---
+
+## 🎮 Code Quests
+
+### 🟡 Quest 7.1: Monitoring Dashboard
+
+**Goal**: Design an LLM monitoring dashboard
+
+Download the quest and follow instructions on your machine:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-7-observability/quest-19-monitoring-dashboard my-quest
+cd my-quest
+node test.js
+```
+
+Required in `dashboard-design.md`:
+
+1. **Metrics to track** — Specify metrics to monitor (latency, cost, quality, errors)
+2. **Alerts** — Write alert rules for anomalies
+3. **Visualization** — Design dashboard layout
+4. **Actions** — What to do when alerts trigger
+
+**Deliverable**: `dashboard-design.md` passing `node test.js`
+
+---
+
+### 🟡 Quest 7.2: Hallucination Detector
+
+**Goal**: Build a function that detects hallucination risk
+
+Download the quest and follow instructions on your machine:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-7-observability/quest-20-hallucination-detector my-quest
+cd my-quest
+node test.js
+```
+
+What to implement:
+
+1. **Score hallucination risk** — return 0-1 (0 = no risk, 1 = very high)
+2. **Check source support** — verify claims are supported by sources
+3. **Detect contradictions** — find conflicting statements
+
+**Deliverable**: `detectHallucination()` passing `node test.js`
+
+---
+
+## ✅ Block 7 Checklist
+
+- [ ] Understand LLM observability concepts
+- [ ] Quest 7.1 completed
+- [ ] Quest 7.2 completed
+
+---
+
+## 🚀 Next Steps
+
+**恭喜!** You have completed all modules:
+
+1. ✅ **Block 1**: AI Tools Setup
+2. ✅ **Block 2**: Prompt Engineering + Cost Management
+3. ✅ **Block 3**: Security + Prompt Injection
+4. ✅ **Block 4**: Agentic Workflows
+5. ✅ **Block 5**: Architecture + Responsible AI
+6. ✅ **Block 6**: AI Development Pipeline
+7. ✅ **Block 7**: LLM Observability
+
+**Ready for Capstone Projects?**
+
+<a href="/capstones" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">View Capstone Projects →</a>

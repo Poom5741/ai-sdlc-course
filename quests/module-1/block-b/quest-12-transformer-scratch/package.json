@@ -1,0 +1,17 @@
+{
+  "name": "quest-12-transformer-scratch",
+  "version": "1.0.0",
+  "description": "Quest 1.12: Transformer From Scratch - simplified transformer block",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-12-transformer-scratch",
+    "block": "module-1/block-b",
+    "slug": "quest-12",
+    "difficulty": "hard",
+    "title": "Transformer From Scratch"
+  }
+}

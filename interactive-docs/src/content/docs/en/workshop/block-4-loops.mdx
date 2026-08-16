@@ -1,0 +1,348 @@
+---
+title: Block 4 - Agentic Workflows
+description: Create automated development loops and multi-agent systems
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 4: Agentic Workflows
+
+<Badge text="15:00 - 16:30" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+By the end of this block, you will:
+
+- Create automated development loops
+- Design multi-agent pipelines
+- Use the Plan-Implement-Validate (PIV) framework
+
+---
+
+## 📖 Concept: Agentic Workflows (30 min)
+
+### What are Agentic Workflows?
+
+Agentic Workflows are systems where AI agents work together autonomously to achieve goals
+
+### The PIV Framework
+
+**Plan-Implement-Validate** is the core pattern:
+
+```
+┌─────────────┐
+│    PLAN     │  Analyze work, break into steps
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  IMPLEMENT  │  Generate code per plan
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  VALIDATE   │  Test, verify quality
+└──────┬──────┘
+       │
+       ▼
+   Pass? ──Yes──► Done
+       │
+       No
+       │
+       └──────► Back to PLAN
+```
+
+### Why Use Loops?
+
+- **Quality**: Verify before deploy
+- **Iteration**: Improve every iteration
+- **Automation**: Reduce manual work
+- **Consistency: Consistent results every time
+
+---
+
+## 🛠️ Loop Patterns
+
+### Pattern 1: Generate-Review-Fix
+
+```
+Generate Code → AI Review → Fix Issues → Repeat until quality
+```
+
+### Pattern 2: Test-Driven Loop
+
+```
+Write Test → Generate Code → Run Test → Fix → Repeat
+```
+
+### Pattern 3: Multi-Agent Pipeline
+
+```
+Planner → Coder → Reviewer → Tester → Deploy
+```
+
+### Convergence Criteria
+
+Loops should stop when:
+
+- Quality gate passes (e.g. 90% test coverage)
+- No critical issues
+- Max iterations reached
+
+---
+
+## 🤖 Multi-Agent Systems with Pi
+
+### What are Subagents?
+
+Subagents are AI agents working under a main agent — like a team dividing responsibilities
+
+**In Pi:**
+
+- **Main Agent** — You (the requester) + Pi (the coordinator)
+- **Subagents** — Agents Pi creates for specialized tasks
+
+### Pi's Built-in Multi-Agent Features
+
+<CardGrid>
+<Card title="Subagent Tool" icon="flow">
+Create child agents for specific tasks
+</Card>
+<Card title="Workflow Engine" icon="process">
+Manage parallel/sequential tasks
+</Card>
+<Card title="Loop Until Done" icon="repeat">
+Work continuously until done
+</Card>
+<Card title="Team Agents" icon="users">
+Coordinate teams of agents working together
+</Card>
+</CardGrid>
+
+---
+
+### Loop Engineering with Pi
+
+**Loop Engineering** is designing systems where AI iterates until goals are achieved
+
+#### Pattern 1: Single Agent Loop
+
+```bash
+# Pi works alone, iterating until done
+pi --loop "Create a REST API with auth, tests, and docs"
+```
+
+**What Pi does:**
+
+1. Plan
+2. Generate code (Implement)
+3. Run tests (Validate)
+4. Fix if fails
+5. Repeat until tests pass
+
+#### Pattern 2: Subagent Fan-out
+
+```bash
+# Pi Create subagents for parallel work
+pi "Build frontend, backend, and docs in parallel"
+```
+
+**What Pi does:**
+
+1. Analyzes how many independent tasks exist
+2. Create each subagent
+3. Work simultaneously (parallel)
+4. Aggregates results
+5. Verifies quality
+
+#### Pattern 3: Pipeline Flow
+
+```text
+User Request
+    │
+    ▼
+┌─────────┐     ┌─────────┐     ┌─────────┐
+│ Planner │────▶│  Coder  │────▶│ Reviewer │
+└─────────┘     └─────────┘     └────┬────┘
+                                     │
+                           ┌─────────┘
+                           ▼
+                     ┌─────────┐
+                     │  Tester │
+                     └─────────┘
+```
+
+**In Pi:**
+
+- `/workflow` — Build pipeline with multiple agents
+- `parallel()` — Work in parallel
+- `pipeline()` — Work step by step
+
+---
+
+### Practical Examples with Pi
+
+#### Example 1: Parallel Code Review
+
+```text
+# Have Pi review code from 3 perspectives simultaneously
+Pi workflow:
+  parallel([
+    agent("Review for security issues"),
+    agent("Review for performance"),
+    agent("Review for code quality")
+  ])
+```
+
+#### Example 2: Feature Implementation Loop
+
+```text
+# Pi works on feature until complete
+Pi workflow:
+  loopUntilDone(
+    plan → implement → test → verify
+  )
+```
+
+#### Example 3: Research + Implement
+
+```text
+# Pi researches before implementing
+Pi workflow:
+  pipeline([
+    agent("Research best practices for X"),
+    agent("Implement based on research"),
+    agent("Write tests"),
+    agent("Deploy")
+  ])
+```
+
+---
+
+### Pi vs Other Tools
+
+| Feature | Pi | Claude Code | Cursor |
+| --------- | ----- | ------------- | -------- |
+| Subagents | ✅ Built-in | ❌ Manual | ❌ Manual |
+| Parallel work | ✅ `parallel()` | ❌ | ❌ |
+| Loop until done | ✅ `/until-done` | ❌ | ❌ |
+| Workflow engine | ✅ `/workflow` | ❌ | ❌ |
+| Team coordination | ✅ `/team-agents` | ❌ | ❌ |
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 4.1: Set Up a Loop
+
+**Goal**: Create a basic PIV loop
+
+<Steps>
+
+1. **Understand the PIV framework**
+   - Plan: Analyze task, create steps
+   - Implement: Execute each step
+   - Validate: Check if result meets requirements
+
+2. **Implement the loop controller**
+
+   ```javascript
+   class PIVLoop {
+     async plan(task) { }
+     async implement(plan) { }
+     async validate(implementation) { }
+     async execute(task, maxIterations) { }
+   }
+   ```
+
+3. **Test with a simple task**
+
+4. **Verify convergence**
+
+</Steps>
+
+**Deliverable**: Working PIV loop with tests
+
+---
+
+### 🟡 Quest 4.2: Generate-Review-Fix Loop
+
+**Goal**: Create an iterative code improvement loop
+
+<Steps>
+
+1. **Design the loop**
+
+   ```
+   Generate → Review → Fix → Quality Check
+       ↑                      │
+       └──────────────────────┘
+   ```
+
+2. **Implement each phase**
+   - Generate: AI writes initial code
+   - Review: AI checks for issues
+   - Fix: AI fixes identified problems
+   - Quality Check: Verify standards met
+
+3. **Add convergence criteria**
+
+4. **Test with sample task**
+
+</Steps>
+
+**Deliverable**: Working GRF loop with quality gates
+
+---
+
+### 🔴 Quest 4.3: Multi-Agent Pipeline
+
+**Goal**: Create a pipeline with multiple AI agents
+
+<Steps>
+
+1. **Design agent roles**
+
+   | Agent | Role | Responsibility |
+   | ------- | ------ | ---------------- |
+   | Planner | Task Analysis | Break tasks into steps |
+   | Coder | Implementation | Write code |
+   | Reviewer | Quality Check | Review code quality |
+   | Tester | Validation | Test code |
+
+2. **Implement the pipeline**
+
+   ```javascript
+   class Pipeline {
+     addAgent(agent) { }
+     async execute(task) { }
+   }
+   ```
+
+3. **Connect agents** in sequence
+
+4. **Test with complex task**
+
+</Steps>
+
+**Deliverable**: Working multi-agent pipeline
+
+---
+
+## ✅ Block 4 Checklist
+
+- [ ] Understand PIV framework
+- [ ] Quest 4.1 completed
+- [ ] Quest 4.2 completed
+- [ ] Quest 4.3 completed
+
+---
+
+## 🚀 Next Block
+
+**Block 5: Architecture** → Design complete AI-powered systems.
+
+<a href="/workshop/block-5-architecture" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">Continue to Block 5 →</a>

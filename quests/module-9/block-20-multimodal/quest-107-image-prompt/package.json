@@ -1,0 +1,17 @@
+{
+  "name": "quest-107-image-prompt",
+  "version": "1.0.0",
+  "description": "Quest 20.1: Image Prompt Engineer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-107-image-prompt",
+    "block": "module-9/block-20",
+    "slug": "quest-107",
+    "difficulty": "easy",
+    "title": "Image Prompt Engineer"
+  }
+}

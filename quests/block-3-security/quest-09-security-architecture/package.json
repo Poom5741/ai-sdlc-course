@@ -13,5 +13,11 @@
     "block-3"
   ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-09-security-architecture",
+    "block": "block-3-security",
+    "slug": "quest-9",
+    "difficulty": "medium"
+  }
 }

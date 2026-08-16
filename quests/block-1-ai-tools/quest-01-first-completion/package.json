@@ -6,7 +6,18 @@
   "scripts": {
     "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-1"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-1"
+  ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-01-first-completion",
+    "block": "block-1-ai-tools",
+    "slug": "quest-1",
+    "difficulty": "easy"
+  }
 }

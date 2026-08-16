@@ -1,0 +1,17 @@
+{
+  "name": "quest-45-input-validator",
+  "version": "1.0.0",
+  "description": "Quest 4.3: Input Validator - sanitize and validate user input",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-45-input-validator",
+    "block": "module-4/block-8",
+    "slug": "quest-45",
+    "difficulty": "medium",
+    "title": "Input Validator"
+  }
+}

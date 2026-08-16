@@ -1,0 +1,17 @@
+{
+  "name": "quest-115-copilot-analysis",
+  "version": "1.0.0",
+  "description": "Quest 22.1: GitHub Copilot Workflow Analysis",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-115-copilot-analysis",
+    "block": "module-10/block-22",
+    "slug": "quest-115",
+    "difficulty": "medium",
+    "title": "GitHub Copilot Workflow Analysis"
+  }
+}

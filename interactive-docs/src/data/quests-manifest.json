@@ -1,0 +1,1031 @@
+[
+  {
+    "id": "quest-01-first-completion",
+    "title": "quest-01-first-completion",
+    "difficulty": "easy",
+    "block": "block-1-ai-tools",
+    "slug": "quest-1"
+  },
+  {
+    "id": "quest-02-multi-file",
+    "title": "quest-02-multi-file",
+    "difficulty": "easy",
+    "block": "block-1-ai-tools",
+    "slug": "quest-2"
+  },
+  {
+    "id": "quest-03-compare-tools",
+    "title": "quest-03-compare-tools",
+    "difficulty": "easy",
+    "block": "block-1-ai-tools",
+    "slug": "quest-3"
+  },
+  {
+    "id": "quest-04-fix-prompt",
+    "title": "quest-04-fix-prompt",
+    "difficulty": "medium",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-4"
+  },
+  {
+    "id": "quest-04-token-counter",
+    "title": "Token Counter",
+    "difficulty": "easy",
+    "block": "module-1/block-a",
+    "slug": "quest-4"
+  },
+  {
+    "id": "quest-05-context-budget",
+    "title": "Context Window Budget Calculator",
+    "difficulty": "medium",
+    "block": "module-1/block-a",
+    "slug": "quest-5"
+  },
+  {
+    "id": "quest-05-multi-step",
+    "title": "quest-05-multi-step",
+    "difficulty": "medium",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-5"
+  },
+  {
+    "id": "quest-06-domain-specific",
+    "title": "quest-06-domain-specific",
+    "difficulty": "medium",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-6"
+  },
+  {
+    "id": "quest-06-hallucination-detector",
+    "title": "Hallucination Detector",
+    "difficulty": "medium",
+    "block": "module-1/block-a",
+    "slug": "quest-6"
+  },
+  {
+    "id": "quest-07-spot-vulnerability",
+    "title": "quest-07-spot-vulnerability",
+    "difficulty": "medium",
+    "block": "block-3-security",
+    "slug": "quest-7"
+  },
+  {
+    "id": "quest-07-vibe-coding-analysis",
+    "title": "Vibe Coding vs Vibe Engineering Analysis",
+    "difficulty": "medium",
+    "block": "module-1/block-a",
+    "slug": "quest-7"
+  },
+  {
+    "id": "quest-08-fix-harden",
+    "title": "quest-08-fix-harden",
+    "difficulty": "medium",
+    "block": "block-3-security",
+    "slug": "quest-8"
+  },
+  {
+    "id": "quest-08-tool-selection",
+    "title": "AI Tool Selection Matrix",
+    "difficulty": "medium",
+    "block": "module-1/block-a",
+    "slug": "quest-8"
+  },
+  {
+    "id": "quest-09-security-architecture",
+    "title": "quest-09-security-architecture",
+    "difficulty": "medium",
+    "block": "block-3-security",
+    "slug": "quest-9"
+  },
+  {
+    "id": "quest-09-self-attention",
+    "title": "Self-Attention Implementation",
+    "difficulty": "medium",
+    "block": "module-1/block-b",
+    "slug": "quest-9"
+  },
+  {
+    "id": "quest-10-position-encoding",
+    "title": "Position Encoding Explorer",
+    "difficulty": "medium",
+    "block": "module-1/block-b",
+    "slug": "quest-10"
+  },
+  {
+    "id": "quest-10-setup-loop",
+    "title": "quest-10-setup-loop",
+    "difficulty": "hard",
+    "block": "block-4-agentic-workflows",
+    "slug": "quest-10"
+  },
+  {
+    "id": "quest-11-generate-review-fix",
+    "title": "quest-11-generate-review-fix",
+    "difficulty": "hard",
+    "block": "block-4-agentic-workflows",
+    "slug": "quest-11"
+  },
+  {
+    "id": "quest-11-model-arch-classifier",
+    "title": "Model Architecture Classifier",
+    "difficulty": "hard",
+    "block": "module-1/block-b",
+    "slug": "quest-11"
+  },
+  {
+    "id": "quest-12-multi-agent",
+    "title": "quest-12-multi-agent",
+    "difficulty": "hard",
+    "block": "block-4-agentic-workflows",
+    "slug": "quest-12"
+  },
+  {
+    "id": "quest-12-transformer-scratch",
+    "title": "Transformer From Scratch",
+    "difficulty": "hard",
+    "block": "module-1/block-b",
+    "slug": "quest-12"
+  },
+  {
+    "id": "quest-13-next-token-predictor",
+    "title": "Next Token Predictor",
+    "difficulty": "easy",
+    "block": "module-2/block-a",
+    "slug": "quest-13"
+  },
+  {
+    "id": "quest-13-rag-design",
+    "title": "quest-13-rag-design",
+    "difficulty": "hard",
+    "block": "block-5-architecture",
+    "slug": "quest-13"
+  },
+  {
+    "id": "quest-14-full-system",
+    "title": "quest-14-full-system",
+    "difficulty": "hard",
+    "block": "block-5-architecture",
+    "slug": "quest-14"
+  },
+  {
+    "id": "quest-14-scaling-laws",
+    "title": "Scaling Laws Calculator",
+    "difficulty": "medium",
+    "block": "module-2/block-a",
+    "slug": "quest-14"
+  },
+  {
+    "id": "quest-15-data-curator",
+    "title": "Data Curator",
+    "difficulty": "medium",
+    "block": "module-2/block-a",
+    "slug": "quest-15"
+  },
+  {
+    "id": "quest-16-finetuning-pipeline",
+    "title": "Fine-Tuning Pipeline Design",
+    "difficulty": "medium",
+    "block": "module-2/block-a",
+    "slug": "quest-16"
+  },
+  {
+    "id": "quest-17-dpo-loss",
+    "title": "DPO Loss Implementation",
+    "difficulty": "hard",
+    "block": "module-2/block-a",
+    "slug": "quest-17"
+  },
+  {
+    "id": "quest-18-sampling-strategy",
+    "title": "Sampling Strategy Explorer",
+    "difficulty": "easy",
+    "block": "module-2/block-b",
+    "slug": "quest-18"
+  },
+  {
+    "id": "quest-19-chain-of-thought",
+    "title": "Chain-of-Thought Prompter",
+    "difficulty": "medium",
+    "block": "module-2/block-b",
+    "slug": "quest-19"
+  },
+  {
+    "id": "quest-20-rag-chunking",
+    "title": "RAG Chunking Strategist",
+    "difficulty": "medium",
+    "block": "module-2/block-b",
+    "slug": "quest-20"
+  },
+  {
+    "id": "quest-21-semantic-search",
+    "title": "Semantic Search Builder",
+    "difficulty": "medium",
+    "block": "module-2/block-b",
+    "slug": "quest-21"
+  },
+  {
+    "id": "quest-22-hallucination-prevention",
+    "title": "Hallucination Prevention System",
+    "difficulty": "hard",
+    "block": "module-2/block-b",
+    "slug": "quest-22"
+  },
+  {
+    "id": "quest-23-user-story-generator",
+    "title": "User Story Generator",
+    "difficulty": "easy",
+    "block": "module-3/block-a",
+    "slug": "quest-23"
+  },
+  {
+    "id": "quest-24-prd-writer",
+    "title": "PRD Writer",
+    "difficulty": "medium",
+    "block": "module-3/block-a",
+    "slug": "quest-24"
+  },
+  {
+    "id": "quest-25-adr-generator",
+    "title": "ADR Generator",
+    "difficulty": "medium",
+    "block": "module-3/block-a",
+    "slug": "quest-25"
+  },
+  {
+    "id": "quest-26-tech-stack-recommender",
+    "title": "Tech Stack Recommender",
+    "difficulty": "medium",
+    "block": "module-3/block-a",
+    "slug": "quest-26"
+  },
+  {
+    "id": "quest-27-risk-identifier",
+    "title": "Risk Identifier",
+    "difficulty": "medium",
+    "block": "module-3/block-a",
+    "slug": "quest-27"
+  },
+  {
+    "id": "quest-28-sprint-planner",
+    "title": "Sprint Planner",
+    "difficulty": "hard",
+    "block": "module-3/block-a",
+    "slug": "quest-28"
+  },
+  {
+    "id": "quest-29-requirements-analyzer",
+    "title": "Requirements Quality Analyzer",
+    "difficulty": "hard",
+    "block": "module-3/block-a",
+    "slug": "quest-29"
+  },
+  {
+    "id": "quest-30-prompt-refiner",
+    "title": "Prompt-for-Code Refiner",
+    "difficulty": "easy",
+    "block": "module-3/block-b",
+    "slug": "quest-30"
+  },
+  {
+    "id": "quest-31-context-window-manager",
+    "title": "Context Window Manager",
+    "difficulty": "medium",
+    "block": "module-3/block-b",
+    "slug": "quest-31"
+  },
+  {
+    "id": "quest-32-mcp-client",
+    "title": "MCP Client Builder",
+    "difficulty": "medium",
+    "block": "module-3/block-b",
+    "slug": "quest-32"
+  },
+  {
+    "id": "quest-33-function-calling",
+    "title": "Function Calling Implementer",
+    "difficulty": "medium",
+    "block": "module-3/block-b",
+    "slug": "quest-33"
+  },
+  {
+    "id": "quest-34-react-agent",
+    "title": "ReAct Pattern Agent",
+    "difficulty": "hard",
+    "block": "module-3/block-b",
+    "slug": "quest-34"
+  },
+  {
+    "id": "quest-35-multi-agent-orchestrator",
+    "title": "Multi-Agent Orchestrator",
+    "difficulty": "hard",
+    "block": "module-3/block-b",
+    "slug": "quest-35"
+  },
+  {
+    "id": "quest-36-code-migration",
+    "title": "Code Migration Assistant",
+    "difficulty": "hard",
+    "block": "module-3/block-b",
+    "slug": "quest-36"
+  },
+  {
+    "id": "quest-37-intent-spec-generator",
+    "title": "Intent-Spec Test Generator",
+    "difficulty": "easy",
+    "block": "module-3/block-c",
+    "slug": "quest-37"
+  },
+  {
+    "id": "quest-38-edge-case-finder",
+    "title": "Edge Case Finder",
+    "difficulty": "medium",
+    "block": "module-3/block-c",
+    "slug": "quest-38"
+  },
+  {
+    "id": "quest-39-test-suite-analyzer",
+    "title": "Test Suite Analyzer",
+    "difficulty": "medium",
+    "block": "module-3/block-c",
+    "slug": "quest-39"
+  },
+  {
+    "id": "quest-40-mock-data-generator",
+    "title": "Mock Data Generator",
+    "difficulty": "medium",
+    "block": "module-3/block-c",
+    "slug": "quest-40"
+  },
+  {
+    "id": "quest-41-ci-pipeline-builder",
+    "title": "CI Pipeline Builder",
+    "difficulty": "hard",
+    "block": "module-3/block-c",
+    "slug": "quest-41"
+  },
+  {
+    "id": "quest-42-regression-test-predictor",
+    "title": "Regression Test Predictor",
+    "difficulty": "hard",
+    "block": "module-3/block-c",
+    "slug": "quest-42"
+  },
+  {
+    "id": "quest-43-sql-injection-spotter",
+    "title": "SQL Injection Spotter",
+    "difficulty": "easy",
+    "block": "module-4/block-8",
+    "slug": "quest-43"
+  },
+  {
+    "id": "quest-44-secret-scanner",
+    "title": "Secret Scanner",
+    "difficulty": "easy",
+    "block": "module-4/block-8",
+    "slug": "quest-44"
+  },
+  {
+    "id": "quest-45-input-validator",
+    "title": "Input Validator",
+    "difficulty": "medium",
+    "block": "module-4/block-8",
+    "slug": "quest-45"
+  },
+  {
+    "id": "quest-46-auth-system",
+    "title": "Auth System Hardener",
+    "difficulty": "hard",
+    "block": "module-4/block-8",
+    "slug": "quest-46"
+  },
+  {
+    "id": "quest-47-prompt-injection",
+    "title": "Prompt Injection Defender",
+    "difficulty": "hard",
+    "block": "module-4/block-8",
+    "slug": "quest-47"
+  },
+  {
+    "id": "quest-48-security-arch",
+    "title": "Security Architecture Design",
+    "difficulty": "hard",
+    "block": "module-4/block-8",
+    "slug": "quest-48"
+  },
+  {
+    "id": "quest-49-dependency-auditor",
+    "title": "Dependency Vulnerability Auditor",
+    "difficulty": "medium",
+    "block": "module-4/block-8",
+    "slug": "quest-49"
+  },
+  {
+    "id": "quest-50-ai-review-policy",
+    "title": "AI Code Review Policy Writer",
+    "difficulty": "medium",
+    "block": "module-4/block-9",
+    "slug": "quest-50"
+  },
+  {
+    "id": "quest-51-ip-risk-analyzer",
+    "title": "IP Risk Analyzer",
+    "difficulty": "medium",
+    "block": "module-4/block-9",
+    "slug": "quest-51"
+  },
+  {
+    "id": "quest-52-audit-trail",
+    "title": "Audit Trail System",
+    "difficulty": "hard",
+    "block": "module-4/block-9",
+    "slug": "quest-52"
+  },
+  {
+    "id": "quest-53-bias-detector",
+    "title": "Bias Detector",
+    "difficulty": "medium",
+    "block": "module-4/block-9",
+    "slug": "quest-53"
+  },
+  {
+    "id": "quest-54-ai-usage-policy",
+    "title": "AI Usage Policy Generator",
+    "difficulty": "medium",
+    "block": "module-4/block-9",
+    "slug": "quest-54"
+  },
+  {
+    "id": "quest-55-compliance-checker",
+    "title": "Compliance Checklist Automator",
+    "difficulty": "hard",
+    "block": "module-4/block-9",
+    "slug": "quest-55"
+  },
+  {
+    "id": "quest-56-dockerfile-generator",
+    "title": "Dockerfile Generator",
+    "difficulty": "easy",
+    "block": "module-4/block-10",
+    "slug": "quest-56"
+  },
+  {
+    "id": "quest-57-iac-generator",
+    "title": "IaC Generator",
+    "difficulty": "medium",
+    "block": "module-4/block-10",
+    "slug": "quest-57"
+  },
+  {
+    "id": "quest-58-deploy-pipeline",
+    "title": "Deployment Pipeline Designer",
+    "difficulty": "medium",
+    "block": "module-4/block-10",
+    "slug": "quest-58"
+  },
+  {
+    "id": "quest-59-monitoring-dashboard",
+    "title": "Monitoring Dashboard Builder",
+    "difficulty": "hard",
+    "block": "module-4/block-10",
+    "slug": "quest-59"
+  },
+  {
+    "id": "quest-60-llm-observability",
+    "title": "LLM Observability System",
+    "difficulty": "hard",
+    "block": "module-4/block-10",
+    "slug": "quest-60"
+  },
+  {
+    "id": "quest-61-cost-optimizer",
+    "title": "Cost Optimizer",
+    "difficulty": "hard",
+    "block": "module-4/block-10",
+    "slug": "quest-61"
+  },
+  {
+    "id": "quest-62-rollback-strategist",
+    "title": "Rollback Strategist",
+    "difficulty": "medium",
+    "block": "module-4/block-10",
+    "slug": "quest-62"
+  },
+  {
+    "id": "quest-63-agent-loop",
+    "title": "Agent Loop Builder",
+    "difficulty": "medium",
+    "block": "module-5/block-11",
+    "slug": "quest-63"
+  },
+  {
+    "id": "quest-64-tool-registry",
+    "title": "Tool Registry System",
+    "difficulty": "medium",
+    "block": "module-5/block-11",
+    "slug": "quest-64"
+  },
+  {
+    "id": "quest-65-agent-debate",
+    "title": "Multi-Agent Debate System",
+    "difficulty": "hard",
+    "block": "module-5/block-11",
+    "slug": "quest-65"
+  },
+  {
+    "id": "quest-66-agent-hierarchy",
+    "title": "Hierarchical Agent Team",
+    "difficulty": "hard",
+    "block": "module-5/block-11",
+    "slug": "quest-66"
+  },
+  {
+    "id": "quest-67-self-reflecting",
+    "title": "Self-Reflecting Agent",
+    "difficulty": "hard",
+    "block": "module-5/block-11",
+    "slug": "quest-67"
+  },
+  {
+    "id": "quest-68-llm-evaluator",
+    "title": "LLM Evaluator",
+    "difficulty": "medium",
+    "block": "module-5/block-12",
+    "slug": "quest-68"
+  },
+  {
+    "id": "quest-69-semantic-cache",
+    "title": "Semantic Cache Builder",
+    "difficulty": "hard",
+    "block": "module-5/block-12",
+    "slug": "quest-69"
+  },
+  {
+    "id": "quest-70-prompt-versioning",
+    "title": "Prompt Version Manager",
+    "difficulty": "medium",
+    "block": "module-5/block-12",
+    "slug": "quest-70"
+  },
+  {
+    "id": "quest-71-rate-limiter",
+    "title": "Rate Limiter for LLM APIs",
+    "difficulty": "medium",
+    "block": "module-5/block-12",
+    "slug": "quest-71"
+  },
+  {
+    "id": "quest-72-prod-readiness",
+    "title": "Production Readiness Checker",
+    "difficulty": "hard",
+    "block": "module-5/block-12",
+    "slug": "quest-72"
+  },
+  {
+    "id": "quest-73-role-prompts",
+    "title": "Role Prompt Library",
+    "difficulty": "easy",
+    "block": "module-6/block-13",
+    "slug": "quest-73"
+  },
+  {
+    "id": "quest-74-few-shot",
+    "title": "Few-Shot Template Builder",
+    "difficulty": "easy",
+    "block": "module-6/block-13",
+    "slug": "quest-74"
+  },
+  {
+    "id": "quest-75-chain-density",
+    "title": "Chain-of-Density Optimizer",
+    "difficulty": "medium",
+    "block": "module-6/block-13",
+    "slug": "quest-75"
+  },
+  {
+    "id": "quest-76-structured-output",
+    "title": "Structured Output Parser",
+    "difficulty": "medium",
+    "block": "module-6/block-13",
+    "slug": "quest-76"
+  },
+  {
+    "id": "quest-77-prompt-chainer",
+    "title": "Prompt Chainer",
+    "difficulty": "hard",
+    "block": "module-6/block-13",
+    "slug": "quest-77"
+  },
+  {
+    "id": "quest-78-context-engineering",
+    "title": "Context Engineering",
+    "difficulty": "medium",
+    "block": "module-6/block-14",
+    "slug": "quest-78"
+  },
+  {
+    "id": "quest-79-meta-prompt",
+    "title": "Meta-Prompt Generator",
+    "difficulty": "hard",
+    "block": "module-6/block-14",
+    "slug": "quest-79"
+  },
+  {
+    "id": "quest-80-injection-tester",
+    "title": "Prompt Injection Tester",
+    "difficulty": "medium",
+    "block": "module-6/block-14",
+    "slug": "quest-80"
+  },
+  {
+    "id": "quest-81-prompt-eval",
+    "title": "Prompt Evaluation Framework",
+    "difficulty": "hard",
+    "block": "module-6/block-14",
+    "slug": "quest-81"
+  },
+  {
+    "id": "quest-82-prompt-porter",
+    "title": "Cross-Model Prompt Porter",
+    "difficulty": "hard",
+    "block": "module-6/block-14",
+    "slug": "quest-82"
+  },
+  {
+    "id": "quest-83-automated-pr-reviewer",
+    "title": "Automated PR Reviewer",
+    "difficulty": "easy",
+    "block": "module-7/block-15",
+    "slug": "quest-83"
+  },
+  {
+    "id": "quest-84-code-smell-detector",
+    "title": "Code Smell Detector",
+    "difficulty": "medium",
+    "block": "module-7/block-15",
+    "slug": "quest-84"
+  },
+  {
+    "id": "quest-85-security-review",
+    "title": "Security Review Automator",
+    "difficulty": "medium",
+    "block": "module-7/block-15",
+    "slug": "quest-85"
+  },
+  {
+    "id": "quest-86-performance-review",
+    "title": "Performance Review Analyzer",
+    "difficulty": "hard",
+    "block": "module-7/block-15",
+    "slug": "quest-86"
+  },
+  {
+    "id": "quest-87-review-quality",
+    "title": "Review Quality Scorer",
+    "difficulty": "hard",
+    "block": "module-7/block-15",
+    "slug": "quest-87"
+  },
+  {
+    "id": "quest-88-docstring-generator",
+    "title": "Docstring Generator",
+    "difficulty": "easy",
+    "block": "module-7/block-16",
+    "slug": "quest-88"
+  },
+  {
+    "id": "quest-89-readme-generator",
+    "title": "README Generator",
+    "difficulty": "easy",
+    "block": "module-7/block-16",
+    "slug": "quest-89"
+  },
+  {
+    "id": "quest-90-api-doc-generator",
+    "title": "API Doc Generator",
+    "difficulty": "medium",
+    "block": "module-7/block-16",
+    "slug": "quest-90"
+  },
+  {
+    "id": "quest-91-changelog-generator",
+    "title": "Changelog Generator",
+    "difficulty": "medium",
+    "block": "module-7/block-16",
+    "slug": "quest-91"
+  },
+  {
+    "id": "quest-92-onboarding-doc",
+    "title": "Onboarding Doc Writer",
+    "difficulty": "hard",
+    "block": "module-7/block-16",
+    "slug": "quest-92"
+  },
+  {
+    "id": "quest-93-code-simplifier",
+    "title": "Code Simplifier",
+    "difficulty": "easy",
+    "block": "module-8/block-17",
+    "slug": "quest-93"
+  },
+  {
+    "id": "quest-94-dead-code",
+    "title": "Dead Code Eliminator",
+    "difficulty": "medium",
+    "block": "module-8/block-17",
+    "slug": "quest-94"
+  },
+  {
+    "id": "quest-95-design-pattern",
+    "title": "Design Pattern Applicator",
+    "difficulty": "medium",
+    "block": "module-8/block-17",
+    "slug": "quest-95"
+  },
+  {
+    "id": "quest-96-type-migration",
+    "title": "Type Migration Assistant",
+    "difficulty": "hard",
+    "block": "module-8/block-17",
+    "slug": "quest-96"
+  },
+  {
+    "id": "quest-97-legacy-modernizer",
+    "title": "Legacy Code Modernizer",
+    "difficulty": "hard",
+    "block": "module-8/block-17",
+    "slug": "quest-97"
+  },
+  {
+    "id": "quest-98-api-migration",
+    "title": "API Migration Tool",
+    "difficulty": "medium",
+    "block": "module-8/block-18",
+    "slug": "quest-98"
+  },
+  {
+    "id": "quest-99-db-migration",
+    "title": "Database Migration Assistant",
+    "difficulty": "hard",
+    "block": "module-8/block-18",
+    "slug": "quest-99"
+  },
+  {
+    "id": "quest-100-framework-migration",
+    "title": "Framework Migration",
+    "difficulty": "hard",
+    "block": "module-8/block-18",
+    "slug": "quest-100"
+  },
+  {
+    "id": "quest-101-monolith-splitter",
+    "title": "Monolith Splitter",
+    "difficulty": "hard",
+    "block": "module-8/block-18",
+    "slug": "quest-101"
+  },
+  {
+    "id": "quest-102-test-migration",
+    "title": "Test Migration",
+    "difficulty": "medium",
+    "block": "module-8/block-18",
+    "slug": "quest-102"
+  },
+  {
+    "id": "quest-103-bias-auditor",
+    "title": "AI Bias Auditor",
+    "difficulty": "medium",
+    "block": "module-9/block-19",
+    "slug": "quest-103"
+  },
+  {
+    "id": "quest-104-pii-redactor",
+    "title": "PII Redactor",
+    "difficulty": "medium",
+    "block": "module-9/block-19",
+    "slug": "quest-104"
+  },
+  {
+    "id": "quest-105-ethical-framework",
+    "title": "Ethical Decision Framework",
+    "difficulty": "medium",
+    "block": "module-9/block-19",
+    "slug": "quest-105"
+  },
+  {
+    "id": "quest-106-accessibility-checker",
+    "title": "Accessibility Checker",
+    "difficulty": "hard",
+    "block": "module-9/block-19",
+    "slug": "quest-106"
+  },
+  {
+    "id": "quest-107-image-prompt",
+    "title": "Image Prompt Engineer",
+    "difficulty": "easy",
+    "block": "module-9/block-20",
+    "slug": "quest-107"
+  },
+  {
+    "id": "quest-108-multimodal-processor",
+    "title": "Multimodal Input Processor",
+    "difficulty": "medium",
+    "block": "module-9/block-20",
+    "slug": "quest-108"
+  },
+  {
+    "id": "quest-109-voice-to-code",
+    "title": "Voice-to-Code Pipeline Design",
+    "difficulty": "medium",
+    "block": "module-9/block-20",
+    "slug": "quest-109"
+  },
+  {
+    "id": "quest-110-multimodal-rag",
+    "title": "Multimodal RAG System",
+    "difficulty": "hard",
+    "block": "module-9/block-20",
+    "slug": "quest-110"
+  },
+  {
+    "id": "quest-111-e2e-pipeline",
+    "title": "End-to-End AI Dev Pipeline",
+    "difficulty": "hard",
+    "block": "module-10/block-21",
+    "slug": "quest-111"
+  },
+  {
+    "id": "quest-112-workflow-orchestrator",
+    "title": "Multi-Tool Workflow Orchestrator",
+    "difficulty": "hard",
+    "block": "module-10/block-21",
+    "slug": "quest-112"
+  },
+  {
+    "id": "quest-113-incident-responder",
+    "title": "Production Incident Responder",
+    "difficulty": "hard",
+    "block": "module-10/block-21",
+    "slug": "quest-113"
+  },
+  {
+    "id": "quest-114-feature-flags",
+    "title": "Feature Flag System with AI Recommendations",
+    "difficulty": "medium",
+    "block": "module-10/block-21",
+    "slug": "quest-114"
+  },
+  {
+    "id": "quest-115-copilot-analysis",
+    "title": "GitHub Copilot Workflow Analysis",
+    "difficulty": "medium",
+    "block": "module-10/block-22",
+    "slug": "quest-115"
+  },
+  {
+    "id": "quest-116-enterprise-adoption",
+    "title": "Enterprise AI Adoption Plan",
+    "difficulty": "medium",
+    "block": "module-10/block-22",
+    "slug": "quest-116"
+  },
+  {
+    "id": "quest-117-ai-roi",
+    "title": "AI ROI Calculator",
+    "difficulty": "medium",
+    "block": "module-10/block-22",
+    "slug": "quest-117"
+  },
+  {
+    "id": "quest-118-governance-framework",
+    "title": "Team AI Governance Framework",
+    "difficulty": "hard",
+    "block": "module-10/block-22",
+    "slug": "quest-118"
+  },
+  {
+    "id": "quest-119-git-repo-setup",
+    "title": "Git Repo Setup",
+    "difficulty": "easy",
+    "block": "module-11/block-23",
+    "slug": "quest-119"
+  },
+  {
+    "id": "quest-120-branching-strategy",
+    "title": "Branching Strategy",
+    "difficulty": "easy",
+    "block": "module-11/block-23",
+    "slug": "quest-120"
+  },
+  {
+    "id": "quest-121-commit-message",
+    "title": "Commit Message Writer",
+    "difficulty": "medium",
+    "block": "module-11/block-23",
+    "slug": "quest-121"
+  },
+  {
+    "id": "quest-122-history-analyzer",
+    "title": "Git History Analyzer",
+    "difficulty": "medium",
+    "block": "module-11/block-23",
+    "slug": "quest-122"
+  },
+  {
+    "id": "quest-123-rebase-simulator",
+    "title": "Interactive Rebase Simulator",
+    "difficulty": "hard",
+    "block": "module-11/block-23",
+    "slug": "quest-123"
+  },
+  {
+    "id": "quest-124-issue-creator",
+    "title": "Issue Creator",
+    "difficulty": "easy",
+    "block": "module-11/block-24",
+    "slug": "quest-124"
+  },
+  {
+    "id": "quest-125-pr-description",
+    "title": "PR Description Generator",
+    "difficulty": "medium",
+    "block": "module-11/block-24",
+    "slug": "quest-125"
+  },
+  {
+    "id": "quest-126-project-board",
+    "title": "GitHub Project Board Builder",
+    "difficulty": "medium",
+    "block": "module-11/block-24",
+    "slug": "quest-126"
+  },
+  {
+    "id": "quest-127-code-review-sim",
+    "title": "Code Review Simulator",
+    "difficulty": "hard",
+    "block": "module-11/block-24",
+    "slug": "quest-127"
+  },
+  {
+    "id": "quest-128-cicd-pipeline",
+    "title": "CI/CD Pipeline Configurator",
+    "difficulty": "hard",
+    "block": "module-11/block-24",
+    "slug": "quest-128"
+  },
+  {
+    "id": "quest-129-pages-deploy",
+    "title": "Pages Deployment",
+    "difficulty": "easy",
+    "block": "module-12/block-25",
+    "slug": "quest-129"
+  },
+  {
+    "id": "quest-130-function-router",
+    "title": "Pages Function Router",
+    "difficulty": "medium",
+    "block": "module-12/block-25",
+    "slug": "quest-130"
+  },
+  {
+    "id": "quest-131-worker-api",
+    "title": "Worker API Builder",
+    "difficulty": "hard",
+    "block": "module-12/block-25",
+    "slug": "quest-131"
+  },
+  {
+    "id": "quest-132-worker-env-config",
+    "title": "Worker Environment Config",
+    "difficulty": "medium",
+    "block": "module-12/block-25",
+    "slug": "quest-132"
+  },
+  {
+    "id": "quest-133-kv-manager",
+    "title": "KV Store Manager",
+    "difficulty": "easy",
+    "block": "module-12/block-26",
+    "slug": "quest-133"
+  },
+  {
+    "id": "quest-134-d1-migrator",
+    "title": "D1 Database Schema Migrator",
+    "difficulty": "medium",
+    "block": "module-12/block-26",
+    "slug": "quest-134"
+  },
+  {
+    "id": "quest-135-r2-uploader",
+    "title": "R2 Object Uploader",
+    "difficulty": "medium",
+    "block": "module-12/block-26",
+    "slug": "quest-135"
+  },
+  {
+    "id": "quest-136-fullstack-deploy",
+    "title": "Full Stack Deploy",
+    "difficulty": "hard",
+    "block": "module-12/block-26",
+    "slug": "quest-136"
+  }
+]

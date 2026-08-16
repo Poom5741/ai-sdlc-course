@@ -1,0 +1,17 @@
+{
+  "name": "quest-112-workflow-orchestrator",
+  "version": "1.0.0",
+  "description": "Quest 21.2: Multi-Tool Workflow Orchestrator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-112-workflow-orchestrator",
+    "block": "module-10/block-21",
+    "slug": "quest-112",
+    "difficulty": "hard",
+    "title": "Multi-Tool Workflow Orchestrator"
+  }
+}

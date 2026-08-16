@@ -1,0 +1,17 @@
+{
+  "name": "quest-129-pages-deploy",
+  "version": "1.0.0",
+  "description": "Quest 25.1: Pages Deployment - wrangler.toml for Cloudflare Pages",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-129-pages-deploy",
+    "block": "module-12/block-25",
+    "slug": "quest-129",
+    "difficulty": "easy",
+    "title": "Pages Deployment"
+  }
+}

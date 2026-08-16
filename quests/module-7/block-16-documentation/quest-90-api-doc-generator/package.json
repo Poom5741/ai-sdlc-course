@@ -1,0 +1,17 @@
+{
+  "name": "quest-90-api-doc-generator",
+  "version": "1.0.0",
+  "description": "Quest 16.3: API Doc Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-90-api-doc-generator",
+    "block": "module-7/block-16",
+    "slug": "quest-90",
+    "difficulty": "medium",
+    "title": "API Doc Generator"
+  }
+}

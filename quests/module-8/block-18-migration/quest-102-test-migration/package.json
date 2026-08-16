@@ -1,0 +1,17 @@
+{
+  "name": "quest-102-test-migration",
+  "version": "1.0.0",
+  "description": "Quest 18.5: Test Migration",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-102-test-migration",
+    "block": "module-8/block-18",
+    "slug": "quest-102",
+    "difficulty": "medium",
+    "title": "Test Migration"
+  }
+}

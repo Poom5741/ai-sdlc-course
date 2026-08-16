@@ -13,5 +13,11 @@
     "block-4"
   ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-11-generate-review-fix",
+    "block": "block-4-agentic-workflows",
+    "slug": "quest-11",
+    "difficulty": "hard"
+  }
 }

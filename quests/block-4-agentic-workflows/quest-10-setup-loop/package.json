@@ -13,5 +13,11 @@
     "block-4"
   ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-10-setup-loop",
+    "block": "block-4-agentic-workflows",
+    "slug": "quest-10",
+    "difficulty": "hard"
+  }
 }

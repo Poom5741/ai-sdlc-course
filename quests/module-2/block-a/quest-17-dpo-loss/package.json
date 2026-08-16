@@ -1,0 +1,17 @@
+{
+  "name": "quest-17-dpo-loss",
+  "version": "1.0.0",
+  "description": "Quest 2.5: DPO Loss Implementation",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-17-dpo-loss",
+    "block": "module-2/block-a",
+    "slug": "quest-17",
+    "difficulty": "hard",
+    "title": "DPO Loss Implementation"
+  }
+}

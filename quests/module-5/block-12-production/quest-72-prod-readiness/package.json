@@ -1,0 +1,17 @@
+{
+  "name": "quest-72-prod-readiness",
+  "version": "1.0.0",
+  "description": "Quest 5.10: Production Readiness Checker",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-72-prod-readiness",
+    "block": "module-5/block-12",
+    "slug": "quest-72",
+    "difficulty": "hard",
+    "title": "Production Readiness Checker"
+  }
+}

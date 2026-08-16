@@ -1,0 +1,17 @@
+{
+  "name": "quest-120-branching-strategy",
+  "version": "1.0.0",
+  "description": "Quest 23.2: Branching Strategy - merge vs fast-forward",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-120-branching-strategy",
+    "block": "module-11/block-23",
+    "slug": "quest-120",
+    "difficulty": "easy",
+    "title": "Branching Strategy"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "quest-134-d1-migrator",
+  "version": "1.0.0",
+  "description": "Quest 26.2: D1 Database Schema Migrator - SQL migrations",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-134-d1-migrator",
+    "block": "module-12/block-26",
+    "slug": "quest-134",
+    "difficulty": "medium",
+    "title": "D1 Database Schema Migrator"
+  }
+}

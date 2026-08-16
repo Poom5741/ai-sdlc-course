@@ -1,0 +1,17 @@
+{
+  "name": "quest-70-prompt-versioning",
+  "version": "1.0.0",
+  "description": "Quest 5.8: Prompt Version Manager - A/B test prompts",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-70-prompt-versioning",
+    "block": "module-5/block-12",
+    "slug": "quest-70",
+    "difficulty": "medium",
+    "title": "Prompt Version Manager"
+  }
+}

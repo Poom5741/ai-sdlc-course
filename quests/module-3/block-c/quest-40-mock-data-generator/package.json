@@ -1,0 +1,11 @@
+{
+  "name": "quest-40-mock-data-generator",
+  "version": "1.0.0",
+  "description": "Quest 40: Mock Data Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-40-mock-data-generator", "block": "module-3/block-c", "slug": "quest-40", "difficulty": "medium", "title": "Mock Data Generator" }
+}

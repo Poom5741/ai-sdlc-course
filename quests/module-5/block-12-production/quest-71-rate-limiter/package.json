@@ -1,0 +1,17 @@
+{
+  "name": "quest-71-rate-limiter",
+  "version": "1.0.0",
+  "description": "Quest 5.9: Rate Limiter for LLM APIs - token bucket",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-71-rate-limiter",
+    "block": "module-5/block-12",
+    "slug": "quest-71",
+    "difficulty": "medium",
+    "title": "Rate Limiter for LLM APIs"
+  }
+}

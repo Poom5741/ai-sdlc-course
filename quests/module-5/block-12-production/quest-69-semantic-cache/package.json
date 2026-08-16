@@ -1,0 +1,17 @@
+{
+  "name": "quest-69-semantic-cache",
+  "version": "1.0.0",
+  "description": "Quest 5.7: Semantic Cache Builder - cache by similarity",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-69-semantic-cache",
+    "block": "module-5/block-12",
+    "slug": "quest-69",
+    "difficulty": "hard",
+    "title": "Semantic Cache Builder"
+  }
+}

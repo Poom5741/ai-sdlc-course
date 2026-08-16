@@ -1,0 +1,17 @@
+{
+  "name": "quest-123-rebase-simulator",
+  "version": "1.0.0",
+  "description": "Quest 23.5: Interactive Rebase Simulator - pick, squash, edit, reorder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-123-rebase-simulator",
+    "block": "module-11/block-23",
+    "slug": "quest-123",
+    "difficulty": "hard",
+    "title": "Interactive Rebase Simulator"
+  }
+}

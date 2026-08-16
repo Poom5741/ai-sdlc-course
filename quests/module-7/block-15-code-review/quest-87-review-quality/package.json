@@ -1,0 +1,17 @@
+{
+  "name": "quest-87-review-quality",
+  "version": "1.0.0",
+  "description": "Quest 15.5: Review Quality Scorer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-87-review-quality",
+    "block": "module-7/block-15",
+    "slug": "quest-87",
+    "difficulty": "hard",
+    "title": "Review Quality Scorer"
+  }
+}

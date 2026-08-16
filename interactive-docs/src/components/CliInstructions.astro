@@ -1,0 +1,111 @@
+---
+interface Props {
+  questId: string;
+}
+
+const { questId } = Astro.props;
+---
+
+<div class="cli-instructions">
+  <h3>🚀 Submit Your Solution</h3>
+  
+  <div class="steps">
+    <div class="step">
+      <span class="step-number">1</span>
+      <div class="step-content">
+        <strong>Setup</strong> (first time only)
+        <pre><code>npx bluebeltdojo setup &lt;your-access-code&gt;</code></pre>
+      </div>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">2</span>
+      <div class="step-content">
+        <strong>Test locally</strong>
+        <pre><code>node test.js</code></pre>
+      </div>
+    </div>
+    
+    <div class="step">
+      <span class="step-number">3</span>
+      <div class="step-content">
+        <strong>Submit</strong>
+        <pre><code>npx bluebeltdojo submit</code></pre>
+      </div>
+    </div>
+  </div>
+  
+  <p class="note">
+    💡 Your solution is tested locally first. Only passing solutions are submitted to the server.
+  </p>
+</div>
+
+<style>
+  .cli-instructions {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background: var(--sl-color-bg);
+  }
+  
+  .cli-instructions h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .step-number {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--sl-color-green-high);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  
+  .step-content {
+    flex: 1;
+  }
+  
+  .step-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  .step-content pre {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--sl-color-gray-6);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    overflow-x: auto;
+  }
+  
+  .step-content code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  
+  .note {
+    margin-top: 1rem;
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+  }
+</style>

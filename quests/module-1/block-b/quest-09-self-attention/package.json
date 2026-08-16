@@ -1,0 +1,17 @@
+{
+  "name": "quest-09-self-attention",
+  "version": "1.0.0",
+  "description": "Quest 1.9: Self-Attention Implementation - manual QKV calculation",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-09-self-attention",
+    "block": "module-1/block-b",
+    "slug": "quest-9",
+    "difficulty": "medium",
+    "title": "Self-Attention Implementation"
+  }
+}

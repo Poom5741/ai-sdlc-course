@@ -7,3 +7,9 @@ pages_build_output_dir = "./dist"
 binding = "KV_NAMESPACE"
 id = "01da0f401560496f89d9b5686567024e"
 preview_id = "df42168648154d0bbaba9021b86e92ce"
+
+# D1 Database for user accounts and progress
+[[d1_databases]]
+binding = "DB"
+database_name = "bluebeltdojo"
+database_id = "931cf7e6-734c-4ddc-8769-93e58d14c140"

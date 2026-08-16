@@ -1,0 +1,17 @@
+{
+  "name": "quest-89-readme-generator",
+  "version": "1.0.0",
+  "description": "Quest 16.2: README Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-89-readme-generator",
+    "block": "module-7/block-16",
+    "slug": "quest-89",
+    "difficulty": "easy",
+    "title": "README Generator"
+  }
+}

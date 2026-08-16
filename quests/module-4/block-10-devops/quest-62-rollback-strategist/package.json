@@ -1,0 +1,17 @@
+{
+  "name": "quest-62-rollback-strategist",
+  "version": "1.0.0",
+  "description": "Quest 4.20: Rollback Strategist - deployment safety",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-62-rollback-strategist",
+    "block": "module-4/block-10",
+    "slug": "quest-62",
+    "difficulty": "medium",
+    "title": "Rollback Strategist"
+  }
+}

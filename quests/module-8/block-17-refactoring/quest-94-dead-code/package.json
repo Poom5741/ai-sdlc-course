@@ -1,0 +1,17 @@
+{
+  "name": "quest-94-dead-code",
+  "version": "1.0.0",
+  "description": "Quest 17.2: Dead Code Eliminator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-94-dead-code",
+    "block": "module-8/block-17",
+    "slug": "quest-94",
+    "difficulty": "medium",
+    "title": "Dead Code Eliminator"
+  }
+}

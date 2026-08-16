@@ -1,0 +1,17 @@
+{
+  "name": "quest-22-hallucination-prevention",
+  "version": "1.0.0",
+  "description": "Quest 2.10: Hallucination Prevention System",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-22-hallucination-prevention",
+    "block": "module-2/block-b",
+    "slug": "quest-22",
+    "difficulty": "hard",
+    "title": "Hallucination Prevention System"
+  }
+}

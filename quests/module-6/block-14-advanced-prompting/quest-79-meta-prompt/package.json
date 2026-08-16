@@ -1,0 +1,17 @@
+{
+  "name": "quest-79-meta-prompt",
+  "version": "1.0.0",
+  "description": "Quest 6.7: Meta-Prompt Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-79-meta-prompt",
+    "block": "module-6/block-14",
+    "slug": "quest-79",
+    "difficulty": "hard",
+    "title": "Meta-Prompt Generator"
+  }
+}

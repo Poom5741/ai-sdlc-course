@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Access | BlueBeltDojo">
+  <div class="min-h-screen bg-[#FAFAF9] pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-6">
+      
+      <!-- Header -->
+      <div class="text-center mb-16">
+        <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">Welcome, Warrior</span>
+        <h1 class="font-['DM_Serif_Display'] text-5xl text-[#1C1917] mb-6">You Have Full Access</h1>
+        <p class="text-xl text-[#78716C] max-w-2xl mx-auto">
+          Your account includes all 147 quests, 6 workshop blocks, and 3 capstone projects.
+        </p>
+      </div>
+
+      <!-- Access Status -->
+      <div class="max-w-lg mx-auto mb-16">
+        <div class="bg-white border-2 border-[#059669] rounded-2xl p-8">
+          <div class="text-center mb-8">
+            <div class="text-5xl mb-4">🥋</div>
+            <h2 class="font-['DM_Serif_Display'] text-3xl text-[#1C1917] mb-2">Full Course Access</h2>
+            <p class="text-[#78716C]">Everything you need to master AI SDLC</p>
+          </div>
+          
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start gap-3">
+              <span class="text-[#059669] mt-1">✓</span>
+              <span class="text-[#57534E]"><strong>147 quests</strong> across 10 modules</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-[#059669] mt-1">✓</span>
+              <span class="text-[#57534E]"><strong>3 capstone projects</strong> with real-world scenarios</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-[#059669] mt-1">✓</span>
+              <span class="text-[#57534E]"><strong>Belt progression system</strong> from White to Black</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-[#059669] mt-1">✓</span>
+              <span class="text-[#57534E]"><strong>Verified certificates</strong> for each belt earned</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-[#059669] mt-1">✓</span>
+              <span class="text-[#57534E]"><strong>Workshop content</strong> in Thai + English</span>
+            </li>
+          </ul>
+          
+          <a href="/dashboard" 
+            class="block w-full bg-[#059669] text-white py-4 px-8 text-center font-['DM_Sans'] font-bold uppercase tracking-wider rounded-lg hover:bg-[#047857] transition-colors">
+            Go to Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- What You'll Master -->
+      <div class="mb-16">
+        <h2 class="font-['DM_Serif_Display'] text-3xl text-[#1C1917] mb-8 text-center">What You'll Master</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white border border-[#E7E5E4] p-6 rounded-lg">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">AI Fundamentals</h3>
+            <p class="text-sm text-[#78716C]">Understand LLMs, transformers, and how AI tools actually work under the hood.</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-6 rounded-lg">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Prompt Engineering</h3>
+            <p class="text-sm text-[#78716C]">Master advanced prompting techniques for reliable, high-quality AI output.</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-6 rounded-lg">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Agentic Workflows</h3>
+            <p class="text-sm text-[#78716C]">Build autonomous AI agents that can plan, execute, and learn.</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-6 rounded-lg">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Production Security</h3>
+            <p class="text-sm text-[#78716C]">Ship AI-powered apps that are secure, scalable, and observable.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Need Help -->
+      <div class="bg-[#F5F5F4] rounded-2xl p-8 text-center">
+        <div class="text-4xl mb-4">💬</div>
+        <h3 class="font-['DM_Serif_Display'] text-2xl text-[#1C1917] mb-4">Need Help?</h3>
+        <p class="text-[#78716C] max-w-xl mx-auto">
+          Contact us at hello@bluebeltdojo.ai if you have any questions about your access.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

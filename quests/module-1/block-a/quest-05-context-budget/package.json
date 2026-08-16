@@ -1,0 +1,17 @@
+{
+  "name": "quest-05-context-budget",
+  "version": "1.0.0",
+  "description": "Quest 1.5: Context Window Budget Calculator - allocate context space intentionally",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-05-context-budget",
+    "block": "module-1/block-a",
+    "slug": "quest-5",
+    "difficulty": "medium",
+    "title": "Context Window Budget Calculator"
+  }
+}

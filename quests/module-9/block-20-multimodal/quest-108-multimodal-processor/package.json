@@ -1,0 +1,17 @@
+{
+  "name": "quest-108-multimodal-processor",
+  "version": "1.0.0",
+  "description": "Quest 20.2: Multimodal Input Processor",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-108-multimodal-processor",
+    "block": "module-9/block-20",
+    "slug": "quest-108",
+    "difficulty": "medium",
+    "title": "Multimodal Input Processor"
+  }
+}

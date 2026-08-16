@@ -1,0 +1,17 @@
+{
+  "name": "quest-128-cicd-pipeline",
+  "version": "1.0.0",
+  "description": "Quest 24.5: CI/CD Pipeline Configurator - GitHub Actions YAML",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-128-cicd-pipeline",
+    "block": "module-11/block-24",
+    "slug": "quest-128",
+    "difficulty": "hard",
+    "title": "CI/CD Pipeline Configurator"
+  }
+}

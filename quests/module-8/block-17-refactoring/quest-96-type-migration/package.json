@@ -1,0 +1,17 @@
+{
+  "name": "quest-96-type-migration",
+  "version": "1.0.0",
+  "description": "Quest 17.4: Type Migration Assistant",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-96-type-migration",
+    "block": "module-8/block-17",
+    "slug": "quest-96",
+    "difficulty": "hard",
+    "title": "Type Migration Assistant"
+  }
+}

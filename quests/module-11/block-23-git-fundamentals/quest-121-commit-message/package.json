@@ -1,0 +1,17 @@
+{
+  "name": "quest-121-commit-message",
+  "version": "1.0.0",
+  "description": "Quest 23.3: Commit Message Writer - conventional commits",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-121-commit-message",
+    "block": "module-11/block-23",
+    "slug": "quest-121",
+    "difficulty": "medium",
+    "title": "Commit Message Writer"
+  }
+}

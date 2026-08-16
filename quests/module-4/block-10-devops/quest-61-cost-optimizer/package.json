@@ -1,0 +1,17 @@
+{
+  "name": "quest-61-cost-optimizer",
+  "version": "1.0.0",
+  "description": "Quest 4.19: Cost Optimizer - token budget routing",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-61-cost-optimizer",
+    "block": "module-4/block-10",
+    "slug": "quest-61",
+    "difficulty": "hard",
+    "title": "Cost Optimizer"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "quest-103-bias-auditor",
+  "version": "1.0.0",
+  "description": "Quest 19.1: AI Bias Auditor",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-103-bias-auditor",
+    "block": "module-9/block-19",
+    "slug": "quest-103",
+    "difficulty": "medium",
+    "title": "AI Bias Auditor"
+  }
+}

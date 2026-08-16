@@ -1,0 +1,23 @@
+{
+  "name": "bluebeltdojo",
+  "version": "1.0.0",
+  "description": "CLI for BlueBeltDojo AI SDLC Workshop - download, test, and submit quest solutions",
+  "main": "bin/entry.js",
+  "bin": {
+    "bluebeltdojo": "./bin/entry.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "cli",
+    "bluebeltdojo"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

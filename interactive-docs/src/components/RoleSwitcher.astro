@@ -1,0 +1,376 @@
+---
+/**
+ * RoleSwitcher — dev-only floating UI for switching mock roles during manual testing.
+ * Only renders on staging (pages.dev), never on production (bluebeltdojo.ai).
+ */
+---
+
+<div id="role-switcher" class="hidden" style="position:fixed;bottom:20px;right:20px;z-index:99999;font-family:'JetBrains Mono',monospace;">
+  <!-- Active role badge -->
+  <div id="role-badge" style="
+    display:none;
+    background:rgba(28,25,23,0.85);
+    color:#78716C;
+    padding:4px 10px;
+    border-radius:4px;
+    font-size:11px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+    text-align:center;
+    backdrop-filter:blur(4px);
+  "></div>
+
+  <!-- Collapsed button -->
+  <button id="role-toggle" style="
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(28,25,23,0.85);
+    color:#A8A29E;
+    border:1px solid rgba(168,162,158,0.3);
+    padding:8px 14px;
+    border-radius:6px;
+    font-size:11px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    cursor:pointer;
+    backdrop-filter:blur(4px);
+    transition:all 0.15s ease;
+  ">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </svg>
+    TEST MODE
+  </button>
+
+  <!-- Expanded panel -->
+  <div id="role-panel" style="
+    display:none;
+    position:absolute;
+    bottom:44px;
+    right:0;
+    background:rgba(28,25,23,0.95);
+    border:1px solid rgba(168,162,158,0.3);
+    border-radius:8px;
+    padding:8px;
+    min-width:200px;
+    backdrop-filter:blur(8px);
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  ">
+    <div style="padding:4px 8px 6px;color:#78716C;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(168,162,158,0.15);margin-bottom:4px;">
+      Switch Role
+    </div>
+    <button class="role-option" data-role="visitor" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#A8A29E;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">🔓 Visitor <span style="color:#57534E;font-size:10px;margin-left:4px;">(no auth)</span></button>
+    <button class="role-option" data-role="white" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#A8A29E;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">⚪ White Belt <span style="color:#57534E;font-size:10px;margin-left:4px;">(0 quests)</span></button>
+    <button class="role-option" data-role="blue" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#2563EB;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">🔵 Blue Belt <span style="color:#57534E;font-size:10px;margin-left:4px;">(25 quests)</span></button>
+    <button class="role-option" data-role="purple" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#9333EA;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">🟣 Purple Belt <span style="color:#57534E;font-size:10px;margin-left:4px;">(60 quests)</span></button>
+    <button class="role-option" data-role="brown" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#92400E;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">🟤 Brown Belt <span style="color:#57534E;font-size:10px;margin-left:4px;">(100 quests)</span></button>
+    <button class="role-option" data-role="black" style="
+      display:block;width:100%;text-align:left;background:none;border:none;color:#1C1917;padding:7px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;transition:background 0.1s;
+    ">⬛ Black Belt <span style="color:#57534E;font-size:10px;margin-left:4px;">(147 quests)</span></button>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  // Only show on staging (pages.dev), never on production
+  var host = window.location.hostname;
+  if (host.includes('bluebeltdojo.ai') || !host.includes('pages.dev')) {
+    return;
+  }
+
+  var container = document.getElementById('role-switcher');
+  if (!container) return;
+  container.classList.remove('hidden');
+
+  var toggle = document.getElementById('role-toggle');
+  var panel = document.getElementById('role-panel');
+  var badge = document.getElementById('role-badge');
+  var expanded = false;
+
+  // Toggle panel
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    expanded = !expanded;
+    panel.style.display = expanded ? 'block' : 'none';
+    toggle.style.borderColor = expanded ? 'rgba(168,162,158,0.6)' : 'rgba(168,162,158,0.3)';
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!container.contains(e.target)) {
+      expanded = false;
+      panel.style.display = 'none';
+      toggle.style.borderColor = 'rgba(168,162,158,0.3)';
+    }
+  });
+
+  // Hover effect on options
+  var options = container.querySelectorAll('.role-option');
+  for (var i = 0; i < options.length; i++) {
+    options[i].addEventListener('mouseenter', function() {
+      this.style.background = 'rgba(168,162,158,0.15)';
+    });
+    options[i].addEventListener('mouseleave', function() {
+      this.style.background = 'none';
+    });
+  }
+
+  // Belt color map
+  var beltColors = {
+    visitor: '#78716C',
+    white: '#E7E5E4',
+    blue: '#2563EB',
+    purple: '#9333EA',
+    brown: '#92400E',
+    black: '#1C1917'
+  };
+
+  var beltLabels = {
+    visitor: 'NO AUTH',
+    white: 'WHITE BELT',
+    blue: 'BLUE BELT',
+    purple: 'PURPLE BELT',
+    brown: 'BROWN BELT',
+    black: 'BLACK BELT'
+  };
+
+  // Belt progression thresholds
+  var beltThresholds = [
+    { belt: 'white', min: 0, max: 0 },
+    { belt: 'blue', min: 1, max: 25 },
+    { belt: 'purple', min: 26, max: 60 },
+    { belt: 'brown', min: 61, max: 100 },
+    { belt: 'black', min: 101, max: 147 }
+  ];
+
+  // Generate quest IDs for a given count
+  function generateQuestIds(count) {
+    var ids = [];
+    for (var i = 1; i <= count; i++) {
+      ids.push('quest-' + String(i).padStart(2, '0'));
+    }
+    return ids;
+  }
+
+  // Role configurations
+  var roles = {
+    visitor: { quests: 0, capstones: [] },
+    white:   { quests: 0, capstones: [] },
+    blue:    { quests: 25, capstones: ['capstone-1'] },
+    purple:  { quests: 60, capstones: ['capstone-1', 'capstone-2'] },
+    brown:   { quests: 100, capstones: ['capstone-1', 'capstone-2', 'capstone-3'] },
+    black:   { quests: 147, capstones: ['capstone-1', 'capstone-2', 'capstone-3'] }
+  };
+
+  // Mock API responses
+  function getMockAuthResponse(role) {
+    var config = roles[role] || roles.visitor;
+    return {
+      id: 'test-user-' + role,
+      email: role + '@test.bluebeltdojo.ai',
+      displayName: role.charAt(0).toUpperCase() + role.slice(1) + ' Tester',
+      belt: role,
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  function getMockProgressResponse(role) {
+    var config = roles[role] || roles.visitor;
+    var quests = {};
+    for (var i = 1; i <= config.quests; i++) {
+      var key = 'quest-' + String(i).padStart(2, '0');
+      quests[key] = {
+        completed: true,
+        completedAt: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(),
+        attempts: Math.floor(Math.random() * 3) + 1
+      };
+    }
+    return {
+      userId: 'test-user-' + role,
+      belt: role,
+      quests: quests,
+      stats: {
+        completed: config.quests,
+        total: 147,
+        percent: Math.round((config.quests / 147) * 100)
+      }
+    };
+  }
+
+  function getMockBeltResponse(role) {
+    var config = roles[role] || roles.visitor;
+    var completed = config.quests;
+    var nextBelt = null;
+    for (var i = 0; i < beltThresholds.length; i++) {
+      if (completed < beltThresholds[i].max) {
+        nextBelt = {
+          belt: beltThresholds[i].belt,
+          questsNeeded: beltThresholds[i].max,
+          questsCompleted: completed,
+          questsRemaining: beltThresholds[i].max - completed
+        };
+        break;
+      }
+    }
+    return {
+      currentBelt: role,
+      nextBelt: nextBelt,
+      totalQuests: 147,
+      thresholds: beltThresholds
+    };
+  }
+
+  // FETCH INTERCEPTOR — bypasses real API when in test mode
+  var originalFetch = window.fetch;
+  var _intercepting = false;
+
+  function installFetchInterceptor() {
+    window.fetch = function(url, options) {
+      var testToken = localStorage.getItem('bbd_token');
+      if (!testToken || testToken.indexOf('test-') !== 0) {
+        return originalFetch.apply(window, arguments);
+      }
+
+      var role = testToken.replace('test-', '');
+      var mockResponse;
+      var urlStr = typeof url === 'string' ? url : url.toString();
+
+      if (urlStr.indexOf('/api/auth/me') !== -1) {
+        mockResponse = getMockAuthResponse(role);
+      } else if (urlStr.indexOf('/api/progress') !== -1) {
+        mockResponse = getMockProgressResponse(role);
+      } else if (urlStr.indexOf('/api/belt') !== -1) {
+        mockResponse = getMockBeltResponse(role);
+      } else if (urlStr.indexOf('/api/submit') !== -1) {
+        return new Response(JSON.stringify({ success: true, message: 'Test mode — submission recorded' }), {
+          status: 200, headers: { 'Content-Type': 'application/json' }
+        });
+      } else if (urlStr.indexOf('/api/auth/login') !== -1 || urlStr.indexOf('/api/auth/register') !== -1) {
+        return originalFetch.apply(window, arguments);
+      } else if (urlStr.indexOf('/api/') !== -1) {
+        return originalFetch.apply(window, arguments);
+      } else {
+        return originalFetch.apply(window, arguments);
+      }
+
+      if (mockResponse) {
+        console.log('[TEST MODE] Intercepted:', urlStr, '→', JSON.stringify(mockResponse).substring(0, 80) + '...');
+        return new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      return originalFetch.apply(window, arguments);
+    };
+    _intercepting = true;
+  }
+
+  function removeFetchInterceptor() {
+    if (_intercepting) {
+      window.fetch = originalFetch;
+      _intercepting = false;
+    }
+  }
+
+  // Show current role badge
+  function showBadge(role) {
+    badge.style.display = 'block';
+    badge.textContent = role === 'visitor' ? '🔓 Visitor' : beltLabels[role];
+    badge.style.color = role === 'visitor' ? '#78716C' : '#fff';
+    badge.style.background = beltColors[role] || '#78716C';
+    toggle.style.color = beltColors[role] || '#A8A29E';
+  }
+
+  // Check stored role on load — install interceptor if active
+  var storedToken = localStorage.getItem('bbd_token');
+  if (storedToken && storedToken.indexOf('test-') === 0) {
+    var storedRole = storedToken.replace('test-', '');
+    if (roles[storedRole]) {
+      showBadge(storedRole);
+      installFetchInterceptor();
+    }
+  }
+
+  // Handle role selection
+  for (var j = 0; j < options.length; j++) {
+    options[j].addEventListener('click', function() {
+      var role = this.getAttribute('data-role');
+
+      if (role === 'visitor') {
+        // Clear all auth data and remove interceptor
+        removeFetchInterceptor();
+        localStorage.removeItem('bbd_token');
+        localStorage.removeItem('bbd_user');
+        localStorage.removeItem('bbd_progress');
+        localStorage.removeItem('bd_token');
+        localStorage.removeItem('bd_user');
+        localStorage.removeItem('bd_progress');
+        showBadge('visitor');
+        window.location.reload();
+        return;
+      }
+
+      var config = roles[role];
+      var completedQuests = generateQuestIds(config.quests);
+
+      // Inject mock auth data into localStorage
+      localStorage.setItem('bbd_token', 'test-' + role);
+      localStorage.setItem('bbd_user', JSON.stringify({
+        id: 'test-user-' + role,
+        email: role + '@test.bluebeltdojo.ai',
+        displayName: role.charAt(0).toUpperCase() + role.slice(1) + ' Tester',
+        belt: role,
+        createdAt: new Date().toISOString()
+      }));
+      localStorage.setItem('bbd_progress', JSON.stringify({
+        completedQuests: completedQuests,
+        totalQuests: 147,
+        capstones: config.capstones,
+        stats: { completed: config.quests, total: 147, percent: Math.round((config.quests / 147) * 100) }
+      }));
+
+      // Also set bd_ variants for compatibility
+      localStorage.setItem('bd_token', 'test-' + role);
+      localStorage.setItem('bd_user', localStorage.getItem('bbd_user'));
+      localStorage.setItem('bd_progress', localStorage.getItem('bbd_progress'));
+
+      // Install fetch interceptor to mock API responses
+      installFetchInterceptor();
+
+      showBadge(role);
+      expanded = false;
+      panel.style.display = 'none';
+      toggle.style.borderColor = 'rgba(168,162,158,0.3)';
+
+      setTimeout(function() {
+        window.location.reload();
+      }, 150);
+    });
+  }
+})();
+</script>
+
+<style>
+  #role-switcher:hover #role-toggle {
+    border-color: rgba(168,162,158,0.6) !important;
+  }
+  .role-option:hover {
+    background: rgba(168,162,158,0.15) !important;
+  }
+</style>

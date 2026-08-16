@@ -1,0 +1,17 @@
+{
+  "name": "quest-78-context-engineering",
+  "version": "1.0.0",
+  "description": "Quest 6.6: Context Engineering - optimal context selection",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-78-context-engineering",
+    "block": "module-6/block-14",
+    "slug": "quest-78",
+    "difficulty": "medium",
+    "title": "Context Engineering"
+  }
+}

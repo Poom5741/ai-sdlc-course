@@ -1,0 +1,17 @@
+{
+  "name": "quest-46-auth-system",
+  "version": "1.0.0",
+  "description": "Quest 4.4: Auth System Hardener - JWT + Argon2 authentication",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-46-auth-system",
+    "block": "module-4/block-8",
+    "slug": "quest-46",
+    "difficulty": "hard",
+    "title": "Auth System Hardener"
+  }
+}

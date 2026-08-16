@@ -1,0 +1,17 @@
+{
+  "name": "quest-104-pii-redactor",
+  "version": "1.0.0",
+  "description": "Quest 19.2: PII Redactor",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-104-pii-redactor",
+    "block": "module-9/block-19",
+    "slug": "quest-104",
+    "difficulty": "medium",
+    "title": "PII Redactor"
+  }
+}

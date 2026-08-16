@@ -1,0 +1,11 @@
+{
+  "name": "quest-38-edge-case-finder",
+  "version": "1.0.0",
+  "description": "Quest 38: Edge Case Finder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-38-edge-case-finder", "block": "module-3/block-c", "slug": "quest-38", "difficulty": "medium", "title": "Edge Case Finder" }
+}

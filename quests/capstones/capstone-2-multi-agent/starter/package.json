@@ -1,0 +1,18 @@
+{
+  "name": "capstone-2-multi-agent",
+  "version": "1.0.0",
+  "description": "Capstone 2: Multi-Agent System",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/index.js"
+  },
+  "keywords": ["capstone", "ai-sdlc", "multi-agent"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "capstone": {
+    "id": "capstone-2-multi-agent",
+    "belt": "blue-to-purple",
+    "title": "Multi-Agent System"
+  }
+}

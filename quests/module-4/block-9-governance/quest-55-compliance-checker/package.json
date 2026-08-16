@@ -1,0 +1,17 @@
+{
+  "name": "quest-55-compliance-checker",
+  "version": "1.0.0",
+  "description": "Quest 4.13: Compliance Checklist Automator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-55-compliance-checker",
+    "block": "module-4/block-9",
+    "slug": "quest-55",
+    "difficulty": "hard",
+    "title": "Compliance Checklist Automator"
+  }
+}

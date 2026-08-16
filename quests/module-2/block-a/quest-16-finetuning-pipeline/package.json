@@ -1,0 +1,17 @@
+{
+  "name": "quest-16-finetuning-pipeline",
+  "version": "1.0.0",
+  "description": "Quest 2.4: Fine-Tuning Pipeline Design",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-16-finetuning-pipeline",
+    "block": "module-2/block-a",
+    "slug": "quest-16",
+    "difficulty": "medium",
+    "title": "Fine-Tuning Pipeline Design"
+  }
+}

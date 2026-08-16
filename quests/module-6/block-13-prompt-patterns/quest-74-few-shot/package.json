@@ -1,0 +1,17 @@
+{
+  "name": "quest-74-few-shot",
+  "version": "1.0.0",
+  "description": "Quest 6.2: Few-Shot Template Builder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-74-few-shot",
+    "block": "module-6/block-13",
+    "slug": "quest-74",
+    "difficulty": "easy",
+    "title": "Few-Shot Template Builder"
+  }
+}

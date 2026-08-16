@@ -1,0 +1,17 @@
+{
+  "name": "quest-52-audit-trail",
+  "version": "1.0.0",
+  "description": "Quest 4.10: Audit Trail System - implement audit logging",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-52-audit-trail",
+    "block": "module-4/block-9",
+    "slug": "quest-52",
+    "difficulty": "hard",
+    "title": "Audit Trail System"
+  }
+}

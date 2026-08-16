@@ -1,0 +1,17 @@
+{
+  "name": "quest-97-legacy-modernizer",
+  "version": "1.0.0",
+  "description": "Quest 17.5: Legacy Code Modernizer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-97-legacy-modernizer",
+    "block": "module-8/block-17",
+    "slug": "quest-97",
+    "difficulty": "hard",
+    "title": "Legacy Code Modernizer"
+  }
+}

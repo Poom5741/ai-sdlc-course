@@ -1,0 +1,17 @@
+{
+  "name": "quest-66-agent-hierarchy",
+  "version": "1.0.0",
+  "description": "Quest 5.4: Hierarchical Agent Team - manager-worker hierarchy",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-66-agent-hierarchy",
+    "block": "module-5/block-11",
+    "slug": "quest-66",
+    "difficulty": "hard",
+    "title": "Hierarchical Agent Team"
+  }
+}

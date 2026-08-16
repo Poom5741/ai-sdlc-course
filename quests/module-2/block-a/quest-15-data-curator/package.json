@@ -1,0 +1,17 @@
+{
+  "name": "quest-15-data-curator",
+  "version": "1.0.0",
+  "description": "Quest 2.3: Data Curator - clean training data",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-15-data-curator",
+    "block": "module-2/block-a",
+    "slug": "quest-15",
+    "difficulty": "medium",
+    "title": "Data Curator"
+  }
+}

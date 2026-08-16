@@ -1,0 +1,17 @@
+{
+  "name": "quest-77-prompt-chainer",
+  "version": "1.0.0",
+  "description": "Quest 6.5: Prompt Chainer - multi-step prompt workflows",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-77-prompt-chainer",
+    "block": "module-6/block-13",
+    "slug": "quest-77",
+    "difficulty": "hard",
+    "title": "Prompt Chainer"
+  }
+}

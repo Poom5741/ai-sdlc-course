@@ -1,0 +1,17 @@
+{
+  "name": "quest-11-model-arch-classifier",
+  "version": "1.0.0",
+  "description": "Quest 1.11: Model Architecture Classifier - BERT vs GPT vs T5",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-11-model-arch-classifier",
+    "block": "module-1/block-b",
+    "slug": "quest-11",
+    "difficulty": "hard",
+    "title": "Model Architecture Classifier"
+  }
+}

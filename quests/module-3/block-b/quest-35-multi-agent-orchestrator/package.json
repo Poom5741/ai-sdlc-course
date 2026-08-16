@@ -1,0 +1,11 @@
+{
+  "name": "quest-35-multi-agent-orchestrator",
+  "version": "1.0.0",
+  "description": "Quest 35: Multi-Agent Orchestrator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-35-multi-agent-orchestrator", "block": "module-3/block-b", "slug": "quest-35", "difficulty": "hard", "title": "Multi-Agent Orchestrator" }
+}

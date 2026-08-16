@@ -61,28 +61,9 @@ const { protectedPaths = ['/workshop/block-', '/quests/'] } = Astro.props;
       </button>
     </form>
 
-    <!-- Divider -->
-    <div class="relative my-6">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-200"></div>
-      </div>
-      <div class="relative flex justify-center text-sm">
-        <span class="px-4 bg-white text-gray-500">OR</span>
-      </div>
-    </div>
-
-    <!-- Continue without code -->
-    <button
-      id="continue-without-code"
-      class="w-full text-gray-600 py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors"
-    >
-      Continue without code (limited access)
-    </button>
-
     <!-- Get access link -->
-    <p class="text-center text-sm text-gray-500 mt-4">
-      Don't have a code? 
-      <a href="#" class="text-trail-green hover:underline">Get access →</a>
+    <p class="text-center text-sm text-gray-500 mt-6">
+      Don't have a code? Contact your workshop organizer.
     </p>
   </div>
 </div>
@@ -95,7 +76,6 @@ const { protectedPaths = ['/workshop/block-', '/quests/'] } = Astro.props;
   const errorEl = document.getElementById('code-error') as HTMLElement;
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
   const closeBtn = document.getElementById('modal-close') as HTMLElement;
-  const continueBtn = document.getElementById('continue-without-code') as HTMLElement;
 
   // Protected paths
   const protectedPaths = ['/workshop/block-', '/quests/'];
@@ -226,11 +206,6 @@ const { protectedPaths = ['/workshop/block-', '/quests/'] } = Astro.props;
 
   // Close modal
   closeBtn?.addEventListener('click', () => {
-    hideModal();
-  });
-
-  // Continue without code
-  continueBtn?.addEventListener('click', () => {
     hideModal();
   });
 

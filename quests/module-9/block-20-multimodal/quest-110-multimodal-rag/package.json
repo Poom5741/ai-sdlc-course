@@ -1,0 +1,17 @@
+{
+  "name": "quest-110-multimodal-rag",
+  "version": "1.0.0",
+  "description": "Quest 20.4: Multimodal RAG System",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-110-multimodal-rag",
+    "block": "module-9/block-20",
+    "slug": "quest-110",
+    "difficulty": "hard",
+    "title": "Multimodal RAG System"
+  }
+}

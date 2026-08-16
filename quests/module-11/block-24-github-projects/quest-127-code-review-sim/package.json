@@ -1,0 +1,17 @@
+{
+  "name": "quest-127-code-review-sim",
+  "version": "1.0.0",
+  "description": "Quest 24.4: Code Review Simulator - detect bugs in diffs",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-127-code-review-sim",
+    "block": "module-11/block-24",
+    "slug": "quest-127",
+    "difficulty": "hard",
+    "title": "Code Review Simulator"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "quest-56-dockerfile-generator",
+  "version": "1.0.0",
+  "description": "Quest 4.14: Dockerfile Generator - optimized Dockerfiles",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-56-dockerfile-generator",
+    "block": "module-4/block-10",
+    "slug": "quest-56",
+    "difficulty": "easy",
+    "title": "Dockerfile Generator"
+  }
+}

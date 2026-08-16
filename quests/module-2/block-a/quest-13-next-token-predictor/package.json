@@ -1,0 +1,17 @@
+{
+  "name": "quest-13-next-token-predictor",
+  "version": "1.0.0",
+  "description": "Quest 2.1: Next Token Predictor - simple bigram model",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-13-next-token-predictor",
+    "block": "module-2/block-a",
+    "slug": "quest-13",
+    "difficulty": "easy",
+    "title": "Next Token Predictor"
+  }
+}

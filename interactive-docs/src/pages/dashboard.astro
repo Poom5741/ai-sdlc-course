@@ -1,0 +1,549 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import questsManifest from '../data/quests-manifest.json';
+import questSynced from '../data/quest-synced.json';
+---
+
+<BaseLayout title="Dashboard | BlueBeltDojo">
+  <!-- Site Navigation -->
+  <header class="fixed top-0 w-full z-50 bg-[#FAFAF9]/90 backdrop-blur-md border-b border-[#E7E5E4]">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="font-['DM_Sans'] text-lg tracking-widest uppercase text-[#1C1917]">BlueBeltDojo</a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="/workshop/overview/" class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors">Curriculum</a>
+        <a href="/dashboard/" class="text-sm uppercase tracking-wider text-[#059669] font-bold">Dashboard</a>
+        <a href="/community/" class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors">Community</a>
+
+      </nav>
+      <div class="flex items-center gap-4">
+        <button id="nav-logout" class="text-sm text-[#78716C] hover:text-[#1C1917] transition-colors">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="min-h-screen bg-[#FAFAF9] pt-20 pb-16">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <!-- Loading State -->
+      <div id="loading" class="text-center py-20">
+        <div class="inline-block w-8 h-8 border-2 border-[#78716C] border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-[#78716C] font-['DM_Sans']">Loading dashboard...</p>
+      </div>
+
+      <!-- Login Form (shown when not authenticated) -->
+      <div id="login-section" class="hidden max-w-md mx-auto py-20">
+        <h1 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917] mb-8 text-center">Sign In</h1>
+        <form id="login-form" class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-[#57534E] mb-2">Email</label>
+            <input type="email" id="email" required
+              class="w-full px-4 py-3 border border-[#E7E5E4] rounded-lg focus:ring-2 focus:ring-[#059669] focus:border-transparent"
+              placeholder="you@example.com" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[#57534E] mb-2">Password</label>
+            <input type="password" id="password" required
+              class="w-full px-4 py-3 border border-[#E7E5E4] rounded-lg focus:ring-2 focus:ring-[#059669] focus:border-transparent"
+              placeholder="••••••••" />
+          </div>
+          <button type="submit"
+            class="w-full bg-[#059669] text-white py-3 px-6 font-['DM_Sans'] font-medium uppercase tracking-wider hover:bg-[#047857] transition-colors">
+            Sign In
+          </button>
+          <p class="text-center text-[#78716C] text-sm">
+            Don't have an account? <a href="/register" class="text-[#059669] hover:underline">Register</a>
+          </p>
+        </form>
+        <div id="login-error" class="hidden mt-4 p-3 bg-red-50 text-red-700 text-sm rounded"></div>
+      </div>
+
+      <!-- Dashboard Content (shown when authenticated) -->
+      <div id="dashboard" class="hidden">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">Welcome, <span id="user-name"></span></h1>
+            <p class="text-[#78716C] mt-1 font-['DM_Sans']">Track your progress through the AI SDLC course</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div id="belt-badge" class="px-5 py-2 rounded-full font-['DM_Sans'] font-bold uppercase tracking-wider text-sm"></div>
+            <button id="logout-btn" class="text-sm text-[#78716C] hover:text-[#1C1917] underline font-['DM_Sans']">Sign Out</button>
+          </div>
+        </div>
+
+        <!-- Continue Learning Hero Card -->
+        <div id="continue-hero" class="bg-gradient-to-r from-[#059669] to-[#047857] rounded-xl p-8 mb-8 text-white">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <p class="text-emerald-100 text-sm uppercase tracking-wider font-['DM_Sans'] mb-1">Continue Learning</p>
+              <h2 id="continue-title" class="font-['DM_Serif_Display'] text-2xl md:text-3xl">Loading...</h2>
+              <p id="continue-module" class="text-emerald-100 mt-1 font-['DM_Sans']"></p>
+            </div>
+            <a id="continue-link" href="#" class="inline-flex items-center gap-2 bg-white text-[#059669] px-6 py-3 rounded-lg font-['DM_Sans'] font-bold uppercase tracking-wider text-sm hover:bg-emerald-50 transition-colors shrink-0">
+              Start Quest
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white border border-[#E7E5E4] p-5 rounded-lg">
+            <p class="text-xs text-[#78716C] uppercase tracking-wider font-['DM_Sans'] mb-1">Quests Completed</p>
+            <p class="font-['DM_Serif_Display'] text-3xl text-[#1C1917]"><span id="stat-completed">0</span> / 147</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-5 rounded-lg">
+            <p class="text-xs text-[#78716C] uppercase tracking-wider font-['DM_Sans'] mb-1">Current Belt</p>
+            <p id="stat-belt" class="font-['DM_Serif_Display'] text-3xl text-[#1C1917]">White</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-5 rounded-lg">
+            <p class="text-xs text-[#78716C] uppercase tracking-wider font-['DM_Sans'] mb-1">Next Belt</p>
+            <p id="stat-next-belt" class="font-['DM_Serif_Display'] text-3xl text-[#1C1917]">Blue</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-5 rounded-lg">
+            <p class="text-xs text-[#78716C] uppercase tracking-wider font-['DM_Sans'] mb-1">To Next Belt</p>
+            <p id="stat-remaining" class="font-['DM_Serif_Display'] text-3xl text-[#1C1917]">25</p>
+          </div>
+        </div>
+
+        <!-- Belt Progression Bar -->
+        <div class="bg-white border border-[#E7E5E4] p-6 rounded-lg mb-8">
+          <h2 class="font-['DM_Serif_Display'] text-xl text-[#1C1917] mb-4">Belt Progression</h2>
+          <div class="relative mb-3">
+            <div class="h-3 bg-[#F5F5F4] rounded-full overflow-hidden">
+              <div id="belt-bar" class="h-full bg-gradient-to-r from-[#059669] to-[#047857] rounded-full transition-all duration-500" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-xs text-[#78716C] font-['DM_Sans']">
+            <span class="flex flex-col items-center"><span class="text-[#1C1917] font-medium">White</span><span>0</span></span>
+            <span class="flex flex-col items-center"><span class="text-[#2563EB] font-medium">Blue</span><span>25</span></span>
+            <span class="flex flex-col items-center"><span class="text-[#9333EA] font-medium">Purple</span><span>60</span></span>
+            <span class="flex flex-col items-center"><span class="text-[#92400E] font-medium">Brown</span><span>100</span></span>
+            <span class="flex flex-col items-center"><span class="text-[#1C1917] font-medium">Black</span><span>147</span></span>
+          </div>
+        </div>
+
+        <!-- Module Progress Grid -->
+        <div class="bg-white border border-[#E7E5E4] rounded-lg p-6 mb-8">
+          <h2 class="font-['DM_Serif_Display'] text-xl text-[#1C1917] mb-5">Module Progress</h2>
+          <div id="module-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- Quest Lists (per module) -->
+        <div id="quest-sections" class="space-y-3 mb-8"></div>
+
+        <!-- Capstones Section -->
+        <div class="bg-white border border-[#E7E5E4] rounded-lg p-6">
+          <h2 class="font-['DM_Serif_Display'] text-xl text-[#1C1917] mb-4">Capstones</h2>
+          <div id="capstones-list" class="space-y-3"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pass manifest data + URL mapping to client (must load before main script) -->
+  <script is:inline set:html={`window.QUESTS = ${JSON.stringify(questsManifest)};`} />
+  <script is:inline set:html={`window.QUEST_SYNCED = ${JSON.stringify(questSynced)};`} />
+
+  <script>
+    // @ts-nocheck
+    const API_BASE = '';
+    const TOTAL_QUESTS = 147;
+
+    // --- Module structure (12 modules) ---
+    const MODULES = [
+      { id: 'module-1', name: 'AI & LLM Foundations', start: 1, end: 12 },
+      { id: 'module-2', name: 'LLM Training', start: 13, end: 22 },
+      { id: 'module-3', name: 'SDLC Tools', start: 23, end: 42 },
+      { id: 'module-4', name: 'Security & Deployment', start: 43, end: 62 },
+      { id: 'module-5', name: 'Advanced Patterns', start: 63, end: 72 },
+      { id: 'module-6', name: 'Prompt Engineering', start: 73, end: 82 },
+      { id: 'module-7', name: 'Review & Docs', start: 83, end: 92 },
+      { id: 'module-8', name: 'Refactoring', start: 93, end: 102 },
+      { id: 'module-9', name: 'Ethics & Multimodal', start: 103, end: 110 },
+      { id: 'module-10', name: 'Integration', start: 111, end: 118 },
+      { id: 'module-11', name: 'Git & GitHub', start: 119, end: 128 },
+      { id: 'module-12', name: 'Cloudflare Deployment', start: 129, end: 136 }
+    ];
+
+    // --- Belt thresholds ---
+    const BELT_THRESHOLDS = [
+      { belt: 'white', min: 0, max: 0, label: 'White', color: '#E7E5E4', textColor: '#1C1917' },
+      { belt: 'blue', min: 1, max: 25, label: 'Blue', color: '#2563EB', textColor: '#FFFFFF' },
+      { belt: 'purple', min: 26, max: 60, label: 'Purple', color: '#9333EA', textColor: '#FFFFFF' },
+      { belt: 'brown', min: 61, max: 100, label: 'Brown', color: '#92400E', textColor: '#FFFFFF' },
+      { belt: 'black', min: 101, max: 147, label: 'Black', color: '#1C1917', textColor: '#FFFFFF' }
+    ];
+
+    const BELT_COLORS = {
+      white: { bg: '#FFFFFF', text: '#1C1917', border: '#E7E5E4' },
+      blue: { bg: '#2563EB', text: '#FFFFFF', border: '#2563EB' },
+      purple: { bg: '#9333EA', text: '#FFFFFF', border: '#9333EA' },
+      brown: { bg: '#92400E', text: '#FFFFFF', border: '#92400E' },
+      black: { bg: '#1C1917', text: '#FFFFFF', border: '#1C1917' }
+    };
+
+    const CAPSTONES = [
+      { id: 'capstone-1', slug: 'capstone-1-api-service', name: 'AI-Assisted API Service', description: 'Build a complete REST API with AI assistance from requirements to deployment', requiredBelt: 'blue', requiredQuests: 25 },
+      { id: 'capstone-2', slug: 'capstone-2-multi-agent', name: 'Multi-Agent System', description: 'Build a multi-agent system with tool integration, testing, and deployment', requiredBelt: 'purple', requiredQuests: 60 },
+      { id: 'capstone-3', slug: 'capstone-3-production-ai', name: 'Production AI Application', description: 'Ship a real AI-powered application with monitoring, cost management, and security', requiredBelt: 'brown', requiredQuests: 100 }
+    ];
+
+    // --- State ---
+    let authToken = localStorage.getItem('bbd_token');
+    let userData = null;
+    let progressData = null;
+    let beltData = null;
+    let questMap = {}; // quest number -> manifest entry
+    let openModules = {}; // track which module quest lists are open
+
+    // --- Build quest map from manifest (deduplicate by quest number) ---
+    function buildQuestMap(manifest) {
+      const map = {};
+      for (const entry of manifest) {
+        // Extract quest number from id (e.g. "quest-04-token-counter" -> 4)
+        const numMatch = entry.id.match(/^quest-(\d+)/);
+        if (!numMatch) continue;
+        const num = parseInt(numMatch[1], 10);
+        // Prefer entries with human-readable titles over auto-generated ones
+        if (!map[num] || (entry.title && !entry.title.startsWith('quest-'))) {
+          map[num] = entry;
+        }
+      }
+      return map;
+    }
+
+    function getQuestNumber(questId) {
+      const m = questId.match(/^quest-(\d+)/);
+      return m ? parseInt(m[1], 10) : 0;
+    }
+
+    function getQuestSlug(entry) {
+      const num = getQuestNumber(entry.id);
+      const synced = window.QUEST_SYNCED[num];
+      if (synced && synced.slug) return synced.slug;
+      return entry.id;
+    }
+
+    function getQuestTitle(entry) {
+      const num = getQuestNumber(entry.id);
+      const synced = window.QUEST_SYNCED[num];
+      if (synced && synced.title) return synced.title;
+      if (entry.title && !entry.title.startsWith('quest-')) return entry.title;
+      return entry.id.replace(/^quest-\d+-/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function getQuestDifficulty(entry) {
+      return entry.difficulty || 'medium';
+    }
+
+    function getQuestKey(num) {
+      return `quest-${String(num).padStart(2, '0')}`;
+    }
+
+    function isQuestCompleted(num) {
+      const key = getQuestKey(num);
+      return progressData?.quests?.[key]?.completed === true;
+    }
+
+    function getModuleCompletedCount(mod) {
+      let count = 0;
+      for (let i = mod.start; i <= mod.end; i++) {
+        if (isQuestCompleted(i)) count++;
+      }
+      return count;
+    }
+
+    function getModuleQuestCount(mod) {
+      return mod.end - mod.start + 1;
+    }
+
+    function getBeltForCompleted(completed) {
+      let belt = 'white';
+      for (const t of BELT_THRESHOLDS) {
+        if (completed >= t.min) belt = t.belt;
+      }
+      return belt;
+    }
+
+    function getBeltInfo(belt) {
+      return BELT_THRESHOLDS.find(t => t.belt === belt) || BELT_THRESHOLDS[0];
+    }
+
+    function getNextBelt(belt) {
+      const idx = BELT_THRESHOLDS.findIndex(t => t.belt === belt);
+      if (idx < BELT_THRESHOLDS.length - 1) return BELT_THRESHOLDS[idx + 1];
+      return null;
+    }
+
+    function getFirstIncompleteQuest() {
+      for (let i = 1; i <= 147; i++) {
+        if (!isQuestCompleted(i) && questMap[i]) return { num: i, entry: questMap[i] };
+      }
+      return null;
+    }
+
+    function getFirstIncompleteInModule(mod) {
+      for (let i = mod.start; i <= mod.end; i++) {
+        if (!isQuestCompleted(i) && questMap[i]) return { num: i, entry: questMap[i] };
+      }
+      return null;
+    }
+
+    // --- Auth flow ---
+    async function checkAuth() {
+      if (!authToken) { showLogin(); return; }
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) { localStorage.removeItem('bbd_token'); showLogin(); return; }
+        userData = await res.json();
+        await loadData();
+      } catch { showLogin(); }
+    }
+
+    function showLogin() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+    }
+
+    async function loadData() {
+      try {
+        const [progressRes, beltRes] = await Promise.all([
+          fetch(`${API_BASE}/api/progress`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+          fetch(`${API_BASE}/api/belt`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+        ]);
+        progressData = await progressRes.json();
+        beltData = await beltRes.json();
+        renderDashboard();
+        showDashboard();
+      } catch (e) { console.error('Failed to load data:', e); }
+    }
+
+    // --- Render everything ---
+    function renderDashboard() {
+      // User info
+      document.getElementById('user-name').textContent = userData.displayName;
+
+      // Belt badge
+      const beltBadge = document.getElementById('belt-badge');
+      const beltColor = BELT_COLORS[userData.belt] || BELT_COLORS.white;
+      beltBadge.style.backgroundColor = beltColor.bg;
+      beltBadge.style.color = beltColor.text;
+      beltBadge.textContent = `${userData.belt} belt`;
+
+      const completed = progressData.stats.completed;
+      const currentBelt = userData.belt;
+      const currentBeltInfo = getBeltInfo(currentBelt);
+      const nextBelt = getNextBelt(currentBelt);
+
+      // Stats
+      document.getElementById('stat-completed').textContent = completed;
+      document.getElementById('stat-belt').textContent = currentBeltInfo.label;
+      document.getElementById('stat-next-belt').textContent = nextBelt ? nextBelt.label : '—';
+      document.getElementById('stat-remaining').textContent = nextBelt ? Math.max(0, nextBelt.max - completed) : '0';
+
+      // Belt progress bar
+      const progressPercent = Math.min(100, (completed / TOTAL_QUESTS) * 100);
+      document.getElementById('belt-bar').style.width = `${progressPercent}%`;
+
+      // Continue Learning hero
+      renderContinueHero();
+
+      // Module grid
+      renderModuleGrid();
+
+      // Quest sections
+      renderQuestSections();
+
+      // Capstones
+      renderCapstones();
+    }
+
+    function renderContinueHero() {
+      const next = getFirstIncompleteQuest();
+      const titleEl = document.getElementById('continue-title');
+      const moduleEl = document.getElementById('continue-module');
+      const linkEl = document.getElementById('continue-link');
+
+      if (next) {
+        const mod = MODULES.find(m => next.num >= m.start && next.num <= m.end);
+        titleEl.textContent = `Quest ${next.num}: ${getQuestTitle(next.entry)}`;
+        moduleEl.textContent = mod ? mod.name : '';
+        linkEl.href = `/quests/${getQuestSlug(next.entry)}`;
+        linkEl.textContent = 'Start Quest →';
+        document.getElementById('continue-hero').className = 'bg-gradient-to-r from-[#059669] to-[#047857] rounded-xl p-8 mb-8 text-white';
+      } else {
+        titleEl.textContent = 'All quests complete!';
+        moduleEl.textContent = 'Start a capstone to earn your belt.';
+        linkEl.href = '#capstones';
+        linkEl.textContent = 'View Capstones ↓';
+        document.getElementById('continue-hero').className = 'bg-gradient-to-r from-[#92400E] to-[#78350F] rounded-xl p-8 mb-8 text-white';
+      }
+    }
+
+    function renderModuleGrid() {
+      const container = document.getElementById('module-grid');
+      container.innerHTML = MODULES.map(mod => {
+        const total = getModuleQuestCount(mod);
+        const completed = getModuleCompletedCount(mod);
+        const percent = Math.round((completed / total) * 100);
+        const incomplete = getFirstIncompleteInModule(mod);
+        const linkHtml = incomplete
+          ? `<a href="/quests/${getQuestSlug(incomplete.entry)}" class="text-xs text-[#059669] hover:underline font-['DM_Sans'] mt-1 inline-block">Continue →</a>`
+          : `<span class="text-xs text-[#059669] font-['DM_Sans'] mt-1 inline-block">✓ Complete</span>`;
+
+        return `
+          <div class="border border-[#E7E5E4] rounded-lg p-4 hover:border-[#059669]/30 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-['DM_Sans'] font-medium text-[#1C1917] text-sm">${mod.name}</h3>
+              <span class="text-xs text-[#78716C] font-['DM_Sans'] whitespace-nowrap ml-2">${completed}/${total}</span>
+            </div>
+            <div class="h-1.5 bg-[#F5F5F4] rounded-full overflow-hidden mb-2">
+              <div class="h-full bg-[#059669] rounded-full transition-all duration-300" style="width:${percent}%"></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-[#78716C] font-['DM_Sans']">${percent}%</span>
+              ${linkHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderQuestSections() {
+      const container = document.getElementById('quest-sections');
+      container.innerHTML = MODULES.map(mod => {
+        const total = getModuleQuestCount(mod);
+        const completed = getModuleCompletedCount(mod);
+        const isOpen = openModules[mod.id] || false;
+
+        const questRows = [];
+        for (let i = mod.start; i <= mod.end; i++) {
+          const entry = questMap[i];
+          if (!entry) continue;
+          const done = isQuestCompleted(i);
+          const diff = getQuestDifficulty(entry);
+          const diffClass = diff === 'easy' ? 'bg-emerald-100 text-emerald-800' : diff === 'hard' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800';
+          questRows.push(`
+            <div class="flex items-center gap-3 py-2 px-3 rounded hover:bg-[#F5F5F4] transition-colors">
+              <div class="w-5 h-5 rounded border-2 ${done ? 'bg-[#059669] border-[#059669]' : 'border-[#D6D3D1]'} flex items-center justify-center shrink-0">
+                ${done ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5L19 7"/></svg>' : ''}
+              </div>
+              <a href="/quests/${getQuestSlug(entry)}" class="text-sm font-['DM_Sans'] ${done ? 'text-[#059669]' : 'text-[#1C1917]'} hover:underline flex-1">${i}. ${getQuestTitle(entry)}</a>
+              <span class="text-[10px] uppercase tracking-wider font-['DM_Sans'] px-2 py-0.5 rounded ${diffClass}">${diff}</span>
+            </div>
+          `);
+        }
+
+        return `
+          <div class="bg-white border border-[#E7E5E4] rounded-lg overflow-hidden">
+            <button onclick="toggleModule('${mod.id}')" class="w-full flex items-center justify-between px-5 py-4 hover:bg-[#F5F5F4] transition-colors">
+              <div class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#78716C] transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                <span class="font-['DM_Sans'] font-medium text-[#1C1917]">${mod.name}</span>
+                <span class="text-xs text-[#78716C] font-['DM_Sans']">${completed}/${total}</span>
+              </div>
+              <span class="text-xs text-[#78716C] font-['DM_Sans']">${mod.start}–${mod.end}</span>
+            </button>
+            <div class="quest-list ${isOpen ? '' : 'hidden'} border-t border-[#E7E5E4]">
+              ${questRows.join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCapstones() {
+      const container = document.getElementById('capstones-list');
+      const completed = progressData.stats.completed;
+
+      container.innerHTML = CAPSTONES.map(cap => {
+        let status, statusClass, statusText;
+        if (completed >= cap.requiredQuests) {
+          status = 'unlocked';
+          statusClass = 'bg-[#059669] text-white';
+          statusText = 'Unlocked';
+        } else {
+          status = 'locked';
+          statusClass = 'bg-[#F5F5F4] text-[#78716C]';
+          statusText = `${cap.requiredQuests - completed} quests to unlock`;
+        }
+
+        return `
+          <div class="flex items-center justify-between p-4 border border-[#E7E5E4] rounded-lg ${status === 'locked' ? 'opacity-60' : ''}">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg ${status === 'unlocked' ? 'bg-[#059669]/10' : 'bg-[#F5F5F4]'} flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${status === 'unlocked' ? '#059669' : '#A8A29E'}" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div>
+                <p class="font-['DM_Sans'] font-medium text-[#1C1917]">${cap.name}</p>
+                <p class="text-xs text-[#78716C] font-['DM_Sans']">${cap.description}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-['DM_Sans'] px-3 py-1 rounded-full ${statusClass}">${statusText}</span>
+              ${status === 'unlocked' ? `<a href="/capstones/${cap.slug}/" class="text-sm text-[#059669] hover:underline font-['DM_Sans'] font-medium">Open →</a>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- Module toggle (global so onclick works) ---
+    window.toggleModule = function(moduleId) {
+      openModules[moduleId] = !openModules[moduleId];
+      renderQuestSections();
+    };
+
+    // --- Login form handler ---
+    document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errorDiv.textContent = data.error; errorDiv.classList.remove('hidden'); return; }
+        localStorage.setItem('bbd_token', data.token);
+        authToken = data.token;
+        userData = { displayName: data.displayName, belt: data.belt };
+        await loadData();
+      } catch {
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.classList.remove('hidden');
+      }
+    });
+
+    // --- Logout handler ---
+    async function handleLogout() {
+      if (authToken) {
+        await fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+      }
+      localStorage.removeItem('bbd_token');
+      window.location.reload();
+    }
+    document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+    document.getElementById('nav-logout')?.addEventListener('click', handleLogout);
+
+    // --- Initialize ---
+    questMap = buildQuestMap(window.QUESTS);
+    checkAuth();
+  </script>
+</BaseLayout>

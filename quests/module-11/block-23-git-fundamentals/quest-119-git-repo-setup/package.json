@@ -1,0 +1,17 @@
+{
+  "name": "quest-119-git-repo-setup",
+  "version": "1.0.0",
+  "description": "Quest 23.1: Git Repo Setup - validate commit sequences with proper user config",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-119-git-repo-setup",
+    "block": "module-11/block-23",
+    "slug": "quest-119",
+    "difficulty": "easy",
+    "title": "Git Repo Setup"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "quest-29-requirements-analyzer",
+  "version": "1.0.0",
+  "description": "Quest 3.7: Requirements Quality Analyzer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-29-requirements-analyzer", "block": "module-3/block-a", "slug": "quest-29", "difficulty": "hard", "title": "Requirements Quality Analyzer" }
+}

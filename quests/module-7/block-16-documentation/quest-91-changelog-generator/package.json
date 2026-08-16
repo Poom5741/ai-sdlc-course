@@ -1,0 +1,17 @@
+{
+  "name": "quest-91-changelog-generator",
+  "version": "1.0.0",
+  "description": "Quest 16.4: Changelog Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-91-changelog-generator",
+    "block": "module-7/block-16",
+    "slug": "quest-91",
+    "difficulty": "medium",
+    "title": "Changelog Generator"
+  }
+}

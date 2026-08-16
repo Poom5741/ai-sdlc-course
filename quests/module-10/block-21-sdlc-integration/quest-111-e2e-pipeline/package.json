@@ -1,0 +1,17 @@
+{
+  "name": "quest-111-e2e-pipeline",
+  "version": "1.0.0",
+  "description": "Quest 21.1: End-to-End AI Dev Pipeline",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-111-e2e-pipeline",
+    "block": "module-10/block-21",
+    "slug": "quest-111",
+    "difficulty": "hard",
+    "title": "End-to-End AI Dev Pipeline"
+  }
+}

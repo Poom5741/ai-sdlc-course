@@ -1,0 +1,17 @@
+{
+  "name": "quest-47-prompt-injection",
+  "version": "1.0.0",
+  "description": "Quest 4.5: Prompt Injection Defender - detect and block injection attempts",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-47-prompt-injection",
+    "block": "module-4/block-8",
+    "slug": "quest-47",
+    "difficulty": "hard",
+    "title": "Prompt Injection Defender"
+  }
+}

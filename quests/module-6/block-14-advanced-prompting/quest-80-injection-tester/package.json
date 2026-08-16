@@ -1,0 +1,17 @@
+{
+  "name": "quest-80-injection-tester",
+  "version": "1.0.0",
+  "description": "Quest 6.8: Prompt Injection Tester - offensive security",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-80-injection-tester",
+    "block": "module-6/block-14",
+    "slug": "quest-80",
+    "difficulty": "medium",
+    "title": "Prompt Injection Tester"
+  }
+}

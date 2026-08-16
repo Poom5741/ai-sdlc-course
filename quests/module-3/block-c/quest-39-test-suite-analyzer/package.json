@@ -1,0 +1,11 @@
+{
+  "name": "quest-39-test-suite-analyzer",
+  "version": "1.0.0",
+  "description": "Quest 39: Test Suite Analyzer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-39-test-suite-analyzer", "block": "module-3/block-c", "slug": "quest-39", "difficulty": "medium", "title": "Test Suite Analyzer" }
+}

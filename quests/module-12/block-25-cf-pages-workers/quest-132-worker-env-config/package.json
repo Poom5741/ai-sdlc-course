@@ -1,0 +1,17 @@
+{
+  "name": "quest-132-worker-env-config",
+  "version": "1.0.0",
+  "description": "Quest 25.4: Worker Environment Config - validate bindings",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-132-worker-env-config",
+    "block": "module-12/block-25",
+    "slug": "quest-132",
+    "difficulty": "medium",
+    "title": "Worker Environment Config"
+  }
+}

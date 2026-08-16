@@ -1,0 +1,17 @@
+{
+  "name": "quest-59-monitoring-dashboard",
+  "version": "1.0.0",
+  "description": "Quest 4.17: Monitoring Dashboard Builder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-59-monitoring-dashboard",
+    "block": "module-4/block-10",
+    "slug": "quest-59",
+    "difficulty": "hard",
+    "title": "Monitoring Dashboard Builder"
+  }
+}

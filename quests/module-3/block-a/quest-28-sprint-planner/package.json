@@ -1,0 +1,11 @@
+{
+  "name": "quest-28-sprint-planner",
+  "version": "1.0.0",
+  "description": "Quest 3.6: Sprint Planner",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-28-sprint-planner", "block": "module-3/block-a", "slug": "quest-28", "difficulty": "hard", "title": "Sprint Planner" }
+}

@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  // Dynamic route - handled by client-side fetching
+  return [{ params: { id: 'placeholder' } }];
+}
+
+const { id } = Astro.params;
+---
+
+<BaseLayout title="Certificate | BlueBeltDojo">
+  <div class="min-h-screen bg-[#FAFAF9] py-12">
+    <div class="max-w-4xl mx-auto px-6">
+      
+      <!-- Loading -->
+      <div id="loading" class="text-center py-20">
+        <div class="inline-block w-8 h-8 border-2 border-[#78716C] border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-[#78716C]">Loading certificate...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error" class="hidden text-center py-20">
+        <h1 class="font-['DM_Serif_Display'] text-3xl text-[#1C1917] mb-4">Certificate Not Found</h1>
+        <p class="text-[#78716C]">This certificate could not be found or is invalid.</p>
+        <a href="/dashboard" class="inline-block mt-6 text-[#059669] hover:underline">Return to Dashboard</a>
+      </div>
+
+      <!-- Certificate -->
+      <div id="certificate" class="hidden">
+        <div class="bg-white border-2 border-[#D97706] rounded-lg p-12 relative overflow-hidden print:shadow-none print:border-0">
+          
+          <!-- Decorative corners -->
+          <div class="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-[#D97706]"></div>
+          <div class="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-[#D97706]"></div>
+          <div class="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 border-[#D97706]"></div>
+          <div class="absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2 border-[#D97706]"></div>
+
+          <div class="text-center py-8">
+            <p class="text-sm uppercase tracking-[0.3em] text-[#78716C] mb-2">BlueBeltDojo</p>
+            <h1 class="font-['DM_Serif_Display'] text-2xl text-[#1C1917] mb-8">Certificate of Achievement</h1>
+            
+            <div class="w-32 h-1 bg-[#D97706] mx-auto mb-8"></div>
+            
+            <p class="text-[#78716C] mb-2">This certifies that</p>
+            
+            <h2 id="cert-name" class="font-['DM_Serif_Display'] text-5xl text-[#1C1917] mb-6"></h2>
+            
+            <p class="text-[#78716C] mb-2">has successfully completed the requirements for</p>
+            
+            <div id="cert-belt" class="inline-block px-8 py-3 rounded-full font-['DM_Sans'] font-bold text-lg uppercase tracking-wider mb-8"></div>
+            
+            <div class="grid grid-cols-2 gap-8 max-w-md mx-auto text-left mb-8">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-[#78716C] mb-1">Quests Completed</p>
+                <p id="cert-quests" class="font-['DM_Serif_Display'] text-2xl text-[#1C1917]"></p>
+              </div>
+              <div>
+                <p class="text-xs uppercase tracking-wider text-[#78716C] mb-1">Date Issued</p>
+                <p id="cert-date" class="font-['DM_Serif_Display'] text-2xl text-[#1C1917]"></p>
+              </div>
+            </div>
+
+            <div class="mb-8">
+              <p class="text-xs uppercase tracking-wider text-[#78716C] mb-2">Skills Demonstrated</p>
+              <div id="cert-skills" class="flex flex-wrap justify-center gap-2"></div>
+            </div>
+
+            <div class="w-32 h-1 bg-[#D97706] mx-auto mb-6"></div>
+            
+            <p class="text-xs text-[#78716C]">
+              Verify at <span id="cert-verify-url" class="text-[#059669]"></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Print button -->
+        <div class="text-center mt-8 print:hidden">
+          <button onclick="window.print()" 
+            class="bg-[#059669] text-white px-8 py-3 font-['DM_Sans'] font-medium uppercase tracking-wider hover:bg-[#047857] transition-colors">
+            Print Certificate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media print {
+      body { background: white !important; }
+      .print\:hidden { display: none !important; }
+      .print\:shadow-none { box-shadow: none !important; }
+      .print\:border-0 { border: 0 !important; }
+    }
+  </style>
+
+  <script>
+    const BELT_COLORS = {
+      white: { bg: '#FFFFFF', text: '#1C1917', border: '#E7E5E4' },
+      blue: { bg: '#2563EB', text: '#FFFFFF', border: '#2563EB' },
+      purple: { bg: '#9333EA', text: '#FFFFFF', border: '#9333EA' },
+      brown: { bg: '#92400E', text: '#FFFFFF', border: '#92400E' },
+      black: { bg: '#1C1917', text: '#FFFFFF', border: '#1C1917' }
+    };
+
+    async function loadCertificate() {
+      const pathParts = window.location.pathname.split('/');
+      const certId = pathParts[pathParts.length - 1];
+      
+      if (!certId || certId === 'certificate') {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/certificates/${certId}`);
+        if (!res.ok) throw new Error('Not found');
+        
+        const cert = await res.json();
+        renderCertificate(cert);
+      } catch (e) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+      }
+    }
+
+    function renderCertificate(cert) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('certificate').classList.remove('hidden');
+
+      document.getElementById('cert-name').textContent = cert.displayName;
+      document.getElementById('cert-quests').textContent = cert.completedQuests || '129';
+      document.getElementById('cert-date').textContent = new Date(cert.issuedAt).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      
+      // Belt badge
+      const beltBadge = document.getElementById('cert-belt');
+      const beltColor = BELT_COLORS[cert.belt] || BELT_COLORS.white;
+      beltBadge.style.backgroundColor = beltColor.bg;
+      beltBadge.style.color = beltColor.text;
+      beltBadge.textContent = `${cert.belt} belt`;
+
+      // Skills
+      const skillsContainer = document.getElementById('cert-skills');
+      skillsContainer.innerHTML = (cert.skills || []).map(skill =>
+        `<span class="px-3 py-1 bg-[#F5F5F4] text-[#57534E] text-sm rounded-full">${skill}</span>`
+      ).join('');
+
+      // Verify URL
+      document.getElementById('cert-verify-url').textContent = 
+        `bluebeltdojo.ai/verify/${cert.verificationToken}`;
+    }
+
+    loadCertificate();
+  </script>
+</BaseLayout>

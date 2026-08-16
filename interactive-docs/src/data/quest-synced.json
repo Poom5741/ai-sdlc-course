@@ -1,0 +1,682 @@
+{
+  "1": {
+    "slug": "quest-1-first-code",
+    "title": "Quest 1 - First AI Completion",
+    "description": "Write a factorial function with AI help"
+  },
+  "2": {
+    "slug": "quest-2-prompts",
+    "title": "Quest 2 - Multi-File Project",
+    "description": "Create a multi-file project with AI"
+  },
+  "3": {
+    "slug": "quest-3-security",
+    "title": "Quest 3 - Compare AI Tools",
+    "description": "Compare different AI coding tools"
+  },
+  "4": {
+    "slug": "quest-4-loops",
+    "title": "Quest 4 - Token Counter",
+    "description": "Count tokens in text"
+  },
+  "5": {
+    "slug": "quest-5-project",
+    "title": "Quest 5 - Context Window Budget Calculator",
+    "description": "Calculate context window usage"
+  },
+  "6": {
+    "slug": "quest-6-multi-file",
+    "title": "Quest 6 - Hallucination Detector",
+    "description": "Detect AI fabricated information"
+  },
+  "7": {
+    "slug": "quest-7-compare-tools",
+    "title": "Quest 7 - Vibe Coding vs Vibe Engineering Analysis",
+    "description": "Analyze vibe coding vs engineering"
+  },
+  "8": {
+    "slug": "quest-8-multi-step",
+    "title": "Quest 8 - AI Tool Selection Matrix",
+    "description": "Create a tool selection matrix"
+  },
+  "9": {
+    "slug": "quest-9-domain-specific",
+    "title": "Quest 9 - Self-Attention Implementation",
+    "description": "Implement self-attention mechanism"
+  },
+  "10": {
+    "slug": "quest-10-fix-harden",
+    "title": "Quest 10 - Position Encoding Explorer",
+    "description": "Implement positional encoding"
+  },
+  "11": {
+    "slug": "quest-11-security-architecture",
+    "title": "Quest 11 - Model Architecture Classifier",
+    "description": "Classify BERT vs GPT vs T5"
+  },
+  "12": {
+    "slug": "quest-12-generate-review-fix",
+    "title": "Quest 12 - Transformer From Scratch",
+    "description": "Build a transformer block"
+  },
+  "13": {
+    "slug": "quest-13-multi-agent",
+    "title": "Quest 13 - Next Token Predictor",
+    "description": "Implement bigram language model"
+  },
+  "14": {
+    "slug": "quest-14-rag-design",
+    "title": "Quest 14 - Scaling Laws Calculator",
+    "description": "Compute optimal parameter allocation"
+  },
+  "15": {
+    "slug": "quest-15-data",
+    "title": "Quest 15 - Data Curator",
+    "description": "Clean training data"
+  },
+  "16": {
+    "slug": "quest-16-finetuning",
+    "title": "Quest 16 - Fine-Tuning Pipeline Design",
+    "description": "Design SFT to RLHF to DPO pipeline"
+  },
+  "17": {
+    "slug": "quest-17-dpo",
+    "title": "Quest 17 - DPO Loss Implementation",
+    "description": "Implement DPO loss function"
+  },
+  "18": {
+    "slug": "quest-18-sampling",
+    "title": "Quest 18 - Sampling Strategy Explorer",
+    "description": "Implement temperature, top-k, top-p"
+  },
+  "19": {
+    "slug": "quest-19-chain",
+    "title": "Quest 19 - Chain-of-Thought Prompter",
+    "description": "Structure prompts for reasoning"
+  },
+  "20": {
+    "slug": "quest-20-rag",
+    "title": "Quest 20 - RAG Chunking Strategist",
+    "description": "Implement document chunking"
+  },
+  "21": {
+    "slug": "quest-21-semantic",
+    "title": "Quest 21 - Semantic Search Builder",
+    "description": "Implement cosine similarity search"
+  },
+  "22": {
+    "slug": "quest-22-hallucination",
+    "title": "Quest 22 - Hallucination Prevention System",
+    "description": "Multi-layer hallucination prevention"
+  },
+  "23": {
+    "slug": "quest-23-user",
+    "title": "Quest 23 - User Story Generator",
+    "description": "Generate user stories from notes"
+  },
+  "24": {
+    "slug": "quest-24-prd",
+    "title": "Quest 24 - PRD Writer",
+    "description": "Write product requirements document"
+  },
+  "25": {
+    "slug": "quest-25-adr",
+    "title": "Quest 25 - ADR Generator",
+    "description": "Generate architecture decision records"
+  },
+  "26": {
+    "slug": "quest-26-tech",
+    "title": "Quest 26 - Tech Stack Recommender",
+    "description": "Recommend tech stack"
+  },
+  "27": {
+    "slug": "quest-27-risk",
+    "title": "Quest 27 - Risk Identifier",
+    "description": "Identify project risks"
+  },
+  "28": {
+    "slug": "quest-28-sprint",
+    "title": "Quest 28 - Sprint Planner",
+    "description": "Break features into sprint tasks"
+  },
+  "29": {
+    "slug": "quest-29-requirements",
+    "title": "Quest 29 - Requirements Quality Analyzer",
+    "description": "Analyze requirements quality"
+  },
+  "30": {
+    "slug": "quest-30-prompt",
+    "title": "Quest 30 - Prompt-for-Code Refiner",
+    "description": "Refine prompts for better code"
+  },
+  "31": {
+    "slug": "quest-31-context",
+    "title": "Quest 31 - Context Window Manager",
+    "description": "Prioritize files for context"
+  },
+  "32": {
+    "slug": "quest-32-mcp",
+    "title": "Quest 32 - MCP Client Builder",
+    "description": "Implement Model Context Protocol client"
+  },
+  "33": {
+    "slug": "quest-33-function",
+    "title": "Quest 33 - Function Calling Implementer",
+    "description": "Implement function calling"
+  },
+  "34": {
+    "slug": "quest-34-react",
+    "title": "Quest 34 - ReAct Pattern Agent",
+    "description": "Implement ReAct agent pattern"
+  },
+  "35": {
+    "slug": "quest-35-multi",
+    "title": "Quest 35 - Multi-Agent Orchestrator",
+    "description": "Orchestrate multiple agents"
+  },
+  "36": {
+    "slug": "quest-36-code",
+    "title": "Quest 36 - Code Migration Assistant",
+    "description": "Convert code between languages"
+  },
+  "37": {
+    "slug": "quest-37-intent",
+    "title": "Quest 37 - Intent-Spec Test Generator",
+    "description": "Generate test specs from intent"
+  },
+  "38": {
+    "slug": "quest-38-edge",
+    "title": "Quest 38 - Edge Case Finder",
+    "description": "Discover edge cases in code"
+  },
+  "39": {
+    "slug": "quest-39-test",
+    "title": "Quest 39 - Test Suite Analyzer",
+    "description": "Analyze test coverage gaps"
+  },
+  "40": {
+    "slug": "quest-40-mock",
+    "title": "Quest 40 - Mock Data Generator",
+    "description": "Generate realistic test data"
+  },
+  "41": {
+    "slug": "quest-41-ci",
+    "title": "Quest 41 - CI Pipeline Builder",
+    "description": "Create CI/CD configurations"
+  },
+  "42": {
+    "slug": "quest-42-regression",
+    "title": "Quest 42 - Regression Test Predictor",
+    "description": "Predict what tests to run"
+  },
+  "43": {
+    "slug": "quest-43-sql-injection-spotter",
+    "title": "Quest 43 - SQL Injection Spotter",
+    "description": "Find SQL injection vulnerabilities in code"
+  },
+  "44": {
+    "slug": "quest-44-secret-scanner",
+    "title": "Quest 44 - Secret Scanner",
+    "description": "Detect hardcoded credentials and API keys"
+  },
+  "45": {
+    "slug": "quest-45-input-validator",
+    "title": "Quest 45 - Input Validator",
+    "description": "Sanitize and validate user input"
+  },
+  "46": {
+    "slug": "quest-46-auth-system",
+    "title": "Quest 46 - Auth System Hardener",
+    "description": "JWT + Argon2 authentication security"
+  },
+  "47": {
+    "slug": "quest-47-prompt-injection",
+    "title": "Quest 47 - Prompt Injection Defender",
+    "description": "Detect and block prompt injection attempts"
+  },
+  "48": {
+    "slug": "quest-48-security-arch",
+    "title": "Quest 48 - Security Architecture Design",
+    "description": "Design security architecture for AI apps"
+  },
+  "49": {
+    "slug": "quest-49-dependency-auditor",
+    "title": "Quest 49 - Dependency Vulnerability Auditor",
+    "description": "Audit packages for known vulnerabilities"
+  },
+  "50": {
+    "slug": "quest-50-ai-review-policy",
+    "title": "Quest 50 - AI Code Review Policy Writer",
+    "description": "Write AI code review policies"
+  },
+  "51": {
+    "slug": "quest-51-ip-risk-analyzer",
+    "title": "Quest 51 - IP Risk Analyzer",
+    "description": "Analyze licensing and copyright risks"
+  },
+  "52": {
+    "slug": "quest-52-audit-trail",
+    "title": "Quest 52 - Audit Trail System",
+    "description": "Implement audit logging with filtering"
+  },
+  "53": {
+    "slug": "quest-53-bias-detector",
+    "title": "Quest 53 - Bias Detector",
+    "description": "Detect bias using fairness metrics"
+  },
+  "54": {
+    "slug": "quest-54-ai-usage-policy",
+    "title": "Quest 54 - AI Usage Policy Generator",
+    "description": "Generate organizational AI usage policies"
+  },
+  "55": {
+    "slug": "quest-55-compliance-checker",
+    "title": "Quest 55 - Compliance Checklist Automator",
+    "description": "Automate compliance checking"
+  },
+  "56": {
+    "slug": "quest-56-dockerfile-generator",
+    "title": "Quest 56 - Dockerfile Generator",
+    "description": "Generate optimized Dockerfiles"
+  },
+  "57": {
+    "slug": "quest-57-iac-generator",
+    "title": "Quest 57 - IaC Generator",
+    "description": "Generate infrastructure-as-code"
+  },
+  "58": {
+    "slug": "quest-58-deploy-pipeline",
+    "title": "Quest 58 - Deployment Pipeline Designer",
+    "description": "Design deployment pipeline architecture"
+  },
+  "59": {
+    "slug": "quest-59-monitoring-dashboard",
+    "title": "Quest 59 - Monitoring Dashboard Builder",
+    "description": "Build monitoring data aggregator with p95"
+  },
+  "60": {
+    "slug": "quest-60-llm-observability",
+    "title": "Quest 60 - LLM Observability System",
+    "description": "Tracing and metrics for LLM calls"
+  },
+  "61": {
+    "slug": "quest-61-cost-optimizer",
+    "title": "Quest 61 - Cost Optimizer",
+    "description": "Token budget routing between models"
+  },
+  "62": {
+    "slug": "quest-62-rollback-strategist",
+    "title": "Quest 62 - Rollback Strategist",
+    "description": "Deployment safety and rollback"
+  },
+  "63": {
+    "slug": "quest-63-agent-loop",
+    "title": "Quest 63 - Agent Loop Builder",
+    "description": "Generate-review-fix agent loop"
+  },
+  "64": {
+    "slug": "quest-64-tool-registry",
+    "title": "Quest 64 - Tool Registry System",
+    "description": "Dynamic tool loading and dispatch"
+  },
+  "65": {
+    "slug": "quest-65-agent-debate",
+    "title": "Quest 65 - Multi-Agent Debate System",
+    "description": "Agents debate and reach consensus"
+  },
+  "66": {
+    "slug": "quest-66-agent-hierarchy",
+    "title": "Quest 66 - Hierarchical Agent Team",
+    "description": "Manager-worker agent hierarchy"
+  },
+  "67": {
+    "slug": "quest-67-self-reflecting",
+    "title": "Quest 67 - Self-Reflecting Agent",
+    "description": "Agent that scores its own output quality"
+  },
+  "68": {
+    "slug": "quest-68-llm-evaluator",
+    "title": "Quest 68 - LLM Evaluator",
+    "description": "LLM-as-a-Judge implementation"
+  },
+  "69": {
+    "slug": "quest-69-semantic-cache",
+    "title": "Quest 69 - Semantic Cache Builder",
+    "description": "Cache LLM responses by similarity"
+  },
+  "70": {
+    "slug": "quest-70-prompt-versioning",
+    "title": "Quest 70 - Prompt Version Manager",
+    "description": "A/B test and version prompts"
+  },
+  "71": {
+    "slug": "quest-71-rate-limiter",
+    "title": "Quest 71 - Rate Limiter for LLM APIs",
+    "description": "Token bucket rate limiter"
+  },
+  "72": {
+    "slug": "quest-72-prod-readiness",
+    "title": "Quest 72 - Production Readiness Checker",
+    "description": "Comprehensive readiness audit"
+  },
+  "73": {
+    "slug": "quest-73-role-prompts",
+    "title": "Quest 73 - Role Prompt Library",
+    "description": "System prompts for different roles"
+  },
+  "74": {
+    "slug": "quest-74-few-shot",
+    "title": "Quest 74 - Few-Shot Template Builder",
+    "description": "Build few-shot prompt templates"
+  },
+  "75": {
+    "slug": "quest-75-chain-density",
+    "title": "Quest 75 - Chain-of-Density Optimizer",
+    "description": "Reduce verbosity while keeping info"
+  },
+  "76": {
+    "slug": "quest-76-structured-output",
+    "title": "Quest 76 - Structured Output Parser",
+    "description": "Parse JSON from LLM responses"
+  },
+  "77": {
+    "slug": "quest-77-prompt-chainer",
+    "title": "Quest 77 - Prompt Chainer",
+    "description": "Multi-step prompt workflows"
+  },
+  "78": {
+    "slug": "quest-78-context-engineering",
+    "title": "Quest 78 - Context Engineering",
+    "description": "Optimal context selection from docs"
+  },
+  "79": {
+    "slug": "quest-79-meta-prompt",
+    "title": "Quest 79 - Meta-Prompt Generator",
+    "description": "Prompts that write prompts"
+  },
+  "80": {
+    "slug": "quest-80-injection-tester",
+    "title": "Quest 80 - Prompt Injection Tester",
+    "description": "Offensive security for prompt injection"
+  },
+  "81": {
+    "slug": "quest-81-prompt-eval",
+    "title": "Quest 81 - Prompt Evaluation Framework",
+    "description": "Evaluate prompt quality systematically"
+  },
+  "82": {
+    "slug": "quest-82-prompt-porter",
+    "title": "Quest 82 - Cross-Model Prompt Porter",
+    "description": "Adapt prompts between different LLMs"
+  },
+  "83": {
+    "slug": "quest-83-automated-pr-reviewer",
+    "title": "Automated PR Reviewer",
+    "description": "Find common issues in code diffs automatically"
+  },
+  "84": {
+    "slug": "quest-84-code-smell-detector",
+    "title": "Code Smell Detector",
+    "description": "Identify common code smells in source code"
+  },
+  "85": {
+    "slug": "quest-85-security-review",
+    "title": "Security Review Automator",
+    "description": "Auto-detect security issues in code"
+  },
+  "86": {
+    "slug": "quest-86-performance-review",
+    "title": "Performance Review Analyzer",
+    "description": "Identify performance anti-patterns in code"
+  },
+  "87": {
+    "slug": "quest-87-review-quality",
+    "title": "Review Quality Scorer",
+    "description": "Score how useful a code review is"
+  },
+  "88": {
+    "slug": "quest-88-docstring-generator",
+    "title": "Docstring Generator",
+    "description": "Generate JSDoc/TSDoc from function signatures"
+  },
+  "89": {
+    "slug": "quest-89-readme-generator",
+    "title": "README Generator",
+    "description": "Generate README from codebase structure"
+  },
+  "90": {
+    "slug": "quest-90-api-doc-generator",
+    "title": "API Doc Generator",
+    "description": "Generate OpenAPI spec from route handlers"
+  },
+  "91": {
+    "slug": "quest-91-changelog-generator",
+    "title": "Changelog Generator",
+    "description": "Generate changelog from git commit messages"
+  },
+  "92": {
+    "slug": "quest-92-onboarding-doc",
+    "title": "Onboarding Doc Writer",
+    "description": "Generate comprehensive onboarding documentation"
+  },
+  "93": {
+    "slug": "quest-93-code-simplifier",
+    "title": "Code Simplifier",
+    "description": "Reduce cyclomatic complexity while preserving behavior"
+  },
+  "94": {
+    "slug": "quest-94-dead-code",
+    "title": "Dead Code Eliminator",
+    "description": "Find and safely remove unused code"
+  },
+  "95": {
+    "slug": "quest-95-design-pattern",
+    "title": "Design Pattern Applicator",
+    "description": "Identify when a design pattern fits and apply it"
+  },
+  "96": {
+    "slug": "quest-96-type-migration",
+    "title": "Type Migration Assistant",
+    "description": "Migrate JavaScript to TypeScript with proper types"
+  },
+  "97": {
+    "slug": "quest-97-legacy-modernizer",
+    "title": "Legacy Code Modernizer",
+    "description": "Modernize callback-based code to async/await"
+  },
+  "98": {
+    "slug": "quest-98-api-migration",
+    "title": "API Migration Tool",
+    "description": "Migrate REST endpoints to GraphQL resolvers"
+  },
+  "99": {
+    "slug": "quest-99-db-migration",
+    "title": "Database Migration Assistant",
+    "description": "Generate schema migration scripts"
+  },
+  "100": {
+    "slug": "quest-100-framework-migration",
+    "title": "Framework Migration",
+    "description": "Migrate Express routes to Fastify"
+  },
+  "101": {
+    "slug": "quest-101-monolith-splitter",
+    "title": "Monolith Splitter",
+    "description": "Identify microservice boundaries in a monolith"
+  },
+  "102": {
+    "slug": "quest-102-test-migration",
+    "title": "Test Migration",
+    "description": "Sync tests with refactored code"
+  },
+  "103": {
+    "slug": "quest-103-bias-auditor",
+    "title": "AI Bias Auditor",
+    "description": "Compute fairness metrics for AI predictions"
+  },
+  "104": {
+    "slug": "quest-104-pii-redactor",
+    "title": "PII Redactor",
+    "description": "Detect and redact personal information from text"
+  },
+  "105": {
+    "slug": "quest-105-ethical-framework",
+    "title": "Ethical Decision Framework",
+    "description": "Design an ethical AI decision framework"
+  },
+  "106": {
+    "slug": "quest-106-accessibility-checker",
+    "title": "Accessibility Checker",
+    "description": "Audit code for accessibility violations"
+  },
+  "107": {
+    "slug": "quest-107-image-prompt",
+    "title": "Image Prompt Engineer",
+    "description": "Write effective prompts for image generation models"
+  },
+  "108": {
+    "slug": "quest-108-multimodal-processor",
+    "title": "Multimodal Input Processor",
+    "description": "Process combined text and image inputs"
+  },
+  "109": {
+    "slug": "quest-109-voice-to-code",
+    "title": "Voice-to-Code Pipeline Design",
+    "description": "Design a voice-to-code system architecture"
+  },
+  "110": {
+    "slug": "quest-110-multimodal-rag",
+    "title": "Multimodal RAG System",
+    "description": "RAG system that handles text, images, and tables"
+  },
+  "111": {
+    "slug": "quest-111-e2e-pipeline",
+    "title": "End-to-End AI Dev Pipeline",
+    "description": "Orchestrate AI tools across the full SDLC"
+  },
+  "112": {
+    "slug": "quest-112-workflow-orchestrator",
+    "title": "Multi-Tool Workflow Orchestrator",
+    "description": "Coordinate multiple AI tools in a workflow"
+  },
+  "113": {
+    "slug": "quest-113-incident-responder",
+    "title": "Production Incident Responder",
+    "description": "AI-assisted debugging and incident response"
+  },
+  "114": {
+    "slug": "quest-114-feature-flags",
+    "title": "Feature Flag System",
+    "description": "Feature flags with AI-driven rollout suggestions"
+  },
+  "115": {
+    "slug": "quest-115-copilot-analysis",
+    "title": "GitHub Copilot Workflow Analysis",
+    "description": "Analyze and optimize Copilot usage patterns"
+  },
+  "116": {
+    "slug": "quest-116-enterprise-adoption",
+    "title": "Enterprise AI Adoption Plan",
+    "description": "Plan enterprise-wide AI tool adoption"
+  },
+  "117": {
+    "slug": "quest-117-ai-roi",
+    "title": "AI ROI Calculator",
+    "description": "Calculate ROI of AI development tools"
+  },
+  "118": {
+    "slug": "quest-118-governance-framework",
+    "title": "Team AI Governance Framework",
+    "description": "Design governance for a team using AI tools"
+  },
+  "119": {
+    "slug": "quest-119-git-repo-setup",
+    "title": "Git Repo Setup",
+    "description": "Initialize git repos with proper config"
+  },
+  "120": {
+    "slug": "quest-120-branching-strategy",
+    "title": "Branching Strategy",
+    "description": "Branching, merging, and fast-forward"
+  },
+  "121": {
+    "slug": "quest-121-commit-message",
+    "title": "Commit Message Writer",
+    "description": "Conventional commits (feat:, fix:, chore:)"
+  },
+  "122": {
+    "slug": "quest-122-history-analyzer",
+    "title": "Git History Analyzer",
+    "description": "Parse git log and detect bad patterns"
+  },
+  "123": {
+    "slug": "quest-123-rebase-simulator",
+    "title": "Interactive Rebase Simulator",
+    "description": "Reorder, squash, edit commits"
+  },
+  "124": {
+    "slug": "quest-124-issue-creator",
+    "title": "Issue Creator",
+    "description": "GitHub issue JSON with templates"
+  },
+  "125": {
+    "slug": "quest-125-pr-description",
+    "title": "PR Description Generator",
+    "description": "Structured PR descriptions"
+  },
+  "126": {
+    "slug": "quest-126-project-board",
+    "title": "GitHub Project Board Builder",
+    "description": "Design GitHub Projects board"
+  },
+  "127": {
+    "slug": "quest-127-code-review-sim",
+    "title": "Code Review Simulator",
+    "description": "Review diffs for bugs and issues"
+  },
+  "128": {
+    "slug": "quest-128-cicd-pipeline",
+    "title": "CI/CD Pipeline Configurator",
+    "description": "GitHub Actions YAML generation"
+  },
+  "129": {
+    "slug": "quest-129-pages-deploy",
+    "title": "Pages Deployment",
+    "description": "wrangler.toml for Cloudflare Pages"
+  },
+  "130": {
+    "slug": "quest-130-function-router",
+    "title": "Pages Function Router",
+    "description": "Route requests with CORS"
+  },
+  "131": {
+    "slug": "quest-131-worker-api",
+    "title": "Worker API Builder",
+    "description": "Workers with KV/D1 routing"
+  },
+  "132": {
+    "slug": "quest-132-worker-env-config",
+    "title": "Worker Environment Config",
+    "description": "Validate bindings and secrets"
+  },
+  "133": {
+    "slug": "quest-133-kv-manager",
+    "title": "KV Store Manager",
+    "description": "Namespaced KV CRUD operations"
+  },
+  "134": {
+    "slug": "quest-134-d1-migrator",
+    "title": "D1 Database Schema Migrator",
+    "description": "SQL migrations with data preservation"
+  },
+  "135": {
+    "slug": "quest-135-r2-uploader",
+    "title": "R2 Object Uploader",
+    "description": "Presigned URLs and multipart upload"
+  },
+  "136": {
+    "slug": "quest-136-fullstack-deploy",
+    "title": "Full Stack Deploy",
+    "description": "Complete Cloudflare deployment config"
+  }
+}

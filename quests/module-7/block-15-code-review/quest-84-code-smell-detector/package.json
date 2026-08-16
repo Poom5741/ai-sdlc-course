@@ -1,0 +1,17 @@
+{
+  "name": "quest-84-code-smell-detector",
+  "version": "1.0.0",
+  "description": "Quest 15.2: Code Smell Detector - identify common code smells",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-84-code-smell-detector",
+    "block": "module-7/block-15",
+    "slug": "quest-84",
+    "difficulty": "medium",
+    "title": "Code Smell Detector"
+  }
+}

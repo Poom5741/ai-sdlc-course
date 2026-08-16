@@ -1,0 +1,17 @@
+{
+  "name": "quest-118-governance-framework",
+  "version": "1.0.0",
+  "description": "Quest 22.4: Team AI Governance Framework",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-118-governance-framework",
+    "block": "module-10/block-22",
+    "slug": "quest-118",
+    "difficulty": "hard",
+    "title": "Team AI Governance Framework"
+  }
+}

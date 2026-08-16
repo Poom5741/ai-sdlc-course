@@ -6,7 +6,18 @@
   "scripts": {
     "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-5"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-5"
+  ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-14-full-system",
+    "block": "block-5-architecture",
+    "slug": "quest-14",
+    "difficulty": "hard"
+  }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "quest-136-fullstack-deploy",
+  "version": "1.0.0",
+  "description": "Quest 26.4: Full Stack Deploy - complete Cloudflare deployment",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-136-fullstack-deploy",
+    "block": "module-12/block-26",
+    "slug": "quest-136",
+    "difficulty": "hard",
+    "title": "Full Stack Deploy"
+  }
+}

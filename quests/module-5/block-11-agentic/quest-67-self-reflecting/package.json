@@ -1,0 +1,17 @@
+{
+  "name": "quest-67-self-reflecting",
+  "version": "1.0.0",
+  "description": "Quest 5.5: Self-Reflecting Agent - output quality scorer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-67-self-reflecting",
+    "block": "module-5/block-11",
+    "slug": "quest-67",
+    "difficulty": "hard",
+    "title": "Self-Reflecting Agent"
+  }
+}

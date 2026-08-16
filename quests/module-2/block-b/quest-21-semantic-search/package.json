@@ -1,0 +1,17 @@
+{
+  "name": "quest-21-semantic-search",
+  "version": "1.0.0",
+  "description": "Quest 2.9: Semantic Search Builder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-21-semantic-search",
+    "block": "module-2/block-b",
+    "slug": "quest-21",
+    "difficulty": "medium",
+    "title": "Semantic Search Builder"
+  }
+}

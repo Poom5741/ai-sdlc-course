@@ -1,0 +1,17 @@
+{
+  "name": "quest-101-monolith-splitter",
+  "version": "1.0.0",
+  "description": "Quest 18.4: Monolith Splitter",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-101-monolith-splitter",
+    "block": "module-8/block-18",
+    "slug": "quest-101",
+    "difficulty": "hard",
+    "title": "Monolith Splitter"
+  }
+}

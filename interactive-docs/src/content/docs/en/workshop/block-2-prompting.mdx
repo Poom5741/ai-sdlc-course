@@ -1,0 +1,295 @@
+---
+title: Block 2 - Prompt Engineering
+description: Master the art of writing effective prompts for AI coding assistants
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 2: Prompt Engineering
+
+<Badge text="10:45 - 12:15" variant="note" /> <Badge text="90 minutes" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 Learning Goals
+
+By the end of this block, you will:
+
+- Understand the principles of Prompt Engineering
+- Write effective prompts for code generation
+- Use multi-step prompting for complex tasks
+- Create domain-specific prompts
+
+---
+
+## 📖 Concept: Prompt Engineering (30 min)
+
+### What is Prompt Engineering?
+
+Prompt Engineering is the art of communicating with AI effectively to get the desired results.
+
+### Why Prompt Quality Matters
+
+```
+Bad Prompt: "Make a function"
+Good Prompt: "Create a JavaScript function called calculateDiscount that takes:
+- price (number, required)
+- discountPercent (number, 0-100, required)
+- memberType ('gold' | 'silver' | 'bronze', optional, default: 'bronze')
+
+Rules:
+- Gold members get extra 10% off
+- Discount cannot exceed 100%
+- Return { originalPrice, discountAmount, finalPrice }
+- Throw error for invalid inputs"
+```
+
+### The Anatomy of a Good Prompt
+
+<CardGrid>
+<Card title="1. Clear Objective" icon="target">
+Tell AI exactly what to build
+</Card>
+<Card title="2. Input Specification" icon="input">
+Define all parameters with types
+</Card>
+<Card title="3. Output Format" icon="document">
+Specify return structure
+</Card>
+<Card title="4. Constraints" icon="warning">
+List rules and limitations
+</Card>
+</CardGrid>
+
+### Prompt Patterns
+
+#### Pattern 1: Role-Task-Format
+
+```
+Act as a [ROLE]
+[TASK]
+Output in [FORMAT]
+```
+
+#### Pattern 2: Few-Shot Examples
+
+```
+Here's an example of what I want:
+Input: [example]
+Output: [example]
+
+Now do the same for:
+Input: [your input]
+```
+
+#### Pattern 3: Chain of Thought
+
+```
+Think step by step:
+1. First, [step 1]
+2. Then, [step 2]
+3. Finally, [step 3]
+```
+
+### Common Prompting Mistakes
+
+| Mistake | Why It Fails | Fix |
+| --------- | -------------- | ----- |
+| Too vague | AI guesses wrong | Be specific about inputs/outputs |
+| No examples | No reference point | Include 1-2 examples |
+| Missing constraints | Unexpected behavior | List all rules |
+| Wrong scope | Too much at once | Break into smaller tasks |
+
+---
+
+## 🛠️ Advanced Techniques
+
+### Multi-Step Prompting
+
+For complex tasks, break them into steps:
+
+```
+Step 1: Design the data model
+Step 2: Create the API endpoints
+Step 3: Add validation
+Step 4: Write tests
+```
+
+### Domain-Specific Prompting
+
+Add context about the domain:
+
+```
+For a healthcare application (HIPAA compliant):
+- Patient data must be encrypted
+- Audit logs required for all access
+- Session timeout: 15 minutes
+```
+
+### Iterative Refinement
+
+```
+Iteration 1: Basic implementation
+Iteration 2: Add error handling
+Iteration 3: Optimize performance
+Iteration 4: Add documentation
+```
+
+---
+
+## 💰 Token Cost Management
+
+### Understanding Token Economics
+
+AI charges per **token** (unit of text the model reads/generates) — the longer the prompt and output, the higher the cost. Understanding what costs more helps control budget.
+
+**Sample pricing (per 1M tokens):**
+
+| Model | Input | Output | When to Use |
+| ------- | ------- | -------- | ------------ |
+| GPT-4o | $2.50 | $10.00 | Complex tasks, code generation |
+| GPT-4o-mini | $0.15 | $0.60 | Simple tasks, classification |
+| Claude 3.5 Sonnet | $3.00 | $15.00 | Complex tasks, analysis |
+| Claude 3.5 Haiku | $0.25 | $1.25 | Routine tasks, drafts |
+
+**What affects cost:**
+
+- **Input tokens** — prompt + context sent in
+- **Output tokens** — response the model generates (usually more expensive)
+- **Model size** — larger = more expensive
+
+### Choosing Models: Cost vs Quality
+
+| Task | Recommended | Reason |
+| ------ | ------- | -------- |
+| Simple classification | Haiku/Mini | Fast, cheap, good enough |
+| Code generation | Sonnet/GPT-4o | Balanced quality/cost |
+| Complex reasoning | Opus/GPT-4 | High quality when needed |
+| Drafting text | Haiku/Mini | Fast iteration, low cost |
+
+### Cost Optimization Strategies
+
+#### 1. Prompt Efficiency
+
+- Remove irrelevant context
+- Write concise instructions
+- Use caching for repeated prefixes
+
+#### 2. Model Routing
+
+- Simple tasks → small model
+- Complex tasks → large model
+- A/B test quality vs cost
+
+#### 3. Token Budgeting
+
+- Set max tokens per request
+- Track usage per user/project
+- Alert when exceeding budget
+
+#### 4. Caching
+
+- Cache identical requests
+- Use semantic similarity for near-matches
+- Invalidate when updating models
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 2.1: Fix the Vague Prompt
+
+**Goal**: Write a prompt with complete constraints, then generate `createUser`
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-04-fix-prompt my-quest
+   cd my-quest
+   ```
+
+2. **Analyze the bad prompt** in `problem.js` — "Make a function that handles users"
+
+3. **Write improved prompt** with complete constraints (input shape, email format, empty/null handling, success/error return shape), then use AI to generate
+
+4. **Verify**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**Deliverable**: `createUser` passing all constraints (handles {} / null / invalid email) + your improved prompt
+
+---
+
+### 🟡 Quest 2.2: Multi-Step Prompting
+
+**Goal**: Build a two-layer URL validator (core + edge) with two prompts
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-05-multi-step my-quest
+   cd my-quest
+   ```
+
+2. **Step 1 prompt (core)**: "Write `isValidUrl(url)` returning true for well-formed http/https URLs with a host, false otherwise." → implement → `node test.js` (Layer 1 passes)
+
+3. **Step 2 prompt (edge)**: "Now handle: empty, whitespace, `javascript:` scheme, no-protocol, `https://` with no host → reject all." → implement → `node test.js` (all passing)
+
+</Steps>
+
+**Deliverable**: Two-layer `isValidUrl` passing Layer 1 + Layer 2 edge cases
+
+---
+
+### 🔴 Quest 2.3: Domain-Specific Prompting
+
+**Goal**: Validate Thai phone numbers and national ID cards by including domain rules in the prompt
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-06-domain-specific my-quest
+   cd my-quest
+   ```
+
+2. **Read domain rules** in `problem.js` (10-digit phone with prefix 06/08/09; 13-digit ID with checksum)
+
+3. **Write prompt** including both rule sets verbatim, then generate `isValidThaiPhone` + `isValidThaiId`
+
+4. **Verify**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**Deliverable**: Two validators passing Thai format edge cases (including checksum that AI can't guess)
+
+---
+
+## ✅ Block 2 Checklist
+
+- [ ] Understand prompt anatomy
+- [ ] Quest 2.1 completed
+- [ ] Quest 2.2 completed
+- [ ] Quest 2.3 completed
+
+---
+
+## 🚀 Next Block
+
+**Block 3: Security** → Learn to identify and fix security vulnerabilities in AI-generated code.
+
+<a href="/workshop/block-3-security" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">Continue to Block 3 →</a>

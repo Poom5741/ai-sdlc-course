@@ -1,0 +1,17 @@
+{
+  "name": "quest-06-hallucination-detector",
+  "version": "1.0.0",
+  "description": "Quest 1.6: Hallucination Detector - detect AI fabricated information",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-06-hallucination-detector",
+    "block": "module-1/block-a",
+    "slug": "quest-6",
+    "difficulty": "medium",
+    "title": "Hallucination Detector"
+  }
+}

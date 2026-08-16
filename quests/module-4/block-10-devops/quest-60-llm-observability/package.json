@@ -1,0 +1,17 @@
+{
+  "name": "quest-60-llm-observability",
+  "version": "1.0.0",
+  "description": "Quest 4.18: LLM Observability System - tracing and metrics",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-60-llm-observability",
+    "block": "module-4/block-10",
+    "slug": "quest-60",
+    "difficulty": "hard",
+    "title": "LLM Observability System"
+  }
+}

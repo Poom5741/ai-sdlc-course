@@ -1,0 +1,17 @@
+{
+  "name": "quest-109-voice-to-code",
+  "version": "1.0.0",
+  "description": "Quest 20.3: Voice-to-Code Pipeline Design",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-109-voice-to-code",
+    "block": "module-9/block-20",
+    "slug": "quest-109",
+    "difficulty": "medium",
+    "title": "Voice-to-Code Pipeline Design"
+  }
+}

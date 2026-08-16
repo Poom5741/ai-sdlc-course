@@ -1,4 +1,6 @@
 ---
+import RoleSwitcher from '../components/RoleSwitcher.astro';
+
 export interface Props {
   title: string;
   description?: string;
@@ -29,6 +31,7 @@ const { title, description = 'BlueBeltDojo — Train Your AI Coding Like You Tra
     FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
   -->
   <slot />
+<RoleSwitcher />
 <!-- impeccable-live-start -->
 <script is:inline src="http://localhost:8400/live.js?token=b832870d-0727-400e-9b0d-3149a4d2921c"></script>
 <!-- impeccable-live-end -->

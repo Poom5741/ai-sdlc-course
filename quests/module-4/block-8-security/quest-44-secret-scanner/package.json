@@ -1,0 +1,17 @@
+{
+  "name": "quest-44-secret-scanner",
+  "version": "1.0.0",
+  "description": "Quest 4.2: Secret Scanner - detect hardcoded credentials in code",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-44-secret-scanner",
+    "block": "module-4/block-8",
+    "slug": "quest-44",
+    "difficulty": "easy",
+    "title": "Secret Scanner"
+  }
+}

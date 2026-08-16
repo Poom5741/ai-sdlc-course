@@ -1,0 +1,11 @@
+{
+  "name": "quest-37-intent-spec-generator",
+  "version": "1.0.0",
+  "description": "Quest 37: Intent-Spec Test Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-37-intent-spec-generator", "block": "module-3/block-c", "slug": "quest-37", "difficulty": "easy", "title": "Intent-Spec Test Generator" }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "capstone-3-production-ai",
+  "version": "1.0.0",
+  "description": "Capstone 3: Production AI Application",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["capstone", "ai-sdlc", "production"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "capstone": {
+    "id": "capstone-3-production-ai",
+    "belt": "purple-to-brown",
+    "title": "Production AI Application"
+  }
+}

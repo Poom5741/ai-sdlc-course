@@ -1,0 +1,17 @@
+{
+  "name": "quest-63-agent-loop",
+  "version": "1.0.0",
+  "description": "Quest 5.1: Agent Loop Builder - generate-review-fix loop",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-63-agent-loop",
+    "block": "module-5/block-11",
+    "slug": "quest-63",
+    "difficulty": "medium",
+    "title": "Agent Loop Builder"
+  }
+}

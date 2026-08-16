@@ -1,0 +1,17 @@
+{
+  "name": "quest-82-prompt-porter",
+  "version": "1.0.0",
+  "description": "Quest 6.10: Cross-Model Prompt Porter",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-82-prompt-porter",
+    "block": "module-6/block-14",
+    "slug": "quest-82",
+    "difficulty": "hard",
+    "title": "Cross-Model Prompt Porter"
+  }
+}

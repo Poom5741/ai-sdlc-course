@@ -1,0 +1,11 @@
+{
+  "name": "quest-36-code-migration",
+  "version": "1.0.0",
+  "description": "Quest 36: Code Migration Assistant",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-36-code-migration", "block": "module-3/block-b", "slug": "quest-36", "difficulty": "hard", "title": "Code Migration Assistant" }
+}

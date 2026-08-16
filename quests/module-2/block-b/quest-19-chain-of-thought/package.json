@@ -1,0 +1,17 @@
+{
+  "name": "quest-19-chain-of-thought",
+  "version": "1.0.0",
+  "description": "Quest 2.7: Chain-of-Thought Prompter",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-19-chain-of-thought",
+    "block": "module-2/block-b",
+    "slug": "quest-19",
+    "difficulty": "medium",
+    "title": "Chain-of-Thought Prompter"
+  }
+}

@@ -6,7 +6,18 @@
   "scripts": {
     "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "block-5"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-5"
+  ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-13-rag-design",
+    "block": "block-5-architecture",
+    "slug": "quest-13",
+    "difficulty": "hard"
+  }
 }

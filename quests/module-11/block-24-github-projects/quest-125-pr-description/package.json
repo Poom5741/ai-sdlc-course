@@ -1,0 +1,17 @@
+{
+  "name": "quest-125-pr-description",
+  "version": "1.0.0",
+  "description": "Quest 24.2: PR Description Generator - structured PR descriptions",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-125-pr-description",
+    "block": "module-11/block-24",
+    "slug": "quest-125",
+    "difficulty": "medium",
+    "title": "PR Description Generator"
+  }
+}

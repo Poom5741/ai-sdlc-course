@@ -1,0 +1,17 @@
+{
+  "name": "quest-117-ai-roi",
+  "version": "1.0.0",
+  "description": "Quest 22.3: AI ROI Calculator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-117-ai-roi",
+    "block": "module-10/block-22",
+    "slug": "quest-117",
+    "difficulty": "medium",
+    "title": "AI ROI Calculator"
+  }
+}

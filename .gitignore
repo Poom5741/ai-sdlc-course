@@ -47,3 +47,11 @@ interactive-docs/.impeccable/
 .pi-glla/audit-jobs/
 .pi-glla/archive/
 .pi-glla/reviews/
+
+# Agent secrets context (NEVER commit to GitHub)
+AGENT.md
+CLAUDE.md
+.agent.md
+
+# Scratch files
+.scratch/

@@ -1,0 +1,11 @@
+{
+  "name": "quest-41-ci-pipeline-builder",
+  "version": "1.0.0",
+  "description": "Quest 41: CI Pipeline Builder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-41-ci-pipeline-builder", "block": "module-3/block-c", "slug": "quest-41", "difficulty": "hard", "title": "CI Pipeline Builder" }
+}

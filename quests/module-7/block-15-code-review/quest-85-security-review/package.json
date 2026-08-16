@@ -1,0 +1,17 @@
+{
+  "name": "quest-85-security-review",
+  "version": "1.0.0",
+  "description": "Quest 15.3: Security Review Automator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-85-security-review",
+    "block": "module-7/block-15",
+    "slug": "quest-85",
+    "difficulty": "medium",
+    "title": "Security Review Automator"
+  }
+}

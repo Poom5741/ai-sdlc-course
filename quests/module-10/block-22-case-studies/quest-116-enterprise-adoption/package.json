@@ -1,0 +1,17 @@
+{
+  "name": "quest-116-enterprise-adoption",
+  "version": "1.0.0",
+  "description": "Quest 22.2: Enterprise AI Adoption Plan",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-116-enterprise-adoption",
+    "block": "module-10/block-22",
+    "slug": "quest-116",
+    "difficulty": "medium",
+    "title": "Enterprise AI Adoption Plan"
+  }
+}

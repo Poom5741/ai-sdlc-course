@@ -1,0 +1,17 @@
+{
+  "name": "quest-122-history-analyzer",
+  "version": "1.0.0",
+  "description": "Quest 23.4: Git History Analyzer - detect bad patterns",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-122-history-analyzer",
+    "block": "module-11/block-23",
+    "slug": "quest-122",
+    "difficulty": "medium",
+    "title": "Git History Analyzer"
+  }
+}

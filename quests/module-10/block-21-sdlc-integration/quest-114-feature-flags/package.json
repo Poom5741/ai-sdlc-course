@@ -1,0 +1,17 @@
+{
+  "name": "quest-114-feature-flags",
+  "version": "1.0.0",
+  "description": "Quest 21.4: Feature Flag System",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-114-feature-flags",
+    "block": "module-10/block-21",
+    "slug": "quest-114",
+    "difficulty": "medium",
+    "title": "Feature Flag System with AI Recommendations"
+  }
+}

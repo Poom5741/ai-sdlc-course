@@ -1,0 +1,17 @@
+{
+  "name": "quest-133-kv-manager",
+  "version": "1.0.0",
+  "description": "Quest 26.1: KV Store Manager - namespaced CRUD operations",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-133-kv-manager",
+    "block": "module-12/block-26",
+    "slug": "quest-133",
+    "difficulty": "easy",
+    "title": "KV Store Manager"
+  }
+}

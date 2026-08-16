@@ -1,0 +1,11 @@
+{
+  "name": "quest-42-regression-test-predictor",
+  "version": "1.0.0",
+  "description": "Quest 42: Regression Test Predictor",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": { "id": "quest-42-regression-test-predictor", "block": "module-3/block-c", "slug": "quest-42", "difficulty": "hard", "title": "Regression Test Predictor" }
+}

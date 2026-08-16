@@ -1,0 +1,24 @@
+{
+  "name": "quest-43-sql-injection-spotter",
+  "version": "1.0.0",
+  "description": "Quest 4.1: SQL Injection Spotter - find SQL injection vulnerabilities in code",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "module-4"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-43-sql-injection-spotter",
+    "block": "module-4/block-8",
+    "slug": "quest-43",
+    "difficulty": "easy",
+    "title": "SQL Injection Spotter"
+  }
+}

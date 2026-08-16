@@ -1,0 +1,17 @@
+{
+  "name": "quest-135-r2-uploader",
+  "version": "1.0.0",
+  "description": "Quest 26.3: R2 Object Uploader - presigned URLs and multipart",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-135-r2-uploader",
+    "block": "module-12/block-26",
+    "slug": "quest-135",
+    "difficulty": "medium",
+    "title": "R2 Object Uploader"
+  }
+}

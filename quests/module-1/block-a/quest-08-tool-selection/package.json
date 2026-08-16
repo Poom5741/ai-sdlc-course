@@ -1,0 +1,17 @@
+{
+  "name": "quest-08-tool-selection",
+  "version": "1.0.0",
+  "description": "Quest 1.8: AI Tool Selection Matrix",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-08-tool-selection",
+    "block": "module-1/block-a",
+    "slug": "quest-8",
+    "difficulty": "medium",
+    "title": "AI Tool Selection Matrix"
+  }
+}

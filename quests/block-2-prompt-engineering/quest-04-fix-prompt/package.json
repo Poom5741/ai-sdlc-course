@@ -13,5 +13,11 @@
     "block-2"
   ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-04-fix-prompt",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-4",
+    "difficulty": "medium"
+  }
 }

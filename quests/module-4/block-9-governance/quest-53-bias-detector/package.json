@@ -1,0 +1,17 @@
+{
+  "name": "quest-53-bias-detector",
+  "version": "1.0.0",
+  "description": "Quest 4.11: Bias Detector - detect bias using fairness metrics",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-53-bias-detector",
+    "block": "module-4/block-9",
+    "slug": "quest-53",
+    "difficulty": "medium",
+    "title": "Bias Detector"
+  }
+}

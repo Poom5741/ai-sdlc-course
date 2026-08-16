@@ -2,311 +2,365 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="BlueBeltDojo | AI SDLC Workshop">
-  <!-- Noise Overlay -->
-  <div class="noise-overlay"></div>
-
+<BaseLayout title="BlueBeltDojo | Master AI-Powered Software Development">
   <!-- Header -->
-  <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-on-surface/10">
-    <div class="h-20 max-w-container mx-auto px-6 lg:px-12 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <span class="font-headline-md text-headline-md tracking-widest uppercase text-on-surface font-light">BlueBeltDojo</span>
-      </div>
-      <nav class="hidden md:flex items-center gap-12">
-        <a class="font-label-caps text-label-caps tracking-widest uppercase text-on-surface/60 hover:text-on-surface transition-colors" href="/workshop/overview">Workshop</a>
-        <a class="font-label-caps text-label-caps tracking-widest uppercase text-on-surface/60 hover:text-on-surface transition-colors" href="/sitemap">Sitemap</a>
-        <a class="font-label-caps text-label-caps tracking-widest uppercase text-on-surface/60 hover:text-on-surface transition-colors" href="#curriculum">Curriculum</a>
-        <a class="font-label-caps text-label-caps tracking-widest uppercase text-on-surface/60 hover:text-on-surface transition-colors" href="#faq">FAQ</a>
+  <header class="fixed top-0 w-full z-50 bg-[#FAFAF9]/90 backdrop-blur-md border-b border-[#E7E5E4]">
+    <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="/" class="font-['DM_Sans'] text-xl tracking-widest uppercase text-[#1C1917]">BlueBeltDojo</a>
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors" href="#curriculum">Curriculum</a>
+        <a class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors" href="#belts">Belts</a>
+        <a class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors" href="#faq">FAQ</a>
+        <a class="text-sm uppercase tracking-wider text-[#78716C] hover:text-[#1C1917] transition-colors" href="/community">Community</a>
       </nav>
-      <div class="flex items-center gap-8">
-        <button class="border border-on-surface text-on-surface px-8 py-3 font-label-caps text-label-caps uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-all duration-300">Earn Your Belt</button>
+      <div class="flex items-center gap-4">
+        <a href="/login" class="text-sm text-[#78716C] hover:text-[#1C1917]">Sign In</a>
+        <a href="/login" class="bg-[#059669] text-white px-6 py-2 font-['DM_Sans'] text-sm uppercase tracking-wider rounded hover:bg-[#047857] transition-colors">
+          Sign In
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="w-full pt-32 pb-32 relative z-10 max-w-container mx-auto px-6 lg:px-12">
-    <div class="tatami-container">
-
-      <!-- HERO SECTION -->
-      <section class="tatami-mat col-span-12 min-h-[80vh] flex flex-col justify-center reveal active">
-        <div class="flex flex-col md:flex-row gap-16 items-start z-10">
-          <div class="w-12 pt-4 hidden md:block">
-            <p class="vertical-text font-serif text-xl tracking-[0.5em] text-on-surface/40 uppercase">AI SDLC · INTENSIVE</p>
-          </div>
-          <div class="flex flex-col gap-12 flex-1 max-w-4xl">
-            <h1 class="font-serif text-7xl md:text-9xl text-on-surface tracking-tighter leading-[0.85] font-light">
-              Train Your<br/>
-              <span class="font-black text-wabi-accent">AI Coding</span><br/>
-              Like You<br/>
-              Train BJJ.
-            </h1>
-            <div class="w-24 h-[2px] bg-on-surface/20"></div>
-            <p class="font-body-base text-body-base text-on-surface/80 max-w-xl text-xl font-light leading-relaxed">
-              Most people vibe code... At BlueBeltDojo, you earn your blue belt — with drills, discipline, and real agentic workflows.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-6 mt-4">
-              <button class="bg-wabi-accent text-white px-10 py-5 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:opacity-90 shadow-lg shadow-wabi-accent/20">
-                Earn Your Blue Belt
-              </button>
-              <button class="bg-transparent border border-on-surface/20 text-on-surface px-10 py-5 font-label-caps text-label-caps uppercase tracking-widest hover:border-on-surface transition-colors">
-                Curriculum
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SOCIAL PROOF -->
-      <section class="tatami-mat col-span-12 py-12 reveal">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-center gap-12">
-          <span class="font-label-caps text-label-caps text-on-surface/50 uppercase tracking-widest whitespace-nowrap">Training alongside</span>
-          <div class="flex flex-wrap gap-8 items-center justify-center">
-            <div class="font-body-sm text-body-sm text-on-surface/80 tracking-widest uppercase">Startup Founders</div>
-            <div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
-            <div class="font-body-sm text-body-sm text-on-surface/80 tracking-widest uppercase">Senior Engineers</div>
-            <div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
-            <div class="font-body-sm text-body-sm text-on-surface/80 tracking-widest uppercase">Product Managers</div>
-            <div class="w-1 h-1 bg-wabi-accent rounded-full"></div>
-            <div class="font-body-sm text-body-sm text-on-surface/80 tracking-widest uppercase">Technical Leads</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MASTERY + PAIN POINTS (Split) -->
-      <section class="tatami-mat col-span-12 md:col-span-6 min-h-[60vh] flex flex-col justify-center reveal items-center text-center relative overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none flex items-center justify-center">
-          <span class="font-serif text-[400px] text-wabi-accent leading-none">道</span>
-        </div>
-        <div class="relative z-10 flex flex-col items-center">
-          <h2 class="font-serif text-5xl text-on-surface mb-6">The Path of Mastery</h2>
-          <p class="font-body-base text-on-surface/70 max-w-sm">Repetition breeds intuition. Command AI agents with the precision of a seasoned black belt.</p>
-        </div>
-      </section>
-
-      <section class="tatami-mat col-span-12 md:col-span-6 min-h-[60vh] flex flex-col justify-center reveal">
-        <div class="flex flex-col gap-12">
-          <div>
-            <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-              Still<br/>Rolling<br/><span class="font-black italic text-on-surface">White Belt</span><br/>Energy?
-            </h2>
-          </div>
-          <div class="flex flex-col gap-10 border-t border-on-surface/10 pt-10">
-            <div class="flex gap-6 items-start">
-              <span class="font-serif text-3xl text-wabi-accent font-black">01</span>
-              <p class="font-body-base text-on-surface/80 text-lg font-light leading-relaxed">You paste AI code straight into prod... and pray nothing breaks.</p>
-            </div>
-            <div class="flex gap-6 items-start">
-              <span class="font-serif text-3xl text-wabi-accent font-black">02</span>
-              <p class="font-body-base text-on-surface/80 text-lg font-light leading-relaxed">Your AI-generated code has SQL injections that a junior could spot.</p>
-            </div>
-            <div class="flex gap-6 items-start">
-              <span class="font-serif text-3xl text-wabi-accent font-black">03</span>
-              <p class="font-body-base text-on-surface/80 text-lg font-light leading-relaxed">You've heard of "agents"... but have no idea how to actually command them.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CURRICULUM OVERVIEW -->
-      <section id="curriculum" class="tatami-mat col-span-12 py-24 reveal">
-        <div class="flex flex-col items-center text-center gap-12">
-          <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">The Curriculum</span>
-          <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-            Five Blocks.<br/>One Day.<br/><span class="font-black text-wabi-accent">Blue Belt.</span>
-          </h2>
-          <div class="w-24 h-[2px] bg-on-surface/20"></div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 max-w-4xl w-full">
-            <div class="bg-surface-container border border-on-surface/10 p-8 text-left">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">Block 1</span>
-              <h3 class="font-headline-md text-headline-md text-on-surface mt-4 mb-3">AI Tools Setup</h3>
-              <p class="font-body-sm text-body-sm text-on-surface/60">GitHub Copilot, Claude Code, CodeRabbit — configure your arsenal.</p>
-            </div>
-            <div class="bg-surface-container border border-on-surface/10 p-8 text-left">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">Block 2</span>
-              <h3 class="font-headline-md text-headline-md text-on-surface mt-4 mb-3">Prompt Engineering</h3>
-              <p class="font-body-sm text-body-sm text-on-surface/60">From vague prompts to structured instructions that ship.</p>
-            </div>
-            <div class="bg-surface-container border border-on-surface/10 p-8 text-left">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">Block 3</span>
-              <h3 class="font-headline-md text-headline-md text-on-surface mt-4 mb-3">Security & Review</h3>
-              <p class="font-body-sm text-body-sm text-on-surface/60">Find the SQL injections. Spot the hallucinations. Ship clean.</p>
-            </div>
-          </div>
-          <button class="mt-8 bg-wabi-accent text-white px-10 py-5 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:opacity-90 shadow-lg shadow-wabi-accent/20">
-            View Full Curriculum
-          </button>
-        </div>
-      </section>
-
-      <!-- SCHEDULE -->
-      <section id="schedule" class="tatami-mat col-span-12 py-24 reveal">
-        <div class="flex flex-col items-center text-center gap-12">
-          <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">Schedule</span>
-          <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-            One Day.<br/><span class="font-black text-wabi-accent">8 Hours.</span>
-          </h2>
-          <div class="w-full max-w-2xl mt-8">
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">09:00</span>
-              <span class="font-body-base text-body-base text-on-surface">Registration & Setup</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">09:30</span>
-              <span class="font-body-base text-body-base text-on-surface">Block 1: AI Tools</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">11:00</span>
-              <span class="font-body-base text-body-base text-on-surface">Block 2: Prompt Engineering</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">13:00</span>
-              <span class="font-body-base text-body-base text-on-surface">Lunch Break</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">14:00</span>
-              <span class="font-body-base text-body-base text-on-surface">Block 3: Security & Review</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">15:30</span>
-              <span class="font-body-base text-body-base text-on-surface">Block 4: Agentic Loops</span>
-            </div>
-            <div class="flex items-center gap-8 py-6 border-b border-on-surface/10">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">17:00</span>
-              <span class="font-body-base text-body-base text-on-surface">Block 5: Architecture</span>
-            </div>
-            <div class="flex items-center gap-8 py-6">
-              <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest w-24 text-left">17:30</span>
-              <span class="font-body-base text-body-base text-on-surface">Wrap-up & Belt Ceremony</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- REVIEWS -->
-      <section id="reviews" class="tatami-mat col-span-12 py-24 reveal">
-        <div class="flex flex-col items-center text-center gap-12">
-          <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">Reviews</span>
-          <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-            What <span class="font-black text-wabi-accent">Trainees</span> Say
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-4xl w-full">
-            <div class="bg-surface-container border border-on-surface/10 p-8 text-left">
-              <p class="font-body-base text-on-surface/80 text-lg font-light leading-relaxed mb-6">
-                "I went from copy-pasting ChatGPT output to actually commanding AI agents. The security block alone was worth it."
-              </p>
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-primary-container flex items-center justify-center text-on-primary-container font-headline-md text-sm">SK</div>
-                <div>
-                  <p class="font-body-sm text-body-sm text-on-surface font-semibold">Senior Engineer</p>
-                  <p class="font-body-sm text-body-sm text-on-surface/50">Bangkok</p>
-                </div>
-              </div>
-            </div>
-            <div class="bg-surface-container border border-on-surface/10 p-8 text-left">
-              <p class="font-body-base text-on-surface/80 text-lg font-light leading-relaxed mb-6">
-                "As a non-coder, I now understand how to work with AI to build real software. The belt system made it click."
-              </p>
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-headline-md text-sm">PM</div>
-                <div>
-                  <p class="font-body-sm text-body-sm text-on-surface font-semibold">Product Manager</p>
-                  <p class="font-body-sm text-body-sm text-on-surface/50">Chiang Mai</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FAQ -->
-      <section id="faq" class="tatami-mat col-span-12 py-24 reveal">
-        <div class="flex flex-col items-center text-center gap-12">
-          <span class="font-label-caps text-label-caps text-wabi-accent uppercase tracking-widest">FAQ</span>
-          <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-            Frequently <span class="font-black text-wabi-accent">Asked</span>
-          </h2>
-          <div class="w-full max-w-2xl mt-8 text-left">
-            <div class="py-6 border-b border-on-surface/10">
-              <h3 class="font-headline-md text-headline-md text-on-surface mb-3">Do I need coding experience?</h3>
-              <p class="font-body-base text-on-surface/70">No. The workshop is designed for both non-tech beginners and experienced devs. Same content, different entry points.</p>
-            </div>
-            <div class="py-6 border-b border-on-surface/10">
-              <h3 class="font-headline-md text-headline-md text-on-surface mb-3">What tools do I need?</h3>
-              <p class="font-body-base text-on-surface/70">A laptop with a code editor (VS Code recommended). We'll set up GitHub Copilot, Claude Code, and CodeRabbit during Block 1.</p>
-            </div>
-            <div class="py-6 border-b border-on-surface/10">
-              <h3 class="font-headline-md text-headline-md text-on-surface mb-3">What's a CTF challenge?</h3>
-              <p class="font-body-base text-on-surface/70">Capture The Flag — hands-on exercises where you solve specific problems. Think: find the SQL injection, fix the broken prompt, architect the system.</p>
-            </div>
-            <div class="py-6">
-              <h3 class="font-headline-md text-headline-md text-on-surface mb-3">Do I earn a real belt?</h3>
-              <p class="font-body-base text-on-surface/70">A blue belt sticker and certificate, yes. The belt system is our progression framework — each block earns you a stripe toward blue belt.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CTA -->
-      <section class="tatami-mat col-span-12 py-24 reveal">
-        <div class="flex flex-col items-center text-center gap-12">
-          <h2 class="font-serif text-5xl md:text-6xl text-on-surface leading-tight font-light">
-            Ready to <span class="font-black text-wabi-accent">Train</span>?
-          </h2>
-          <p class="font-body-base text-on-surface/70 text-lg max-w-lg">
-            Stop vibe coding. Start shipping clean. Earn your blue belt in one intensive day.
+  <main class="pt-20">
+    <!-- HERO -->
+    <section class="min-h-[90vh] flex items-center bg-[#FAFAF9]">
+      <div class="max-w-6xl mx-auto px-6 py-24">
+        <div class="max-w-3xl">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-6 block">AI-Powered Software Development</span>
+          <h1 class="font-['DM_Serif_Display'] text-6xl md:text-7xl text-[#1C1917] leading-tight mb-8">
+            Master AI Coding<br/>
+            <span class="text-[#059669]">Like a Black Belt</span>
+          </h1>
+          <p class="text-xl text-[#78716C] mb-10 max-w-2xl">
+            129 hands-on quests. 3 capstone projects. A belt progression system that takes you from vibe coder to AI-powered engineer.
           </p>
-          <button class="bg-wabi-accent text-white px-12 py-6 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:opacity-90 shadow-lg shadow-wabi-accent/20 text-lg">
-            Earn Your Blue Belt
-          </button>
+          <div class="flex flex-wrap gap-4">
+            <a href="/login" class="bg-[#059669] text-white px-10 py-4 font-['DM_Sans'] font-bold uppercase tracking-wider rounded hover:bg-[#047857] transition-colors text-lg">
+              Start Training
+            </a>
+            <a href="#curriculum" class="border border-[#E7E5E4] text-[#1C1917] px-10 py-4 font-['DM_Sans'] uppercase tracking-wider rounded hover:border-[#1C1917] transition-colors">
+              View Curriculum
+            </a>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </div>
+    <!-- STATS -->
+    <section class="bg-white border-y border-[#E7E5E4] py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <p class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">129</p>
+            <p class="text-sm text-[#78716C] uppercase tracking-wider">Quests</p>
+          </div>
+          <div>
+            <p class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">10</p>
+            <p class="text-sm text-[#78716C] uppercase tracking-wider">Modules</p>
+          </div>
+          <div>
+            <p class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">3</p>
+            <p class="text-sm text-[#78716C] uppercase tracking-wider">Capstones</p>
+          </div>
+          <div>
+            <p class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">5</p>
+            <p class="text-sm text-[#78716C] uppercase tracking-wider">Belts</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEFORE/AFTER -->
+    <section class="py-24 bg-[#FAFAF9]">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">The Problem</span>
+          <h2 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">Stop Vibe Coding.<br/>Start Engineering.</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-white border border-[#E7E5E4] p-8 rounded-lg">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-2xl">😰</span>
+              <h3 class="font-['DM_Sans'] font-bold text-[#DC2626] uppercase tracking-wider">Vibe Coding</h3>
+            </div>
+            <ul class="space-y-3 text-[#78716C]">
+              <li class="flex items-start gap-2">
+                <span class="text-[#DC2626]">✕</span>
+                <span>Copy-pasting AI output without understanding</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#DC2626]">✕</span>
+                <span>SQL injections in production code</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#DC2626]">✕</span>
+                <span>No tests, no security, no monitoring</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#DC2626]">✕</span>
+                <span>Hoping nothing breaks</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-white border border-[#059669] p-8 rounded-lg">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-2xl">💪</span>
+              <h3 class="font-['DM_Sans'] font-bold text-[#059669] uppercase tracking-wider">AI Engineering</h3>
+            </div>
+            <ul class="space-y-3 text-[#78716C]">
+              <li class="flex items-start gap-2">
+                <span class="text-[#059669]">✓</span>
+                <span>Understand and command AI tools effectively</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#059669]">✓</span>
+                <span>Security-first development practices</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#059669]">✓</span>
+                <span>Tested, monitored, production-ready code</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#059669]">✓</span>
+                <span>Confident, repeatable engineering</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CURRICULUM -->
+    <section id="curriculum" class="py-24 bg-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">The Curriculum</span>
+          <h2 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917] mb-4">10 Modules. 129 Quests.</h2>
+          <p class="text-[#78716C] max-w-2xl mx-auto">
+            A comprehensive journey from AI fundamentals to production-ready systems.
+          </p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 1</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Foundations of AI & LLM Technology</h3>
+            <p class="text-sm text-[#78716C]">12 quests • AI tools, transformers, model architectures</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 2</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">LLM Training & Capabilities</h3>
+            <p class="text-sm text-[#78716C]">10 quests • Training, fine-tuning, RAG, embeddings</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 3</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">AI Tools for Each SDLC Phase</h3>
+            <p class="text-sm text-[#78716C]">20 quests • Planning, development, testing with AI</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 4</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Security, Governance & Deployment</h3>
+            <p class="text-sm text-[#78716C]">20 quests • Security, compliance, DevOps</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 5</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Advanced AI Patterns</h3>
+            <p class="text-sm text-[#78716C]">10 quests • Agentic workflows, production patterns</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 6</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Prompt Engineering Deep Dive</h3>
+            <p class="text-sm text-[#78716C]">10 quests • Advanced prompting techniques</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 7</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Code Review & Documentation</h3>
+            <p class="text-sm text-[#78716C]">10 quests • AI-assisted review and docs</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 8</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Refactoring & Migration</h3>
+            <p class="text-sm text-[#78716C]">10 quests • Modernization with AI</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 9</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Ethics, Accessibility & Multimodal</h3>
+            <p class="text-sm text-[#78716C]">8 quests • Responsible AI, multimodal systems</p>
+          </div>
+          <div class="bg-[#FAFAF9] border border-[#E7E5E4] p-6 rounded-lg">
+            <span class="text-sm text-[#D97706] font-bold">Module 10</span>
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Integration & Real-World</h3>
+            <p class="text-sm text-[#78716C]">8 quests • Full SDLC, case studies</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BELT PROGRESSION -->
+    <section id="belts" class="py-24 bg-[#1C1917] text-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">The Journey</span>
+          <h2 class="font-['DM_Serif_Display'] text-4xl mb-4">Earn Your Belt</h2>
+          <p class="text-[#A8A29E] max-w-2xl mx-auto">
+            Progress through the ranks as you complete quests and capstones.
+          </p>
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
+          <div class="flex flex-col items-center p-4">
+            <div class="w-16 h-16 rounded-full bg-white mb-3"></div>
+            <p class="font-bold">White</p>
+            <p class="text-sm text-[#A8A29E]">Start here</p>
+          </div>
+          <div class="hidden md:block w-12 h-1 bg-[#44403C]"></div>
+          <div class="flex flex-col items-center p-4">
+            <div class="w-16 h-16 rounded-full bg-[#2563EB] mb-3"></div>
+            <p class="font-bold">Blue</p>
+            <p class="text-sm text-[#A8A29E]">20 quests + Capstone 1</p>
+          </div>
+          <div class="hidden md:block w-12 h-1 bg-[#44403C]"></div>
+          <div class="flex flex-col items-center p-4">
+            <div class="w-16 h-16 rounded-full bg-[#9333EA] mb-3"></div>
+            <p class="font-bold">Purple</p>
+            <p class="text-sm text-[#A8A29E]">50 quests + Capstone 2</p>
+          </div>
+          <div class="hidden md:block w-12 h-1 bg-[#44403C]"></div>
+          <div class="flex flex-col items-center p-4">
+            <div class="w-16 h-16 rounded-full bg-[#92400E] mb-3"></div>
+            <p class="font-bold">Brown</p>
+            <p class="text-sm text-[#A8A29E]">90 quests + Capstone 3</p>
+          </div>
+          <div class="hidden md:block w-12 h-1 bg-[#44403C]"></div>
+          <div class="flex flex-col items-center p-4">
+            <div class="w-16 h-16 rounded-full bg-[#F5F5F4] mb-3"></div>
+            <p class="font-bold">Black</p>
+            <p class="text-sm text-[#A8A29E]">118 quests</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAPSTONES -->
+    <section class="py-24 bg-[#FAFAF9]">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">Capstone Projects</span>
+          <h2 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917] mb-4">What You'll Build</h2>
+          <p class="text-[#78716C] max-w-2xl mx-auto">
+            Real projects that demonstrate real skills. Not toy examples.
+          </p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-white border border-[#E7E5E4] p-8 rounded-lg">
+            <div class="text-sm text-[#D97706] font-bold mb-2">Capstone 1</div>
+            <h3 class="font-['DM_Serif_Display'] text-2xl text-[#1C1917] mb-4">AI-Assisted API Service</h3>
+            <p class="text-[#78716C] text-sm mb-4">
+              Build a complete REST API from requirements to deployment using AI tools throughout the SDLC.
+            </p>
+            <p class="text-xs text-[#A8A29E] uppercase tracking-wider">White → Blue Belt</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-8 rounded-lg">
+            <div class="text-sm text-[#D97706] font-bold mb-2">Capstone 2</div>
+            <h3 class="font-['DM_Serif_Display'] text-2xl text-[#1C1917] mb-4">Multi-Agent System</h3>
+            <p class="text-[#78716C] text-sm mb-4">
+              Design and build a system of collaborating AI agents with tool integration and observability.
+            </p>
+            <p class="text-xs text-[#A8A29E] uppercase tracking-wider">Blue → Purple Belt</p>
+          </div>
+          <div class="bg-white border border-[#E7E5E4] p-8 rounded-lg">
+            <div class="text-sm text-[#D97706] font-bold mb-2">Capstone 3</div>
+            <h3 class="font-['DM_Serif_Display'] text-2xl text-[#1C1917] mb-4">Production AI App</h3>
+            <p class="text-[#78716C] text-sm mb-4">
+              Ship a real AI-powered application with monitoring, cost management, and security.
+            </p>
+            <p class="text-xs text-[#A8A29E] uppercase tracking-wider">Purple → Brown Belt</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-24 bg-white">
+      <div class="max-w-3xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-sm uppercase tracking-[0.3em] text-[#D97706] mb-4 block">FAQ</span>
+          <h2 class="font-['DM_Serif_Display'] text-4xl text-[#1C1917]">Questions & Answers</h2>
+        </div>
+        <div class="space-y-6">
+          <div class="border-b border-[#E7E5E4] pb-6">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Do I need coding experience?</h3>
+            <p class="text-[#78716C]">Basic programming knowledge helps, but the course teaches you how to leverage AI tools effectively. Start with the free preview to gauge the level.</p>
+          </div>
+          <div class="border-b border-[#E7E5E4] pb-6">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">How long does it take?</h3>
+            <p class="text-[#78716C]">Most learners complete the course in 4-8 weeks, spending a few hours per day. The belt system lets you progress at your own pace.</p>
+          </div>
+          <div class="border-b border-[#E7E5E4] pb-6">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">What tools do I need?</h3>
+            <p class="text-[#78716C]">A laptop with VS Code and access to AI tools like GitHub Copilot or Claude. We help you set everything up in Module 1.</p>
+          </div>
+          <div class="border-b border-[#E7E5E4] pb-6">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">Are the certificates recognized?</h3>
+            <p class="text-[#78716C]">Our certificates verify demonstrated skills through hands-on projects. Share them on LinkedIn — employers value what you can do over credentials.</p>
+          </div>
+          <div class="border-b border-[#E7E5E4] pb-6">
+            <h3 class="font-['DM_Sans'] font-bold text-[#1C1917] mb-2">What if I'm not satisfied?</h3>
+            <p class="text-[#78716C]">We offer a 7-day money-back guarantee. Try the full course risk-free.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="py-24 bg-[#059669] text-white">
+      <div class="max-w-3xl mx-auto px-6 text-center">
+        <h2 class="font-['DM_Serif_Display'] text-4xl md:text-5xl mb-6">Ready to Train?</h2>
+          <p class="text-lg mb-10 opacity-90">
+          Access your course content and start training.
+        </p>
+        <a href="/login" class="inline-block bg-white text-[#059669] px-12 py-5 font-['DM_Sans'] font-bold uppercase tracking-wider rounded-lg hover:bg-gray-100 transition-colors text-lg">
+          Sign In to Start
+        </a>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
-  <footer class="w-full border-t border-on-surface/10 bg-surface py-24">
-    <div class="max-w-container mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between gap-16">
-      <div class="max-w-sm">
-        <div class="flex items-center gap-4 mb-8">
-          <span class="font-headline-md text-headline-md tracking-widest uppercase text-on-surface font-light text-xl">BlueBeltDojo</span>
+  <footer class="bg-[#1C1917] text-white py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-12 mb-12">
+        <div>
+          <span class="font-['DM_Sans'] text-lg tracking-widest uppercase">BlueBeltDojo</span>
+          <p class="text-[#A8A29E] mt-4 text-sm">Master AI-powered software development through hands-on practice.</p>
         </div>
-        <p class="font-serif text-on-surface/60 mb-6 italic text-lg">Train hard. Ship clean. Earn your belt.</p>
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-sm mb-4">Course</h4>
+          <ul class="space-y-2 text-[#A8A29E] text-sm">
+            <li><a href="#curriculum" class="hover:text-white transition-colors">Curriculum</a></li>
+            <li><a href="#belts" class="hover:text-white transition-colors">Belt System</a></li>
+            <li><a href="/login" class="hover:text-white transition-colors">Sign In</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-sm mb-4">Community</h4>
+          <ul class="space-y-2 text-[#A8A29E] text-sm">
+            <li><a href="/community" class="hover:text-white transition-colors">Discord</a></li>
+            <li><a href="/dashboard" class="hover:text-white transition-colors">Dashboard</a></li>
+            <li><a href="/login" class="hover:text-white transition-colors">Sign In</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold uppercase tracking-wider text-sm mb-4">Resources</h4>
+          <ul class="space-y-2 text-[#A8A29E] text-sm">
+            <li><a href="https://github.com/Poom5741/ai-sdlc-course" class="hover:text-white transition-colors">GitHub</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Support</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="grid grid-cols-2 gap-16">
-        <div class="flex flex-col gap-6">
-          <h4 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest font-bold">Academy</h4>
-          <a class="font-body-sm text-body-sm text-on-surface/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#curriculum">Curriculum</a>
-          <a class="font-body-sm text-body-sm text-on-surface/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#faq">FAQ</a>
-          <a class="font-body-sm text-body-sm text-on-surface/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#schedule">Schedule</a>
-        </div>
-        <div class="flex flex-col gap-6">
-          <h4 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest font-bold">Connect</h4>
-          <a class="font-body-sm text-body-sm text-on-surface/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="https://github.com/Poom5741/ai-sdlc-course" target="_blank">GitHub</a>
-          <a class="font-body-sm text-body-sm text-on-surface/60 hover:text-wabi-accent transition-colors uppercase tracking-wider" href="#">Discord</a>
-        </div>
+      <div class="border-t border-[#44403C] pt-8 text-center text-[#78716C] text-sm">
+        <p>© 2024 BlueBeltDojo. All rights reserved.</p>
       </div>
-    </div>
-    <div class="max-w-container mx-auto px-6 lg:px-12 mt-24 pt-8 border-t border-on-surface/10">
-      <p class="font-body-sm text-body-sm text-on-surface/40 tracking-widest uppercase text-center text-xs">© 2024 BlueBeltDojo. All rights reserved.</p>
     </div>
   </footer>
-
-  <!-- Scroll Reveal Script -->
-  <script>
-    function reveal() {
-      const reveals = document.querySelectorAll('.reveal');
-      for (let i = 0; i < reveals.length; i++) {
-        const windowHeight = window.innerHeight;
-        const elementTop = reveals[i].getBoundingClientRect().top;
-        const elementVisible = 150;
-        if (elementTop < windowHeight - elementVisible) {
-          reveals[i].classList.add('active');
-        }
-      }
-    }
-    window.addEventListener('scroll', reveal);
-    reveal();
-  </script>
 </BaseLayout>

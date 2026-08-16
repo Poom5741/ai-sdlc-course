@@ -1,0 +1,89 @@
+---
+title: "Multi-Agent System"
+description: "Build a multi-agent system with tool integration, testing, and deployment"
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+# Multi-Agent System
+
+<Badge text="Blue → Purple Belt" variant="caution" /> <Badge text="Multi-day project" variant="note" />
+
+## Overview
+
+Build a multi-agent system that can solve complex tasks through agent collaboration. This capstone tests your understanding of agentic workflows, tool use, and multi-agent coordination.
+
+## Prerequisites
+
+- **Current Belt:** Blue
+- **Quests Completed:** At least 50 quests
+- **Modules Covered:** Module 1-5
+
+## Requirements
+
+### Phase 1: Design (Day 1-2)
+- [ ] Design agent architecture (manager-worker, peer-to-peer, or hierarchical)
+- [ ] Define agent roles and responsibilities
+- [ ] Design tool interfaces for agent capabilities
+- [ ] Create interaction diagrams showing agent communication
+
+### Phase 2: Implementation (Day 3-5)
+- [ ] Implement at least 3 specialized agents
+- [ ] Build a coordinator/orchestrator agent
+- [ ] Implement tool registry and dynamic tool loading
+- [ ] Add inter-agent communication (message passing or shared state)
+- [ ] Implement error handling and fallback strategies
+
+### Phase 3: Testing (Day 6)
+- [ ] Unit tests for individual agents
+- [ ] Integration tests for agent interactions
+- [ ] Load testing with multiple concurrent tasks
+- [ ] Failure scenario testing (agent crashes, tool failures)
+
+### Phase 4: Polish & Deploy (Day 7)
+- [ ] Add logging and observability
+- [ ] Create monitoring dashboard
+- [ ] Deploy with proper documentation
+- [ ] Write architecture documentation
+
+## Example Projects
+
+Choose one or propose your own:
+
+1. **Code Review Bot** - Multiple agents reviewing code from different angles (security, performance, style)
+2. **Research Assistant** - Agents that search, analyze, and synthesize information
+3. **Task Automation** - Agents that break down complex tasks and execute them
+4. **Data Pipeline** - Agents that extract, transform, and load data from multiple sources
+
+## Rubric
+
+| Criteria | Weight | Description |
+|----------|--------|-------------|
+| **Architecture** | 30% | Clean agent design, proper separation, extensible |
+| **Agent Quality** | 25% | Agents are focused, effective, and handle errors |
+| **Tool Integration** | 20% | Tools are well-designed and properly used |
+| **Testing** | 15% | Comprehensive test coverage for agents and tools |
+| **Documentation** | 10% | Clear docs on architecture and usage |
+
+## Getting Started
+
+```bash
+npx bluebeltdojo download capstone-2-multi-agent
+cd capstone-2-multi-agent
+```
+
+## Key Concepts to Demonstrate
+
+- **Agent Loop** - Observe → Think → Act cycles
+- **Tool Use** - Dynamic tool selection and execution
+- **Multi-Agent Coordination** - Agents working together
+- **Error Handling** - Graceful degradation when agents fail
+- **Observability** - Logging and monitoring agent behavior
+
+## Tips
+
+- Start with a simple 2-agent system and expand
+- Use the patterns from Quest 65 (Multi-Agent Debate) and Quest 66 (Hierarchical Agent Team)
+- Implement proper logging from the start
+- Test failure scenarios - agents WILL fail
+- Document your design decisions in ADRs

@@ -1,0 +1,17 @@
+{
+  "name": "quest-23-user-story-generator",
+  "version": "1.0.0",
+  "description": "Quest 3.1: User Story Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-3"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-23-user-story-generator",
+    "block": "module-3/block-a",
+    "slug": "quest-23",
+    "difficulty": "easy",
+    "title": "User Story Generator"
+  }
+}

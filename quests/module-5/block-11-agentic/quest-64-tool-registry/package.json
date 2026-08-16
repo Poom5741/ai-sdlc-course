@@ -1,0 +1,17 @@
+{
+  "name": "quest-64-tool-registry",
+  "version": "1.0.0",
+  "description": "Quest 5.2: Tool Registry System - dynamic tool loading",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-5"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-64-tool-registry",
+    "block": "module-5/block-11",
+    "slug": "quest-64",
+    "difficulty": "medium",
+    "title": "Tool Registry System"
+  }
+}

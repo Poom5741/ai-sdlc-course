@@ -1,0 +1,17 @@
+{
+  "name": "quest-07-vibe-coding-analysis",
+  "version": "1.0.0",
+  "description": "Quest 1.7: Vibe Coding vs Vibe Engineering Analysis",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-1"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-07-vibe-coding-analysis",
+    "block": "module-1/block-a",
+    "slug": "quest-7",
+    "difficulty": "medium",
+    "title": "Vibe Coding vs Vibe Engineering Analysis"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "quest-105-ethical-framework",
+  "version": "1.0.0",
+  "description": "Quest 19.3: Ethical Decision Framework",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-9"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-105-ethical-framework",
+    "block": "module-9/block-19",
+    "slug": "quest-105",
+    "difficulty": "medium",
+    "title": "Ethical Decision Framework"
+  }
+}

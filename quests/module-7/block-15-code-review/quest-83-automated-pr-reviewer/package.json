@@ -1,0 +1,19 @@
+{
+  "name": "quest-83-automated-pr-reviewer",
+  "version": "1.0.0",
+  "description": "Quest 15.1: Automated PR Reviewer - pattern-based code review",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-7"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-83-automated-pr-reviewer",
+    "block": "module-7/block-15",
+    "slug": "quest-83",
+    "difficulty": "easy",
+    "title": "Automated PR Reviewer"
+  }
+}

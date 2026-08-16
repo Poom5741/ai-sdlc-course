@@ -1,0 +1,17 @@
+{
+  "name": "quest-54-ai-usage-policy",
+  "version": "1.0.0",
+  "description": "Quest 4.12: AI Usage Policy Generator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-54-ai-usage-policy",
+    "block": "module-4/block-9",
+    "slug": "quest-54",
+    "difficulty": "medium",
+    "title": "AI Usage Policy Generator"
+  }
+}

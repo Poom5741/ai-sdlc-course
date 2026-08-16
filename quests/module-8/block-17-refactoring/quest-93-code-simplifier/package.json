@@ -1,0 +1,17 @@
+{
+  "name": "quest-93-code-simplifier",
+  "version": "1.0.0",
+  "description": "Quest 17.1: Code Simplifier",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-93-code-simplifier",
+    "block": "module-8/block-17",
+    "slug": "quest-93",
+    "difficulty": "easy",
+    "title": "Code Simplifier"
+  }
+}

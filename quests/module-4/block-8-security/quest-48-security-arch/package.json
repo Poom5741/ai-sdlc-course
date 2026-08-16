@@ -1,0 +1,17 @@
+{
+  "name": "quest-48-security-arch",
+  "version": "1.0.0",
+  "description": "Quest 4.6: Security Architecture Design - design security for AI apps",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-4"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-48-security-arch",
+    "block": "module-4/block-8",
+    "slug": "quest-48",
+    "difficulty": "hard",
+    "title": "Security Architecture Design"
+  }
+}

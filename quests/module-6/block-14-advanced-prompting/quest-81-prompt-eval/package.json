@@ -1,0 +1,17 @@
+{
+  "name": "quest-81-prompt-eval",
+  "version": "1.0.0",
+  "description": "Quest 6.9: Prompt Evaluation Framework",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-6"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-81-prompt-eval",
+    "block": "module-6/block-14",
+    "slug": "quest-81",
+    "difficulty": "hard",
+    "title": "Prompt Evaluation Framework"
+  }
+}

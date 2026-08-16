@@ -1,0 +1,17 @@
+{
+  "name": "quest-131-worker-api",
+  "version": "1.0.0",
+  "description": "Quest 25.3: Worker API Builder - routing with KV/D1",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-12"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-131-worker-api",
+    "block": "module-12/block-25",
+    "slug": "quest-131",
+    "difficulty": "hard",
+    "title": "Worker API Builder"
+  }
+}

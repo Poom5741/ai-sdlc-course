@@ -1,0 +1,19 @@
+{
+  "name": "capstone-1-api-service",
+  "version": "1.0.0",
+  "description": "Capstone 1: AI-Assisted API Service",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["capstone", "ai-sdlc", "api"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "capstone": {
+    "id": "capstone-1-api-service",
+    "belt": "white-to-blue",
+    "title": "AI-Assisted API Service"
+  }
+}

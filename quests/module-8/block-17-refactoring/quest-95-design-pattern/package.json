@@ -1,0 +1,17 @@
+{
+  "name": "quest-95-design-pattern",
+  "version": "1.0.0",
+  "description": "Quest 17.3: Design Pattern Applicator",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-8"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-95-design-pattern",
+    "block": "module-8/block-17",
+    "slug": "quest-95",
+    "difficulty": "medium",
+    "title": "Design Pattern Applicator"
+  }
+}

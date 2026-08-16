@@ -1,0 +1,17 @@
+{
+  "name": "quest-113-incident-responder",
+  "version": "1.0.0",
+  "description": "Quest 21.3: Production Incident Responder",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-10"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-113-incident-responder",
+    "block": "module-10/block-21",
+    "slug": "quest-113",
+    "difficulty": "hard",
+    "title": "Production Incident Responder"
+  }
+}

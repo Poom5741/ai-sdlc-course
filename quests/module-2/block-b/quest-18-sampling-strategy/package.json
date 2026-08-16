@@ -1,0 +1,17 @@
+{
+  "name": "quest-18-sampling-strategy",
+  "version": "1.0.0",
+  "description": "Quest 2.6: Sampling Strategy Explorer",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-2"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-18-sampling-strategy",
+    "block": "module-2/block-b",
+    "slug": "quest-18",
+    "difficulty": "easy",
+    "title": "Sampling Strategy Explorer"
+  }
+}

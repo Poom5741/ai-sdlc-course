@@ -1,0 +1,17 @@
+{
+  "name": "quest-126-project-board",
+  "version": "1.0.0",
+  "description": "Quest 24.3: GitHub Project Board Builder - design a project board",
+  "main": "problem.js",
+  "scripts": { "test": "node test.js" },
+  "keywords": ["ai-sdlc", "workshop", "quest", "module-11"],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-126-project-board",
+    "block": "module-11/block-24",
+    "slug": "quest-126",
+    "difficulty": "medium",
+    "title": "GitHub Project Board Builder"
+  }
+}

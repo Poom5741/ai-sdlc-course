@@ -6,7 +6,19 @@
   "scripts": {
     "test": "node test.js"
   },
-  "keywords": ["ai-sdlc", "workshop", "quest", "scaffold", "template"],
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "scaffold",
+    "template"
+  ],
   "author": "AI SDLC Workshop",
-  "license": "MIT"
+  "license": "MIT",
+  "quest": {
+    "id": "quest-scaffold",
+    "block": "scaffold",
+    "slug": "scaffold",
+    "difficulty": "easy"
+  }
 }
