@@ -1,0 +1,23 @@
+{
+  "name": "quest-140-token-budgeter",
+  "version": "1.0.0",
+  "description": "Quest: Token Budgeter — Build a token budget tracker that monitors usage and alerts on limits",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-2"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-140-token-budgeter",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-140",
+    "difficulty": "medium"
+  }
+}

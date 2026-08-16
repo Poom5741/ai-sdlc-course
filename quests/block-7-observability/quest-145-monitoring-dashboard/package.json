@@ -1,0 +1,23 @@
+{
+  "name": "quest-145-monitoring-dashboard",
+  "version": "1.0.0",
+  "description": "Quest: Monitoring Dashboard — Build a function that generates monitoring dashboard configurations",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-7"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-145-monitoring-dashboard",
+    "block": "block-7-observability",
+    "slug": "quest-145",
+    "difficulty": "hard"
+  }
+}

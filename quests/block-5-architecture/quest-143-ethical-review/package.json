@@ -1,0 +1,23 @@
+{
+  "name": "quest-143-ethical-review",
+  "version": "1.0.0",
+  "description": "Quest: Ethical Review — Build a function that audits code for ethical concerns",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-5"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-143-ethical-review",
+    "block": "block-5-architecture",
+    "slug": "quest-143",
+    "difficulty": "medium"
+  }
+}

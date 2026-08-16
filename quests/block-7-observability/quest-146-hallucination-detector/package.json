@@ -1,0 +1,23 @@
+{
+  "name": "quest-146-hallucination-detector",
+  "version": "1.0.0",
+  "description": "Quest: Hallucination Detector — Build a function that scores hallucination risk in LLM outputs",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-7"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-146-hallucination-detector",
+    "block": "block-7-observability",
+    "slug": "quest-146",
+    "difficulty": "hard"
+  }
+}

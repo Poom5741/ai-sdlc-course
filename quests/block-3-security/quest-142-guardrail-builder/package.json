@@ -1,0 +1,23 @@
+{
+  "name": "quest-142-guardrail-builder",
+  "version": "1.0.0",
+  "description": "Quest: Guardrail Builder — Build a guardrail system that validates inputs and outputs for an LLM chatbot",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-3"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-142-guardrail-builder",
+    "block": "block-3-security",
+    "slug": "quest-142",
+    "difficulty": "hard"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "quest-139-cost-optimizer",
+  "version": "1.0.0",
+  "description": "Quest: Cost Optimizer — Build a function that recommends the cheapest model for a given task",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-2"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-139-cost-optimizer",
+    "block": "block-2-prompt-engineering",
+    "slug": "quest-139",
+    "difficulty": "medium"
+  }
+}

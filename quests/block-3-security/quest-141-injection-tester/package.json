@@ -1,0 +1,23 @@
+{
+  "name": "quest-141-injection-tester",
+  "version": "1.0.0",
+  "description": "Quest: Injection Tester — Build a function that detects prompt injection attempts",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-3"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-141-injection-tester",
+    "block": "block-3-security",
+    "slug": "quest-141",
+    "difficulty": "hard"
+  }
+}

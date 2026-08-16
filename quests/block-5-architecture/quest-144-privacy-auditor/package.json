@@ -1,0 +1,23 @@
+{
+  "name": "quest-144-privacy-auditor",
+  "version": "1.0.0",
+  "description": "Quest: Privacy Auditor — Build a function that detects PII in data strings",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-5"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-144-privacy-auditor",
+    "block": "block-5-architecture",
+    "slug": "quest-144",
+    "difficulty": "hard"
+  }
+}
