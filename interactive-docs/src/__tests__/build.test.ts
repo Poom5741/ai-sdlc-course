@@ -22,9 +22,9 @@ describe("Astro project scaffold", () => {
 
   it("has required directory structure", () => {
     const dirs = [
-      "src/content/docs/workshop",
-      "src/content/docs/quests",
-      "src/content/docs/reference",
+      "src/content/docs/en/workshop",
+      "src/content/docs/en/quests",
+      "src/content/docs/en/reference",
       "src/components",
       "src/layouts",
     ];

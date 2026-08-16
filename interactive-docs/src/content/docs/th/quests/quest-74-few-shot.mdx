@@ -1,0 +1,66 @@
+---
+title: "Quest 74 - Few-Shot Template Builder"
+description: "Build few-shot prompt templates"
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Quest 74: Few-Shot Template Builder
+
+<Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
+
+## เป้าหมาย
+
+Build few-shot prompt templates
+
+---
+
+## วิธีทำ
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+   ```bash
+   npx bluebeltdojo download quest-74-few-shot
+   cd quest-74-few-shot
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+
+3. Implement solution ตาม instructions ใน `problem.js`
+
+4. ตรวจสอบ solution ของคุณ:
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+---
+
+## การตรวจสอบ
+
+```bash
+node test.js
+```
+
+When all tests pass, you will see the completion message.
+
+---
+
+## ส่งคำตอบ
+
+When tests pass, submit your solution:
+
+```bash
+npx bluebeltdojo submit
+```
+
+> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+
+## คำใบ้
+
+- อ่าน instructions ใน `problem.js` อย่างละเอียด
+- ตรวจสอบ edge cases ที่กล่าวถึง
+- ถ้าติดขัด ดู `_solution/solution.js`

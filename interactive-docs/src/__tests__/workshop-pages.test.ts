@@ -16,17 +16,17 @@ describe('Workshop MDX content files', () => {
   ];
 
   for (const file of pages) {
-    it(`${file} exists in content/docs/workshop/`, () => {
-      expect(existsSync(join(DOCS_DIR, 'workshop', file))).toBe(true);
+    it(`${file} exists in content/docs/en/workshop/`, () => {
+      expect(existsSync(join(DOCS_DIR, 'en', 'workshop', file))).toBe(true);
     });
 
     it(`${file} has valid frontmatter with title`, () => {
-      const content = readFileSync(join(DOCS_DIR, 'workshop', file), 'utf-8');
+      const content = readFileSync(join(DOCS_DIR, 'en', 'workshop', file), 'utf-8');
       expect(content).toMatch(/^---[\s\S]*?title:/m);
     });
 
     it(`${file} uses Starlight component imports (not custom)`, () => {
-      const content = readFileSync(join(DOCS_DIR, 'workshop', file), 'utf-8');
+      const content = readFileSync(join(DOCS_DIR, 'en', 'workshop', file), 'utf-8');
       // Should NOT import from ../../components/ for Card, Badge, Steps, CardGrid
       expect(content).not.toMatch(/from '\.\.\/\.\.\/components\/(Card|Badge|Steps|CardGrid)/);
     });

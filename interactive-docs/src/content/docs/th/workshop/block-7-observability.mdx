@@ -1,0 +1,280 @@
+---
+title: Block 7 - LLM Observability
+description: Monitor, trace, และ debug LLM applications ใน production
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 7: LLM Observability
+
+<Badge text="Module ใหม่" variant="note" /> <Badge text="60 นาที" variant="note" /> <Badge text="2 Quests" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- เข้าใจ LLM Observability คืออะไรและทำไมสำคัญ
+- ตั้งค่า basic tracing สำหรับ LLM calls
+- Detect hallucination ใน LLM output
+- Monitor token usage และต้นทุน
+
+---
+
+## 📖 Concept: LLM Observability (25 นาที)
+
+### LLM Observability คืออะไร?
+
+LLM Observability คือการ monitor, trace, และ debug สิ่งที่เกิดขึ้นภายใน LLM applications:
+
+<CardGrid>
+<Card title="Tracing" icon="search">
+ติดตาม requests ผ่านระบบ
+</Card>
+<Card title="Metrics" icon="chart">
+วัด latency, cost, quality
+</Card>
+<Card title="Logs" icon="document">
+บันทึก inputs, outputs, errors
+</Card>
+<Card title="Alerts" icon="warning">
+แจ้งเตือนเมื่อมีปัญหา
+</Card>
+</CardGrid>
+
+### ทำถึง Observability สำคัญสำหรับ LLMs
+
+**ความท้าทายเฉพาะ LLM:**
+
+- **Non-deterministic** — ผลลัพธ์ต่างกันแม้ input เดียวกัน
+- **Hallucination** — สร้างข้อมูลเท็จ
+- **Token costs** — แพงและคาดเดายาก
+- **Latency** — ช้ากว่า APIs ทั่วไป
+- **Quality drift** — คุณภาพเปลี่ยนเมื่อ model อัปเดต
+
+### Key Metrics สำหรับ LLM Apps
+
+```
+Performance:
+├── Latency (time to first token, total)
+├── Throughput (requests per second)
+└── Error rate (failed requests)
+
+Cost:
+├── Tokens per request
+├── Cost per request
+└── Cost per user/project
+
+Quality:
+├── User satisfaction scores
+├── Hallucination rate
+└── Task completion rate
+```
+
+---
+
+## 🛠️ Basic Tracing Setup
+
+### Simple Trace Structure
+
+```javascript
+const trace = {
+  id: generateId(),
+  timestamp: Date.now(),
+  input: {
+    prompt: userPrompt,
+    model: 'gpt-4o',
+    temperature: 0.7,
+    maxTokens: 1000
+  },
+  output: {
+    completion: llmResponse,
+    tokensUsed: 450,
+    latencyMs: 1200
+  },
+  metadata: {
+    userId: 'user_123',
+    projectId: 'project_abc',
+    cost: 0.0045
+  }
+};
+
+await logTrace(trace);
+```
+
+### สิ่งที่ควร Trace
+
+<CardGrid>
+<Card title="Inputs" icon="input">
+- User prompt
+- System prompt
+- Model parameters
+- Context length
+</Card>
+<Card title="Outputs" icon="output">
+- LLM response
+- Tokens ที่ใช้
+- Finish reason
+- Confidence scores
+</Card>
+<Card title="Metadata" icon="document">
+- User ID
+- Session ID
+- Timestamp
+- Cost estimate
+</Card>
+</CardGrid>
+
+---
+
+## 🔍 Hallucination Detection
+
+### Hallucination คืออะไร?
+
+LLM สร้างข้อมูลเท็จหรือขัดแย้งกับข้อมูลที่ให้ไว้
+
+**สัญญาณของ Hallucination:**
+
+- ขัดแย้งกับ context ที่ให้
+- สร้างข้อเท็จจริงที่ไม่มีใน source material
+- มั่นใจเกินไปเกี่ยวกับเรื่องที่ไม่แน่ใจ
+- อ้างอิง sources ที่ไม่มีอยู่
+
+### Detection Strategies
+
+```javascript
+function detectHallucination(output, sources) {
+  const issues = [];
+
+  // 1. Source verification
+  const claims = extractClaims(output);
+  for (const claim of claims) {
+    if (!isSupportedBySources(claim, sources)) {
+      issues.push({
+        type: 'unsupported_claim',
+        claim,
+        confidence: 0.8
+      });
+    }
+  }
+
+  // 2. Consistency check
+  if (containsContradictions(output)) {
+    issues.push({
+      type: 'contradiction',
+      confidence: 0.7
+    });
+  }
+
+  // 3. Confidence scoring
+  const confidenceScore = calculateConfidence(output, sources);
+
+  return { hasHallucination: issues.length > 0, issues, confidenceScore };
+}
+```
+
+### Tools สำหรับ Observability
+
+| Tool | วัตถุประสงค์ | ความซับซ้อน |
+| ------ | --------- | ------------ |
+| LangSmith | Tracing + evaluation | ปานกลาง |
+| Arize Phoenix | Observability platform | สูง |
+| PromptFlow | Azure-based | สูง |
+| Custom logging | DIY approach | ต่ำ |
+
+---
+
+## 💰 Cost Monitoring
+
+### ติดตาม Token Usage
+
+```javascript
+async function callWithTracking(prompt, model) {
+  const start = Date.now();
+  const response = await llm.complete(prompt, { model });
+  const tokens = countTokens(prompt) + countTokens(response);
+  const cost = calculateCost(model, tokens);
+  const latency = Date.now() - start;
+
+  await logMetric({ model, tokens, cost, latency, timestamp: Date.now() });
+  return response;
+}
+```
+
+### เคล็ดลดต้นทุน
+
+1. **Cache common queries** — หลีกเลี่ยง LLM calls ที่ซ้ำ
+2. **ใช้ models เล็กสำหรับ tasks ง่าย** — routing
+3. **Trim context** — ลด input tokens
+4. **กำหนด token limits** — ป้องกัน output ที่ยาวเกินไป
+
+---
+
+## 🎮 Code Quests
+
+### 🟡 Quest 7.1: Monitoring Dashboard
+
+**เป้าหมาย**: ออกแบบ LLM monitoring dashboard
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-7-observability/quest-19-monitoring-dashboard my-quest
+cd my-quest
+node test.js
+```
+
+ต้องมีใน `dashboard-design.md`:
+
+1. **Metrics ที่ติดตาม** — latency, cost, quality, errors
+2. **Alerts** — alert rules สำหรับ anomalies
+3. **Visualization** — ออกแบบ dashboard layout
+4. **Actions** — ทำอะไรเมื่อ alerts trigger
+
+**ส่งมอบ**: `dashboard-design.md` ผ่าน `node test.js`
+
+---
+
+### 🟡 Quest 7.2: Hallucination Detector
+
+**เป้าหมาย**: สร้าง function ที่ detect hallucination risk
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-7-observability/quest-20-hallucination-detector my-quest
+cd my-quest
+node test.js
+```
+
+สิ่งที่ต้อง implement:
+
+1. **Score hallucination risk** — return 0-1 (0 = ไม่มี risk, 1 = risk สูงมาก)
+2. **ตรวจสอบ source support** — ตรวจ claims ว่าได้รับการสนับสนุนจาก sources หรือไม่
+3. **Detect contradictions** — หา statements ที่ขัดแย้งกัน
+
+**ส่งมอบ**: `detectHallucination()` ผ่าน `node test.js`
+
+---
+
+## ✅ Block 7 Checklist
+
+- [ ] เข้าใจ LLM observability concepts
+- [ ] Quest 7.1 เสร็จแล้ว
+- [ ] Quest 7.2 เสร็จแล้ว
+
+---
+
+## 🚀 ขั้นตอนถัดไป
+
+**ยินดีด้วย!** คุณได้เรียนรู้ทุก modules:
+
+1. ✅ **Block 1**: ตั้งค่าเครื่องมือ AI
+2. ✅ **Block 2**: Prompt Engineering + การจัดการต้นทุน
+3. ✅ **Block 3**: Security + Prompt Injection
+4. ✅ **Block 4**: Agentic Workflows
+5. ✅ **Block 5**: Architecture + Responsible AI
+6. ✅ **Block 6**: AI Development Pipeline
+7. ✅ **Block 7**: LLM Observability
+
+**พร้อมสำหรับ Capstone Projects?**
+
+<a href="/capstones" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ดู Capstone Projects →</a>

@@ -1,0 +1,192 @@
+---
+title: Block 1 - ตั้งค่าเครื่องมือ AI
+description: ตั้งค่าชุดเครื่องมือพัฒนาด้วย AI และทำงาน coding ด้วย AI เป็นครั้งแรก
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 1: ตั้งค่าเครื่องมือ AI
+
+<Badge text="09:00 - 10:30" variant="note" /> <Badge text="90 นาที" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- ติดตั้งและกำหนดค่า GitHub Copilot ใน VS Code
+- ใช้ Claude Code สำหรับ AI แบบ terminal
+- เปรียบเทียบเครื่องมือ AI ต่างๆ
+
+---
+
+## 📖 Concept: ภูมิทัศน์เครื่องมือ AI (30 นาที)
+
+### AI-Assisted Development คืออะไร?
+
+AI-Assisted Development คือการใช้เครื่องมือ AI เพื่อช่วยเขียนโค้ดได้เร็วและดีขึ้น
+
+### การเปลี่ยนแปลง: Manual → AI-Assisted
+
+```
+ก่อน: คิด → เขียนโค้ด → Debug → Test
+หลัง: คิด → บอก AI → Review → Refine → Deploy
+```
+
+### Key Concepts
+
+#### Tokens
+
+- หน่วยเล็กที่สุดของข้อความที่ AI อ่าน
+- แต่ละ token อาจเป็นคำหรือส่วนหนึ่งของคำ
+- สำคัญเพราะมีผลต่อต้นทุนและ context window
+
+#### Context Window
+
+- ปริมาณข้อมูลที่ AI จดจำได้พร้อมกัน
+- มากขึ้น = จดจำมากขึ้น = ดีขึ้น
+
+#### Hallucination
+
+- เมื่อ AI สร้างสิ่งที่ไม่มีอยู่จริง
+- ต้องตรวจสอบ output เสมอ
+
+---
+
+## 🛠️ ภาพรวมเครื่องมือ
+
+### GitHub Copilot
+
+- **อะไร**: AI pair programmer ใน VS Code
+- **ทำอย่างไร**: แนะนำโค้ดขณะพิมพ์
+- **เหมาะสำหรับ**: Inline code completion
+
+### Claude Code
+
+- **อะไร**: AI assistant แบบ terminal
+- **ทำอย่างไร**: สนทนาใน terminal, execute commands
+- **เหมาะสำหรับ**: Complex tasks, debugging
+
+### CodeRabbit
+
+- **อะไร**: AI code review
+- **ทำอย่างไร**: Review PRs อัตโนมัติ
+- **เหมาะสำหรับ**: Quality assurance
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 1.1: First AI Completion
+
+**เป้าหมาย**: ใช้ GitHub Copilot เขียน function
+
+<Steps>
+
+1. **ติดตั้ง GitHub Copilot**
+   - เปิด VS Code
+   - ไปที่ Extensions (Ctrl+Shift+X)
+   - ค้นหา "GitHub Copilot Chat"
+   - ติดตั้งและ sign in
+
+2. **สร้างไฟล์ใหม่**
+
+   ```javascript
+   // factorial.js
+   ```
+
+3. **เขียน comment**
+
+   ```javascript
+   // Calculate factorial of n using recursion
+   ```
+
+4. **ยอมรับคำแนะนำของ Copilot** (กด Tab)
+
+5. **ทดสอบ function**
+
+   ```javascript
+   console.log(factorial(5)); // ควร output 120
+   console.log(factorial(10)); // อะไรออกมา?
+   ```
+
+</Steps>
+
+**ส่งมอบ**: factorial function ที่ทำงานได้ + screenshot
+
+---
+
+### 🟡 Quest 1.2: Multi-file Generation
+
+**เป้าหมาย**: สร้าง utility library แบบ multi-file ด้วย AI — ระบุ interface ก่อน
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-02-multi-file my-quest
+   cd my-quest
+   ```
+
+2. **เขียน interface ใน `problem.js`** ก่อน (add/subtract/multiply/divide/calculate)
+
+3. **ให้ AI สร้างไฟล์แต่ละไฟล์** (math.js, validators.js, index.js) จาก interface
+
+4. **ตรวจสอบ**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**ส่งมอบ**: Multi-file library ที่ interface ตรงกับ spec + tests ผ่าน
+
+---
+
+### 🟡 Quest 1.3: Compare Tools
+
+**เป้าหมาย**: รัน prompt เดียวกันใน 2+ เครื่องมือ AI และเปรียบเทียบ (calibrate เครื่องมือของคุณ)
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-1-ai-tools/quest-03-compare-tools my-quest
+   cd my-quest
+   ```
+
+2. **รัน prompt เดียวกัน** ใน 2+ เครื่องมือ AI เช่น `sortByKey(array, key, ascending)`
+
+3. **เขียน `comparison.md`** ในโฟลเดอร์พร้อม sections: Tool, Output, Better, Why
+
+4. **ตรวจสอบ**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**ส่งมอบ**: `comparison.md` ผ่าน checklist validator (ทุก section มี + ≥200 ตัวอักษร)
+
+---
+
+## ✅ Block 1 Checklist
+
+- [ ] ติดตั้ง GitHub Copilot แล้ว
+- [ ] Quest 1.1 เสร็จแล้ว
+- [ ] Quest 1.2 เสร็จแล้ว
+- [ ] Quest 1.3 เสร็จแล้ว
+
+---
+
+## 🚀 Block ถัดไป
+
+**Block 2: Prompt Engineering + Loops** → เรียนรู้การเขียน prompt ที่ดีขึ้นและตั้งค่า iterative workflows
+
+<a href="/workshop/block-2-prompting" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ไป Block 2 →</a>

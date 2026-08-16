@@ -1,0 +1,101 @@
+---
+title: GitHub Copilot Reference
+description: Quick reference for GitHub Copilot, GitHub's AI pair programmer
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+# GitHub Copilot Reference
+
+<Badge text="AI Pair Programmer" variant="note" /> <Badge text="JetBrains/VS Code" variant="tip" />
+
+## Overview
+
+**GitHub Copilot** เป็น AI pair programmer ของ GitHub — มันให้ autocomplete, Copilot Chat, และ Copilot Agent ภายใน IDE ของคุณ ช่วยให้เขียน code ตามความตั้งใจ (intent) ได้เร็วขึ้น
+
+```
+Your comment/context → Copilot → suggested code
+```
+
+---
+
+## When to Use
+
+- autocomplete function จาก comment หรือ context
+- ถามคำถามเกี่ยวกับ code ในโปรเจกต์ (Chat)
+- ทำ refactor / fix / test ผ่าน Copilot Agent
+- เรียนรู้ syntax หรือ library ใหม่ใน IDE
+
+**When NOT to Use**:
+- งานที่ต้องการ reasoning หลายขั้นตอนข้ามไฟล์ใหญ่ๆ (อาจใช้ Claude Code แทน)
+- เขียน code ที่ sensitive ต้องมีคนตรวจก่อนเสมอ
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Autocomplete** | แนะนำ code ต่อจาก context/comment |
+| **Copilot Chat** | ถาม-ตอบ เกี่ยวกับ code ใน IDE |
+| **Copilot Agent** | ทำ multi-step task (แก้หลายไฟล์) |
+| **Multi-model** | เลือก model (เช่น GPT, Claude) ได้ |
+| **Inline edits** | แก้ code ที่เลือกโดยตรง |
+| **Test generation** | สร้าง test จาก function |
+
+---
+
+## Basic Usage
+
+**Autocomplete** — เขียน comment หรือเริ่มพิมพ์ แล้วกด Tab:
+```js
+// Calculate factorial of n using recursion
+function factorial(n) {
+  // Copilot suggests the body here
+}
+```
+
+**Chat** — เปิด Copilot panel แล้วถาม:
+```text
+Explain what this function does and how to make it safer.
+```
+
+**Inline edit** — เลือก code แล้วขอเปลี่ยนแปลง:
+```text
+Use a parameterized query here instead.
+```
+
+---
+
+## Common Workflows
+
+### 1. Generate from a Comment (Verify Before Trust)
+```js
+// add(a,b), subtract(a,b), multiply(a,b), divide(a,b), calculate(op,a,b)
+// → accept suggestion, then run node test.js
+```
+
+### 2. Agentic Task
+```text
+@workspace Add error handling to the fetch wrapper and add a test for it.
+```
+
+### 3. Fix on Failure
+```text
+The test fails on negative input. Fix the edge case.
+```
+
+---
+
+## Tips
+
+- **Verify before trust** — Copilot suggestions ดูถูกต้องแต่อาจผิดที่ edge case; ต้องรัน test
+- **Write the interface first** — ระบุ public API ใน comment ก่อนแล้วให้มันเติม
+- **Ask for the failing case** — "why does this fail on input -1?" ได้คำตอบที่ดีกว่า "make it work"
+- **Separate generation from review** — อย่าให้ AI grade งานของตัวเองโดยไม่ตรวจ
+
+---
+
+## 📚 Resources
+
+- [GitHub Copilot docs](https://docs.github.com/en/copilot)

@@ -1,0 +1,106 @@
+---
+title: CodeRabbit Reference
+description: Quick reference for CodeRabbit, an AI-powered pull request review bot
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+# CodeRabbit Reference
+
+<Badge text="AI Code Review" variant="note" /> <Badge text="Pull Requests" variant="tip" />
+
+## Overview
+
+**CodeRabbit** เป็น AI code review bot ที่ review pull requests โดยอัตโนมัติ — มันวิเคราะห์ diff, ให้ inline comments, ตรวจหา bug/security issues, และสรุปการเปลี่ยนแปลง เพื่อประหยัดเวลา review ของมนุษย์
+
+```
+PR opened → CodeRabbit analyzes diff → inline comments + summary
+```
+
+---
+
+## When to Use
+
+- ต้องการ automated review ก่อน merge ทุก PR
+- ต้องการจับ bug, security issues, และ best-practice violations
+- ต้องการขอ feedback เกี่ยวกับ code ที่คุณยังไม่แน่ใจ
+- reviews หลายๆ PR ที่เล็กและซ้ำกัน
+
+**When NOT to Use**:
+- review ที่ต้องใช้ความเข้าใจ business context ระดับลึกด้วยตัวเอง
+- ขั้นตอนที่ต้อง decision ทางสถาปัตยกรรมใหญ่ (เอาไว้ให้มนุษย์ตัดสิน)
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Inline comments** | comment ตรงบรรทัดที่เจอปัญหาใน PR |
+| **Security analysis** | ตรวจจับ vulnerabilities / hardcoded secrets |
+| **PR summary** | สรุปการเปลี่ยนแปลง, impact, และ test suggestions |
+| **Auto-generated walkthrough** | อธิบาย diff เป็นภาษาเข้าใจง่าย |
+| **CI/CD integration** | ทำงานใน GitHub Actions / GitLab CI |
+| **Customizable** | ตั้ง rules / config ตามโปรเจกต์ |
+
+---
+
+## Basic Usage
+
+CodeRabbit มักถูกว่าเป็น **GitHub App** — เปิดไว้ใน repository แล้วมันจะ review PR ที่เปิด:
+
+```yaml
+# .coderabbit.yaml (example config)
+language: "en"
+early_access: false
+reviews:
+  profile: "best"
+  request_changes_workflow: false
+```
+
+**ภายใน PR**:
+```text
+@coderabbitai review       # ขอ full review
+@coderabbitai summary      # สรุป PR
+@coderabbitai full_review  # review แบบลึก
+```
+
+---
+
+## Common Workflows
+
+### 1. Automated Review on Every PR
+```yaml
+# .github/workflows/coderabbit.yml
+on: [pull_request]
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: coderabbitai/ai-review@main
+```
+
+### 2. Ask a Targeted Question
+```text
+@coderabbitai "Is this SQL safely parameterized?"
+```
+
+### 3. Get a Security Pass
+```text
+@coderabbitai security
+```
+
+---
+
+## Tips
+
+- **Treat bot reviews as a first pass, not the final word** — human reviews still own architecture decisions.
+- **Fix the class, not the instance** — if the bot flags a pattern, fix it everywhere, not just one spot.
+- **Configure severity** — tune what triggers "request changes" vs. a comment.
+- **Verify security claims** — the bot is a triage aid; confirm before shipping.
+
+---
+
+## 📚 Resources
+
+- [CodeRabbit docs](https://docs.coderabbit.ai)
