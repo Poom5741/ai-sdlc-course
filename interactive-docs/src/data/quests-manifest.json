@@ -1,28 +1,28 @@
 [
   {
     "id": "quest-01-first-completion",
-    "title": "quest-01-first-completion",
+    "title": "First AI Code Completion",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
     "slug": "quest-1"
   },
   {
     "id": "quest-02-multi-file",
-    "title": "quest-02-multi-file",
+    "title": "Multi-File AI Workflow",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
     "slug": "quest-2"
   },
   {
     "id": "quest-03-compare-tools",
-    "title": "quest-03-compare-tools",
+    "title": "AI Tool Comparison",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
     "slug": "quest-3"
   },
   {
     "id": "quest-04-fix-prompt",
-    "title": "quest-04-fix-prompt",
+    "title": "Fix a Broken Prompt",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
     "slug": "quest-4"
@@ -43,14 +43,14 @@
   },
   {
     "id": "quest-05-multi-step",
-    "title": "quest-05-multi-step",
+    "title": "Multi-Step Prompt Chain",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
     "slug": "quest-5"
   },
   {
     "id": "quest-06-domain-specific",
-    "title": "quest-06-domain-specific",
+    "title": "Domain-Specific Code Generation",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
     "slug": "quest-6"
@@ -64,7 +64,7 @@
   },
   {
     "id": "quest-07-spot-vulnerability",
-    "title": "quest-07-spot-vulnerability",
+    "title": "Spot the Security Vulnerability",
     "difficulty": "medium",
     "block": "block-3-security",
     "slug": "quest-7"
@@ -78,7 +78,7 @@
   },
   {
     "id": "quest-08-fix-harden",
-    "title": "quest-08-fix-harden",
+    "title": "Fix and Harden the Code",
     "difficulty": "medium",
     "block": "block-3-security",
     "slug": "quest-8"
@@ -92,7 +92,7 @@
   },
   {
     "id": "quest-09-security-architecture",
-    "title": "quest-09-security-architecture",
+    "title": "Security Architecture Design",
     "difficulty": "medium",
     "block": "block-3-security",
     "slug": "quest-9"
@@ -113,14 +113,14 @@
   },
   {
     "id": "quest-10-setup-loop",
-    "title": "quest-10-setup-loop",
+    "title": "Setup a Generate-Review-Fix Loop",
     "difficulty": "hard",
     "block": "block-4-agentic-workflows",
     "slug": "quest-10"
   },
   {
     "id": "quest-11-generate-review-fix",
-    "title": "quest-11-generate-review-fix",
+    "title": "Generate-Review-Fix Pattern",
     "difficulty": "hard",
     "block": "block-4-agentic-workflows",
     "slug": "quest-11"
@@ -134,7 +134,7 @@
   },
   {
     "id": "quest-12-multi-agent",
-    "title": "quest-12-multi-agent",
+    "title": "Multi-Agent Collaboration",
     "difficulty": "hard",
     "block": "block-4-agentic-workflows",
     "slug": "quest-12"
