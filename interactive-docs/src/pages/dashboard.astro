@@ -530,6 +530,12 @@ import questSynced from '../data/quest-synced.json';
         const data = await res.json();
         if (!res.ok) { errorDiv.textContent = data.error; errorDiv.classList.remove('hidden'); return; }
         localStorage.setItem('bbd_token', data.token);
+        localStorage.setItem('bbd_role', data.role || 'user');
+        // Redirect admin to admin panel
+        if (data.role === 'admin') {
+          window.location.href = '/admin';
+          return;
+        }
         authToken = data.token;
         userData = { displayName: data.displayName, belt: data.belt };
         await loadData();
