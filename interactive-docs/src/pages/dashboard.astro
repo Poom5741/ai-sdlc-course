@@ -6,7 +6,7 @@ import questSynced from '../data/quest-synced.json';
 
 <BaseLayout title="Dashboard | BlueBeltDojo">
   <!-- Site Navigation -->
-  <header class="fixed top-0 w-full z-50 bg-[#FAFAF9]/90 backdrop-blur-md border-b border-[#E7E5E4]">
+  <header id="site-header" class="hidden fixed top-0 w-full z-50 bg-[#FAFAF9]/90 backdrop-blur-md border-b border-[#E7E5E4]">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="/" class="font-['DM_Sans'] text-lg tracking-widest uppercase text-[#1C1917]">BlueBeltDojo</a>
       <nav class="hidden md:flex items-center gap-6">
@@ -307,12 +307,14 @@ import questSynced from '../data/quest-synced.json';
 
     function showLogin() {
       document.getElementById('loading').classList.add('hidden');
+      document.getElementById('site-header').classList.add('hidden');
       document.getElementById('login-section').classList.remove('hidden');
       document.getElementById('dashboard').classList.add('hidden');
     }
 
     function showDashboard() {
       document.getElementById('loading').classList.add('hidden');
+      document.getElementById('site-header').classList.remove('hidden');
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
     }
@@ -327,7 +329,14 @@ import questSynced from '../data/quest-synced.json';
         beltData = await beltRes.json();
         renderDashboard();
         showDashboard();
-      } catch (e) { console.error('Failed to load data:', e); }
+      } catch (e) {
+        console.error('Failed to load data:', e);
+        // If API calls fail but we have a valid token, show dashboard with default data
+        progressData = { stats: { completed: 0, total: 147 }, quests: {} };
+        beltData = { belt: 'white', completed: 0, nextBelt: 'blue', remaining: 25 };
+        renderDashboard();
+        showDashboard();
+      }
     }
 
     // --- Render everything ---
