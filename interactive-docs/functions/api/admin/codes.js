@@ -34,42 +34,26 @@ async function generateUniqueCode(env) {
   return code;
 }
 
-// Validate admin session using stateless token
+// Validate admin session using unified auth (same as /api/auth/me)
 async function validateAdminAuth(env, request) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace("Bearer ", "").trim();
   if (!token) return false;
 
   try {
-    const decoded = atob(token + "==");
-    const parts = decoded.split(":");
-    if (parts.length !== 4) return false;
+    // Look up session in KV
+    const session = await env.KV_NAMESPACE.get(`session:${token}`, {
+      type: "json",
+    });
+    if (!session) return false;
 
-    const [timestamp, expires, _tokenIp, sigHex] = parts;
+    // Get user from D1 and check admin role
+    const user = await env.DB.prepare(
+      "SELECT id, role FROM users WHERE id = ?"
+    ).bind(session.userId).first();
 
-    // Check expiry
-    if (Date.now() > parseInt(expires)) return false;
-
-    // Verify HMAC signature
-    const payload = `${timestamp}:${expires}:${_tokenIp}`;
-    const key = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(env.ADMIN_PASSWORD),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["verify"],
-    );
-    const sigBytes = new Uint8Array(
-      sigHex.match(/.{2}/g).map((b) => parseInt(b, 16)),
-    );
-    const valid = await crypto.subtle.verify(
-      "HMAC",
-      key,
-      sigBytes,
-      new TextEncoder().encode(payload),
-    );
-
-    return valid;
+    if (!user) return false;
+    return user.role === "admin";
   } catch {
     return false;
   }
