@@ -1,66 +1,183 @@
 ---
-title: "PII Redactor"
-description: "Detect and redact personal information from text"
+title: "Quest 104 - PII Redactor"
+description: "Detect and redact personal information from text to protect privacy"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# PII Redactor
+# Quest 104: PII Redactor
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Detect and redact personal information from text
+<LearningObjectives items={[
+  "How to identify common types of PII (emails, phones, SSNs, names)",
+  "Why privacy by default means redacting before logging or sharing",
+  "How to distinguish real PII from example/test data",
+  "The importance of returning both redacted text and counts of what was found"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Personal Information Redaction
+
+**PII (Personally Identifiable Information)** is any data that could identify a specific individual — email addresses, phone numbers, Social Security numbers, names, and more. When you're building AI systems that process user data, you must handle PII carefully to comply with privacy regulations like GDPR, CCPA, and HIPAA.
+
+**Redaction** means replacing sensitive data with placeholders like `[EMAIL REDACTED]` or `[SSN REDACTED]`. This lets you log, share, and analyze text without exposing personal information. The key principle is **privacy by default** — redact first, then decide what to keep.
+
+A common pitfall is treating all text the same way. Real PII detection requires understanding context: `test@example.com` is example data, not a real email address, and should not be redacted. Similarly, a phone number format like `555-0123` is a fictional prefix.
+
+---
+
+## ⚙️ How It Works
+
+### The PII Redaction Pipeline
+
+```
+1. Input text arrives
+         ↓
+2. Scan for email addresses (skip example emails)
+         ↓
+3. Scan for phone numbers (US format)
+         ↓
+4. Scan for SSNs (XXX-XX-XXXX)
+         ↓
+5. Scan for names (after "My name is" / "I'm")
+         ↓
+6. Replace each match with [TYPE REDACTED]
+         ↓
+7. Return redacted text + counts of what was found
+```
+
+### Why Example Data Should Be Skipped
+
+Consider this text:
+
+```
+Contact me at test@example.com or call 555-0123-4567.
+My name is John Smith.
+```
+
+A naive redactor would redact everything, including `test@example.com` (which is a standard example email). A smart redactor recognizes example data patterns and skips them, while still catching real PII.
+
+---
+
+## 💡 Example: PII Redaction with Context Awareness
+
+Here's how to implement context-aware PII redaction:
+
+**Step 1: Email detection with example filtering**
+
+```javascript
+const emailRegex = /([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+const emails = [...text.matchAll(emailRegex)];
+for (const match of emails) {
+  const localPart = match[1].toLowerCase();
+  // Skip example/test emails
+  if (localPart === 'test' || localPart === 'example') continue;
+  redacted = redacted.replace(match[0], '[EMAIL REDACTED]');
+  found.email = (found.email || 0) + 1;
+}
+```
+
+**Step 2: Phone and SSN detection**
+
+```javascript
+// US phone numbers
+const phoneRegex = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g;
+// SSNs (XXX-XX-XXXX format)
+const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/g;
+```
+
+**Step 3: Name detection from context**
+
+```javascript
+// Names after "My name is" or "I'm"
+const nameRegex = /(?:My name is|I'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/g;
+```
+
+Notice that names are detected from **context clues**, not just looking for capitalized words. This reduces false positives.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Redacting example/test data**
+> "`<test@example.com>` has an `@` sign, so redact it"
+> → Example emails are not real PII. Redacting them adds noise and breaks logging. Filter by local part before redacting.
+
+**Mistake 2: Only returning redacted text without counts**
+> "I returned the redacted text, what else is needed?"
+> → Stakeholders need to know HOW MUCH PII was found and of WHAT TYPE. Always return both the redacted text and a summary of what was found.
+
+**Mistake 3: Using overly broad patterns**
+> "Any capitalized word might be a name"
+> → Overly broad patterns cause false positives. Use context clues like "My name is" or "I'm" to anchor name detection.
+
+**Mistake 4: Not handling the edge case of no input**
+> "The function should just work when called"
+> → Always handle null/empty input gracefully. Return `{ redacted: '', found: {} }` for empty text.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-104-pii-redactor" />
+
+---
+
+## 🏋️ Quest: PII Redactor
+
+Now it's time to practice! Build a PII redaction system that handles emails, phones, SSNs, and names.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-104-pii-redactor
    cd quest-104-pii-redactor
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `redactPII(text)` that:
+   - Detects and redacts emails (but skips example/test emails)
+   - Detects and redacts US phone numbers
+   - Detects and redacts SSNs
+   - Detects and redacts names after "My name is" / "I'm"
+   - Returns `{ redacted: string, found: object }` with counts
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` and read the failures carefully
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The hardest part is distinguishing real PII from example data. Pay close attention to the email example filtering — `test@example.com` should NOT be redacted.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- `test@example.com` เป็น example data ไม่ใช่ PII จริง — อย่า redact
+- Redact อีเมล, เบอร์โทร, SSN, และชื่อหลัง "My name is" / "I'm"
+- Return ทั้ง redacted text และ object ที่นับจำนวน PII ที่พบ
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

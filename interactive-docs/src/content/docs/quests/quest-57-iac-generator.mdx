@@ -5,62 +5,176 @@ description: "Generate infrastructure-as-code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 57: IaC Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate infrastructure-as-code
+<LearningObjectives items={[
+  "How to generate Terraform-style infrastructure-as-code from descriptions",
+  "Why sensitive values must use variables instead of hardcoding",
+  "How to structure provider blocks, resources, variables, and outputs",
+  "The principle: if you can't version control it, you can't review, test, or roll it back"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Infrastructure as Code (IaC)
+
+Infrastructure as Code means defining your servers, databases, and networks in code files instead of clicking through a web console. When infrastructure is code, you can version it, review it, test it, and roll it back — just like application code.
+
+Think of IaC like a dojo's training curriculum written down vs. passed by word of mouth. If the head instructor gets sick, the word-of-mouth version disappears. The written curriculum keeps the dojo running. IaC does the same thing for your infrastructure — it survives any personnel change.
+
+The key engineering habit: **infrastructure as code means infrastructure is reviewable.** A Terraform file can be put in a PR, reviewed by teammates, tested in CI, and rolled back if something goes wrong. Clicking buttons in a console can't do any of that.
+
+---
+
+## ⚙️ How It Works
+
+### Terraform HCL Structure
+
+```hcl
+# 1. Provider block — which cloud to use
+provider "aws" {
+  region = var.region
+}
+
+# 2. Variables — sensitive values stay out of code
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+
+# 3. Resources — what to create
+resource "aws_db_instance" "main" {
+  engine         = "postgres"
+  instance_class = "db.t3.micro"
+  password       = var.db_password
+}
+
+# 4. Outputs — useful IDs to reference
+output "db_endpoint" {
+  value = aws_db_instance.main.endpoint
+}
+```
+
+### The Critical Security Rule: Never Hardcode Secrets
+
+```hcl
+# ❌ NAIVE: Hardcoded password in resource block
+resource "aws_db_instance" "main" {
+  password = "SuperSecret123!"  # Visible in git history forever!
+}
+
+# ✅ CORRECT: Variable reference
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+
+resource "aws_db_instance" "main" {
+  password = var.db_password  # Value comes from env/secrets manager
+}
+```
+
+---
+
+## 💡 Example: Full IaC Generation
+
+Given an infrastructure description:
+
+```javascript
+const infra = {
+  provider: 'aws',
+  resources: [
+    { type: 'aws_instance', name: 'web', config: { ami: 'ami-123', type: 't3.micro' } },
+    { type: 'aws_db_instance', name: 'db', config: { engine: 'postgres', password: 'secret' } }
+  ]
+};
+```
+
+The generator produces Terraform HCL with:
+
+- A `provider "aws"` block at the top
+- Resource blocks for each resource
+- `variable` declarations for sensitive values (like passwords)
+- `output` blocks for resource IDs
+- No hardcoded secrets anywhere
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Hardcoding passwords and API keys**
+> "It works for testing"
+> → Once committed to git, secrets are in history forever. Use variables and inject values at deploy time.
+
+**Mistake 2: Missing provider block**
+> "The cloud provider knows what region I want"
+> → Terraform requires an explicit provider block. Without it, the plan fails.
+
+**Mistake 3: No outputs defined**
+> "I don't need to reference these resources later"
+> → Outputs let other Terraform configs or scripts reference your resources (e.g., database endpoint for the app server).
+
+**Mistake 4: Not marking variables as sensitive**
+> "I'm using a variable, that's secure enough"
+> → Without `sensitive = true`, Terraform will print the value in plan output and logs.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-57-iac-generator" />
+
+---
+
+## 🏋️ Quest: IaC Generator
+
+Now it's time to practice! Build an infrastructure-as-code generator that produces Terraform HCL.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-57-iac-generator
    cd quest-57-iac-generator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `generateIaC(infra)` that produces Terraform HCL with provider, resources, variables for sensitive values, and outputs
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The generator MUST use variables for sensitive data (passwords, API keys) — naive AI hardcodes them in resource blocks.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Use template literals to build the HCL string. For sensitive values like passwords, detect keywords like "password", "secret", "key" in config values and replace them with `var.<name>` references.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อย่า hardcoded ค่า sensitive (password, secret, key) — ต้องใช้ variable reference (`var.xxx`)
+- ต้องมี provider block ที่ด้านบน
+- ต้องมี output block สำหรับ resource IDs
+- ใช้ template literal สร้าง HCL string
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

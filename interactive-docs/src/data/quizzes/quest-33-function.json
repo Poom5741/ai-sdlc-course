@@ -1,0 +1,38 @@
+{
+  "questId": "quest-33-function",
+  "questions": [
+    {
+      "question": "Function calling ใน LLM มีจุดประสงค์หลักคืออะไร?",
+      "choices": [
+        "ให้ LLM เขียนโค้ดได้เร็วขึ้น",
+        "ให้ LLM return structured data แทน free-form text",
+        "ให้ LLM เรียก API ของตัวเองได้",
+        "ให้ LLM ทำงานแบบ offline"
+      ],
+      "answer": 1,
+      "explanation": "Function calling ทำให้ LLM return structured data ที่ program ของเรา validate และใช้งานได้จริง — ไม่ใช่แค่ text ที่ต้อง parse เอง"
+    },
+    {
+      "question": "ทำไมต้องมี validate function ใน function schema?",
+      "choices": [
+        "เพื่อให้ LLM รู้ว่า parameters ถูกต้อง",
+        "เพื่อป้องกัน invalid arguments ไม่ให้เข้า system จริง",
+        "เพื่อให้ code ดู professional",
+        "เพื่อให้ AI generate code ได้ดีขึ้น"
+      ],
+      "answer": 1,
+      "explanation": "Validate คือ safety net — ป้องกันไม่ให้ invalid arguments จาก LLM เข้า system จริงและทำให้เกิด bugs"
+    },
+    {
+      "question": "LLM มักจะส่ง error แบบไหนบ่อยที่สุดในการ function calling?",
+      "choices": [
+        "ส่ง function name ผิด",
+        "Omit required fields หรือส่ง null",
+        "ส่ง arguments มากเกินไป",
+        "ลืม return structured output"
+      ],
+      "answer": 1,
+      "explanation": "LLM บางครั้งจะ omit required fields หรือส่ง null แทน values จริง — นี่คือเหตุผลที่ validate required fields เป็นสิ่งจำเป็น"
+    }
+  ]
+}

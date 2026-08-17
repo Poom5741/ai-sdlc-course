@@ -1,0 +1,38 @@
+{
+  "questId": "quest-55-compliance-checker",
+  "questions": [
+    {
+      "question": "Why must a compliance checker search ALL files in the codebase, not just the first match?",
+      "choices": [
+        "It's faster to check all files at once",
+        "A violation in file #20 is still a violation — stopping early misses real issues",
+        "Some files are larger than others and need more attention",
+        "Compliance rules only apply to certain file types"
+      ],
+      "answer": 1,
+      "explanation": "A naive implementation stops at the first matching file. But a compliance violation in the 20th file is just as serious as one in the 1st file. The checker must iterate over every file to be reliable."
+    },
+    {
+      "question": "What is the difference between 'required' and 'recommended' compliance checks?",
+      "choices": [
+        "Required checks run first, recommended checks run later",
+        "Required failures are critical (block deployment), recommended failures are warnings",
+        "Required checks use regex, recommended checks use string matching",
+        "There is no difference — both are treated the same"
+      ],
+      "answer": 1,
+      "explanation": "In compliance, severity matters. 'Required' checks that fail are critical blockers. 'Recommended' checks that fail are warnings — should be fixed but don't block deployment. The results must distinguish between these."
+    },
+    {
+      "question": "What evidence should a compliance check provide when it fails?",
+      "choices": [
+        "Just the rule ID and status",
+        "The file path and matching line where the check was found or not found",
+        "A full diff of the file contents",
+        "A screenshot of the IDE showing the error"
+      ],
+      "answer": 1,
+      "explanation": "Evidence helps developers find and fix issues quickly. For each result, provide the file path and the specific line or content where the check passed or failed."
+    }
+  ]
+}

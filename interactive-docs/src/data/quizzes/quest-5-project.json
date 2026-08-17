@@ -1,0 +1,38 @@
+{
+  "questId": "quest-5-project",
+  "questions": [
+    {
+      "question": "What happens when usage exceeds the context window?",
+      "choices": [
+        "The function throws an error",
+        "available goes negative",
+        "available is clamped to 0 and overBy shows how many tokens over",
+        "The function returns null"
+      ],
+      "answer": 2,
+      "explanation": "When usage exceeds the context window, available must be clamped to 0 (not negative), and overBy calculates exactly how many tokens over budget you are."
+    },
+    {
+      "question": "In the budget formula, what is `used` equal to?",
+      "choices": [
+        "systemTokens + userTokens",
+        "systemTokens + userTokens + historyTokens",
+        "total - reservedResponse",
+        "systemTokens + reservedResponse"
+      ],
+      "answer": 1,
+      "explanation": "Used tokens include all three input sources: system prompt tokens, user prompt tokens, and conversation history tokens."
+    },
+    {
+      "question": "Why must `overBy` be 0 (not negative) when within budget?",
+      "choices": [
+        "Negative numbers are invalid in JavaScript",
+        "overBy represents tokens over budget — being under budget means 0 over",
+        "It's a formatting preference",
+        "The tests will fail with negative numbers"
+      ],
+      "answer": 1,
+      "explanation": "overBy measures how far over budget you are. When within budget, you're not over at all, so overBy should be 0. A negative overBy would incorrectly suggest you're 'under budget by X tokens' which isn't the intended semantics."
+    }
+  ]
+}

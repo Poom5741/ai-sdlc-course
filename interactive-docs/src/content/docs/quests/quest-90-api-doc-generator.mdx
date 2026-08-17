@@ -5,22 +5,149 @@ description: "Generate OpenAPI spec from route handlers"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# API Doc Generator
+# Quest 90: API Doc Generator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate OpenAPI spec from route handlers
+<LearningObjectives items={[
+  "How to generate OpenAPI 3.0 specifications from route handler definitions",
+  "Why Documenting the Interface keeps API docs in sync with code",
+  "How to map HTTP methods and parameters to OpenAPI schema objects",
+  "The edge case of HTTP method casing — DELETE must stay uppercase"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: API Documentation as Code
+
+API documentation is one of the most neglected parts of software projects. Hand-maintained docs fall out of sync with the actual API, leading to frustrated developers and broken integrations. **API Doc Generator** solves this by generating OpenAPI (Swagger) specifications directly from route handler definitions.
+
+OpenAPI 3.0 is the industry standard for describing REST APIs. It defines a structured format for paths, methods, parameters, and responses that tools like Swagger UI, Postman, and Redoc can render into beautiful interactive documentation.
+
+The key insight: **your route definitions already contain all the information needed for documentation** — the HTTP method, path, parameters, and descriptions. An API doc generator just reformats this information into the OpenAPI schema.
+
+---
+
+## ⚙️ How It Works
+
+### OpenAPI Generation Pipeline
+
+```
+1. Parse route definitions (method, path, description, params)
+         ↓
+2. Map each route to an OpenAPI path object
+         ↓
+3. Convert parameters to query/path parameters
+         ↓
+4. Generate response schemas
+         ↓
+5. Output valid OpenAPI 3.0 spec
+```
+
+### OpenAPI Structure
+
+```json
+{
+  "openapi": "3.0.0",
+  "info": { "title": "My API", "version": "1.0.0" },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "List users",
+        "parameters": [...],
+        "responses": { "200": { "description": "Success" } }
+      }
+    }
+  }
+}
+```
+
+---
+
+## 💡 Example: Generating OpenAPI from Routes
+
+Given these route definitions:
+
+```javascript
+const routes = [
+  { method: 'GET', path: '/users', description: 'List all users', params: ['limit', 'offset'] },
+  { method: 'POST', path: '/users', description: 'Create a user' },
+  { method: 'DELETE', path: '/users/:id', description: 'Delete a user' }
+];
+```
+
+The generator should produce:
+
+```json
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Generated API", "version": "1.0.0" },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "List all users",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "string" } },
+          { "name": "offset", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "summary": "Create a user",
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/users/{id}": {
+      "delete": {
+        "summary": "Delete a user",
+        "responses": { "200": { "description": "Success" } }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Lowercasing HTTP methods**
+> "I'll convert all methods to lowercase for consistency"
+> → HTTP methods are case-sensitive. `DELETE` is an HTTP method, not a variable name. Lowercasing it (`delete`) makes it look like a JavaScript keyword and breaks API validators.
+
+**Mistake 2: Ignoring path parameters**
+> `/users/:id` should become `/users/{id}` in OpenAPI
+> → OpenAPI uses `{param}` syntax, not Express-style `:param`. Convert the syntax when generating the spec.
+
+**Mistake 3: Missing the info section**
+> "I'll just generate paths"
+> → A valid OpenAPI spec requires `info.title` and `info.version`. Without them, the spec fails validation.
+
+**Mistake 4: Forgetting responses**
+> "I'll just list the endpoints"
+> → Every endpoint should have at least a `200` response entry. Missing responses make the spec incomplete.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-90-api-doc-generator" />
+
+---
+
+## 🏋️ Quest: API Doc Generator
+
+Now it's time to practice! Build an OpenAPI spec generator.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-90-api-doc-generator
    cd quest-90-api-doc-generator
@@ -28,39 +155,34 @@ Generate OpenAPI spec from route handlers
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `generateOpenApi(routes)` function that:
+   - Maps each route to an OpenAPI path with correct HTTP method
+   - Converts `route.params` to query parameters
+   - Includes `info`, `paths`, and `responses`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Critical edge case:** HTTP methods must stay uppercase — especially `DELETE`
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Build the OpenAPI object step by step — first `info`, then `paths`, then fill in each method. Don't try to generate the entire spec in one expression.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- HTTP methods ต้องเป็น UPPERCASE — โดยเฉพาะ `DELETE`
+- แปลง `:param` (Express syntax) เป็น `{param}` (OpenAPI syntax)
+- อย่าลืม `info.title` และ `info.version` — OpenAPI spec จะ validation ไม่ผ่านถ้าไม่มี
+- ลองตรวจสอบ OpenAPI spec ของคุณด้วย Swagger Editor ออนไลน์

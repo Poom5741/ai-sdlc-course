@@ -1,66 +1,199 @@
 ---
 title: "Quest 78 - Context Engineering"
-description: "Optimal context selection from docs"
+description: "เลือก context ที่ดีที่สุดจากเอกสารที่มี"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 78: Context Engineering
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Optimal context selection from docs
+<LearningObjectives items={[
+  "เข้าใจว่า context selection ส่งผลต่อคุณภาพ LLM output อย่างไร",
+  "เลือก documents ที่เกี่ยวข้องที่สุดภายใน token budget",
+  "จัดการกับ trade-off ระหว่าง relevance และ token limit",
+  "รู้ว่าทำไม \"ข้อมูลเยอะ\" ไม่ได้แปลว่า \"คำตอบดี\""
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Context Engineering
+
+**Context Engineering** คือศิลปะการเลือกข้อมูลที่จะใส่เข้าไปใน prompt — LLMs มี token limit ดังนั้นคุณไม่สามารถใส่ทุกอย่างได้ ต้องเลือกเฉพาะสิ่งที่เกี่ยวข้องที่สุด
+
+ลองนึกภาพเหมือนการสอบ open book — คุณมีหนังสือ 100 เล่ม แต่พกได้แค่ 3 เล่ม คุณต้องเลือก 3 เล่มที่เกี่ยวข้องกับข้อสอบมากที่สุด
+
+**หลักการสำคัญ:** More context ≠ Better context. Relevant context = Better context.
+
+```
+Strategy 1 (ผิด): ใส่ทุก documents ที่มี → token limit exceeded → error
+Strategy 2 (ผิด): สุ่มเลือก 3 documents → อาจไม่เกี่ยวข้องเลย
+Strategy 3 (ถูก): เลือกตาม relevance score → ได้ context ที่เกี่ยวข้องที่สุด
+```
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Select Context
+
+```
+Documents [{ id, text, relevance }] + Query + maxTokens
+    ↓
+1. Sort by relevance score (สูง → ต่ำ)
+    ↓
+2. เลือก documents ทีละตัว (สูงสุดก่อน)
+    ↓
+3. บวกลบ tokens ทีละตัว
+    ↓
+4. ถ้า token ที่รวมกัน > maxTokens → หยุด
+    ↓
+5. Track ว่า documents ไหนถูก dropped
+    ↓
+Return { selected, totalTokens, dropped }
+```
+
+### ตัวอย่าง Scenario
+
+```javascript
+const documents = [
+  { id: 'doc1', text: 'Python basics...', relevance: 0.9 },   // สูง → เลือกก่อน
+  { id: 'doc2', text: 'React hooks...',   relevance: 0.8 },
+  { id: 'doc3', text: 'CSS grid...',      relevance: 0.3 },   // ต่ำ → อาจถูก dropped
+  { id: 'doc4', text: 'Node.js...',       relevance: 0.7 },
+];
+
+const maxTokens = 150;
+
+// Result:
+// selected: [doc1 (0.9), doc2 (0.8), doc4 (0.7)]
+// totalTokens: 140 (ไม่เกิน 150)
+// dropped: ['doc3'] (relevance ต่ำสุด + token ไม่พอ)
+```
+
+---
+
+## 💡 Example: Context Selector ใน Action
+
+```javascript
+function selectContext(query, documents, maxTokens) {
+  // Step 1: Sort by relevance (สูงสุดก่อน)
+  const sorted = [...documents].sort((a, b) => b.relevance - a.relevance);
+
+  const selected = [];
+  const dropped = [];
+  let totalTokens = 0;
+
+  // Step 2: เลือก documents ทีละตัว
+  for (const doc of sorted) {
+    const docTokens = doc.text.split(/\s+/).length; // นับ words เป็น tokens
+
+    if (totalTokens + docTokens <= maxTokens) {
+      selected.push({ id: doc.id, text: doc.text, tokens: docTokens });
+      totalTokens += docTokens;
+    } else {
+      dropped.push(doc.id);
+    }
+  }
+
+  return { selected, totalTokens, dropped };
+}
+
+// ตัวอย่างการใช้งาน
+const docs = [
+  { id: 'a', text: 'React is a UI library', relevance: 0.9 },
+  { id: 'b', text: 'Vue is also a UI framework', relevance: 0.7 },
+  { id: 'c', text: 'CSS is for styling', relevance: 0.4 },
+  { id: 'd', text: 'Webpack bundles modules', relevance: 0.6 }
+];
+
+const result = selectContext('How does React work?', docs, 8);
+// result.selected = [
+//   { id: 'a', text: 'React is a UI library', tokens: 6 },
+//   { id: 'b', text: 'Vue is also a UI framework', tokens: 6 }  // ← ไม่ fit
+// ]
+// จริงๆ แล้ว doc b (6 tokens) + doc a (6 tokens) = 12 > 8
+// ดังนั้นจะเหลือแค่ doc a (6 tokens)
+// result.dropped = ['b', 'c', 'd']
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: เลือก documents จนเต็ม budget โดยไม่สน relevance**
+> ใส่ documents ทั้งหมดจน token เต็ม
+> → ได้ context ที่ไม่เกี่ยวข้อง ทำให้ LLM สับสน
+
+**Mistake 2: ไม่ track dropped documents**
+> ไม่รู้ว่า documents ไหนถูกทิ้งไป
+> → debug ไม่ได้ว่าทำไมคำตอบถึงไม่ดี
+
+**Mistake 3: นับ tokens ผิด**
+> คิดว่า words = tokens เสมอ
+> → ในความเป็นจริง tokens ≠ words (แต่สำหรับ quest นี้ใช้ words เป็น proxy)
+
+**Mistake 4: เรียง relevance ผิด (ต่ำ → สูง)**
+> เลือก documents ที่ relevance ต่ำก่อน
+> → token budget เต็มก่อนจะได้ documents ที่เกี่ยวข้อง
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-78-context-engineering" />
+
+---
+
+## 🏋️ Quest: Context Engineering
+
+ถึงเวลาฝึกฝน! สร้าง context selector ที่เลือก documents ที่เกี่ยวข้องที่สุด
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-78-context-engineering
    cd quest-78-context-engineering
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `selectContext(query, documents, maxTokens)` ที่:
+   - Sort documents by relevance (สูง → ต่ำ)
+   - เลือก documents ทีละตัวจนเกิน maxTokens
+   - Track dropped documents
+   - Return `{ selected, totalTokens, dropped }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก case ที่ documents ทุกตัว fit ใน budget ก่อน — แล้วค่อยเพิ่ม case ที่ต้อง drop
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Sort documents: `documents.sort((a, b) => b.relevance - a.relevance)`
+- นับ tokens: `text.split(/\s+/).length` (words เป็น proxy สำหรับ tokens)
+- เก็บ selected เป็น array ของ objects: `{ id, text, tokens }`
+- เก็บ dropped เป็น array ของ strings: `['doc3', 'doc5']`
+- ทดสอบด้วย edge case: documents ว่าง, maxTokens = 0, relevance เท่ากันทุกตัว

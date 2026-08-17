@@ -1,66 +1,233 @@
 ---
 title: "Quest 82 - Cross-Model Prompt Porter"
-description: "Adapt prompts between different LLMs"
+description: "ปรับ prompt สำหรับ LLMs ต่างรุ่น"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 82: Cross-Model Prompt Porter
 
-<Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
-
-## เป้าหมาย
-
-Adapt prompts between different LLMs
+<Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจว่า LLMs แต่ละรุ่นมีจุดแข็งและจุดอ่อนต่างกัน",
+  "ปรับ prompt จาก model หนึ่งไปใช้กับอีก model หนึ่งได้",
+  "รู้จัก model-specific adaptations: Claude, GPT, Gemini",
+  "เข้าใจว่า same-model passthrough ต้องไม่เปลี่ยน prompt"
+]} />
+
+---
+
+## 📖 Concept: Cross-Model Prompting
+
+**Cross-Model Prompting** คือการปรับ prompt ที่เขียนสำหรับ LLM ตัวหนึ่ง ให้ใช้กับ LLM ตัวอื่นได้ — เหมือนการแปลภาษาจากอังกฤษเป็นญี่ปุ่น แม้ความหมายเหมือนกัน แต่วิธีสื่อสารต่างกัน
+
+ลองนึกภาพเหมือนการสั่งอาหารในร้านต่างประเทศ — แม้ "ข้าวผัด" ในไทยกับจีนเหมือนกัน แต่วิธีสั่งต่างกัน ต้องปรับให้เข้ากับร้านนั้น
+
+**Model Differences:**
+
+| Model | จุดแข็ง | จุดอ่อน | วิธีปรับ prompt |
+| ------- | --------- | --------- | ---------------- |
+| Claude | Following instructions precisely | บางครั้งยาวเกินไป | เพิ่ม "Be concise" |
+| GPT | Creative, flexible | บางครั้ง freeform เกินไป | เพิ่ม structure/format |
+| Gemini | Fast, multimodal | บางครั้งไม่ละเอียด | เพิ่ม "Be thorough" |
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Port Prompt
+
+```
+Original Prompt + fromModel + toModel
+    ↓
+1. ถ้า fromModel === toModel → passthrough (ไม่เปลี่ยน)
+    ↓
+2. ถ้า toModel ไม่รู้จัก → return warning
+    ↓
+3. ปรับ prompt ตาม model-specific adaptations:
+    ↓
+   ├── Claude: เพิ่ม conciseness, structured format
+    ↓
+   ├── GPT: เพิ่ม explicit structure, step-by-step
+    ↓
+   └── Gemini: เพิ่ม thoroughness, detail
+    ↓
+4. Return { adapted, model, warnings }
+```
+
+### Model Adaptations
+
+```javascript
+const adaptations = {
+  claude: {
+    additions: ['Be concise and direct.', 'Use structured format.'],
+    removals: ['Creative flourishes', 'Long explanations']
+  },
+  gpt: {
+    additions: ['Follow these steps explicitly:', 'Output as structured JSON.'],
+    removals: ['Ambiguous instructions']
+  },
+  gemini: {
+    additions: ['Be thorough and detailed.', 'Provide examples.'],
+    removals: ['Assumed knowledge']
+  }
+};
+```
+
+---
+
+## 💡 Example: Prompt Porter ใน Action
+
+```javascript
+function portPrompt(prompt, fromModel, toModel) {
+  // Same model = passthrough
+  if (fromModel === toModel) {
+    return { adapted: prompt, model: toModel, warnings: [] };
+  }
+
+  // Unknown model = warning
+  const knownModels = ['claude', 'gpt', 'gemini'];
+  if (!knownModels.includes(toModel)) {
+    return {
+      adapted: prompt,
+      model: toModel,
+      warnings: [`Unknown model "${toModel}" — no adaptations applied`]
+    };
+  }
+
+  const warnings = [];
+  let adapted = prompt;
+
+  // Model-specific adaptations
+  switch (toModel) {
+    case 'claude':
+      adapted = prompt + '\n\nBe concise and direct. Use structured format.';
+      break;
+    case 'gpt':
+      adapted = prompt + '\n\nFollow these steps explicitly. Output as structured JSON.';
+      break;
+    case 'gemini':
+      adapted = prompt + '\n\nBe thorough and detailed. Provide examples.';
+      break;
+  }
+
+  return { adapted, model: toModel, warnings };
+}
+
+// ตัวอย่าง 1: Claude → GPT
+portPrompt(
+  'Review this code for bugs',
+  'claude',
+  'gpt'
+);
+// {
+//   adapted: 'Review this code for bugs\n\nFollow these steps explicitly. Output as structured JSON.',
+//   model: 'gpt',
+//   warnings: []
+// }
+
+// ตัวอย่าง 2: Same model (passthrough)
+portPrompt(
+  'Review this code for bugs',
+  'claude',
+  'claude'
+);
+// {
+//   adapted: 'Review this code for bugs',
+//   model: 'claude',
+//   warnings: []
+// }
+
+// ตัวอย่าง 3: Unknown model
+portPrompt(
+  'Review this code for bugs',
+  'claude',
+  'llama-3'
+);
+// {
+//   adapted: 'Review this code for bugs',
+//   model: 'llama-3',
+//   warnings: ['Unknown model "llama-3" — no adaptations applied']
+// }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: เปลี่ยน prompt สำหรับ same model**
+> fromModel === toModel แต่ยัง apply adaptations
+> → prompt เปลี่ยนโดยไม่จำเป็น — ทำให้ผลลัพธ์ต่างจากที่คาด
+
+**Mistake 2: ไม่ handle unknown models**
+> ไม่มี warning สำหรับ model ที่ไม่รู้จัก
+> → ผู้ใช้ไม่รู้ว่า prompt ไม่ได้ถูกปรับ
+
+**Mistake 3: ปรับ prompt มากเกินไป**
+> เปลี่ยนความหมายของ prompt ตอน port
+> → prompt ต้องรักษาสาระสำคัญไว้ แค่ปรับวิธีสื่อสาร
+
+**Mistake 4: ไม่ return model name**
+> ไม่บันทึกว่า prompt ถูกปรับสำหรับ model ไหน
+> → debug ไม่ได้ว่า prompt ที่ใช้เป็นของ model ไหน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-82-prompt-porter" />
+
+---
+
+## 🏋️ Quest: Cross-Model Prompt Porter
+
+ถึงเวลาฝึกฝน! สร้าง prompt porter ที่ปรับ prompt สำหรับ LLMs ต่างรุ่น
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-82-prompt-porter
    cd quest-82-prompt-porter
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `portPrompt(prompt, fromModel, toModel)` ที่:
+   - Same model → passthrough (ไม่เปลี่ยน)
+   - Unknown model → return warning
+   - Known model → apply adaptations (Claude, GPT, Gemini)
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก same-model passthrough ก่อน — ถ้าทำงานได้แล้วค่อยเพิ่ม model-specific adaptations
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Same model: ถ้า fromModel === toModel → return `{ adapted: prompt, model: toModel, warnings: [] }`
+- Unknown model: เช็คว่า toModel มีใน knownModels list ไหม — ถ้าไม่มี return warning
+- Claude adaptations: เพิ่ม "Be concise and direct. Use structured format."
+- GPT adaptations: เพิ่ม "Follow these steps explicitly. Output as structured JSON."
+- Gemini adaptations: เพิ่ม "Be thorough and detailed. Provide examples."
+- ทดสอบด้วยทุกคู่ model: claude→gpt, gpt→gemini, gemini→claude, same→same

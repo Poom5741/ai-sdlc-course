@@ -1,0 +1,38 @@
+{
+  "questId": "quest-45-input-validator",
+  "questions": [
+    {
+      "question": "ความแตกต่างระหว่าง validation และ sanitization คืออะไร?",
+      "choices": [
+        "Validation ตรวจสอบ format, Sanitization ทำความสะอาด input",
+        "Validation ใช้สำหรับ frontend, Sanitization ใช้สำหรับ backend",
+        "Validation ช้ากว่า Sanitization",
+        "ไม่มีความแตกต่าง ใช้คำแทนกันได้"
+      ],
+      "answer": 0,
+      "explanation": "Validation ตรวจสอบว่า input ตรงกับ expected format แล้ว reject ถ้าไม่ตรง ส่วน Sanitization ทำความสะอาด input โดยลบ/escape อักขระอันตราย"
+    },
+    {
+      "question": "Blacklist approach สำหรับ XSS prevention มีปัญหาอย่างไร?",
+      "choices": [
+        "ช้าเกินไปสำหรับ production",
+        "Attacker หา ways around blocklist ได้เสมอ",
+        "ใช้ memory มากเกินไป",
+        "ไม่ทำงานกับ modern browsers"
+      ],
+      "answer": 1,
+      "explanation": "Blacklisting เป็น losing game — attacker หา ways รอบ blocklist ได้เสมอ ควรใช้ whitelisting แทน (กำหนดว่าอะไร allowed)"
+    },
+    {
+      "question": "Client-side validation เพียงพอสำหรับ security หรือไม่?",
+      "choices": [
+        "เพียงพอ เพราะ browser ป้องกันได้",
+        "ไม่เพียงพอ — attacker bypass ได้ง่าย ต้อง validate ที่ server เสมอ",
+        "เพียงพอเฉพาะ mobile apps",
+        "ไม่จำเป็นเลย ใช้ server-side validation อย่างเดียว"
+      ],
+      "answer": 1,
+      "explanation": "Client-side validation ใช้สำหรับ UX เท่านั้น — attacker bypass ได้ง่าย ต้อง validate ที่ server เสมอเป็น primary defense"
+    }
+  ]
+}

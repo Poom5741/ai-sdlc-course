@@ -1,26 +1,173 @@
 ---
-title: "Worker API Builder"
-description: "Workers with KV/D1 routing"
+title: "Quest 131 - Worker API Builder"
+description: "สร้าง Worker API routes ด้วย KV/D1 routing และ error handling"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Worker API Builder
+# Quest 131: Worker API Builder
 
 <Badge text="hard" variant="danger" /> <Badge text="35 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Workers with KV/D1 routing
+<LearningObjectives items={[
+  "เข้าใจ path-based routing สำหรับ different storage backends (KV vs D1)",
+  "รู้วิธี config error handling ที่แตกต่างกันสำหรับ preview vs production environments",
+  "สร้าง Worker routes ที่เชื่อมต่อ storage ได้ถูกต้อง",
+  "จัดการ edge cases ของ D1 ใน preview environments"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Worker API Routing with Storage
+
+Cloudflare Workers ไม่ได้เป็นแค่ "run code on edge" — มันคือ full API platform ที่เชื่อมต่อ storage backends หลายชนิดได้ ใน quest นี้คุณจะเรียนรู้ pattern ที่ route API requests ไปหา storage ที่ถูกต้องตาม URL path
+
+**KV** (Key-Value) เหมือน dictionary — เก็บ key-value pairs ที่เข้าถึงเร็วมาก เหมาะสำหรับ caching, sessions, และ config data
+
+**D1** (Database) เหมือน SQL database — เῄาะสำหรับ relational data ที่ต้อง query ด้วย SQL
+
+Think ของ pattern นี้เหมือน "มัลติแพลตฟอร์ม dispatch" — URL path เป็น "address" ที่บอกว่า request ต้องไปหา storage ไหน
+
+---
+
+## ⚙️ How It Works
+
+### Routing Logic
+
+```
+1. รับ request (method, path, env)
+         ↓
+2. ตรวจสอบ path prefix (/kv/, /d1/, etc.)
+         ↓
+3. Route ไปหา storage backend ที่ถูกต้อง
+         ↓
+4. เพิ่ม error handling ตาม storage type
+         ↓
+5. ตรวจสอบ env.isPreview → เพิ่ม preview-specific handling
+         ↓
+6. Return { handler, storage, errorHandling, status }
+```
+
+### Path-Based Storage Detection
+
+| Path Pattern | Storage | Handler Example |
+| --- | --- | --- |
+| `/kv/*` | KV | `kv-get`, `kv-post` |
+| `/d1/*` | D1 | `d1-get`, `d1-post` |
+| Other | None | `api-get`, `api-post` |
+
+### Error Handling by Environment
+
+**Production:**
+
+- D1 query errors
+- Database connection timeout
+
+**Preview:**
+
+- Database not ready in preview environment
+- D1 binding not configured
+- Friendly error for preview DB errors
+
+---
+
+## 💡 Example: Building Worker Routes
+
+**ขั้นตอนที่ 1: กำหนด path-based routing**
+
+```javascript
+function buildWorkerRoute(method, path, env) {
+  let storage = 'none';
+  let handler = '';
+  const errorHandling = [];
+```
+
+**ขั้นตอนที่ 2: Route by path prefix**
+
+```javascript
+  if (path.startsWith('/kv/')) {
+    storage = 'kv';
+    handler = `kv-${method.toLowerCase()}`;
+    errorHandling.push('Handle KV namespace not found');
+    errorHandling.push('Handle key not found (404)');
+  } else if (path.startsWith('/d1/')) {
+    storage = 'd1';
+    handler = `d1-${method.toLowerCase()}`;
+    // ... more handling below
+  } else {
+    handler = `api-${method.toLowerCase()}`;
+    errorHandling.push('Handle method not allowed');
+  }
+```
+
+**ขั้นตอนที่ 3: D1 environment-specific handling**
+
+```javascript
+    // D1 requires special error handling in preview environments
+    if (env.isPreview) {
+      errorHandling.push('Handle database not ready in preview environment');
+      errorHandling.push('Handle D1 binding not configured');
+      errorHandling.push('Return friendly error for preview DB errors');
+    } else {
+      errorHandling.push('Handle D1 query errors');
+      errorHandling.push('Handle database connection timeout');
+    }
+
+    // D1 specific method handling
+    if (method === 'POST' || method === 'PUT') {
+      errorHandling.push('Validate request body before D1 insert');
+      errorHandling.push('Handle unique constraint violations');
+    }
+```
+
+**ขั้นตอนที่ 4: Return structured result**
+
+```javascript
+  return { handler, storage, errorHandling, status: 200 };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ distinguish preview vs production**
+> "env.isPreview ไม่สำคัญ"
+> → D1 ใน preview environment อาจไม่ ready — ต้อง handle error ต่างกัน
+
+**Mistake 2: ลืม validate request body สำหรับ D1**
+> POST/PUT requests ต้อง validate body ก่อน insert เสมอ
+> → D1 จะ throw error ถ้า data ไม่ตรง schema
+
+**Mistake 3: ไม่ handle KV namespace not found**
+> KV namespace อาจไม่ถูก config ใน environment บางตัว
+> → ต้อง check และ return user-friendly error
+
+**Mistake 4: ใช้ method name ตรงๆ แทน lowercase**
+> `"GET"` แทน `"get"` ทำให้ handler name ผิด format
+> → เสมอใช้ `.toLowerCase()` กับ method name
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-131-worker-api" />
+
+---
+
+## 🏋️ Quest: Worker API Builder
+
+ถึงเวลาสร้าง Worker API router ที่เชื่อมต่อ storage backends ได้แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-131-worker-api
    cd quest-131-worker-api
@@ -28,39 +175,37 @@ Workers with KV/D1 routing
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `buildWorkerRoute(method, path, env)` ที่:
+   - Route requests ตาม path prefix (/kv/, /d1/)
+   - เพิ่ม error handling ที่ถูกต้องสำหรับแต่ละ storage
+   - จัดการ preview vs production environments ต่างกัน
+   - Handle POST/PUT validation สำหรับ D1
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง flow ของ request — path เป็น "address" ที่บอกว่า request ต้องไปหา storage ไหน
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Path prefixes ที่ต้อง handle: `/kv/` สำหรับ KV และ `/d1/` สำหรับ D1
+- ใช้ `.toLowerCase()` กับ method name เพื่อสร้าง handler name
+- ตรวจสอบ `env.isPreview` เพื่อเพิ่ม preview-specific error handling
+- POST และ PUT requests สำหรับ D1 ต้อง validate request body

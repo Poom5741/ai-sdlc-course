@@ -1,0 +1,38 @@
+{
+  "questId": "quest-121-commit-message",
+  "questions": [
+    {
+      "question": "What is wrong with this commit message: 'feat: Added login page.'?",
+      "choices": [
+        "The type 'feat' is not valid",
+        "It uses past tense ('Added') and ends with a period",
+        "The description is too short",
+        "The scope is missing"
+      ],
+      "answer": 1,
+      "explanation": "Two violations: 'Added' is past tense (should be 'add' in imperative mood), and the description ends with a period (not allowed). Correct: 'feat: add login page'"
+    },
+    {
+      "question": "Why does Conventional Commits require imperative mood instead of past tense?",
+      "choices": [
+        "It's just a stylistic preference with no functional difference",
+        "Because commit messages describe what the commit WILL do, not what was done",
+        "Because Git only understands imperative commands",
+        "Because past tense messages are too long"
+      ],
+      "answer": 1,
+      "explanation": "Imperative mood ('add login') reads as 'this commit will add login page', which is a forward-looking description of the change. Past tense ('added') is grammatically awkward when applied to future code that will use this commit."
+    },
+    {
+      "question": "Which of these is a valid Conventional Commit type?",
+      "choices": [
+        "updated",
+        "changed",
+        "refactor",
+        "modified"
+      ],
+      "answer": 2,
+      "explanation": "Only a fixed set of types are valid: feat, fix, chore, docs, style, refactor, test, perf, ci, build. 'updated', 'changed', and 'modified' are not in the list."
+    }
+  ]
+}

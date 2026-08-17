@@ -1,66 +1,176 @@
 ---
-title: "GitHub Project Board Builder"
+title: "Quest 126 - GitHub Project Board Builder"
 description: "Design GitHub Projects board"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# GitHub Project Board Builder
+# Quest 126: GitHub Project Board Builder
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design GitHub Projects board
+<LearningObjectives items={[
+  "How to design GitHub Projects (v2) boards with custom fields",
+  "The relationship between columns/statuses and workflow stages",
+  "How automation rules reduce manual project management",
+  "When to use Board, Table, and Roadmap views"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: GitHub Project Boards
+
+GitHub Projects (v2) เป็นเครื่องมือจัดการงานที่ทรงพลัง — มันไม่ใช่แค่ sticky notes บน digital board แต่เป็น **database ของงาน** ที่มี custom fields, automation rules, และ multiple views
+
+ถ้าคุณออกแบบ board ไม่ดี มันจะกลายเป็น just another to-do list ที่ไม่มีใครเปิดดู แต่ถ้าออกแบบดี มันจะเป็น command center ที่ทั้งทีมใช้ day-to-day
+
+Think of project board design like planning a dojo's training schedule — you need clear phases (warm-up, technique, sparring, cool-down), tracked metrics (reps, intensity), and views for different audiences (instructor view vs student view).
+
+---
+
+## ⚙️ How It Works
+
+### Required Sections
+
+```
+1. PROJECT OVERVIEW — name, purpose, team
+2. COLUMNS / STATUSES — what states work items flow through
+3. CUSTOM FIELDS — dropdown, number, date fields for metadata
+4. VIEWS — Board, Table, Roadmap
+5. AUTOMATION RULES — auto-move, auto-assign
+6. SWIMLANES — grouping by priority, assignee, or iteration
+```
+
+### Example Column Flow
+
+```
+📋 Backroom → 🔨 In Progress → 👀 In Review → ✅ Done
+     ↑              ↑               ↑            ↑
+  triaged      started PR       PR opened    merged/closed
+```
+
+### Automation Examples
+
+| Trigger | Action |
+| --- | --- |
+| PR opened | Move issue to "In Review" |
+| PR merged | Move issue to "Done" |
+| Issue created | Assign to sprint |
+| Label added | Update priority field |
+
+---
+
+## 💡 Example: Designing a Board
+
+```markdown
+## Project Overview
+- **Name:** BlueBeltDojo Sprint Board
+- **Purpose:** Track sprint work for the engineering team
+- **Team:** 4 developers, 1 PM
+
+## Columns / Statuses
+| Column | When items move here |
+| --- | --- |
+| 📋 Backlog | New issues, not yet prioritized |
+| 🎯 Sprint Ready | Prioritized for current sprint |
+| 🔨 In Progress | Developer started working |
+| 👀 In Review | PR opened, awaiting review |
+| ✅ Done | PR merged, story accepted |
+
+## Custom Fields
+- **Priority** (dropdown): P0, P1, P2, P3
+- **Story Points** (number): 1, 2, 3, 5, 8, 13
+- **Sprint** (iteration): 2-week cycles
+- **Due Date** (date): deadline for delivery
+
+## Views
+- **Board View:** Kanban-style for daily standups
+- **Table View:** Filter by assignee for 1-on-1s
+- **Roadmap View:** Timeline for stakeholder demos
+
+## Automation Rules
+- When PR is opened → move linked issue to "In Review"
+- When PR is merged → move linked issue to "Done"
+- When issue is labeled "bug" → set Priority to P1
+
+## Swimlanes
+- By Priority: P0 items always visible at top
+- By Assignee: filter per developer for workload balance
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่มี automation rules**
+> AI ออกแบบ board ที่ดูดีแต่ไม่มี automation
+> → ทุกอย่างต้อง move ด้วยมือ = ไม่มีใครทำ = board ล้าสมัย
+
+**Mistake 2: Columns มากเกินไป**
+> AI สร้าง 10+ columns เพื่อ cover ทุก scenario
+> → Too many columns = cognitive overload, ไม่มีใครใช้
+
+**Mistake 3: ไม่มี custom fields**
+> AI ออกแบบ board ที่ไม่มี priority, story points, หรือ sprint
+> → ไม่สามารถ filter หรือจัดลำดับงานได้
+
+**Mistake 4: ไม่คิดถึง views ที่ different audiences ต้องการ**
+> AI ออกแบบ board view เดียว
+> → PM ต้องการ roadmap, dev ต้องการ table, lead ต้องการ board
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-126-project-board" />
+
+---
+
+## 🏋️ Quest: GitHub Project Board Builder
+
+Now it's time to practice! Design a complete GitHub Projects board.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-126-project-board
    cd quest-126-project-board
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. สร้างไฟล์ `project-board-design.md` ที่มี sections ครบ: Overview, Columns, Custom Fields, Views, Automation, Swimlanes
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — ตรวจสอบว่าทุก required section มีอยู่ครบ
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกว่าคุณเป็น PM ที่ต้อง explain sprint progress ให้ CTO ฟัง — board ของคุณจะช่วยได้อย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- board ต้องมี 6 sections: Overview, Columns, Custom Fields, Views, Automation, Swimlanes
+- Automation rules คือ key differentiator ระหว่าง board ที่ดีและ board ที่ตายแล้ว
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

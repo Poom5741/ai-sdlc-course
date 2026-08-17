@@ -5,62 +5,179 @@ description: "Generate user stories from notes"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 23: User Story Generator
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Generate user stories from notes
+<Badge text="easy" variant="success" /> <Badge text="20 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-23-user-story-generator
-   cd quest-23-user-story-generator
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Understanding the User Story format (As a / I want / So that)",
+  "Converting raw notes into structured, actionable user stories",
+  "Writing acceptance criteria that make stories testable",
+  "Recognizing when AI returns raw text instead of structured data"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: User Stories — โครงสร้างความต้องการแบบมีระเบียบ
+
+User Story คือรูปแบบมาตรฐานในการเขียนความต้องการ (requirements) ให้อยู่ในรูปแบบที่ **สั้น ชัดเจน และทดสอบได้** format คือ:
+
+```
+As a [role], I want [feature], so that [benefit]
+```
+
+เช่น: *"As a registered user, I want to reset my password, so that I can regain access when I forget it"*
+
+ทำไมต้องใช้ User Story? เพราะมันบังคับให้เราคิดถึง **3 สิ่งพร้อมกัน**: ใครใช้ (role), ทำอะไร (feature), ทำไมถึงต้องการ (benefit) — ทำให้ requirements ไม่หลุดกรอบ
+
+---
+
+## ⚙️ How It Works
+
+### The User Story Workflow
+
+```
+1. เก็บ notes ดิบ (raw requirements notes)
+         ↓
+2. AI แยกแยะ role, feature, benefit
+         ↓
+3. จัดรูปแบบเป็น structured object
+         ↓
+4. เพิ่ม acceptance criteria สำหรับทดสอบ
+         ↓
+5. ตรวจสอบว่าครบทุก field
+```
+
+### Acceptance Criteria — เกณฑ์ทดสอบ
+
+acceptance criteria คือ **เงื่อนไขที่ต้องเป็นจริง** เพื่อให้ user story "done" เช่น:
+
+```
+User Story: "As a user, I want to login with email and password"
+
+Acceptance Criteria:
+- ✅ User can enter email and password
+- ✅ System validates email format
+- ✅ Password must be at least 8 characters
+- ✅ Shows error on wrong credentials
+- ✅ Redirects to dashboard on success
+```
+
+ถ้าไม่มี acceptance criteria → ทดสอบไม่ได้ → ไม่รู้ว่า "done" จริงหรือยัง
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: ดู raw notes ที่ไม่มีโครงสร้าง**
+
+```javascript
+const notes = "As a user, I want to login so that I can access my account. Must have email and password fields.";
+```
+
+**Step 2: ใช้ AI ช่วยแปลงเป็น structured object**
+
+```javascript
+function generateUserStory(notes) {
+  // Parse the notes into structured format
+  const asA = "registered user";
+  const iWant = "to login with email and password";
+  const soThat = "I can securely access my account";
+  const acceptanceCriteria = [
+    "Login form has email and password fields",
+    "Email format is validated",
+    "Password is masked during input",
+    "Error message shown on invalid credentials",
+    "User is redirected to dashboard on success"
+  ];
+
+  return { asA, iWant, soThat, acceptanceCriteria };
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: อ่าน test output** — ทดสอบว่าทุก field มีค่าและ acceptance criteria มีอย่างน้อย 1 ข้อ
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: คืน raw notes ตรงๆ แทน structured format**
+> "ข้อความดูโอเคแล้ว ไม่ต้องแปลง"
+> → Test จะ fail เพราะ expects object ที่มี `asA`, `iWant`, `soThat` fields
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: ไม่เขียน acceptance criteria**
+> "User story ดูดีแล้ว ไม่ต้องทดสอบ"
+> → ถ้าไม่มี criteria → ไม่มีเกณฑ์วัดว่า feature ทำเสร็จหรือยัง
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: ไม่ handle minimal input**
+> "ถ้า notes น้อยเกินไปก็ไม่ต้องทำ"
+> → AI ต้องหาทาง structure แม้ input จะสั้น เช่น "need login" ก็ต้องได้ story กลับมา
+
+**Mistake 4: ลอก solution โดยตรง**
+> "ดู solution แล้วก็เขียนตาม"
+> → ไม่ได้เรียนรู้วิธีคิด — ต้องเข้าใจว่าทำไมต้อง structure แบบนี้
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-23-user-story-generator" />
+
+---
+
+## 🏋️ Quest: User Story Generator
+
+ตอนนี้ถึงเวลาฝึกฝน! สร้าง user story จาก raw notes โดยใช้ AI ช่วย
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-23-user-story-generator
+   cd quest-23-user-story-generator
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `generateUserStory(notes)` ที่แปลง raw notes เป็น structured user story object
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — คำตอบอยู่ที่การเข้าใจว่าทำไม code ถึง fail ไม่ใช่ที่ `_solution/solution.js`
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า return object มีครบทุก field: `asA`, `iWant`, `soThat`, `acceptanceCriteria`
+- ทดสอบ edge case ของ minimal input เช่น "need login" สั้นๆ ก็ต้องได้ structured story กลับมา
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -5,62 +5,158 @@ description: "Detect bias using fairness metrics"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 53: Bias Detector
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Detect bias using fairness metrics
+<LearningObjectives items={[
+  "How to detect bias in AI outputs using the 4/5ths rule (disparate impact ratio)",
+  "Why measuring rates matters more than measuring counts",
+  "How to calculate per-group fairness metrics",
+  "The critical edge case: different group sizes masking bias"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Fairness & Bias Detection
+
+AI models can produce biased outputs — and the bias is often invisible unless you actively measure it. A model might approve 90% of applicants from Group A but only 50% from Group B. If you only look at total counts, this disparity gets hidden behind group size differences.
+
+Fairness in AI is not just an ethical ideal — it's a measurable property. The most widely used metric is the **disparate impact ratio** (also called the 4/5ths rule), borrowed from US employment law. If one group's positive outcome rate is less than 80% of another group's rate, that's a signal of potential bias.
+
+Think of bias detection like a dojo instructor watching your form. You might think your technique looks perfect, but the instructor measures the angles and catches the 15-degree deviation you can't feel. Bias detection tools do the same thing — they measure the numbers your intuition misses.
+
+---
+
+## ⚙️ How It Works
+
+### The 4/5ths Rule (Disparate Impact Ratio)
+
+```
+Disparate Impact Ratio = min(group_rates) / max(group_rates)
+```
+
+If this ratio is < 0.8 (80%), the system is flagged as potentially biased.
+
+### Step-by-step calculation
+
+**Step 1: Calculate the approval rate per group**
+
+```javascript
+// Group A: 10 people, 9 approved → rate = 0.9
+// Group B: 10 people, 5 approved → rate = 0.5
+const rateA = approvedA / totalA;  // 0.9
+const rateB = approvedB / totalB;  // 0.5
+```
+
+**Step 2: Compute the disparate impact ratio**
+
+```javascript
+const ratio = Math.min(rateA, rateB) / Math.max(rateA, rateB);
+// 0.5 / 0.9 = 0.555 → biased (below 0.8)
+```
+
+**Step 3: Flag groups below threshold**
+
+```javascript
+const flagged = groups.filter(g => rates[g] < threshold);
+```
+
+---
+
+## 💡 Example: Different Group Sizes (The Edge Case)
+
+The most dangerous naive-AI mistake: checking raw counts instead of rates.
+
+```javascript
+// ❌ NAIVE: Checks if "approved count" is similar
+const approvedA = 9;  // Group A: 9 approved
+const approvedB = 1;  // Group B: 1 approved
+// Naive: "9 vs 1 — that's biased!"
+
+// ✅ CORRECT: Checks approval RATES
+// Group A: 9 out of 10 (90%)
+// Group B: 1 out of 2 (50%)
+const rateA = 9 / 10;  // 0.9
+const rateB = 1 / 2;   // 0.5
+const ratio = 0.5 / 0.9;  // 0.555 → flagged
+```
+
+**Why rates matter:** If Group A has 1,000 people and Group B has 10, comparing raw counts will always make Group B look "underrepresented" — even if both groups have the same approval rate. Rates normalize for group size.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Comparing raw counts instead of rates**
+> "Group A has more approvals than Group B — that's bias!"
+> → Always normalize by group size. A larger group will naturally have more approvals.
+
+**Mistake 2: Only checking one direction**
+> "What if Group A is favored over Group B?"
+> → Bias can flow both ways. Check all group pairs.
+
+**Mistake 3: Ignoring small sample sizes**
+> "Group C has 1 person who was denied — bias!"
+> → Small samples are noisy. A single denial in a group of 1 doesn't prove bias. Consider statistical significance.
+
+**Mistake 4: Using counts for the disparate impact ratio**
+> "The ratio of 9 approved to 1 approved is 0.11 — that's biased!"
+> → The ratio must use *rates* (approved/total per group), not raw counts.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-53-bias-detector" />
+
+---
+
+## 🏋️ Quest: Bias Detector
+
+Now it's time to practice! Build a bias detection system using fairness metrics.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-53-bias-detector
    cd quest-53-bias-detector
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool (Copilot, Claude Code, Cursor, etc.)
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `detectBias(results, demographics)` that uses the 4/5ths rule to detect bias
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** Pay special attention to the different-group-sizes edge case — naive AI compares counts instead of rates
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The hardest test case has groups of different sizes. Make sure you calculate *rates* (approved/total per group), not raw counts.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- คำนวณ approval rate ต่อกลุ่ม (จำนวน approved / จำนวนทั้งหมด) ไม่ใช่จำนวน raw
+- Edge case ที่สำคัญที่สุด: กลุ่มที่มีขนาดต่างกัน — ต้องใช้ rate เทียบกัน
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

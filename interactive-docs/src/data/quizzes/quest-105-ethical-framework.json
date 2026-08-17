@@ -1,0 +1,38 @@
+{
+  "questId": "quest-105-ethical-framework",
+  "questions": [
+    {
+      "question": "What does 'ethics by design' mean?",
+      "choices": [
+        "Adding an ethics review after the product launches",
+        "Building ethical considerations into the development process from the start",
+        "Writing a mission statement about ethics",
+        "Hiring an ethics consultant at the end of the project"
+      ],
+      "answer": 1,
+      "explanation": "Ethics by design means integrating ethical considerations into every phase of development — requirements, design, implementation, testing, and deployment — not treating it as an afterthought."
+    },
+    {
+      "question": "Why must an ethical framework include a monitoring plan?",
+      "choices": [
+        "Monitoring is required by law in all jurisdictions",
+        "AI systems drift over time as data distributions change, so fairness must be continuously checked",
+        "Monitoring looks good in compliance audits",
+        "It prevents all future ethical issues"
+      ],
+      "answer": 1,
+      "explanation": "AI models degrade as real-world data changes. A model that was fair at deployment may become biased over time. Continuous monitoring catches drift before it causes harm."
+    },
+    {
+      "question": "What makes an ethical framework actionable rather than theoretical?",
+      "choices": [
+        "It uses formal academic language",
+        "It includes specific metrics, thresholds, and escalation processes",
+        "It's endorsed by a famous ethicist",
+        "It covers every possible ethical scenario"
+      ],
+      "answer": 1,
+      "explanation": "An actionable framework defines concrete metrics (e.g., demographic parity gap < 0.1), clear roles (who is accountable), and specific processes (when to escalate). Vague principles aren't enough."
+    }
+  ]
+}

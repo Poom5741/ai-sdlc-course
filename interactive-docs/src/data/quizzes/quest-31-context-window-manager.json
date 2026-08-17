@@ -1,0 +1,38 @@
+{
+  "questId": "quest-31-context-window-manager",
+  "questions": [
+    {
+      "question": "Context Window Manager ทำหน้าที่อะไร?",
+      "choices": [
+        "ลบทั้งหมดไฟล์ที่ไม่จำเป็นออกจาก project",
+        "เลือกเฉพาะไฟล์ที่เกี่ยวข้องที่สุดสำหรับ task โดยอยู่ภายใน token budget",
+        "เพิ่ม context window ให้ใหญ่ขึ้น",
+        "จัดเรียงไฟล์ตามชื่อ alphabetically"
+      ],
+      "answer": 1,
+      "explanation": "Context Window Manager เลือกเฉพาะไฟล์ที่เกี่ยวข้องที่สุดสำหรับ task — เพราะ AI มี context window จำกัด ต้องเลือกเฉพาะสิ่งที่จำเป็น"
+    },
+    {
+      "question": "เพราะอะไรไฟล์ต้อง sort ตาม relevance score?",
+      "choices": [
+        "เพราะทำให้ code ทำงานเร็วขึ้น",
+        "เพราะไฟล์ที่เกี่ยวข้องที่สุดต้องมาก่อน — ถ้า budget เต็ม ไฟล์ที่ relevance ต่ำจะถูกตัดออก",
+        "เพราะเป็น formal requirement",
+        "เพราะ AI ต้องการ input ที่ sorted"
+      ],
+      "answer": 1,
+      "explanation": "การ sort ตาม relevance ทำให้ไฟล์ที่เกี่ยวข้องที่สุดมาก่อน — ถ้า token budget เต็ม ไฟล์ที่ relevance ต่ำจะถูกตัดออกก่อน"
+    },
+    {
+      "question": "ถ้า project มีไฟล์ 50 ไฟล์ แต่ context window ใส่ได้แค่ 10 ไฟล์ ควรทำอย่างไร?",
+      "choices": [
+        "ใส่ทุกไฟล์เข้าไป because AI ต้องการข้อมูลทั้งหมด",
+        "เลือก 10 ไฟล์ที่ relevance score สูงสุดสำหรับ task ปัจจุบัน",
+        "สุ่มเลือก 10 ไฟล์",
+        "ไม่ต้องเลือก เพราะ AI จัดการเองได้"
+      ],
+      "answer": 1,
+      "explanation": "ต้องเลือก 10 ไฟล์ที่ relevance score สูงสุดสำหรับ task ปัจจุบัน — ไม่ใช่ใส่ทุกไฟล์เพราะ context window มีข้อจำกัด"
+    }
+  ]
+}

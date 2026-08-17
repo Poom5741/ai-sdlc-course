@@ -1,0 +1,38 @@
+{
+  "questId": "quest-109-voice-to-code",
+  "questions": [
+    {
+      "question": "Why is a verification layer essential in a voice-to-code pipeline?",
+      "choices": [
+        "It makes the pipeline look more professional",
+        "Generated code can have subtle bugs that must be caught before applying to the editor",
+        "It's required by the STT model",
+        "Verification adds zero overhead"
+      ],
+      "answer": 1,
+      "explanation": "Code generation models produce code that often looks correct but can contain subtle bugs, missing edge cases, or incorrect logic. A verification layer tests the code against sample inputs before it's inserted into the editor."
+    },
+    {
+      "question": "What is 'design before building' in the context of voice-to-code?",
+      "choices": [
+        "Writing the code first, then designing the architecture",
+        "Mapping out each pipeline layer and its interactions before writing implementation code",
+        "Using a design tool like Figma to mock up the UI",
+        "Writing a README before coding"
+      ],
+      "answer": 1,
+      "explanation": "Voice-to-code has multiple interacting layers (STT, intent parsing, code gen, verification, application). Designing the full pipeline first prevents discovering fundamental architectural problems midway through implementation."
+    },
+    {
+      "question": "What is a common STT error in voice-to-code systems?",
+      "choices": [
+        "STT always outputs perfect text",
+        "Technical terms like 'sort' can be misheard as 'short' or other similar words",
+        "STT only works with American English accents",
+        "STT cannot process code-related vocabulary"
+      ],
+      "answer": 1,
+      "explanation": "Speech-to-text systems can misrecognize words, especially technical terms that sound similar to common words. This is why confidence checks and confirmation steps are essential design elements."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-127-code-review-sim",
+  "questions": [
+    {
+      "question": "Why is a hardcoded API key in a code diff considered an error (not just a warning)?",
+      "choices": [
+        "It's a style issue that can be fixed later",
+        "Exposed secrets can be exploited by anyone with access to the repository, including automated scanners",
+        "It only matters if the code is deployed to production",
+        "GitHub automatically removes secrets before merge"
+      ],
+      "answer": 1,
+      "explanation": "Hardcoded secrets in source code are immediately accessible to anyone with repo access, including bots that scan for leaked credentials. This is a critical security vulnerability that must be fixed before merge."
+    },
+    {
+      "question": "How do you detect that an async call lacks error handling?",
+      "choices": [
+        "Check if the function is declared with 'async' keyword",
+        "Look for 'await' without a surrounding try/catch or .catch() in nearby lines",
+        "Check if the file has any import statements",
+        "Verify the function returns a Promise"
+      ],
+      "answer": 1,
+      "explanation": "An 'await' call without try/catch or .catch() will cause an unhandled promise rejection if the async operation fails. Checking surrounding lines for error handling patterns is a reliable detection method."
+    },
+    {
+      "question": "What is the limitation of pattern-based code review tools?",
+      "choices": [
+        "They are too slow for large diffs",
+        "They can detect syntax issues but miss logical and architectural bugs that require understanding business context",
+        "They only work with JavaScript code",
+        "They cannot read git diffs"
+      ],
+      "answer": 1,
+      "explanation": "Pattern-based review (regex, AST) catches known anti-patterns but cannot evaluate whether the logic is correct for the specific business requirement. Human review is still needed for architectural and logical decisions."
+    }
+  ]
+}

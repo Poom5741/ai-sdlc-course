@@ -1,26 +1,172 @@
 ---
-title: "Full Stack Deploy"
-description: "Complete Cloudflare deployment config"
+title: "Quest 136 - Full Stack Deploy"
+description: "สร้าง complete Cloudflare deployment config"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Full Stack Deploy
+# Quest 136: Full Stack Deploy
 
 <Badge text="hard" variant="danger" /> <Badge text="40 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Complete Cloudflare deployment config
+<LearningObjectives items={[
+  "รวม KV, D1, R2 bindings เข้าด้วยกันใน wrangler.toml เดียว",
+  "เข้าใจ environment-specific config (preview vs production)",
+  "สร้าง migration scripts สำหรับ D1 database",
+  "สร้าง complete deployment config จาก feature flags"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Full Stack Cloudflare Deployment
+
+Full stack deployment บน Cloudflare หมายถึงการ combine services หลายตัวเข้าด้วยกัน — Pages สำหรับ frontend, Workers สำหรับ API, KV สำหรับ caching, D1 สำหรับ database, และ R2 สำหรับ file storage ทั้งหมด config อยู่ใน `wrangler.toml` เดียว
+
+Think ของมันเหมือน "/master chef" — คุณต้อง combine ingredients หลายตัวเข้าด้วยกันอย่างลงตัว แต่ละ feature (KV, D1, R2) เป็น "ingredient" ที่ต้อง config อย่างถูกต้อง
+
+ใน quest นี้คุณจะเรียนรู้ pattern ที่ **generates complete wrangler.toml** จาก feature flags — วิธีเดียวกับที่ production projects ใช้กัน
+
+---
+
+## ⚙️ How It Works
+
+### Config Generation Flow
+
+```
+1. รับ projectConfig (name, features, environment)
+         ↓
+2. Validate inputs (name, environment, features)
+         ↓
+3. สร้าง base TOML (name, compatibility_date)
+         ↓
+4. Loop ผ่าน features array
+         ↓
+5. เพิ่ม bindings ตาม feature type (KV/D1/R2/Pages)
+         ↓
+6. เพิ่ม D1 migration scripts ถ้า features.includes('d1')
+         ↓
+7. Return { wranglerToml, migrations, bindings, errors }
+```
+
+### Feature Flags
+
+| Feature | Binding | TOML Section |
+| --- | --- | --- |
+| `kv` | `KV` | `[[kv_namespaces]]` |
+| `d1` | `DB` | `[[d1_databases]]` |
+| `r2` | `MY_BUCKET` | `[[r2_buckets]]` |
+| `pages-functions` | N/A | `[build]` section |
+
+### Environment Suffix
+
+```javascript
+const envSuffix = environment === 'preview' ? '_preview' : '';
+// preview: kv-myapp_preview
+// production: kv-myapp
+```
+
+---
+
+## 💡 Example: Generating Full Config
+
+**ขั้นตอนที่ 1: Validate project config**
+
+```javascript
+if (!projectConfig.name || projectConfig.name.trim() === '') {
+  errors.push('project name is required');
+}
+if (!['preview', 'production'].includes(projectConfig.environment)) {
+  errors.push('environment must be "preview" or "production"');
+}
+if (!Array.isArray(projectConfig.features)) {
+  errors.push('features must be an array');
+}
+```
+
+**ขั้นตอนที่ 2: Generate base TOML**
+
+```javascript
+let toml = `name = "${name}"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+`;
+```
+
+**ขั้นตอนที่ 3: Add KV binding**
+
+```javascript
+if (features.includes('kv')) {
+  bindings['KV'] = `kv-${name}${envSuffix}`;
+  toml += `
+[[kv_namespaces]]
+binding = "KV"
+id = "kv-${name}-${environment}"
+preview_id = "kv-${name}-preview"
+`;
+}
+```
+
+**ขั้นตอนที่ 4: Add D1 binding + migration**
+
+```javascript
+if (features.includes('d1')) {
+  bindings['DB'] = `d1-${name}${envSuffix}`;
+  toml += `
+[[d1_databases]]
+binding = "DB"
+database_name = "${name}-db"
+database_id = "d1-${name}-${environment}"
+`;
+  migrations.push(`CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);`);
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate environment value**
+> ใส่ environment เป็น `"staging"` ที่ไม่ valid
+> → ต้อง check กับ whitelist: `['preview', 'production']`
+
+**Mistake 2: ไม่ handle empty features array**
+> features เป็น `[]` ทำให้ไม่มี bindings เลย
+> → Validate ว่า features เป็น array ก่อน loop
+
+**Mistake 3: ลืม environment suffix ใน binding names**
+> ใช้ชื่อเดียวกันทั้ง preview และ production
+> → Preview ต้องมี `_preview` suffix เพื่อแยก environments
+
+**Mistake 4: ไม่ generate D1 migration scripts**
+> config มี D1 binding แต่ไม่มี migration
+> → D1 ต้องมี table schema — เสมอ generate CREATE TABLE migration
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-136-fullstack-deploy" />
+
+---
+
+## 🏋️ Quest: Full Stack Deploy
+
+ถึงเวลาสร้าง complete deployment config แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-136-fullstack-deploy
    cd quest-136-fullstack-deploy
@@ -28,39 +174,38 @@ Complete Cloudflare deployment config
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `generateFullStackConfig(projectConfig)` ที่:
+   - Validate projectConfig (name, environment, features)
+   - สร้าง base wrangler.toml
+   - เพิ่ม bindings ตาม feature flags (KV, D1, R2, Pages)
+   - Generate D1 migration scripts
+   - Return `{ wranglerToml, migrations, bindings, errors }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง "master chef" — combine ingredients เข้าด้วยกันอย่างลงตัว
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Environment values ที่ valid: "preview" และ "production" เท่านั้น
+- Preview environment ต้องมี `_preview` suffix ใน binding names
+- D1 features ต้อง generate CREATE TABLE migration
+- ใช้ template literals สร้าง TOML sections ตาม feature flags

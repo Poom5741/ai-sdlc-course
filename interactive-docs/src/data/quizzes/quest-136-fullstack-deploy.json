@@ -1,0 +1,38 @@
+{
+  "questId": "quest-136-fullstack-deploy",
+  "questions": [
+    {
+      "question": "Environment suffix ใดที่ถูกต้องสำหรับ preview binding names?",
+      "choices": [
+        "_staging",
+        "_dev",
+        "_preview",
+        "_test"
+      ],
+      "answer": 2,
+      "explanation": "Preview environment ใช้ `_preview` suffix — เช่น `kv-myapp_preview` เพื่อแยกจาก production binding `kv-myapp`"
+    },
+    {
+      "question": "D1 feature ใน wrangler.toml ต้อง generate อะไรเพิ่มเติม?",
+      "choices": [
+        "ไม่ต้องทำอะไรเพิ่ม",
+        "CREATE TABLE migration script",
+        "INSERT INTO seed data",
+        "CREATE INDEX script"
+      ],
+      "answer": 1,
+      "explanation": "D1 ต้องมี table schema — เมื่อ enable D1 feature ต้อง generate CREATE TABLE migration script เสมอเพื่อกำหนด schema เบื้องต้น"
+    },
+    {
+      "question": "Environment values ใดที่ valid สำหรับ `generateFullStackConfig`?",
+      "choices": [
+        "'preview', 'production', 'staging'",
+        "'dev', 'staging', 'prod'",
+        "'preview' และ 'production' เท่านั้น",
+        "ค่าใดก็ได้เป็น string"
+      ],
+      "answer": 2,
+      "explanation": "ต้อง validate กับ whitelist `['preview', 'production']` เท่านั้น — ค่าอื่นเช่น 'staging' หรือ 'dev' ไม่ valid"
+    }
+  ]
+}

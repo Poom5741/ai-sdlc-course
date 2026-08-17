@@ -5,62 +5,172 @@ description: "Calculate context window usage"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 5: Context Window Budget Calculator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Calculate context window usage
+<LearningObjectives items={[
+  "How context windows work and why budgeting matters",
+  "How to calculate available tokens given system/user/history/reserved response",
+  "Why negative available tokens must be clamped to zero",
+  "The engineering habit: BUDGET YOUR CONTEXT"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Context Window Budgeting
+
+ทุก LLM มี **context window** — จำนวน tokens สูงสุดที่รับได้ใน 1 request เช่น GPT-4 รับ 128K tokens, Claude รับ 200K tokens
+
+แต่ context window ไม่ใช่ของฟรี — คุณต้อง **แบ่งสรร** ให้:
+
+- **System prompt:** instructions ที่บอก AI ว่าต้องทำอะไร
+- **User prompt:** คำถามหรือคำสั่งของผู้ใช้
+- **History:** บทสนทนาก่อนหน้า
+- **Reserved response:** พื้นที่สำหรับคำตอบ
+
+ถ้าคุณไม่ budget ให้ดี ข้อความจะถูกตัด (truncated) ทำให้ AI ตอบไม่ครบ
+
+---
+
+## ⚙️ How It Works
+
+### The Budget Formula
+
+```
+total = 16384 (context window size)
+used = systemTokens + userTokens + historyTokens
+available = total - used - reservedResponse (min 0)
+withinBudget = (used + reservedResponse) <= total
+overBy = max(0, (used + reservedResponse) - total)
+```
+
+### ตัวอย่าง Calculation
+
+```javascript
+// Scenario: Chatbot with history
+const systemTokens = 500;    // system prompt
+const userTokens = 100;      // current message
+const historyTokens = 2000;  // previous messages
+const reservedResponse = 1000; // expected response size
+
+// total = 16384
+// used = 500 + 100 + 2000 = 2600
+// available = 16384 - 2600 - 1000 = 12784
+// withinBudget = true
+// overBy = 0
+```
+
+### Edge Case: Over Budget
+
+```javascript
+// Scenario: Too much history
+const systemTokens = 500;
+const userTokens = 100;
+const historyTokens = 15000; // ประวัติเยอะมาก
+const reservedResponse = 1000;
+
+// total = 16384
+// used = 500 + 100 + 15000 = 15600
+// available = 16384 - 15600 - 1000 = -216 → clamp to 0
+// withinBudget = false
+// overBy = 15600 + 1000 - 16384 = 216
+```
+
+---
+
+## 💡 Example: Budget Calculator Implementation
+
+```javascript
+function calculateBudget({ systemTokens, userTokens, historyTokens, reservedResponse }) {
+  const total = 16384;
+  const used = systemTokens + userTokens + historyTokens;
+  const available = Math.max(0, total - used - reservedResponse);
+  const withinBudget = (used + reservedResponse) <= total;
+  const overBy = withinBudget ? 0 : (used + reservedResponse) - total;
+
+  return { total, used, available, withinBudget, overBy };
+}
+
+// Example usage
+const budget = calculateBudget({
+  systemTokens: 500,
+  userTokens: 100,
+  historyTokens: 2000,
+  reservedResponse: 1000
+});
+
+console.log(budget);
+// { total: 16384, used: 2600, available: 12784, withinBudget: true, overBy: 0 }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ clamp available เป็น 0**
+> ถ้า usage > total, available จะติดลบ
+> → ต้องใช้ `Math.max(0, ...)`
+
+**Mistake 2: คำนวณ overBy ผิด**
+> คิดว่า overBy = total - used (กลับกัน)
+> → overBy = (used + reservedResponse) - total
+
+**Mistake 3: ลืม reservedResponse**
+> คำนวณ available โดยไม่หัก reservedResponse
+> → ต้องหัก reservedResponse ด้วย
+
+**Mistake 4: ไม่ test edge cases**
+> ทดสอบแค่ happy path
+> → ทดสอบ over budget, exact budget, zero tokens
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-5-project" />
+
+---
+
+## 🏋️ Quest: Context Window Budget Calculator
+
+เขียน function ที่คำนวณ context window budget อย่างแม่นยำ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-05-context-budget
    cd quest-05-context-budget
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `calculateBudget()` ตาม contract ที่กำหนด
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ edge cases: over budget, exact budget, zero tokens
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI ให้ `available = total - used` โดยไม่ clamp เป็น 0 ให้บอกว่าต้องใช้ `Math.max(0, ...)`
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี contract ระบุไว้ชัดเจน
+- ต้อง return object ที่มี: total, used, available, withinBudget, overBy
+- available ต้อง clamp ที่ 0 ไม่ให้ติดลบ
+- ทดสอบ over budget scenario — overBy ต้อง > 0

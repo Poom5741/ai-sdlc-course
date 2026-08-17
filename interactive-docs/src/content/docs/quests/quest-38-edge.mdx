@@ -5,22 +5,125 @@ description: "Discover edge cases in code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 38: Edge Case Finder
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Discover edge cases in code
+<LearningObjectives items={[
+  "ใช้ AI เป็นเครื่องมือค้นหา edge cases ในโค้ดที่มีอยู่",
+  "ระบุ input patterns ที่可能导致 unexpected behavior",
+  "เข้าใจ boundary conditions ที่ developer มักมองข้าม",
+  "สร้าง edge case catalog สำหรับ reuse"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI-Powered Edge Case Discovery
+
+Edge cases คือ input patterns ที่อยู่ "ขอบ" ของ expected behavior — เช่น empty strings, null values, boundary numbers, หรือ unexpected types
+
+Developer ที่เขียนโค้ดมักจะมองข้าม edge cases เพราะ brain โฟกัสที่ "happy path" แต่ production bugs มักเกิดจาก edge cases ที่ไม่มีใครคิดถึง
+
+AI เหมือน sensei ที่มองเห็น edge cases ที่คุณมองไม่เห็น — มันได้เห็น bugs นับล้านจาก training data และรู้ว่าpatterns ไหนมักจะ fail
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Edge Case Discovery
+
+```
+1. INPUT — ป้อนโค้ดให้ AI วิเคราะห์
+         ↓
+2. ANALYSIS — AI วิเคราะห์ data flow และ branching
+         ↓
+3. DISCOVERY — สร้าง edge cases จาก patterns ที่พบ
+         ↓
+4. CATEGORIZE — จัดกลุ่มตาม severity
+         ↓
+5. VERIFY — ทดสอบว่า edge cases ทำให้ fail จริง
+```
+
+### หมวดหมู่ของ Edge Cases
+
+| หมวด | ตัวอย่าง | ความเสี่ยง |
+| --- | --- | --- |
+| **Null/Undefined** | `null`, `undefined`, empty string | สูง — มักทำให้ crash |
+| **Boundary** | 0, -1, MAX_SAFE_INTEGER | กลาง — อาจให้ผลลัพธ์ผิด |
+| **Type mismatch** | String แทน Number, Array แทน Object | สูง — logic error |
+| **Empty collections** | Empty array, empty object, empty map | กลาง — logic อาจskip |
+| **Concurrency** | Race conditions, duplicate requests | สูง — hard to reproduce |
+
+---
+
+## 💡 Example: วิเคราะห์ Edge Cases
+
+```javascript
+// โค้ดที่ต้องวิเคราะห์
+function calculateDiscount(price, discountPercent) {
+  const discount = price * (discountPercent / 100);
+  return price - discount;
+}
+
+// Edge Cases ที่ AI ค้นพบ:
+const edgeCases = [
+  { input: { price: 100, discountPercent: 0 }, desc: "Zero discount — should return original price" },
+  { input: { price: 100, discountPercent: 100 }, desc: "100% discount — should return 0" },
+  { input: { price: 100, discountPercent: -10 }, desc: "Negative discount — increases price?" },
+  { input: { price: 0, discountPercent: 50 }, desc: "Zero price — always 0" },
+  { input: { price: -100, discountPercent: 50 }, desc: "Negative price — makes no sense" },
+  { input: { price: "100", discountPercent: 50 }, desc: "String price — type coercion?" },
+  { input: { price: 100, discountPercent: 150 }, desc: "Discount > 100% — negative result" },
+  { input: { price: NaN, discountPercent: 50 }, desc: "NaN price — NaN propagation" }
+];
+
+// AI ยังพบว่า:
+// - ไม่มี input validation
+// - ไม่มี upper bound check
+// - floating point precision issues (0.1 + 0.2)
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ทดสอบแค่ valid inputs**
+> "แค่ test กับข้อมูลที่ถูกต้องก็พอ"
+> → Production ได้รับ inputs ทุกรูปแบบ — null, undefined, empty, wrong types
+
+**Mistake 2: มองข้าม floating point precision**
+> "100 * 0.1 = 10 ไม่เห็นมีปัญหา"
+> → `0.1 + 0.2 = 0.30000000000000004` ใน JavaScript — ใช้ rounding เสมอ
+
+**Mistake 3: ไม่ test boundary values**
+> "ค่าระหว่าง 0-100 น่าจะโอเค"
+> → ทดสอบที่ 0, 1, 99, 100, 101 — boundary มักจะ break
+
+**Mistake 4: ไม่ catalog edge cases ที่พบ**
+> "รู้แล้วก็เก็บไว้ในหัว"
+> → เขียน edge case list ไว้ — developer ใหม่จะได้ไม่เจอปัญหาเดิม
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-38-edge" />
+
+---
+
+## 🏋️ Quest: Edge Case Finder
+
+พร้อมแล้วค้นหา edge cases! ใช้ AI หา inputs ที่โค้ดคุณอาจ handle ไม่ได้
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-38-edge-case-finder
    cd quest-38-edge-case-finder
@@ -28,39 +131,28 @@ Discover edge cases in code
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ discover edge cases ในโค้ด
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง bug ที่คุณเคยเจอ — มันเกิดจาก edge case ที่มองข้ามใช่ไหม?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- คิดถึง null/undefined, type mismatches, boundary values
+- ลอง trace data flow จาก input ถึง output — จุดไหนบ้างที่อาจ break?
+- ทดสอบกับ inputs จริงๆ ว่า edge cases ทำให้ fail จริงไหม

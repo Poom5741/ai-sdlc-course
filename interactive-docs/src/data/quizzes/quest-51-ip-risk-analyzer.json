@@ -1,0 +1,38 @@
+{
+  "questId": "quest-51-ip-risk-analyzer",
+  "questions": [
+    {
+      "question": "GPL license มีข้อจำกัดสำคัญอะไรสำหรับ AI-generated code?",
+      "choices": [
+        "ห้ามใช้ใน commercial projects",
+        "บังคับให้ derivative works ต้องเป็น GPL ด้วย — ถ้าใช้ GPL code คุณต้อง open-source โปรเจกต์",
+        "ห้ามแก้ไข code",
+        "ใช้ได้เฉพาะ personal projects"
+      ],
+      "answer": 1,
+      "explanation": "GPL เป็น copyleft license — ถ้าคุณรวม GPL code เข้ากับโปรเจกต์ของคุณ derivative works ทั้งหมดต้องเป็น GPL ด้วย ซึ่งบังคับให้ open-source"
+    },
+    {
+      "question": "MIT license แตกต่างจาก GPL อย่างไร?",
+      "choices": [
+        "MIT ห้ามใช้ commercial, GPL อนุญาต",
+        "MIT อนุญาตใช้ commercial โดยไม่ต้อง open-source, GPL บังคับ open-source",
+        "MIT ไม่มีข้อจำกัดใดๆ",
+        "MIT และ GPL เหมือนกัน"
+      ],
+      "answer": 1,
+      "explanation": "MIT อนุญาตให้ใช้ commercial โดยไม่ต้อง open-source (แค่ต้อง include license notice) แต่ GPL บังคับให้ derivative works ต้องเป็น GPL"
+    },
+    {
+      "question": "ก่อนใช้ AI-generated code ใน production ควรเช็คอะไรบ้าง?",
+      "choices": [
+        "เช็คแค่ functionality ว่าทำงานถูกต้อง",
+        "License compatibility, code provenance, AI tool's ToS, และ attribution requirements",
+        "เช็คแค่ performance",
+        "ไม่ต้องเช็คอะไร AI สร้างมาให้แล้ว"
+      ],
+      "answer": 1,
+      "explanation": "ต้องเช็ค license compatibility (code ใช้ license อะไร), provenance (มาจากไหน), AI tool's ToS (ใครเป็นเจ้าของ), และ attribution (ต้อง credit ใครบ้าง)"
+    }
+  ]
+}

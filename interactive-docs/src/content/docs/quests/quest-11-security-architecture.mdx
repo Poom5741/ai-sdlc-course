@@ -5,62 +5,181 @@ description: "Classify BERT vs GPT vs T5"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 11: Model Architecture Classifier
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Classify BERT vs GPT vs T5
+<Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "The differences between BERT, GPT, and T5 architectures",
+  "How attention type determines model behavior",
+  "How to classify models by their configuration properties",
+  "The engineering habit: KNOW YOUR TOOLS"
+]} />
+
+---
+
+## 📖 Concept: Model Architectures
+
+ไม่ใช่ LLM ทุกตัวจะเหมือนกัน — มี architecture หลัก 3 แบบ:
+
+### BERT (Encoder-Only)
+
+- **Attention:** Bidirectional (มองทั้งซ้ายและขวา)
+- **Use case:** Classification, NER, Q&A
+- **ตัวอย่าง:** "The cat [MASK] on the mat" -> ทำนายว่า "sat"
+
+### GPT (Decoder-Only)
+
+- **Attention:** Causal (มองแค่ซ้าย — ไม่เห็นอนาคต)
+- **Use case:** Text generation, completion
+- **ตัวอย่าง:** "The cat sat on" -> ทำนายว่า "the mat"
+
+### T5 (Encoder-Decoder)
+
+- **Attention:** Both (bidirectional encoder + causal decoder)
+- **Use case:** Translation, summarization
+- **ตัวอย่าง:** "translate English to French: Hello" -> "Bonjour"
+
+---
+
+## ⚙️ How It Works
+
+### Classification Rules
+
+```javascript
+function classifyArchitecture(config) {
+  const { type, attentionType } = config;
+  
+  // BERT: encoder-only + bidirectional
+  if (type === 'encoder-only' && attentionType === 'bidirectional') {
+    return 'BERT';
+  }
+  
+  // GPT: decoder-only + causal
+  if (type === 'decoder-only' && attentionType === 'causal') {
+    return 'GPT';
+  }
+  
+  // T5: encoder-decoder + both
+  if (type === 'encoder-decoder' && attentionType === 'both') {
+    return 'T5';
+  }
+  
+  return 'UNKNOWN';
+}
+```
+
+### Configuration Examples
+
+```javascript
+// BERT config
+const bertConfig = {
+  type: 'encoder-only',
+  attentionType: 'bidirectional',
+  useCase: 'text classification'
+};
+
+// GPT config
+const gptConfig = {
+  type: 'decoder-only',
+  attentionType: 'causal',
+  useCase: 'text generation'
+};
+
+// T5 config
+const t5Config = {
+  type: 'encoder-decoder',
+  attentionType: 'both',
+  useCase: 'translation'
+};
+```
+
+---
+
+## 💡 Example: Why Attention Type Matters
+
+```javascript
+// Bidirectional (BERT) — มองทั้งซ้ายและขวา
+// Input: "The cat [MASK] on the mat"
+// BERT เห็น: "The", "cat", "on", "the", "mat" -> ทำนาย "sat"
+
+// Causal (GPT) — มองแค่ซ้าย
+// Input: "The cat sat on"
+// GPT เห็น: "The", "cat", "sat", "on" -> ทำนาย "the"
+
+// Both (T5) — encoder มองทั้งสองข้าง, decoder มองแค่ซ้าย
+// Input: "translate: Hello"
+// T5 encoder เห็น: "translate", "Hello"
+// T5 decoder สร้าง: "Bonjour"
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้แค่ `type` ในการ classify**
+> คิดว่า decoder-only = GPT เสมอ
+> -> ต้อง check `attentionType` ด้วย — decoder-only + bidirectional ไม่ใช่ GPT
+
+**Mistake 2: สับสน bidirectional กับ causal**
+> คิดว่า BERT ใช้ causal attention
+> -> BERT ใช้ bidirectional, GPT ใช้ causal
+
+**Mistake 3: ไม่ handle UNKNOWN**
+> ลืม return 'UNKNOWN' สำหรับ config ที่ไม่ match
+> -> ต้อง return 'UNKNOWN' สำหรับ architecture ที่ไม่รู้จัก
+
+**Mistake 4: ไม่ test edge cases**
+> ไม่ test กับ config ที่ไม่ match rule ใดเลย
+> -> ต้อง test กับ invalid config
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-11-model-arch-classifier" />
+
+---
+
+## 🏋️ Quest: Model Architecture Classifier
+
+เขียน function ที่ classify model architecture จาก configuration
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-11-model-arch-classifier
    cd quest-11-model-arch-classifier
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `classifyArchitecture(config)` ตาม rules
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ: BERT, GPT, T5, UNKNOWN configurations
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI classify แค่จาก `type` ให้บอกว่า "Check both type AND attentionType"
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี classification rules ระบุไว้
+- ตรวจสอบทั้ง `type` และ `attentionType`
+- ทดสอบ edge case: decoder-only + bidirectional ต้อง return UNKNOWN
+- ถ้าติดขัด ลอง search "BERT vs GPT vs T5 architecture"

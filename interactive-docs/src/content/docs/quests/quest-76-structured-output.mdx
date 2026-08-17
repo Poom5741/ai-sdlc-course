@@ -1,66 +1,220 @@
 ---
 title: "Quest 76 - Structured Output Parser"
-description: "Parse JSON from LLM responses"
+description: "แยก JSON จาก LLM responses"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 76: Structured Output Parser
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Parse JSON from LLM responses
+<LearningObjectives items={[
+  "เข้าใจว่า LLMs มักใส่ JSON ใน markdown code blocks",
+  "แยก JSON ออกจาก freeform text ได้อย่างน่าเชื่อถือ",
+  "จัดการกับ malformed JSON และ type coercion",
+  "สร้าง schema validation สำหรับ structured output"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Structured Output from LLMs
+
+**Structured Output** คือเทคนิคการบังคับให้ LLM ตอบออกมาในรูปแบบที่ machine-readable — โดยปกติคือ JSON
+
+ปัญหาคือ LLMs มักจะใส่ JSON ไว้ใน markdown code blocks:
+
+````
+```json
+{"name": "John", "age": "25"}
+```
+````
+
+หรือบางทีก็ตอบ freeform text ปนกับ JSON ทำให้ code ที่จะ parse ต้องฉลาดพอที่จะแยกออก
+
+**ทำไมถึงสำคัญ:** ถ้าคุณส่ง prompt ไปแล้วหวังว่าจะได้ JSON กลับมา คุณจะผิดหวัง — LLMs ไม่ได้ guarantee ว่าจะตอบ JSON เสมอไป Parser คือ safety net ของคุณ
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Parse Structured Output
+
+```
+LLM Response (freeform text)
+    ↓
+1. ลอง JSON.parse() ตรงๆ ก่อน
+    ↓ (ถ้าไม่ได้)
+2. ค้นหา JSON ใน markdown code blocks (```json ... ```)
+    ↓ (ถ้าไม่เจอ)
+3. ค้นหา JSON objects ({...}) ใน text
+    ↓ (ถ้าเจอ)
+4. JSON.parse() อีกครั้ง
+    ↓
+5. Type coercion (string "42" → number 42)
+    ↓
+6. Schema validation (required fields, types)
+    ↓
+Return { parsed, errors, valid }
+```
+
+### Schema Definition
+
+```javascript
+const schema = {
+  name: { type: 'string', required: true },
+  age: { type: 'number', required: true },
+  is_active: { type: 'boolean', required: false }
+};
+```
+
+---
+
+## 💡 Example: Parser ใน Action
+
+```javascript
+function parseStructuredOutput(text, schema) {
+  let parsed = null;
+  let jsonStr = text;
+
+  // Step 1: ลอง parse ตรงๆ
+  try {
+    parsed = JSON.parse(text);
+  } catch (e) {
+    // Step 2: หา JSON ใน markdown code block
+    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      jsonStr = codeBlockMatch[1].trim();
+    } else {
+      // Step 3: หา JSON object ใน text
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[0];
+      }
+    }
+
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch (e2) {
+      return { parsed: null, errors: ['Invalid JSON: ' + e2.message], valid: false };
+    }
+  }
+
+  // Step 4: Type coercion
+  const errors = [];
+  for (const [field, rules] of Object.entries(schema)) {
+    if (rules.required && !(field in parsed)) {
+      errors.push(`Missing required field: ${field}`);
+      continue;
+    }
+    if (field in parsed && rules.type) {
+      const val = parsed[field];
+      if (rules.type === 'number' && typeof val === 'string') {
+        const num = Number(val);
+        if (!isNaN(num)) parsed[field] = num;
+      }
+      if (rules.type === 'boolean' && typeof val === 'string') {
+        if (val.toLowerCase() === 'true') parsed[field] = true;
+        if (val.toLowerCase() === 'false') parsed[field] = false;
+      }
+    }
+  }
+
+  return { parsed, errors, valid: errors.length === 0 };
+}
+
+// ตัวอย่าง 1: JSON ใน code block
+parseStructuredOutput(
+  'Here is the result:\n```json\n{"name": "John", "age": "25"}\n```\nHope this helps!',
+  { name: { type: 'string', required: true }, age: { type: 'number', required: true } }
+);
+// { parsed: { name: "John", age: 25 }, errors: [], valid: true }
+
+// ตัวอย่าง 2: ไม่มี required field
+parseStructuredOutput(
+  '{"name": "John"}',
+  { name: { type: 'string', required: true }, age: { type: 'number', required: true } }
+);
+// { parsed: { name: "John" }, errors: ["Missing required field: age"], valid: false }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่จัดการ JSON ใน code blocks**
+> LLMs มักใส่ JSON ใน ````json ...```` blocks
+> → JSON.parse() จะ fail ถ้าไม่ extract ก่อน
+
+**Mistake 2: ไม่ทำ type coercion**
+> LLM ตอบ `"age": "25"` (string) แทน `"age": 25` (number)
+> → code ที่ expect number จะ error
+
+**Mistake 3: ไม่ validate required fields**
+> ได้ JSON กลับมาแล้วใช้เลยโดยไม่เช็ค fields
+> → runtime error เมื่อเข้าถึง field ที่ไม่มี
+
+**Mistake 4: ไม่ handle malformed JSON**
+> คิดว่า JSON.parse() จะสำเร็จเสมอ
+> → LLMs บางครั้ง generate JSON ที่ syntax ผิด (missing comma, trailing comma)
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-76-structured-output" />
+
+---
+
+## 🏋️ Quest: Structured Output Parser
+
+ถึงเวลาฝึกฝน! สร้าง JSON parser ที่ฉลาดพอจะแยก JSON จาก LLM response
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-76-structured-output
    cd quest-76-structured-output
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `parseStructuredOutput(text, schema)` ที่:
+   - ลอง parse JSON ตรงๆ ก่อน
+   - หา JSON ใน markdown code blocks (````json ...````)
+   - หา JSON objects (`{...}`) ใน text
+   - ทำ type coercion (string → number, string → boolean)
+   - Validate required fields ตาม schema
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก case ง่ายๆ (plain JSON) แล้วค่อยเพิ่ม code blocks — อย่าพยายามแก้ทุก edge case พร้อมกัน
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Regex สำหรับ code block: `/```(?:json)?\s*([\s\S]*?)```/`
+- Regex สำหรับ JSON object: `/\{[\s\S]*\}/`
+- Type coercion: ใช้ `Number(val)` สำหรับ string → number, `val.toLowerCase() === 'true'` สำหรับ string → boolean
+- Validate หลัง coerce — ถ้า coerce ไม่ได้ให้ใส่ error message
+- ทดสอบด้วย input หลายแบบ: plain JSON, JSON ใน code block, JSON ใน freeform text, missing fields

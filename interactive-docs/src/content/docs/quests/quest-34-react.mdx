@@ -5,22 +5,170 @@ description: "Implement ReAct agent pattern"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 34: ReAct Pattern Agent
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Implement ReAct agent pattern
+<Badge text="hard" variant="danger" /> <Badge text="35 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจ ReAct pattern: Reason → Act → Observe → Repeat",
+  "implement agent ที่ reason ก่อนทำ action ทุกครั้ง",
+  "ออกแบบ agent loop ที่ observe results ก่อนตัดสินใจครั้งต่อไป",
+  "สร้าง agent ที่ใช้ tools ได้อย่างมีเหตุผล"
+]} />
+
+---
+
+## 📖 Concept: ReAct Pattern
+
+ReAct (Reason + Act) คือ design pattern ที่ AI agents ใช้ตัดสินใจ — แทนที่จะทำอะไรสุ่มๆ agent จะ **คิดก่อนทำ** และ **ดูผลลัพธ์ก่อนคิดต่อ**
+
+ลองนึกภาพ Ninjutsu master — ก่อนจะลงมือโจมตี เขาจะ:
+
+1. **Observe** — ดูสถานการณ์รอบตัว
+2. **Reason** — คิดว่าจะรับมือยังไง
+3. **Act** — ลงมือทำ
+4. **Observe result** — ดูว่าทำแล้วเป็นยังไง
+
+แล้ววนซ้ำอีกครั้ง นี่คือหัวใจของ ReAct
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ ReAct Loop
+
+```
+1. OBSERVATION — เก็บข้อมูลจาก environment
+         ↓
+2. REASONING — คิดว่า goal คืออะไร ต้องทำอะไร
+         ↓
+3. ACTION — เลือก tool และ executes
+         ↓
+4. RESULT — ได้ผลลัพธ์กลับมา
+         ↓
+   (วนซ้ำจนถึง goal)
+```
+
+### ทำไม ReAct ดีกว่า Chain-of-Thought ธรรมดา?
+
+| Approach | ข้อดี | ข้อเสีย |
+| ---------- | ------- | --------- |
+| Chain-of-Thought | คิดเป็นขั้นตอน | ไม่ได้ interact กับโลกจริง |
+| Action-only | ทำเร็ว | ไม่คิด ทำผิดได้ง่าย |
+| **ReAct** | **คิดก่อนทำ + observe result** | **ช้ากว่าเล็กน้อย แต่ถูกต้องกว่ามาก** |
+
+### ตัวอย่าง Tool Definition
+
+```javascript
+const tools = [
+  {
+    name: 'search',
+    description: 'Search for information',
+    execute: (query) => `Results for: ${query}`
+  },
+  {
+    name: 'calculate',
+    description: 'Perform calculation',
+    execute: (expr) => eval(expr).toString()
+  }
+];
+```
+
+---
+
+## 💡 Example: ReAct Agent ที่สมบูรณ์
+
+```javascript
+function reactAgent(goal, tools) {
+  // Step 1: Observation — ดูว่ามี tools อะไรบ้าง
+  const availableTools = tools.map(t => `${t.name}: ${t.description}`).join(', ');
+  const observation = `Goal: ${goal}. Available tools: ${availableTools}`;
+  
+  // Step 2: Reasoning — คิดว่าจะบรรลุ goal ยังไง
+  let reasoning = '';
+  let action = null;
+  
+  if (goal.toLowerCase().includes('search') || goal.toLowerCase().includes('find')) {
+    reasoning = `Goal involves finding information. I should use the search tool.`;
+    action = { tool: 'search', args: { query: goal } };
+  } else if (goal.toLowerCase().includes('calculate') || goal.includes('+') || goal.includes('*')) {
+    reasoning = `Goal involves calculation. I should use the calculate tool.`;
+    action = { tool: 'calculate', args: { expression: goal } };
+  } else {
+    reasoning = `No specific tool matches the goal. Attempting direct approach.`;
+    action = { tool: null, args: {} };
+  }
+  
+  // Step 3: Action — execute
+  let result = null;
+  if (action.tool) {
+    const tool = tools.find(t => t.name === action.tool);
+    if (tool) {
+      result = tool.execute(action.args.query || action.args.expression);
+    }
+  }
+  
+  // Step 4: Return ผลลัพธ์ทั้งหมด
+  return {
+    observation,
+    reasoning,
+    action,
+    result
+  };
+}
+
+// ใช้งาน
+const result = reactAgent('search for JavaScript tutorials', tools);
+console.log(result);
+// {
+//   observation: 'Goal: search for JavaScript tutorials. Available tools: search: ..., calculate: ...',
+//   reasoning: 'Goal involves finding information. I should use the search tool.',
+//   action: { tool: 'search', args: { query: 'search for JavaScript tutorials' } },
+//   result: 'Results for: search for JavaScript tutorials'
+// }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ทำ action โดยไม่ reason ก่อน**
+> "รู้ว่าต้องใช้ tool ไหน ไม่ต้องคิดก็ได้"
+> → บางครั้ง assumption ของคุณผิด — reasoning step ช่วย catch ก่อนสาย
+
+**Mistake 2: ไม่ observe result ก่อนทำ action ถัดไป**
+> "ทำไปเรื่อยๆ เดี๋ยวก็ถึง goal"
+> → ผลลัพธ์จาก action หนึ่งอาจเปลี่ยน strategy ทั้งหมด — observe เสมอ
+
+**Mistake 3: ไม่ return observation**
+> "observation แค่ข้อมูล ไม่สำคัญ"
+> → Observation คือ context ที่ agent ใช้ตัดสินใจครั้งต่อไป — ไม่มีมัน agent จะวนซ้ำแบบไม่รู้ตัว
+
+**Mistake 4: Reasoning สั้นเกินไป**
+> "คิดว่าใช้ tool A แล้วก็ done"
+> → Reasoning ควรอธิบาย **ทำไม** ถึงเลือก tool นี้ — ไม่ใช่แค่ **อะไร**
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-34-react" />
+
+---
+
+## 🏋️ Quest: ReAct Pattern Agent
+
+ถึงเวลาสร้าง agent ของคุณเอง! Implement ReAct pattern ที่ reason ก่อน act
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-34-react-agent
    cd quest-34-react-agent
@@ -28,39 +176,28 @@ Implement ReAct agent pattern
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `reactAgent(goal, tools)` ที่ return `{ observation, reasoning, action, result }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** คิดถึง Ninjutsu master — observe ก่อน reason ก่อน act ทุกครั้ง
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ขั้นตอน Observation ควรเก็บข้อมูลที่จำเป็นต่อการตัดสินใจ
+- Reasoning ต้องอธิบาย **ทำไม** ไม่ใช่แค่ **อะไร**
+- ทดสอบกับ goals หลายแบบ — ทั้งที่ตรงกับ tool และไม่ตรง

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-30-prompt-refiner",
+  "questions": [
+    {
+      "question": "Prompt refinement คืออะไร?",
+      "choices": [
+        "การเขียน prompt ใหม่ทั้งหมดตั้งแต่ต้น",
+        "การปรับปรุง prompt ที่คลุมเครือให้ชัดเจนขึ้นโดยเพิ่ม parameters, types, edge cases",
+        "การลบ prompt เดิมทิ้งแล้วเขียนใหม่",
+        "การใช้ AI ช่วยเขียน prompt อัตโนมัติ"
+      ],
+      "answer": 1,
+      "explanation": "Prompt refinement คือการปรับปรุง prompt ที่คลุมเครือให้ชัดเจนขึ้น — เช่น เปลี่ยน 'write a function' เป็น 'write a function that takes an array of numbers and returns the average'"
+    },
+    {
+      "question": "เพราะอะไร prompt คลุมเครือจึงเป็นปัญหา?",
+      "choices": [
+        "เพราะทำให้ prompt ดูสั้นเกินไป",
+        "เพราะ AI จะเข้าใจผิดและเขียน code ที่ไม่ตรงกับที่ต้องการ",
+        "เพราะเป็นแค่ปัญหาเล็กๆ ที่แก้ได้ทีหลัง",
+        "เพราะทำให้ AI ทำงานช้าลง"
+      ],
+      "answer": 1,
+      "explanation": "Prompt คลุมเครือ = AI ต้องเดา → code ที่ได้อาจไม่ตรงกับที่ต้องการ — ยิ่ง specific ยิ่งได้ code ที่ตรง"
+    },
+    {
+      "question": "สิ่งไหนที่ควรเพิ่มใน prompt คลุมเครือ?",
+      "choices": [
+        "แค่ word คลุมเครือเพิ่มเข้าไป เช่น 'do things with stuff'",
+        "Parameters, data types, edge cases, และ return type",
+        "แค่ชื่อ function โดยไม่ต้องมี description",
+        "แค่ comment โดยไม่ต้องมี code"
+      ],
+      "answer": 1,
+      "explanation": "Prompt ที่ดีต้องมี parameters (รับอะไร), types (data types), edge cases (ต้อง handle อะไร), และ return type (คืนอะไร)"
+    }
+  ]
+}

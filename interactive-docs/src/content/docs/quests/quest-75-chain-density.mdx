@@ -1,66 +1,223 @@
 ---
 title: "Quest 75 - Chain-of-Density Optimizer"
-description: "Reduce verbosity while keeping info"
+description: "ลดความยาวแต่คงข้อมูลให้ครบถ้วน"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 75: Chain-of-Density Optimizer
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Reduce verbosity while keeping info
+<LearningObjectives items={[
+  "เข้าใจว่า information density สำคัญต่อ LLM output อย่างไร",
+  "กำจัด filler words และ redundant phrases ได้อย่างมีประสิทธิภาพ",
+  "รักษา key terms ไว้ในขณะที่ลดความยาว",
+  "เข้าใจว่า token cost ส่งผลต่อการ optimize prompt อย่างไร"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Information Density
+
+**Chain-of-Density** คือเทคนิคการลดความยาวของข้อความโดยคงข้อมูลสำคัญไว้ — ทุก token มีค่าใช้จ่าย ดังนั้นทุกคำต้อง "มีค่า"
+
+ลองนึกภาพเหมือนการเขียนข้อความบน Twitter — มี character limit แต่ต้องสื่อสารให้ครบ คุณต้องตัดคำที่ไม่จำเป็นออก แต่ไม่ตัดสาระสำคัญ
+
+**เป้าหมาย:** ลดข้อความลง 50% (targetRatio = 0.5) โดยไม่เสียความหมาย
+
+```
+Before (100 tokens):
+"The very important function is basically used in order to 
+calculate the total sum of all the numbers in the array"
+
+After  (45 tokens):
+"Function calculates total sum of array numbers"
+```
+
+**หลักการสำคัญ:**
+
+- **ตัด filler words:** very, really, basically, actually, essentially
+- **ตัด redundant phrases:** "in order to" → "to", "due to the fact that" → "because"
+- **รักษา key terms:** function, calculate, sum, array — ห้ามตัดออก
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Optimizer
+
+```
+Input text
+    ↓
+1. Tokenize (นับคำ)
+    ↓
+2. กำจัด filler words (very, really, basically...)
+    ↓
+3. กำจัด redundant phrases (in order to, due to the fact that...)
+    ↓
+4. ตรวจสอบว่า key terms ยังอยู่ครบ
+    ↓
+5. คำนวณ ratio (optimized / original)
+    ↓
+6. ถ้า ratio > targetRatio → ตัดเพิ่ม
+    ↓
+Return { optimized, originalTokens, optimizedTokens, ratio }
+```
+
+### ตัวอย่าง Filler Words vs Key Terms
+
+| คำ | ประเภท | ทำยังไง |
+| ----- | -------- | ---------- |
+| very | Filler | ตัดออก |
+| really | Filler | ตัดออก |
+| basically | Filler | ตัดออก |
+| actually | Filler | ตัดออก |
+| calculate | Key term | เก็บไว้ |
+| function | Key term | เก็บไว้ |
+| array | Key term | เก็บไว้ |
+
+### Redundant Phrases
+
+| ยาว | สั้น | ประหยัดได้ |
+| ----- | ------ | ------------ |
+| in order to | to | 2 คำ |
+| due to the fact that | because | 4 คำ |
+| at this point in time | now | 4 คำ |
+| in the event that | if | 3 คำ |
+
+---
+
+## 💡 Example: Optimizer ใน Action
+
+```javascript
+function optimizeDensity(text, targetRatio = 0.5) {
+  const originalTokens = text.split(/\s+/).length;
+
+  // Step 1: กำจัด filler words
+  const fillers = [
+    /\bvery\b/gi, /\breally\b/gi, /\bbasically\b/gi,
+    /\bactually\b/gi, /\bessentially\b/gi, /\bliterally\b/gi,
+    /\bquite\b/gi, /\bfairly\b/gi, /\bpretty much\b/gi
+  ];
+
+  let optimized = text;
+  for (const filler of fillers) {
+    optimized = optimized.replace(filler, '');
+  }
+
+  // Step 2: กำจัด redundant phrases
+  const redundancies = [
+    [/\bin order to\b/gi, 'to'],
+    [/\bdue to the fact that\b/gi, 'because'],
+    [/\bat this point in time\b/gi, 'now'],
+    [/\bin the event that\b/gi, 'if'],
+    [/\bfor the purpose of\b/gi, 'to']
+  ];
+
+  for (const [pattern, replacement] of redundancies) {
+    optimized = optimized.replace(pattern, replacement);
+  }
+
+  // Step 3: ล้าง whitespace ที่เกิน
+  optimized = optimized.replace(/\s+/g, ' ').trim();
+
+  const optimizedTokens = optimized.split(/\s+/).length;
+  const ratio = optimizedTokens / originalTokens;
+
+  return {
+    optimized,
+    originalTokens,
+    optimizedTokens,
+    ratio: Math.round(ratio * 100) / 100
+  };
+}
+
+// ตัวอย่าง
+const result = optimizeDensity(
+  "The very important function is basically used in order to calculate the total sum of all the numbers in the array",
+  0.5
+);
+// result: { optimized: "The important function is used to calculate total sum of numbers in the array",
+//           originalTokens: 18, optimizedTokens: 13, ratio: 0.72 }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ตัดคำแบบสุ่มเพื่อให้ถึง target ratio**
+> ลบคำออกโดยไม่ดูว่าเป็น key term หรือ filler
+> → ข้อความเสียความหมาย "calculate the sum" → "the sum"
+
+**Mistake 2: ไม่รักษา key terms**
+> ตัด "function" ออกเพราะคิดว่าเป็น filler
+> → ข้อความไม่สื่อสารสิ่งที่ต้องการ
+
+**Mistake 3: ไม่คำนวณ ratio จริง**
+> คิดว่า "ตัดไปบ้างแล้วน่าจะพอ"
+> → ต้องคำนวณจริงๆ ว่า ratio เท่าไหร่
+
+**Mistake 4: ตัด filler ที่เป็น emphasis จริงๆ**
+> "The VERY important security vulnerability" — "very" ที่นี่เป็น emphasis จริง
+> → ควรระวัง context ก่อนตัด
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-75-chain-density" />
+
+---
+
+## 🏋️ Quest: Chain-of-Density Optimizer
+
+ถึงเวลาฝึกฝน! สร้าง text optimizer ที่ลดความยาวแต่คงสาระ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-75-chain-density
    cd quest-75-chain-density
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `optimizeDensity(text, targetRatio)` ที่:
+   - กำจัด filler words (very, really, basically, actually...)
+   - กำจัด redundant phrases ("in order to" → "to")
+   - รักษา key terms ไว้
+   - คำนวณ ratio จริงๆ
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก filler words ที่แน่นอนก่อน (very, really) แล้วค่อยเพิ่ม redundant phrases — อย่าพยายามทำทุกอย่างพร้อมกัน
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Filler words: very, really, basically, actually, essentially, literally, quite, fairly
+- Redundant phrases: "in order to" → "to", "due to the fact that" → "because"
+- ใช้ regex สำหรับ replacing — แต่ระวัง word boundaries (\b) เพื่อไม่ให้ replace คำที่อยู่กลางคำ
+- Ratio = optimizedTokens / originalTokens — ต้อง ≤ targetRatio
+- ล้าง whitespace ที่เกินหลังจาก replacing ทุกครั้ง

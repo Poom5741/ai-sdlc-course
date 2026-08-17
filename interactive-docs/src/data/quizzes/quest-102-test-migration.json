@@ -1,0 +1,38 @@
+{
+  "questId": "quest-102-test-migration",
+  "questions": [
+    {
+      "question": "Why should you use word-boundary-aware replacement instead of simple string replace?",
+      "choices": [
+        "It's faster than string replace",
+        "It prevents corrupting similar identifiers (e.g., 'get' → 'fetch' corrupting 'getter' to 'fetchter')",
+        "It's required by the test framework",
+        "Simple string replace doesn't work in JavaScript"
+      ],
+      "answer": 1,
+      "explanation": "Simple string replace เปลี่ยน substring ทุกที่ — 'get' → 'fetch' จะทำให้ 'getter' กลายเป็น 'fetchter'. Word-boundary regex (\\b) ป้องกันปัญหานี้"
+    },
+    {
+      "question": "When source code removes a function, what should happen to its tests?",
+      "choices": [
+        "Keep the tests as-is for documentation",
+        "Update the tests to expect undefined",
+        "Remove test lines that reference the removed function",
+        "Move the tests to a separate file"
+      ],
+      "answer": 2,
+      "explanation": "Tests ที่ reference removed function จะ fail — ต้องลบ test lines นั้นออก. Broken tests แย่กว่าไม่มี tests"
+    },
+    {
+      "question": "What regex pattern ensures only whole-word matches for renaming?",
+      "choices": [
+        "/oldName/g",
+        "/oldName.*/g",
+        "/\\boldName\\b/g",
+        "/^.oldName.$/g"
+      ],
+      "answer": 2,
+      "explanation": "\\b คือ word boundary — ทำให้ regex match เฉพาะ whole word ไม่ใช่ substring. \\boldName\\b จะ match 'getData' แต่ไม่ match 'getter'"
+    }
+  ]
+}

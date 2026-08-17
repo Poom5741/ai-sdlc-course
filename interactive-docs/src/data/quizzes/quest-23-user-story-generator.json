@@ -1,0 +1,38 @@
+{
+  "questId": "quest-23-user-story-generator",
+  "questions": [
+    {
+      "question": "User Story format ที่ถูกต้องคืออะไร?",
+      "choices": [
+        "Feature: [name], Priority: [high/low], Status: [todo/done]",
+        "As a [role], I want [feature], so that [benefit]",
+        "Given [context], When [action], Then [result]",
+        "Title: [name], Description: [text], Estimate: [hours]"
+      ],
+      "answer": 1,
+      "explanation": "User Story ใช้ format 'As a [role], I want [feature], so that [benefit]' — ซึ่งบังคับให้คิดถึง 3 สิ่งพร้อมกัน: ใครใช้, ทำอะไร, ทำไมถึงต้องการ"
+    },
+    {
+      "question": "Acceptance Criteria สำคัญเพราะอะไร?",
+      "choices": [
+        "ทำให้ user story ดูยาวขึ้นและน่าเชื่อถือ",
+        "เป็นเกณฑ์ทดสอบว่า feature ทำเสร็จแล้วหรือยัง",
+        "ช่วยให้ PM ดู report ได้ง่ายขึ้น",
+        "เป็นแค่ formal requirement ไม่จำเป็นต้องใช้จริง"
+      ],
+      "answer": 1,
+      "explanation": "Acceptance Criteria คือเงื่อนไขที่ต้องเป็นจริงเพื่อให้ user story 'done' — ถ้าไม่มี criteria → ทดสอบไม่ได้ → ไม่รู้ว่าทำเสร็จจริงหรือยัง"
+    },
+    {
+      "question": "ทำไม `generateUserStory` ต้อง return object แทน raw text?",
+      "choices": [
+        "เพราะ object ทำงานเร็วกว่า string",
+        "เพราะต้องแยก `asA`, `iWant`, `soThat`, `acceptanceCriteria` ให้ชัดเจน",
+        "เพราะ test ใช้ string comparison ไม่ได้",
+        "เพราะ AI tools ต้องการ input เป็น object เท่านั้น"
+      ],
+      "answer": 1,
+      "explanation": "Structured object ทำให้แต่ละ field ชัดเจนและแยกจากกัน — ทำให้ test ตรวจสอบได้ว่าครบทุก field และไม่หลุดกรอบ"
+    }
+  ]
+}

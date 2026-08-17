@@ -53,7 +53,6 @@ export default defineConfig({
           label: "Module 2: LLM Training",
           collapsed: true,
           items: [
-            { slug: "quests/quest-13-multi-agent" },
             { slug: "quests/quest-14-rag-design" },
             { slug: "quests/quest-15-data" },
             { slug: "quests/quest-16-finetuning" },

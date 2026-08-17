@@ -1,0 +1,38 @@
+{
+  "questId": "quest-89-readme-generator",
+  "questions": [
+    {
+      "question": "Why is hierarchical (tree-style) file listing better than a flat list for READMEs?",
+      "choices": [
+        "It uses fewer characters",
+        "It shows directory structure and file relationships, making the project easier to navigate",
+        "It's required by npm",
+        "Flat lists don't render in markdown"
+      ],
+      "answer": 1,
+      "explanation": "A hierarchical tree shows which files belong to which directories, giving readers an immediate understanding of the project's organization. A flat list of 50 files gives no structural information."
+    },
+    {
+      "question": "What does 'README as Code' mean?",
+      "choices": [
+        "The README must be written in a programming language",
+        "The README is generated from actual codebase structure, not manually maintained",
+        "The README contains executable code snippets",
+        "The README is version-controlled separately from the code"
+      ],
+      "answer": 1,
+      "explanation": "README as Code means generating the README from the actual project structure (file metadata, descriptions) rather than hand-writing it. This keeps documentation in sync with the codebase automatically."
+    },
+    {
+      "question": "Which files should be EXCLUDED from a generated README project structure?",
+      "choices": [
+        "Source files and config files",
+        "Build artifacts, node_modules, .git, and dependencies",
+        "JavaScript and TypeScript files",
+        "Test files only"
+      ],
+      "answer": 1,
+      "explanation": "Generated artifacts (dist/), dependencies (node_modules/), and version control directories (.git/) are implementation details that clutter the README. Focus on source files, configs, and documentation."
+    }
+  ]
+}

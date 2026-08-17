@@ -1,0 +1,38 @@
+{
+  "questId": "quest-117-ai-roi",
+  "questions": [
+    {
+      "question": "ROI formula ที่ถูกต้องคืออะไร?",
+      "choices": [
+        "ROI = Cost / Savings × 100",
+        "ROI = (Savings - Cost) / Cost × 100",
+        "ROI = Savings × Cost × 100",
+        "ROI = Cost - Savings"
+      ],
+      "answer": 1,
+      "explanation": "ROI = (Savings - Cost) / Cost × 100%. This shows the percentage return relative to the investment. Positive means profit; negative means loss."
+    },
+    {
+      "question": "ถ้า cost > savings (ROI เป็น negative) break-even weeks ควร return อะไร?",
+      "choices": [
+        "0",
+        "-1",
+        "Infinity",
+        "The same as positive ROI"
+      ],
+      "answer": 2,
+      "explanation": "When costs exceed savings, the investment will never break even. Infinity correctly represents an impossible break-even point — the tool will always cost more than it saves."
+    },
+    {
+      "question": "totalCost สำหรับ 1 quarter (3 เดือน) คำนวณจากอะไร?",
+      "choices": [
+        "teamSize × monthlyCostPerDev",
+        "teamSize × monthlyCostPerDev × 3",
+        "teamSize × monthlyCostPerDev × 12",
+        "teamSize × hourlyRate × 13"
+      ],
+      "answer": 1,
+      "explanation": "Total cost for a quarter = teamSize × monthlyCostPerDev × 3 months. This represents the total investment for a 3-month period."
+    }
+  ]
+}

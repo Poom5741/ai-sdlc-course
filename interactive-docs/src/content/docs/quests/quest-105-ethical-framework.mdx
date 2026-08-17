@@ -1,66 +1,178 @@
 ---
-title: "Ethical Decision Framework"
-description: "Design an ethical AI decision framework"
+title: "Quest 105 - Ethical Decision Framework"
+description: "Design an ethical AI decision framework with actionable guidelines"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Ethical Decision Framework
+# Quest 105: Ethical Decision Framework
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design an ethical AI decision framework
+<LearningObjectives items={[
+  "Why ethics must be built into AI development from the start, not added as an afterthought",
+  "How to structure a framework covering stakeholders, fairness, transparency, and accountability",
+  "How to define escalation processes for ethical concerns",
+  "The importance of ongoing monitoring, not just one-time audits"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Ethics by Design
+
+Most AI teams think about ethics **after** something goes wrong — after a biased model goes live, after a privacy breach, after public backlash. **Ethics by design** means building ethical considerations into the development process from day one, just like you build in security and performance.
+
+An ethical framework isn't a vague mission statement. It's a structured document that answers concrete questions: Who is affected by this AI? How do we define fairness? What happens when things go wrong? Who is accountable? How do we monitor ongoing behavior?
+
+Think of it like a martial arts code of conduct. Before you enter the ring, you've already decided how you'll fight — what's allowed, what's not, and what to do when things escalate. An ethical AI framework works the same way.
+
+---
+
+## ⚙️ How It Works
+
+### The Six Pillars of an Ethical AI Framework
+
+```
+1. Stakeholder Analysis — Who is affected?
+         ↓
+2. Fairness Criteria — How do we define fair?
+         ↓
+3. Transparency Requirements — How do we explain decisions?
+         ↓
+4. Accountability Chain — Who is responsible?
+         ↓
+5. Escalation Process — When do we escalate?
+         ↓
+6. Monitoring Plan — How do we watch for drift?
+```
+
+### Why Each Pillar Matters
+
+| Pillar | Key Question | Without It... |
+| --- | --- | --- |
+| Stakeholder Analysis | Who is affected by AI decisions? | You miss affected groups |
+| Fairness Criteria | How do we measure fairness? | Bias goes undetected |
+| Transparency | How do we explain decisions? | Users can't trust or challenge |
+| Accountability | Who is responsible when things go wrong? | Nobody takes ownership |
+| Escalation | When do we escalate concerns? | Problems fester until crisis |
+| Monitoring | How do we watch for drift? | Fairness degrades over time |
+
+---
+
+## 💡 Example: Framework Structure in Action
+
+Here's what a concrete ethical framework looks like for a hiring AI:
+
+**Stakeholder Analysis:**
+
+```
+- Job applicants (primary affected group)
+- Hiring managers (decision makers)
+- Company (reputation and legal risk)
+- Society (workforce equity)
+```
+
+**Fairness Criteria:**
+
+```
+- Demographic parity gap < 0.1 across gender and ethnicity groups
+- Equalized odds gap < 0.15
+- Monthly re-evaluation with updated data
+```
+
+**Accountability Chain:**
+
+```
+- ML Engineer: model fairness metrics
+- Product Owner: business decisions using AI
+- Ethics Board: escalation and policy
+- External Auditor: annual review
+```
+
+This isn't theoretical — it's a working document that engineers reference when building, testing, and deploying AI systems.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Writing a framework nobody reads**
+> "We have an ethics document filed in Confluence"
+> → A framework that isn't referenced in daily work is useless. Integrate it into code reviews, design docs, and deployment checklists.
+
+**Mistake 2: Being too vague**
+> "We commit to fairness and transparency"
+> → Vague statements aren't actionable. Define specific metrics, thresholds, and processes.
+
+**Mistake 3: Treating ethics as a one-time audit**
+> "We did the ethics review, we're done"
+> → AI systems drift. Fairness degrades as data changes. Monitoring must be ongoing.
+
+**Mistake 4: No escalation path**
+> "If someone sees a problem, they can file a ticket"
+> → Ethical concerns need a clear, fast escalation path — not a generic ticket queue.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-105-ethical-framework" />
+
+---
+
+## 🏋️ Quest: Ethical Decision Framework
+
+Now it's time to practice! Design an ethical AI decision framework with actionable guidelines.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-105-ethical-framework
    cd quest-105-ethical-framework
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` to read the design requirements
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Create `ethical-framework.md` with all six required sections:
+   - Stakeholder Analysis
+   - Fairness Criteria
+   - Transparency Requirements
+   - Accountability Chain
+   - Escalation Process
+   - Monitoring Plan
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` to validate your document structure
+
+5. Ensure each section is **actionable**, not just theoretical
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** This is a design quest — the real work goes in `ethical-framework.md`, not `problem.js`. Think about a real AI system (hiring, lending, medical) and make your framework specific to it.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- นี่เป็น design quest — งานจริงอยู่ใน `ethical-framework.md`
+- ครอบคลุมทั้ง 6 sections: stakeholders, fairness, transparency, accountability, escalation, monitoring
+- Framework ต้องเป็น actionable — ไม่ใช่แค่ theory
+- ลองนึกถึง AI system จริง (hiring, lending, medical) แล้วทำให้ framework เจาะจง
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

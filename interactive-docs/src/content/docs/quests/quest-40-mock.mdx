@@ -5,22 +5,139 @@ description: "Generate realistic test data"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 40: Mock Data Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate realistic test data
+<LearningObjectives items={[
+  "สร้าง realistic mock data สำหรับ testing",
+  "ใช้ AI ช่วย generate data ที่ครอบคลุม edge cases",
+  "เข้าใจว่า mock data ที่ดีต้องมี patterns สมจริง",
+  "เรียนรู้วิธี generate data หลาย formats"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI-Generated Mock Data
+
+Mock data คือข้อมูลจำลองที่ใช้ทดสอบโค้ดโดยไม่ต้องใช้ database จริง — แต่ mock data ที่ไม่ realistic จะทดสอบได้ไม่ดี
+
+AI ช่วย generate mock data ที่ realistic เพราะมันรู้ patterns จริงจาก training data — เช่น ชื่อคนไทย, ที่อยู่จริง, email formats ที่ถูกต้อง, หรือ product names ที่สมจริง
+
+เหมือน Ninjutsu training dummy — ถ้า dummy ดูเหมือนจริง การฝึกจะมีประสิทธิภาพกว่า dummy ที่ดูปลอมๆ
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Generate Mock Data
+
+```
+1. SCHEMA — กำหนดโครงสร้างข้อมูลที่ต้องการ
+         ↓
+2. PATTERNS — AI สร้าง realistic patterns
+         ↓
+3. GENERATE — สร้างข้อมูลตาม schema
+         ↓
+4. VARIATION — เพิ่ม edge cases และ variations
+         ↓
+5. VERIFY — ตรวจสอบว่าข้อมูลสมจริงและครบถ้วน
+```
+
+### Schema Definition
+
+```javascript
+const userSchema = {
+  name: { type: 'string', pattern: 'name' },
+  email: { type: 'string', pattern: 'email' },
+  age: { type: 'number', min: 18, max: 80 },
+  phone: { type: 'string', pattern: 'phone-thai' },
+  address: { type: 'object', properties: {
+    street: { type: 'string', pattern: 'address' },
+    city: { type: 'string', pattern: 'city-thai' }
+  }}
+};
+```
+
+---
+
+## 💡 Example: Mock Data Generator
+
+```javascript
+function generateMockUser(overrides = {}) {
+  const firstNames = ['สมชาย', 'สมหญิง', 'วิชัย', 'วิภา', 'ประเสริฐ', 'สุดา'];
+  const lastNames = ['ใจดี', 'สุขสวัสดิ์', 'มั่นคง', 'สุขสันต์', 'เจริญ'];
+  const cities = ['กรุงเทพฯ', 'เชียงใหม่', 'ภูเก็ต', 'ขอนแก่น', 'สงขลา'];
+  
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  
+  return {
+    name: `${firstName} ${lastName}`,
+    email: `${firstName.toLowerCase()}@example.com`,
+    age: Math.floor(Math.random() * 62) + 18,
+    phone: `0${Math.floor(Math.random() * 900000000) + 100000000}`,
+    address: {
+      street: `${Math.floor(Math.random() * 999) + 1} ถนนสุขุมวิท`,
+      city: cities[Math.floor(Math.random() * cities.length)]
+    },
+    ...overrides
+  };
+}
+
+// สร้าง users หลายตัว
+const users = Array.from({ length: 10 }, () => generateMockUser());
+
+// เพิ่ม edge cases
+const edgeCases = [
+  generateMockUser({ age: 0 }),        // edge: minimum age
+  generateMockUser({ age: 150 }),      // edge: impossible age
+  generateMockUser({ name: '' }),      // edge: empty name
+  generateMockUser({ email: 'invalid' }) // edge: invalid email
+];
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ hardcoded data ตลอด**
+> "ใช้ 'John Doe' ทุกครั้งก็ได้"
+> → Hardcoded data ทำให้ tests ไม่ cover variation — ใช้ random generation
+
+**Mistake 2: ไม่ realistic พอ**
+> `user.email = 'test@test.com' ทุกตัว`
+> → Real users มีชื่อซ้ำกันได้ แต่ emails ต้อง unique — ต้อง generate ให้สมจริง
+
+**Mistake 3: ไม่ generate edge cases**
+> "happy path data พอแล้ว"
+> → Edge cases ใน mock data ช่วย discover bugs — เพิ่ม boundary values เสมอ
+
+**Mistake 4: ไม่ configurable**
+> "hardcode schema ไว้เลย"
+> → Mock data generator ควร configurable — บาง test ต้องการ data รูปแบบต่างกัน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-40-mock" />
+
+---
+
+## 🏋️ Quest: Mock Data Generator
+
+พร้อมแล้วสร้าง mock data! ใช้ AI ช่วย generate realistic test data
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-40-mock-data-generator
    cd quest-40-mock-data-generator
@@ -28,39 +145,28 @@ Generate realistic test data
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ generate realistic mock data
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง data ที่คุณใช้ test บ่อยๆ — มัน realistic พอไหม?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ดู schema ใน problem.js สำหรับ fields ที่ต้อง generate
+- เพิ่ม realistic variations — ไม่ใช่แค่ random strings
+- ทดสอบกับ edge cases ด้วย — empty, boundary, invalid

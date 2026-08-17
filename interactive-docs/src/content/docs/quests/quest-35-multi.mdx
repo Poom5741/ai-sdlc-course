@@ -5,22 +5,167 @@ description: "Orchestrate multiple agents"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 35: Multi-Agent Orchestrator
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Orchestrate multiple agents
+<Badge text="hard" variant="danger" /> <Badge text="25 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจว่า multi-agent systems ทำงานร่วมกันยังไง",
+  "ออกแบบ orchestration ที่ assign tasks ให้ agents ได้เหมาะสม",
+  "จัดการ results จาก agents หลายตัวให้รวมเป็น unified output",
+  "เรียนรู้ว่า agents ควร specialization มากกว่า generalization"
+]} />
+
+---
+
+## 📖 Concept: Multi-Agent Orchestration
+
+ใน Ninjutsu บางที mission ใหญ่เกินไปสำหรับ ninja ตัวเดียว — คุณต้องส่งทีมที่แต่ละคนมี role ต่างกัน Multi-agent orchestration คือ art ของการจัดการ agents หลายตัวให้ทำงานร่วมกันอย่างมีประสิทธิภาพ
+
+แทนที่จะมี agent ตัวเดียวพยายามทำทุกอย่าง — คุณจะมี:
+
+- **Research Agent** — เก็บข้อมูล
+- **Code Agent** — เขียนโค้ด
+- **Review Agent** — ตรวจสอบคุณภาพ
+
+แล้ว **Orchestrator** จัดการว่าใครทำอะไร เมื่อไหร่
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ Multi-Agent System
+
+```
+         ┌─────────────┐
+         │ Orchestrator │
+         └──────┬──────┘
+                │
+    ┌───────────┼───────────┐
+    ↓           ↓           ↓
+┌────────┐ ┌────────┐ ┌────────┐
+│ Agent A │ │ Agent B │ │ Agent C │
+│(Research)│ │  (Code) │ │(Review) │
+└────────┘ └────────┘ └────────┘
+```
+
+### รูปแบบการ Orchestrate
+
+| Pattern | เมื่อไหร่ | ตัวอย่าง |
+| --------- | ---------- | --------- |
+| **Sequential** | แต่ละ step ขึ้นอยู่กับ step ก่อน | Research → Code → Review |
+| **Parallel** | Tasks ทำอิสระจากกัน | Build frontend + backend พร้อมกัน |
+| **Conditional** | ขึ้นอยู่กับผลลัพธ์ | ถ้า tests ผ่าน → deploy, ถ้าไม่ → fix |
+
+### Agent Definition
+
+```javascript
+const agents = {
+  researcher: {
+    role: 'Research',
+    capability: 'find information',
+    execute: (task) => `Research result: ${task}`
+  },
+  coder: {
+    role: 'Code',
+    capability: 'write code',
+    execute: (task) => `Code for: ${task}`
+  },
+  reviewer: {
+    role: 'Review',
+    capability: 'review quality',
+    execute: (task) => `Review of: ${task}`
+  }
+};
+```
+
+---
+
+## 💡 Example: Sequential Orchestrator
+
+```javascript
+function orchestrate(task, agents, pipeline) {
+  const results = [];
+  let currentInput = task;
+  
+  // Sequential: แต่ละ agent รับผลลัพธ์จาก agent ก่อนหน้า
+  for (const agentName of pipeline) {
+    const agent = agents[agentName];
+    if (!agent) continue;
+    
+    const result = agent.execute(currentInput);
+    results.push({
+      agent: agentName,
+      role: agent.role,
+      input: currentInput,
+      output: result
+    });
+    
+    // ส่งผลลัพธ์เป็น input ของ agent ถัดไป
+    currentInput = result;
+  }
+  
+  return {
+    task,
+    pipeline,
+    results,
+    finalOutput: currentInput
+  };
+}
+
+// ใช้งาน
+const result = orchestrate(
+  'Build a login page',
+  {
+    researcher: { role: 'Research', execute: (t) => `Requirements: ${t}` },
+    coder: { role: 'Code', execute: (t) => `function login() { /* ${t} */ }` },
+    reviewer: { role: 'Review', execute: (t) => `Approved: ${t}` }
+  },
+  ['researcher', 'coder', 'reviewer']
+);
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ agent ตัวเดียวทำทุกอย่าง**
+> "ให้ agent เก่งๆ ตัวเดียวจัดการทั้งหมดดีกว่า"
+> → Agents ที่ specialize จะทำได้ดีกว่า — เช่นเดียวกับทีม Ninjutsu ที่แต่ละคนมี role
+
+**Mistake 2: ไม่ส่งผลลัพธ์ระหว่าง agents**
+> "ให้แต่ละ agent ทำงานอิสระ"
+> → ถ้า agents ไม่ share context ผลลัพธ์จะไม่สอดคล้องกัน
+
+**Mistake 3: ไม่ handle agent failures**
+> "ถ้า agent ตัวหนึ่งล้มเหลว ไม่เป็นไร"
+> → Orchestrator ต้องมี error handling — เช่น retry, fallback, หรือ skip
+
+**Mistake 4: ไม่ track ผลลัพธ์แต่ละ step**
+> "แค่ aggregate ผลลัพธ์สุดท้ายก็พอ"
+> → Debugging จะยากมากถ้าไม่มี trace — track ผลลัพธ์ทุก step
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-35-multi" />
+
+---
+
+## 🏋️ Quest: Multi-Agent Orchestrator
+
+พร้อมแล้วสร้างทีม Ninjutsu ของคุณ! Orchestrate agents หลายตัวให้ทำงานร่วมกัน
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-35-multi-agent-orchestrator
    cd quest-35-multi-agent-orchestrator
@@ -28,39 +173,28 @@ Orchestrate multiple agents
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ orchestrate multiple agents ตามที่ README อธิบาย
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง project ที่คุณเคยทำ — มีกี่งานที่ควร split ให้ agents ต่างกัน?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ดู README สำหรับ agent definitions ที่ต้องใช้
+- คิดถึง sequential vs parallel pipeline — แต่ละแบบมี trade-off
+- อย่าลืม track results จากแต่ละ agent

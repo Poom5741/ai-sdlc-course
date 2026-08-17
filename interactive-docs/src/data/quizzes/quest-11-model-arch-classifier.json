@@ -1,0 +1,38 @@
+{
+  "questId": "quest-11-model-arch-classifier",
+  "questions": [
+    {
+      "question": "What type of attention does BERT use?",
+      "choices": [
+        "Causal (left-to-right only)",
+        "Bidirectional (sees both left and right)",
+        "Both bidirectional and causal",
+        "No attention mechanism"
+      ],
+      "answer": 1,
+      "explanation": "BERT uses bidirectional attention, meaning it can look at tokens both before and after the current position. This is why it's good at understanding context for classification tasks."
+    },
+    {
+      "question": "A model with config { type: 'decoder-only', attentionType: 'bidirectional' } should be classified as?",
+      "choices": [
+        "GPT",
+        "BERT",
+        "T5",
+        "UNKNOWN"
+      ],
+      "answer": 3,
+      "explanation": "GPT requires decoder-only + causal attention. A decoder-only model with bidirectional attention doesn't match any known architecture and should return UNKNOWN."
+    },
+    {
+      "question": "Which architecture uses both bidirectional encoder and causal decoder attention?",
+      "choices": [
+        "BERT",
+        "GPT",
+        "T5",
+        "None of them"
+      ],
+      "answer": 2,
+      "explanation": "T5 uses encoder-decoder architecture with both attention types: bidirectional in the encoder and causal in the decoder, making it suitable for translation and summarization."
+    }
+  ]
+}

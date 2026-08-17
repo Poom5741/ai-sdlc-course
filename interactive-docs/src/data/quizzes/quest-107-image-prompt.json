@@ -1,0 +1,38 @@
+{
+  "questId": "quest-107-image-prompt",
+  "questions": [
+    {
+      "question": "What is the recommended structure for an effective image prompt?",
+      "choices": [
+        "Adjective + noun + verb",
+        "Subject → Style → Composition → Lighting → Mood",
+        "A list of random keywords",
+        "Just describe what you want in natural language"
+      ],
+      "answer": 1,
+      "explanation": "The Subject → Style → Composition → Lighting → Mood formula gives the model enough structured information to produce a specific, intentional image rather than a generic one."
+    },
+    {
+      "question": "Why is 'photorealistic anime style watercolor' a bad prompt?",
+      "choices": [
+        "It's too long",
+        "It uses contradictory styles that confuse the model",
+        "It doesn't include enough keywords",
+        "Anime and watercolor are the same style"
+      ],
+      "answer": 1,
+      "explanation": "Photorealistic, anime, and watercolor are three distinct styles with different visual characteristics. Combining them contradicts the model's ability to produce a coherent image."
+    },
+    {
+      "question": "How do DALL-E, Midjourney, and Stable Diffusion differ in prompt handling?",
+      "choices": [
+        "They all interpret prompts identically",
+        "Each model has different strengths — DALL-E for literal, Midjourney for artistic, SD for customization",
+        "Only Midjourney supports image prompts",
+        "Stable Diffusion doesn't accept text prompts"
+      ],
+      "answer": 1,
+      "explanation": "DALL-E excels at literal interpretations of prompts, Midjourney is known for artistic and stylized outputs, and Stable Diffusion offers the most customization through parameters and fine-tuning."
+    }
+  ]
+}

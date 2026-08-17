@@ -1,0 +1,38 @@
+{
+  "questId": "quest-42-regression",
+  "questions": [
+    {
+      "question": "Regression test prediction ช่วยประหยัดเวลาได้ยังไง?",
+      "choices": [
+        "รัน tests เร็วขึ้น",
+        "เลือกรันแค่ tests ที่ได้รับผลกระทบจาก code change — ไม่ต้องรันทั้ง suite",
+        "ลบ tests ที่ไม่จำเป็น",
+        "ใช้ AI รัน tests แทน"
+      ],
+      "answer": 1,
+      "explanation": "Prediction ช่วยเลือก tests ที่ได้รับผลกระทบ — ใน codebase ใหญ่ การรันแค่ affected tests ประหยัดเวลามาก"
+    },
+    {
+      "question": "Transitive dependencies สำคัญในการ predict regression tests อย่างไร?",
+      "choices": [
+        "ไม่สำคัญ",
+        "File A อาจ import File C ที่ import File B — ถ้า A เปลี่ยน B อาจได้รับผลกระทบด้วย",
+        "เฉพาะ large projects เท่านั้น",
+        "เฉพาะ monorepo เท่านั้น"
+      ],
+      "answer": 1,
+      "explanation": "Transitive dependencies หมายถึง dependencies ทางอ้อม — A → C → B ถ้า A เปลี่ยน B อาจ affected ด้วย"
+    },
+    {
+      "question": "เพราะเหตุใดจึงไม่ควร rely แค่ AI prediction โดยไม่มี fallback?",
+      "choices": [
+        "AI แม่น 100% อยู่แล้ว",
+        "AI prediction อาจ miss — ควรมี fallback รัน full test suite บ้าง",
+        "AI ช้าเกินไป",
+        "Fallback ไม่จำเป็น"
+      ],
+      "answer": 1,
+      "explanation": "AI prediction ไม่แม่น 100% — ควรมี periodic full test runs เพื่อ catch misses"
+    }
+  ]
+}

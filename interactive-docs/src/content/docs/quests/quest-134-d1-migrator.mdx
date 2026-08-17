@@ -1,26 +1,157 @@
 ---
-title: "D1 Database Schema Migrator"
-description: "SQL migrations with data preservation"
+title: "Quest 134 - D1 Database Schema Migrator"
+description: "สร้าง SQL migrations พร้อม data preservation"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# D1 Database Schema Migrator
+# Quest 134: D1 Database Schema Migrator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-SQL migrations with data preservation
+<LearningObjectives items={[
+  "เข้าใจ database migration pattern (up/down scripts)",
+  "รู้วิธี generate SQL DDL statements (CREATE, ALTER, DROP)",
+  "เข้าใจ data preservation เมื่อ drop columns",
+  "สร้าง reversible migrations ที่สามารถ undo ได้"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Database Migrations
+
+Database migration คือ "แผนที่เปลี่ยนแปลง schema" ของ database — มันบอกว่า table ต้องเพิ่ม column ไหน, เปลี่ยน type อะไร, หรือลบ table ไหน ที่สำคัญคือ migration ต้อง **reversible** — ต้องมีทั้ง "up" (ทำ) และ "down" (undo)
+
+Cloudflare D1 ใช้ SQL migrations เหมือน SQLite database ทั่วไป ใน quest นี้คุณจะเรียนรู้ pattern ที่ generate migration SQL จาก parameters
+
+**สิ่งสำคัญที่สุด:** เมื่อ DROP column — คุณ **ต้อง** preserve data ก่อนเสมอ Think ของมันเหมือน "move furniture ก่อนรื้อบ้าน" — ย้ายข้อมูลไป backup table ก่อน drop column
+
+---
+
+## ⚙️ How It Works
+
+### Migration Generation Flow
+
+```
+1. รับ action, table, changes
+         ↓
+2. Validate inputs (table name, action type)
+         ↓
+3. Switch ตาม action type (create/alter/drop)
+         ↓
+4. Generate UP script (ทำ)
+         ↓
+5. Generate DOWN script (undo)
+         ↓
+6. Return { up, down, isValid, errors }
+```
+
+### Migration Actions
+
+| Action | UP Script | DOWN Script |
+| --- | --- | --- |
+| `create` | `CREATE TABLE ...` | `DROP TABLE IF EXISTS ...` |
+| `alter` (add) | `ALTER TABLE ADD COLUMN ...` | `ALTER TABLE DROP COLUMN ...` |
+| `alter` (drop) | Backup → `ALTER TABLE DROP COLUMN` | Restore → `DROP TABLE backup` |
+| `drop` | `DROP TABLE IF EXISTS ...` | Warning (data loss) |
+
+### Data Preservation Pattern
+
+```sql
+-- UP: Preserve data before dropping columns
+CREATE TABLE users_backup AS SELECT * FROM users;
+ALTER TABLE users DROP COLUMN legacy_field;
+
+-- DOWN: Restore dropped columns from backup
+INSERT INTO users SELECT * FROM users_backup;
+DROP TABLE users_backup;
+```
+
+---
+
+## 💡 Example: Generating Migrations
+
+**ขั้นตอนที่ 1: CREATE TABLE migration**
+
+```javascript
+const columns = [
+  'id INTEGER PRIMARY KEY AUTOINCREMENT',
+  'email TEXT UNIQUE NOT NULL',
+  'name TEXT NOT NULL'
+];
+
+// UP
+const up = `CREATE TABLE users (\n  ${columns.join(',\n  ')}\n);`;
+// DOWN
+const down = `DROP TABLE IF EXISTS users;`;
+```
+
+**ขั้นตอนที่ 2: ALTER TABLE ADD COLUMN**
+
+```javascript
+const addColumns = ['age INTEGER', 'phone TEXT'];
+
+// UP
+const up = `ALTER TABLE users\n  ADD COLUMN age INTEGER,\n  ADD COLUMN phone TEXT;`;
+// DOWN
+const down = `ALTER TABLE users\n  DROP COLUMN age,\n  DROP COLUMN phone;`;
+```
+
+**ขั้นตอนที่ 3: ALTER TABLE DROP COLUMN (with preservation)**
+
+```javascript
+// UP: Backup first, then drop
+const up = `-- Preserve data before dropping columns
+CREATE TABLE users_backup AS SELECT * FROM users;
+ALTER TABLE users DROP COLUMN legacy_field;`;
+
+// DOWN: Restore from backup
+const down = `-- Restore dropped columns from backup
+INSERT INTO users SELECT * FROM users_backup;
+DROP TABLE users_backup;`;
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: DROP column โดยไม่ backup data**
+> "ลบ column ไปเลย ไม่ต้อง backup"
+> → ข้อมูลจะหายตลอดกาล — เสมอ backup ก่อน DROP
+
+**Mistake 2: DOWN script ไม่ reversible**
+> UP script ทำได้แต่ DOWN script ไม่ undo ได้
+> → Migration ที่ดีต้อง undo ได้เสมอ
+
+**Mistake 3: ไม่ validate table name**
+> table name ว่าง string ทำให้ SQL ผิด
+> → Validate table name ก่อน generate SQL
+
+**Mistake 4: DROP TABLE โดยไม่ check existence**
+> `DROP TABLE users` ถ้า table ไม่มีจะ error
+> → ใช้ `DROP TABLE IF EXISTS` เสมอ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-134-d1-migrator" />
+
+---
+
+## 🏋️ Quest: D1 Database Schema Migrator
+
+ถึงเวลาสร้าง SQL migrations ที่ปลอดภัยแล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-134-d1-migrator
    cd quest-134-d1-migrator
@@ -28,39 +159,37 @@ SQL migrations with data preservation
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `generateMigration(action, table, changes)` ที่:
+   - Validate action (create/alter/drop) และ table name
+   - Generate UP script ตาม action type
+   - Generate DOWN script สำหรับ undo
+   - ใช้ data preservation pattern สำหรับ DROP COLUMN
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง "move furniture ก่อนรื้อบ้าน" — backup data ก่อน DROP column เสมอ
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Actions ที่รองรับ: create, alter, drop
+- DROP COLUMN ต้อง backup data ก่อนเสมอ (CREATE TABLE backup AS SELECT ...)
+- ใช้ `DROP TABLE IF EXISTS` เสมอ
+- DOWN script ต้อง undo ได้เสมอ

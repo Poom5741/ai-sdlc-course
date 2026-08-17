@@ -1,66 +1,189 @@
 ---
 title: "Quest 25 - ADR Generator"
-description: "Generate architecture decision records"
+description: "Generate Architecture Decision Records"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 25: ADR Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate architecture decision records
+<LearningObjectives items={[
+  "Understanding what ADRs (Architecture Decision Records) are and why they matter",
+  "Writing ADRs with title, context, decision, and consequences sections",
+  "Using AI to draft ADRs while ensuring completeness",
+  "The engineering habit: Document Decisions — capturing why choices were made"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: ADR — บันทึกว่าทำไมถึงตัดสินใจแบบนี้
 
-<Steps>
+ADR (Architecture Decision Record) คือเอกสารสั้นๆ ที่ **บันทึกการตัดสินใจทางเทคนิคว่าเลือกอะไร, ทำไมถึงเลือก, และผลกระทบคืออะไร** — เหมือน "บันทึกการประชุม" สำหรับ decision สำคัญๆ
 
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-25-adr-generator
-   cd quest-25-adr-generator
-   ```
+ทำไมต้องเขียน ADR? เพราะ **ใน 6 เดือนเราจะลืมว่าทำไมถึงเลือก PostgreSQL แทน MongoDB** — ADR คือ "time capsule" ที่ช่วยให้ทีมใหม่เข้าใจ context เดิมได้
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+ADR มี 4 ส่วนหลัก:
 
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+| ส่วน | คำถามที่ตอบ |
+| --- | --- |
+| **Title** | กำลังตัดสินใจเรื่องอะไร? |
+| **Context** | สถานการณ์ตอนนี้เป็นอย่างไร? |
+| **Decision** | เลือกทำอะไร? |
+| **Consequences** | ผลที่ตามมาคืออะไร? (ทั้งดีและไม่ดี) |
 
 ---
 
-## การตรวจสอบ
+## ⚙️ How It Works
+
+### ADR Writing Workflow
+
+```
+1. ระบุ decision ที่ต้องทำ
+         ↓
+2. อธิบาย context (สถานการณ์ปัจจุบัน)
+         ↓
+3. ตัดสินใจเลือกทางเลือกหนึ่ง
+         ↓
+4. วิเคราะห์ consequences (ผลดี + ผลเสีย)
+         ↓
+5. บันทึกเป็น markdown
+```
+
+### Why Consequences Matter
+
+Consequences คือส่วนที่ **AI มักลืมเขียน** — แต่มันสำคัญมาก เพราะมันบอกว่า decision นี้ **จะส่งผลอะไรต่อไป** เช่น:
+
+```markdown
+## Decision: Use PostgreSQL
+
+### Consequences
+**Positive:**
+- ACID compliance ensures data integrity
+- Rich ecosystem of tools and extensions
+
+**Negative:**
+- Need to hire/train DBA with PostgreSQL expertise
+- Migration from MongoDB will require schema redesign
+```
+
+ถ้าไม่มี consequences → ไม่มีใครรู้ว่า decision นี้จะส่งผลอะไรต่อทีม
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: เริ่มจาก problem**
+
+> "เราต้องเลือกระหว่าง REST API กับ GraphQL"
+
+**Step 2: เขียน ADR ที่ครบถ้วน**
+
+```markdown
+# ADR-001: Use REST API over GraphQL
+
+## Context
+Team is building a new mobile app API. 
+Team has 3 backend developers, none with GraphQL experience.
+The API serves simple CRUD operations with fixed data shapes.
+
+## Decision
+We will use REST API with JSON payloads.
+
+## Consequences
+**Positive:**
+- Team already knows REST — no learning curve
+- Mature tooling (Express, FastAPI, etc.)
+- Easier to cache and rate-limit
+
+**Negative:**
+- May need multiple round-trips for complex queries
+- Less flexible for mobile bandwidth optimization
+- If data shapes become dynamic, may need to revisit
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่เขียน consequences section**
+> "ตัดสินใจแล้วก็พอ ไม่ต้องเขียนผลที่ตามมา"
+> → AI มักลืมส่วนนี้ — คุณต้องตรวจสอบว่ามี consequences อยู่จริง
+
+**Mistake 2: เขียน context ไม่ชัดเจน**
+> "เราต้องการ database ที่ดี"
+> → Context ต้องอธิบาย **สถานการณ์จริง**: ทีมมีกี่คน, มีประสบการณ์อะไร, ข้อจำกัดคืออะไร
+
+**Mistake 3: Decision ไม่ชัดเจน**
+> "Maybe we should consider PostgreSQL or MongoDB"
+> → ADR ต้องมี decision ที่ชัดเจน ไม่ใช่แค่ list ทางเลือก
+
+**Mistake 4: ไม่มี title ที่สื่อความ**
+> "ADR-001: Database Choice"
+> → Title ควรบอก decision เช่น "Use PostgreSQL over MongoDB for user data"
 
 ---
 
-## ส่งคำตอบ
+## 📝 Knowledge Check
 
-When tests pass, submit your solution:
+<Quiz questId="quest-25-adr-generator" />
 
-```bash
-npx bluebeltdojo submit
-```
+---
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+## 🏋️ Quest: ADR Generator
+
+ตอนนี้ถึงเวลาฝึกฝน! สร้าง ADR สำหรับ architecture decision โดยใช้ AI ช่วย
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-25-adr-generator
+   cd quest-25-adr-generator
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `generateADR(title, context, decision, consequences)` ที่สร้าง ADR markdown ครบถ้วน
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด — ตรวจสอบว่ามี consequences section อยู่จริง
+
+5. แก้ไข edge case ที่ AI พลาด (โดยเฉพาะ consequences)
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** ADR ที่ดีคือ ADR ที่ **คนอ่านแล้วเข้าใจว่าทำไมถึงเลือกแบบนี้** — ถ้าอ่านแล้วยังลังเล แปลว่า context ยังไม่ชัดพอ
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า output มีครบทุก section: Title, Context, Decision, Consequences
+- **สำคัญ:** AI มักลืมเขียน consequences — ตรวจสอบให้ดี
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

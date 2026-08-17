@@ -1,66 +1,217 @@
 ---
-title: "Enterprise AI Adoption Plan"
-description: "Plan enterprise-wide AI tool adoption"
+title: "Quest 116 - Enterprise AI Adoption Plan"
+description: "Plan enterprise-wide AI tool adoption — วางแผนการใช้ AI ระดับองค์กร"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Enterprise AI Adoption Plan
+# Quest 116: Enterprise AI Adoption Plan
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Plan enterprise-wide AI tool adoption
+<LearningObjectives items={[
+  "How to plan AI tool adoption at enterprise scale — from pilot to full rollout",
+  "Why adoption is a process (not just buying licenses) — training, governance, and measurement matter",
+  "How to design phased rollout strategies that minimize risk",
+  "The engineering habit of ADOPTION IS A PROCESS — tool rollout needs more than just deployment"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Enterprise AI Adoption
+
+การนำ AI tools มาใช้ในองค์กรไม่ใช่แค่ "ซื้อ license แล้วบอกทีมใช้" — มีหลายมิติที่ต้อง plan:
+
+```
+┌──────────────────────────────────────────────┐
+│           Enterprise AI Adoption              │
+│                                              │
+│  📋 Executive Summary    → Why invest?       │
+│  🔍 Current State        → Where are we?     │
+│  🛠️ Tool Selection       → Which tools?      │
+│  🧪 Pilot Program        → Start small       │
+│  🚀 Rollout Strategy     → Scale gradually   │
+│  📚 Training Program     → Upskill team      │
+│  📏 Governance           → Rules & policies  │
+│  📊 Success Metrics      → Measure impact    │
+└──────────────────────────────────────────────┘
+```
+
+**Core Principle: ADOPTION IS A PROCESS**
+
+หลายองค์กร fail เพราะ:
+
+1. **ซื้อ tool แต่ไม่ train** — ทีมไม่รู้จะใช้ยังไง
+2. **Deploy ทั้งองค์กรพร้อมกัน** — ถ้ามีปัญหา ทุกคนกระทบ
+3. **ไม่มี measurement** — ไม่รู้ว่าคุ้มค่าหรือเปล่า
+4. **ไม่มี governance** — ใครใช้ยังไง ไม่มีมาตรฐาน
+
+---
+
+## ⚙️ How It Works
+
+### Adoption Lifecycle
+
+```
+Phase 1: ASSESSMENT (Week 1-2)
+├─ Survey team skills and current tools
+├─ Identify pain points and opportunities
+└─ Benchmark current productivity metrics
+
+Phase 2: SELECTION (Week 3-4)
+├─ Evaluate tools against criteria
+├─ Cost-benefit analysis
+└─ Security and compliance review
+
+Phase 3: PILOT (Week 5-8)
+├─ Small group (3-5 developers)
+├─ 4-week trial with metrics
+└─ Collect feedback and adjust
+
+Phase 4: ROLLOUT (Week 9-16)
+├─ Phase 1: Power users (10% of team)
+├─ Phase 2: Early adopters (30%)
+├─ Phase 3: General availability (100%)
+└─ Training at each phase
+
+Phase 5: OPTIMIZATION (Ongoing)
+├─ Measure ROI quarterly
+├─ Update guidelines based on usage
+└─ Share best practices across teams
+```
+
+### Tool Selection Criteria
+
+| Criteria | Weight | Description |
+| --- | --- | --- |
+| Productivity Impact | 30% | How much time does it save? |
+| Ease of Adoption | 20% | How quickly can the team learn it? |
+| Security | 20% | Does it meet compliance requirements? |
+| Cost | 15% | Total cost of ownership |
+| Integration | 15% | Does it work with existing tools? |
+
+### Success Metrics (KPIs)
+
+- **Developer Productivity**: Lines of code, PR merge time, bug rate
+- **Tool Adoption**: Daily active users, acceptance rate, feature usage
+- **Business Impact**: Time-to-market, customer satisfaction, cost savings
+- **Quality**: Code review scores, test coverage, incident rate
+
+---
+
+## 💡 Example: Executive Summary
+
+```markdown
+## Executive Summary
+
+### Problem
+Our development team spends 30% of time on repetitive tasks (boilerplate,
+tests, documentation) that AI tools can automate.
+
+### Proposed Solution
+Adopt GitHub Copilot across the engineering organization with a phased
+rollout starting with a 4-week pilot program.
+
+### Expected ROI
+- Time savings: 8 hours/developer/week → $200K annual savings (team of 20)
+- Faster time-to-market: 15% reduction in feature delivery time
+- Quality improvement: 20% reduction in minor bugs
+
+### Investment
+- Tool licenses: $24K/year
+- Training: $10K one-time
+- Total first-year cost: $34K
+- Net savings: $166K
+- ROI: 488%
+
+### Risk Mitigation
+- Start with 4-week pilot before full commitment
+- Security review completed — no code leaves our environment
+- Rollback plan: disable tool access within 1 hour if issues arise
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Buying tools without pilot program**
+> "Copilot works for everyone, let's just buy it for all 200 devs"
+> → Pilot 3-5 people ก่อน แล้วค่อย scale — ลด risk อย่างมาก
+
+**Mistake 2: No training plan**
+> "Developers are smart, they'll figure it out"
+> → แม้แต่ experienced devs ก็ต้อง training เพื่อใช้ AI tools ได้อย่างมีประสิทธิภาพ
+
+**Mistake 3: Ignoring security review**
+> "It's just code completion, what's the risk?"
+> → AI tools อาจส่ง code snippets ไป cloud — ต้อง review data privacy และ compliance
+
+**Mistake 4: No success metrics**
+> "We'll know if it's working"
+> → ไม่มี metrics = ไม่รู้ว่า investment คุ้มค่า — ต้อง measure ก่อน adopt
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-116-enterprise-adoption" />
+
+---
+
+## 🏋️ Quest: Enterprise AI Adoption Plan
+
+Now it's time to practice! Design a comprehensive enterprise AI adoption plan.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-116-enterprise-adoption
    cd quest-116-enterprise-adoption
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor — สังเกต required sections ที่ต้องเขียนใน `adoption-plan.md`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. สร้างไฟล์ `adoption-plan.md` ที่มี sections ครบถ้วน:
+   - Executive Summary
+   - Current State Assessment
+   - Tool Selection Criteria
+   - Pilot Program
+   - Rollout Strategy
+   - Training Program
+   - Governance Framework
+   - Success Metrics
 
-4. ตรวจสอบ solution ของคุณ:
+4. ใช้ AI ช่วยสร้าง plan — แต่ **customize ให้เหมาะกับ scenario** ที่ problem.js กำหนด
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เขียน plan ที่มี timeline ชัดเจน (สัปดาห์/เดือน) — vague plans ไม่ช่วยให้ anyone execute ได้
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Executive Summary ต้อง mention ROI ตัวเลข
+- Pilot Program ต้องมี duration ชัดเจน (กี่สัปดาห์)
+- Rollout Strategy ต้อง phased — ไม่ใช่ big bang
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -5,22 +5,152 @@ description: "Clean training data"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 15: Data Curator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Clean training data
+<LearningObjectives items={[
+  "Understand why data quality matters more than data quantity for LLM training",
+  "Implement common data cleaning pipelines (dedup, filtering, normalization)",
+  "Detect and handle noise patterns in training data",
+  "Apply quality thresholds to curate high-quality datasets"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Data Curation
+
+"Garbage in, garbage out" — นี่คือกฎเหล็กของ ML. Model ที่ดีที่สุดในโลกก็ไร้ค่าถ้า training data สกปรก Data curation คือ process ของการทำความสะอาด ตรวจสอบ และคัดกรองข้อมูลก่อนนำไป train
+
+Data curation ไม่ใช่แค่ลบ duplicate — มันรวมถึง:
+
+- **Deduplication:** ลบข้อมูลซ้ำซ้อน
+- **Quality filtering:** ลบข้อมูลที่สั้นเกินไป หรือมีสัญลักษณ์พิเศษมากเกินไป
+- **Whitespace normalization:** trim spaces ที่ไม่จำเป็น
+- **Preservation:** รักษาข้อมูลที่มีคุณภาพ
+
+เหมือน martial arts: คุณไม่ได้ฝึกท่าผิดซ้ำ ๆ แล้วหวังว่าจะเก่ง Data cleaning คือการลบ "ท่าผิด" ออกจาก training set
+
+---
+
+## ⚙️ How It Works
+
+### The Data Curation Pipeline
+
+```
+1. Receive raw data array
+         ↓
+2. Remove duplicates (keep first occurrence)
+         ↓
+3. Filter out short lines (< threshold)
+         ↓
+4. Remove punctuation-heavy lines
+         ↓
+5. Trim whitespace from remaining lines
+         ↓
+6. Return curated dataset
+```
+
+### Quality Filters
+
+| Filter | Rule | Why |
+| --- | --- | --- |
+| Deduplication | Remove exact duplicates | Prevents memorization bias |
+| Short lines | Remove if < 10 chars | Too short to be meaningful |
+| Punctuation | Remove if > 50% punctuation | Noise, not signal |
+| Whitespace | Trim leading/trailing spaces | Normalization |
+
+---
+
+## 💡 Example: Data Curation Pipeline
+
+**Step 1: Implement deduplication**
+
+```javascript
+function curateData(rawData) {
+  const seen = new Set();
+  const curated = [];
+  
+  for (const line of rawData) {
+    const trimmed = line.trim();
+    if (seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    curated.push(trimmed);
+  }
+  return curated;
+}
+```
+
+**Step 2: Add quality filters**
+
+```javascript
+function curateData(rawData) {
+  const seen = new Set();
+  return rawData
+    .filter(line => {
+      const trimmed = line.trim();
+      if (seen.has(trimmed)) return false;
+      seen.add(trimmed);
+      if (trimmed.length < 10) return false;        // too short
+      const punctRatio = (trimmed.match(/[^a-zA-Z0-9\s]/g) || []).length / trimmed.length;
+      if (punctRatio > 0.5) return false;            // too much punctuation
+      return true;
+    })
+    .map(line => line.trim());
+}
+```
+
+**Step 3: Verify with test data**
+
+```bash
+node test.js
+# Test: removes duplicates
+# Test: filters short lines
+# Test: removes punctuation-heavy lines
+# Test: trims whitespace
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Not trimming before deduplication**
+> "Hello world" and "  Hello world  " treated as different lines
+→ Always trim before checking for duplicates.
+
+**Mistake 2: Removing valid content with punctuation**
+> Removing lines with `!!!` at the end of sentences
+→ Check the RATIO of punctuation, not just presence.
+
+**Mistake 3: Case-sensitive deduplication**
+> "Hello" and "hello" treated as different
+→ Normalize case when comparing for duplicates (if appropriate for your data).
+
+**Mistake 4: Being too aggressive with filtering**
+> Removing all short lines including valid headers
+→ Set reasonable thresholds (10 chars is a good minimum for meaningful text).
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-15-data-curator" />
+
+---
+
+## 🏋️ Quest: Data Curator
+
+Now it's time to build a data cleaning pipeline!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-15-data-curator
    cd quest-15-data-curator
@@ -28,39 +158,31 @@ Clean training data
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `curateData(rawData)` — ทำความสะอาด training data
 
-4. ตรวจสอบ solution ของคุณ:
+4. ทดสอบ edge cases: duplicates, short lines, punctuation-heavy lines, whitespace
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Data quality สำคัญกว่า data quantity — model ที่ train บนข้อมูลสะอาด 1000 ตัวอย่าง อาจดีกว่า model ที่ train บนข้อมูลสกปรก 1 ล้านตัวอย่าง
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ edge cases: duplicates, short lines, punctuation ratio, whitespace trimming
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง
+- Data curation คือ investment — ทำความสะอาดดี ผลลัพธ์ดีตามมา

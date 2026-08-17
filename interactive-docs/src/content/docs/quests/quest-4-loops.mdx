@@ -5,62 +5,176 @@ description: "Count tokens in text"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 4: Token Counter
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Count tokens in text
+<LearningObjectives items={[
+  "How tokens work in LLMs and why they matter for cost/quality",
+  "How to implement a basic token counting algorithm",
+  "Why naive tokenization (split by spaces) is inaccurate",
+  "The engineering habit: UNDERSTAND YOUR INPUTS"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Tokenization
+
+ในโลกของ LLMs ไม่ได้อ่านคำเต็ม — แต่อ่าน **tokens** ซึ่งเป็นชิ้นส่วนเล็กๆ ของข้อความ เช่น "hello" อาจเป็น 1 token, แต่ "unbelievable" อาจเป็น 2-3 tokens
+
+การเข้าใจ tokenization สำคัญเพราะ:
+
+- **Cost:** คุณจ่ายตามจำนวน tokens ที่ใช้
+- **Quality:** context window มีจำกัด — ถ้า tokens มากเกินไป ข้อความจะถูกตัด
+- **Accuracy:** ถ้าคุณนับ tokens ผิด คุณจะวางแผน budget ผิด
+
+---
+
+## ⚙️ How It Works
+
+### Token คืออะไร?
+
+```
+"Hello, world!" → ["Hello", ",", " world", "!"] = 4 tokens
+"unbelievable" → ["un", "believ", "able"] = 3 tokens
+```
+
+Token ไม่ใช่คำ — เป็น subword ที่ถูกแบ่งด้วย algorithm เช่น BPE (Byte-Pair Encoding)
+
+### การนับ Tokens แบบง่าย
+
+```javascript
+// วิธีง่ายๆ แต่ไม่แม่นยำ — แบ่งด้วย space
+function countTokensSimple(text) {
+  return text.split(/\s+/).filter(t => t.length > 0).length;
+}
+
+// ปัญหา: "Hello, world!" = 2 tokens แต่จริงๆ ควรเป็น 4
+```
+
+### การนับ Tokens แบบละเอียด
+
+```javascript
+// แบ่ง word + punctuation แยกกัน
+function countTokens(text) {
+  if (text === '') return 0;
+  
+  const tokens = [];
+  let current = '';
+  
+  for (const ch of text) {
+    if (/[.,!?;:'"()[\]{}]/.test(ch)) {
+      // Punctuation = separate token
+      if (current) tokens.push(current);
+      tokens.push(ch);
+      current = '';
+    } else if (/\s/.test(ch)) {
+      if (current) tokens.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current) tokens.push(current);
+  
+  return tokens.length;
+}
+```
+
+---
+
+## 💡 Example: Token Counting in Practice
+
+**ตัวอย่างที่ 1: ประโยคสั้น**
+
+```javascript
+countTokens("Hi!") // → 2 tokens: ["Hi", "!"]
+countTokens("Hello world") // → 2 tokens: ["Hello", "world"]
+```
+
+**ตัวอย่างที่ 2: ประโยคยาว**
+
+```javascript
+countTokens("I can't believe it's not butter!")
+// → ["I", "can", "'", "t", "believe", "it", "'", "s", "not", "butter", "!"]
+// → 11 tokens
+```
+
+**ตัวอย่างที่ 3: Edge cases**
+
+```javascript
+countTokens("") // → 0 tokens
+countTokens("   ") // → 0 tokens (whitespace only)
+countTokens("hello   world") // → 2 tokens (multiple spaces)
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ split(" ") อย่างเดียว**
+> `"Hello, world!".split(" ")` = 2 items แต่จริงๆ ควรเป็น 4 tokens
+> → ต้องแยก punctuation ออก
+
+**Mistake 2: ไม่จัดการ empty string**
+> ถ้า text = "" แล้ว return undefined
+> → ต้อง return 0
+
+**Mistake 3: นับ whitespace เป็น token**
+> `"  hello  "` นับ spaces เป็น tokens
+> → whitespace ไม่ควรถูกนับเป็น token แยก
+
+**Mistake 4: ไม่ grouped consecutive punctuation**
+> `"!!!"` นับเป็น 3 tokens แต่จริงๆ ควรเป็น 1 token
+> → consecutive punctuation ควรรวมกัน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-4-loops" />
+
+---
+
+## 🏋️ Quest: Token Counter
+
+เขียน function ที่นับ tokens ในข้อความอย่างแม่นยำ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-04-token-counter
    cd quest-04-token-counter
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `countTokens(text)` ตาม instructions
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ edge cases: empty string, whitespace only, consecutive punctuation
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI ให้แค่ `text.split(" ").length` ให้บอกว่าต้องจัดการ punctuation ด้วย
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี edge cases ระบุไว้
+- ต้องจัดการ: empty string, whitespace, punctuation ติดกัน
+- ทดสอบ "Hello, world!" — ควรนับเป็น 4 tokens ไม่ใช่ 2
+- ถ้าติดขัด ลองดู tokenization examples ใน solution directory

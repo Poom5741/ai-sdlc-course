@@ -1,0 +1,38 @@
+{
+  "questId": "quest-40-mock",
+  "questions": [
+    {
+      "question": "ทำไม mock data จึงต้อง realistic?",
+      "choices": [
+        "ดูดีใน demo",
+        "Mock data ที่ realistic ช่วย discover bugs ที่ data ปลอมๆ มองไม่เห็น",
+        "ลูกค้าชอบ",
+        "Tests รันเร็วขึ้น"
+      ],
+      "answer": 1,
+      "explanation": "Mock data ที่ realistic มี patterns เหมือน data จริง — ช่วย discover bugs เช่น encoding issues, length limits, format validation"
+    },
+    {
+      "question": "Hardcoded mock data มีข้อเสียอะไร?",
+      "choices": [
+        "ไม่มีข้อเสีย",
+        "Tests ไม่ cover variation — ทุกครั้งได้ผลลัพธ์เดิม",
+        "Code ดูยาวเกินไป",
+        "CI รันช้าลง"
+      ],
+      "answer": 1,
+      "explanation": "Hardcoded data ทำให้ tests ไม่ cover variation — random generation ช่วยให้ tests เจอ edge cases ที่ hardcoded data มองไม่เห็น"
+    },
+    {
+      "question": "Edge cases ที่ควรเพิ่มใน mock data มีอะไรบ้าง?",
+      "choices": [
+        "แค่ valid data ที่สมบูรณ์แบบ",
+        "Empty values, boundary numbers, invalid formats, duplicates",
+        "เฉพาะ data ที่好看",
+        "เฉพาะ data ภาษาอังกฤษ"
+      ],
+      "answer": 1,
+      "explanation": "Edge cases เช่น empty strings, boundary values, invalid formats ช่วย discover bugs ที่ happy path data มองไม่เห็น"
+    }
+  ]
+}

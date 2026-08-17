@@ -1,0 +1,38 @@
+{
+  "questId": "quest-27-risk",
+  "questions": [
+    {
+      "question": "What is the purpose of systematic risk identification in software development?",
+      "choices": [
+        "To assign blame when things go wrong",
+        "To anticipate potential problems before they occur, enabling proactive mitigation rather than reactive firefighting",
+        "To eliminate all possible risks, which is always achievable",
+        "To document risks after the project is complete"
+      ],
+      "answer": 1,
+      "explanation": "Risk identification aims to surface potential threats early, when they're cheapest to address. Proactive mitigation (planning alternatives, adding safeguards) is far less costly than reacting to crises after they happen."
+    },
+    {
+      "question": "Which risk category involves the danger of relying on a single AI provider or external service?",
+      "choices": [
+        "Technical risk",
+        "Operational risk — dependency on external services creates a single point of failure that can disrupt the entire system",
+        "Market risk",
+        "Legal risk"
+      ],
+      "answer": 1,
+      "explanation": "Dependency risk is operational — relying on a single external service (like an AI API) means that service's downtime, pricing changes, or policy updates directly impact your system. Mitigation includes fallback providers and graceful degradation."
+    },
+    {
+      "question": "What makes risk identification for AI systems different from traditional software?",
+      "choices": [
+        "AI systems have no unique risks",
+        "AI introduces risks like model hallucination, data privacy concerns, prompt injection, and non-deterministic behavior that don't exist in traditional software",
+        "AI risks are all security-related",
+        "Risk identification is not needed for AI systems"
+      ],
+      "answer": 1,
+      "explanation": "AI systems introduce novel risks: hallucinated outputs, training data bias, adversarial prompt attacks, unpredictable behavior, model versioning challenges, and regulatory uncertainty — all requiring specialized identification and mitigation strategies."
+    }
+  ]
+}

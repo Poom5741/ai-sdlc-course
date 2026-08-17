@@ -1,0 +1,38 @@
+{
+  "questId": "quest-65-agent-debate",
+  "questions": [
+    {
+      "question": "Multi-Agent Debate มีข้อดีอย่างไร compared to single agent?",
+      "choices": [
+        "เร็วกว่าเพราะทำพร้อมกัน",
+        "Adversarial agents เปิดเผย biases และ logical gaps ที่ agent เดียว miss",
+        "ใช้น้อยกว่า tokens",
+        "ไม่ต้องมี history"
+      ],
+      "answer": 1,
+      "explanation": "Adversarial debate ทำให้ agents challenge กัน — จุดอ่อนที่ agent เดียวไม่เห็นจะถูกเปิดเผยเมื่อมี agent อีกตัว counter argument"
+    },
+    {
+      "question": "Consensus ใน debate หมายถึงอะไร?",
+      "choices": [
+        "Winner ถูกเลือกแล้ว",
+        "ทุก agents เห็นตรงกัน (same stance) หรือ|maxRounds|ถึง",
+        "辩论ยกเลิก",
+        "ไม่มี arguments เหลือ"
+      ],
+      "answer": 1,
+      "explanation": "Consensus เกิดขึ้นเมื่อทุก agents เปลี่ยนเป็น stance เดียวกัน หรือ辩论ครบจำนวนรอบ — ทั้งสองกรณีเป็น exit condition"
+    },
+    {
+      "question": "Argument influence (concessions) สำคัญอย่างไร?",
+      "choices": [
+        "ช่วยให้辩论เร็วขึ้น",
+        "ใช้ตัดสิน winner — agent ที่โน้มน้าวคนอื่นได้มากที่สุด = winner",
+        "ช่วย cache arguments",
+        "ใช้แทน maxRounds"
+      ],
+      "answer": 1,
+      "explanation": "Concessions คือ agent ที่ยอมรับ argument ของอีกฝ่าย — ยิ่งมี agent ยอมรับมาก ยิ่งแสดงว่า argument นั้นมี impact"
+    }
+  ]
+}

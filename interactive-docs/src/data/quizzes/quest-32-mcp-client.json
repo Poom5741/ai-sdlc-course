@@ -1,0 +1,38 @@
+{
+  "questId": "quest-32-mcp-client",
+  "questions": [
+    {
+      "question": "MCP (Model Context Protocol) คืออะไร?",
+      "choices": [
+        "ภาษาโปรแกรมมิ่งใหม่สำหรับ AI",
+        "มาตรฐานสำหรับให้ AI models เชื่อมต่อกับ external tools และ data",
+        "ระบบ database สำหรับเก็บ context",
+        "เครื่องมือสำหรับ debug AI models"
+      ],
+      "answer": 1,
+      "explanation": "MCP คือมาตรฐานสำหรับให้ AI models เชื่อมต่อกับ external tools — เหมือน USB ที่ทำให้อุปกรณ์ต่างๆ เชื่อมต่อกันได้โดยไม่ต้องทำ custom cable"
+    },
+    {
+      "question": "MCP Client มี functions หลักอะไรบ้าง?",
+      "choices": [
+        "connect, disconnect, reconnect",
+        "registerTool, getTools, executeTool",
+        "create, read, update, delete",
+        "start, stop, pause"
+      ],
+      "answer": 1,
+      "explanation": "MCP Client มี 3 functions หลัก: registerTool (เพิ่ม tool), getTools (ดู tools ที่มี), executeTool (รัน tool)"
+    },
+    {
+      "question": "executeTool ควรทำอย่างไรเมื่อไม่เจอ tool ที่ต้องการ?",
+      "choices": [
+        "Throw error ทันที",
+        "Return null แทนที่จะ error",
+        "สร้าง tool ใหม่อัตโนมัติ",
+        "คืน undefined"
+      ],
+      "answer": 1,
+      "explanation": "executeTool ต้อง return null เมื่อไม่เจอ tool — ไม่ใช่ throw error เพราะ client ควร handle gracefully"
+    }
+  ]
+}

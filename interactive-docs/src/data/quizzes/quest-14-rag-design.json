@@ -1,0 +1,38 @@
+{
+  "questId": "quest-14-rag-design",
+  "questions": [
+    {
+      "question": "What does the Chinchilla scaling law suggest about the relationship between model size and training data?",
+      "choices": [
+        "Bigger models always perform better regardless of data size",
+        "For a given compute budget, there is an optimal ratio of model parameters to training tokens — both should scale together",
+        "Training data size is irrelevant once the model exceeds 1 billion parameters",
+        "Smaller models with more data always outperform larger models"
+      ],
+      "answer": 1,
+      "explanation": "Chinchilla's key insight is compute-optimal scaling: given a fixed compute budget, you should balance model size and dataset size proportionally rather than over-parameterizing a model with insufficient data."
+    },
+    {
+      "question": "What is the practical significance of the compute-optimal ratio in scaling laws?",
+      "choices": [
+        "It tells you exactly how many GPUs to buy",
+        "It helps estimate whether investing compute in a larger model or more training data will yield better performance per dollar",
+        "It guarantees that the model will achieve human-level performance",
+        "It only applies to models with fewer than 1 billion parameters"
+      ],
+      "answer": 1,
+      "explanation": "The compute-optimal ratio guides resource allocation — if your model is over-parameterized relative to its data, you'd get better returns by either collecting more data or using a smaller model at the same compute cost."
+    },
+    {
+      "question": "What happens when a model is significantly over-parameterized (too many parameters relative to training data)?",
+      "choices": [
+        "The model becomes more robust to all types of inputs",
+        "The model tends to memorize training data rather than learning generalizable patterns, leading to overfitting",
+        "Training becomes faster and cheaper",
+        "The model automatically adjusts its own parameter count"
+      ],
+      "answer": 1,
+      "explanation": "Over-parameterized models with insufficient data tend to memorize rather than generalize. Scaling laws help identify the sweet spot where model capacity matches data availability for optimal generalization."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-19-chain-of-thought",
+  "questions": [
+    {
+      "question": "What is chain-of-thought (CoT) prompting?",
+      "choices": [
+        "Asking the model to generate code step by step",
+        "Structuring prompts to elicit explicit step-by-step reasoning",
+        "Chaining multiple API calls together",
+        "Using multiple models in sequence"
+      ],
+      "answer": 1,
+      "explanation": "CoT prompting structures the prompt to force the model to show its reasoning process, which improves accuracy on complex tasks."
+    },
+    {
+      "question": "Why does CoT prompting improve accuracy on math problems?",
+      "choices": [
+        "It gives the model more tokens to compute with",
+        "It forces the model to reason through each step instead of jumping to an answer",
+        "It automatically verifies the answer",
+        "It uses a different model architecture"
+      ],
+      "answer": 1,
+      "explanation": "CoT forces sequential reasoning, giving the model intermediate computation tokens. This prevents skipping steps and allows self-correction."
+    },
+    {
+      "question": "What should a CoT prompt include even when no steps are provided?",
+      "choices": [
+        "An error message",
+        "Nothing — return empty string",
+        "At least the problem statement and a 'step by step' trigger phrase",
+        "A list of default generic steps"
+      ],
+      "answer": 2,
+      "explanation": "Even with empty steps, the prompt should include the problem and the 'Let's think step by step' phrase to trigger the model's reasoning mode."
+    }
+  ]
+}

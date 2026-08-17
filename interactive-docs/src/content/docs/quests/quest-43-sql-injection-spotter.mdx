@@ -5,22 +5,153 @@ description: "Find SQL injection vulnerabilities in code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 43: SQL Injection Spotter
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Find SQL injection vulnerabilities in code
+<LearningObjectives items={[
+  "Recognize common SQL injection patterns in code",
+  "Understand how string concatenation and template literals create injection risks",
+  "Use AI to build a vulnerability scanner that detects unsafe SQL queries",
+  "Differentiate between high and medium severity injection patterns"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: SQL Injection — The Classic Attack
+
+SQL Injection (SQLi) เป็นหนึ่งในช่องโหว่ด้านความปลอดภัยที่เก่าแก่และอันตรายที่สุดในประวัติศาสตร์เว็บ แม้ว่าจะมีมาตั้งแต่ยุค 90 แต่ก็ยังคงเป็นหนึ่งใน Top 10 ของ OWASP อยู่ทุกปี
+
+ปัญหาหลักคือ: เมื่อคุณนำ user input มารวมกับ SQL query แบบ raw string โดยไม่มี parameterization ผู้โจมตีสามารถ "ฉีด" SQL command เข้าไปใน input ได้
+
+```javascript
+// ❌ อันตราย — string concatenation
+const query = `SELECT * FROM users WHERE id = '${userId}'`;
+// ถ้า userId = "'; DROP TABLE users; --"
+// ผลลัพธ์: SELECT * FROM users WHERE id = ''; DROP TABLE users; --'
+```
+
+```javascript
+// ✅ ปลอดภัย — parameterized query
+const query = 'SELECT * FROM users WHERE id = ?';
+db.query(query, [userId]);
+```
+
+Think of it like a castle gate: if you build a gate that accepts any shape of input without checking, an attacker can sneak soldiers right through. Parameterized queries are the gate that only accepts pre-approved shapes.
+
+---
+
+## ⚙️ How It Works
+
+### The Anatomy of a SQL Injection Attack
+
+```
+1. Attacker submits malicious input
+   "'; DROP TABLE users; --"
+         ↓
+2. Input gets concatenated into SQL query
+   SELECT * FROM users WHERE id = ''; DROP TABLE users; --'
+         ↓
+3. Database executes the FULL query including attacker's payload
+         ↓
+4. Table dropped. Data gone. 🏚️
+```
+
+### How to Detect SQL Injection Patterns
+
+มี 3 รูปแบบหลักที่มักพบในโค้ดที่เป็นอันตราย:
+
+| Pattern | Severity | Example |
+| --- | --- | --- |
+| Template literal in SQL | 🔴 High | `` `SELECT ... ${var}` `` |
+| String concatenation with `+` | 🔴 High | `"SELECT ... " + var` |
+| `.concat()` method in SQL | 🟡 Medium | `"SELECT ...".concat(var)` |
+
+### Why This Matters for AI-Generated Code
+
+AI coding tools มักจะ suggestion โค้ดที่ใช้ template literals เพราะมันดู clean และ readable แต่นั่นคือช่องโหว่ SQL injection โดยตรง! เมื่อ AI สร้าง SQL query คุณต้องตรวจสอบเสมอว่าไม่มี string interpolation อยู่ในนั้น
+
+---
+
+## 💡 Example: Building a SQL Injection Scanner
+
+Here's how to build a scanner that detects unsafe SQL patterns:
+
+```javascript
+function findSQLInjection(code) {
+  if (!code) return [];
+
+  const results = [];
+  const lines = code.split('\n');
+  const sqlKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|WHERE|FROM|JOIN)\b/i;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!sqlKeywords.test(line)) continue;
+
+    // High severity: template literal in SQL
+    if (/`[^`]*\$\{[^}]+\}[^`]*`/.test(line)) {
+      results.push({ line: i + 1, severity: 'high', pattern: 'template-literal' });
+    }
+
+    // High severity: string concatenation with + in SQL
+    if (/[\"'][^\"']*(?:SELECT|INSERT|UPDATE|DELETE)[^\"']*[\"']\s*\+/.test(line)) {
+      results.push({ line: i + 1, severity: 'high', pattern: 'string-concat' });
+    }
+
+    // Medium severity: .concat() in SQL
+    if (/\.concat\(/.test(line)) {
+      results.push({ line: i + 1, severity: 'medium', pattern: 'string-concat-method' });
+    }
+  }
+
+  return results;
+}
+```
+
+**Key insight:** The scanner uses regex to detect both template literals (`${var}`) and string concatenation (`+ var`) patterns. Each detection includes the line number and severity so developers know which issues to fix first.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Only checking for `DROP TABLE`**
+> "I'll just look for the most dangerous SQL commands"
+> → SQL injection isn't just about dropping tables. It's about reading data, bypassing authentication, and modifying data. Detect ALL unsafe patterns, not just destructive ones.
+
+**Mistake 2: Trusting "validated" input**
+> "I already check if the input is a number"
+> → Input validation helps, but it's not a substitute for parameterized queries. Always use parameterized queries as the primary defense.
+
+**Mistake 3: Missing `.concat()` patterns**
+> "String concatenation with `+` is dangerous, but `.concat()` is fine"
+> → Both patterns are equally dangerous. `.concat()` just looks cleaner but produces the same injection risk.
+
+**Mistake 4: Not considering template literals**
+> "Template literals are modern and safe"
+> → Template literals in SQL are one of the most common injection vectors because they look professional. `` `SELECT ... ${userInput}` `` is just as dangerous as `"SELECT ... " + userInput`.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-43-sql-injection-spotter" />
+
+---
+
+## 🏋️ Quest: SQL Injection Spotter
+
+เวลาใช้ AI ช่วยเขียน scanner — ต้องระวังว่า AI อาจ proposal regex ที่ง่ายเกินไป หรือจับไม่ครบทุก pattern!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-43-sql-injection-spotter
    cd quest-43-sql-injection-spotter
@@ -28,9 +159,14 @@ Find SQL injection vulnerabilities in code
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `findSQLInjection(code)` ที่ตรวจจับ unsafe SQL patterns:
+   - Template literals (`\${variable}`) ใน SQL queries
+   - String concatenation (`+`) ใน SQL queries
+   - `.concat()` method ใน SQL queries
+   - Return results พร้อม line number, severity, และ pattern type
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +197,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ regex ที่จับ SQL keywords (SELECT, INSERT, UPDATE, DELETE, WHERE, FROM) ร่วมกับ unsafe patterns
+- อย่าลืมเช็คทั้ง template literals และ string concatenation
+- ถ้าติดขัด ลองนึกว่าผู้โจมตีจะ inject อะไรได้บ้าง — แล้ว scanner ควรจับอะไร
+- อย่าดู solution โดยตรง — ลองคิดเองก่อน

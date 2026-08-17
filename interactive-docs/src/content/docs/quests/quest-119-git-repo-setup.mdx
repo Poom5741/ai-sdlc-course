@@ -1,66 +1,194 @@
 ---
-title: "Git Repo Setup"
+title: "Quest 119 - Git Repo Setup"
 description: "Initialize git repos with proper config"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Git Repo Setup
+# Quest 119: Git Repo Setup
 
 <Badge text="easy" variant="success" /> <Badge text="15 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Initialize git repos with proper config
+<LearningObjectives items={[
+  "Why git user.name and user.email must be configured before committing",
+  "How to validate commit history for proper parent chains",
+  "How missing config causes 'unknown' author in git log",
+  "The connection between git config and commit integrity"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Git Repository Setup & Configuration
+
+เมื่อคุณเริ่มต้นโปรเจค Git สิ่งแรกที่ต้องทำคือตั้งค่า **user identity** — นั่นคือ `user.name` และ `user.email` เพราะ Git ฝังข้อมูลนี้ไว้ในทุก commit ที่คุณสร้าง
+
+ถ้าคุณลืมตั้งค่า identity คุณจะเห็นชื่อ `unknown` ใน `git log` — นั่นหมายความว่าไม่มีใครรู้ว่าใครเขียนโค้ด และในทีมจริง สิ่งนี้สร้างความสับสนมหาศาล
+
+Think of it like a martial artist signing their work — you need your name on every technique you execute. No signature means nobody knows who performed the move.
+
+---
+
+## ⚙️ How It Works
+
+### Git Commit Chain Validation
+
+ทุก commit ใน Git มีโครงสร้างเป็น linked list — แต่ละ commit ชี้กลับไปหา **parent commit** ผ่าน hash
+
+```
+commit C (abc123) → parent: def456
+    ↓
+commit B (def456) → parent: 789ghi
+    ↓
+commit A (789ghi) → parent: null  ← root commit
+```
+
+### Validation Rules
+
+| Rule | Description |
+| --- | --- |
+| Root commit | ต้องมี `parent === null` |
+| Parent chain | commit ถัดไปต้อง reference hash ของ parent |
+| Config check | `name` และ `email` ต้องไม่ใช่ empty string |
+| Hash format | ทุก commit hash ต้องเป็น non-empty string |
+| Message required | ทุก commit ต้องมี message |
+
+### Why Config Validation Matters
+
+```
+// Without config → git log shows:
+commit abc123 (HEAD -> main)
+Author: unknown <unknown>
+
+// With config → git log shows:
+commit abc123 (HEAD -> main)
+Author: Poom <poom@example.com>
+```
+
+---
+
+## 💡 Example: Validating Commit Sequences
+
+Here's how to validate a series of commits form a proper git history:
+
+```javascript
+function validateCommitSequence(commits, config) {
+  const errors = [];
+
+  // Rule 3: Config must be set
+  if (!config.name || config.name.trim() === '') {
+    errors.push('git user.name is not configured');
+  }
+  if (!config.email || config.email.trim() === '') {
+    errors.push('git user.email is not configured');
+  }
+
+  if (commits.length === 0) {
+    return { valid: errors.length === 0, errors };
+  }
+
+  // Rule 1: First commit must be root
+  if (commits[0].parent !== null) {
+    errors.push('first commit must have parent === null (root commit)');
+  }
+
+  // Rule 2: Each subsequent commit references its parent
+  for (let i = 1; i < commits.length; i++) {
+    if (commits[i].parent !== commits[i - 1].hash) {
+      errors.push(
+        `commit ${commits[i].hash} parent ${commits[i].parent} does not match previous commit hash ${commits[i - 1].hash}`
+      );
+    }
+  }
+
+  // Rule 4 & 5: Hash and message must be present
+  for (const commit of commits) {
+    if (!commit.hash || commit.hash.trim() === '') {
+      errors.push('commit hash must not be empty');
+    }
+    if (!commit.message || commit.message.trim() === '') {
+      errors.push(`commit ${commit.hash} message must not be empty`);
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+```
+
+**Key insight:** AI อาจเขียนโค้ดที่ validate commit hash ได้ถูกต้อง แต่ลืมตรวจสอบว่า `config.name` และ `config.email` มีค่า — นั่นคือ edge case ที่คุณต้องจับได้
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ลืม validate config**
+> AI เขียนโค้ด validate commit chain แต่ลืมเช็ค name/email
+> → Commits แสดง `unknown` author เมื่อ config หายไป
+
+**Mistake 2: ตรวจสอบแค่ hash ไม่เช็ค message**
+> AI ตรวจว่า hash มีค่า แต่ลืมเช็คว่า message ต้องไม่ empty
+> → Empty commit messages ทำให้ `git log` อ่านยาก
+
+**Mistake 3: ไม่ validate root commit parent**
+> AI ข้ามการเช็คว่า commit แรกต้องมี `parent === null`
+> → Chain validation ไม่สมบูรณ์
+
+**Mistake 4: ไม่ trim whitespace**
+> Config มีค่า `" "` (space only) แล้วเช็คแค่ `!== ''`
+> → ผ่าน validation แต่จริงๆ แล้วไม่มีค่า
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-119-git-repo-setup" />
+
+---
+
+## 🏋️ Quest: Git Repo Setup
+
+Now it's time to practice! Validate commit sequences with proper git config.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-119-git-repo-setup
    cd quest-119-git-repo-setup
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `validateCommitSequence(commits, config)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests อย่างละเอียด — เอาใจใส่ edge cases เกี่ยวกับ config
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าลังหว่า config validation สำคัญแค่ไหน ลองนึกภาพ `git log` ในโปรเจคที่มี 50 commits แต่ทุก commit แสดง `unknown` — จะ追踪ใครได้?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ edge cases เกี่ยวกับ config name/email (empty string, whitespace)
+- ถ้าติดขัด ลองคิดว่าถ้า config หายไป会发生什么 — commits จะแสดง `unknown`
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

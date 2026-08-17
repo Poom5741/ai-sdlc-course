@@ -1,0 +1,38 @@
+{
+  "questId": "quest-110-multimodal-rag",
+  "questions": [
+    {
+      "question": "Why can't you use the same scoring strategy for all document types in a multimodal RAG system?",
+      "choices": [
+        "It's technically impossible to score everything the same way",
+        "Images don't have searchable text content, and tables have structured columns — each needs a different approach",
+        "Text is always more relevant than images",
+        "Different scoring strategies take too long to compute"
+      ],
+      "answer": 1,
+      "explanation": "Text has content that can be searched directly, but images rely on metadata (alt text, tags) for matching, and tables have column names that indicate their structure. Each type needs a strategy that matches its data format."
+    },
+    {
+      "question": "What is the 'visual query boost' and when should it be applied?",
+      "choices": [
+        "A boost applied to all documents when any query is made",
+        "A multiplier for image scores when the query contains visual language like 'show,' 'see,' or 'photo'",
+        "A penalty applied to text documents to make images rank higher",
+        "A boost applied only to table documents"
+      ],
+      "answer": 1,
+      "explanation": "When a user asks 'show me a sunset photo,' they're clearly looking for an image. The visual query boost (e.g., 1.5x) increases image scores when the query contains visual language, matching user intent."
+    },
+    {
+      "question": "Why should each RAG result include a 'reason' field?",
+      "choices": [
+        "It makes the output more verbose",
+        "It helps users understand why a document was ranked highly, enabling trust and debugging",
+        "It's required by the RAG protocol",
+        "Reasons are only needed for failed searches"
+      ],
+      "answer": 1,
+      "explanation": "Results without reasons are opaque. If a user sees an unexpected document ranked highly, the reason ('Image metadata match: 3/5' or 'Table column match: 2/4') helps them understand and trust the ranking."
+    }
+  ]
+}

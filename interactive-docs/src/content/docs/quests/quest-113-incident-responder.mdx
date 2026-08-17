@@ -1,66 +1,227 @@
 ---
-title: "Production Incident Responder"
-description: "AI-assisted debugging and incident response"
+title: "Quest 113 - Production Incident Responder"
+description: "AI-assisted debugging and incident response — รับมือ production incidents อย่างมีระบบ"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Production Incident Responder
+# Quest 113: Production Incident Responder
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-AI-assisted debugging and incident response
+<LearningObjectives items={[
+  "How to create structured incident response plans using AI assistance",
+  "Why even low-severity incidents need triage — they may be symptoms of bigger issues",
+  "How to estimate impact, draft stakeholder communications, and prepare postmortems",
+  "The engineering habit of INCIDENT RESPONSE PROTOCOL — structured approach, not panic"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Structured Incident Response
+
+เมื่อ production system มีปัญหา — database down, API errors, slow queries — สิ่งที่หลายคนทำคือ **panic debugging**: เปิด terminal, พิมพ์ random commands, หวังว่าจะเจอปัญหา
+
+**Structured Incident Response** คือวิธีที่ดีกว่า — มี protocol ชัดเจน:
+
+```
+1. TRIAGE → จำแนกประเภทและความรุนแรง
+      ↓
+2. ACTIONS → ทำตามขั้นตอนที่กำหนด
+      ↓
+3. IMPACT → ประเมินผลกระทบ
+      ↓
+4. COMMUNICATION → แจ้ง stakeholder
+      ↓
+5. POSTMORTEM → วิเคราะห์ root cause ป้องกัน recurrence
+```
+
+**AI ช่วยได้อย่างไร?** AI สามารถช่วย generate triage classifications, แนะนำ response actions จาก symptoms, draft communication templates, และสร้าง postmortem frameworks — แต่ **คุณต้อง verify ทุกอย่าง**
+
+### ทำไม Severity ทุกระดับต้อง Triage?
+
+```
+⚠️ Low severity: "slight delay"
+     │
+     ▼ อาจเป็น symptom ของ...
+🔴 High severity: database connection pool exhausted
+```
+
+ถ้า skip triage สำหรับ low severity คุณอาจพลาดปัญหาใหญ่ที่ซ่อนอยู่
+
+---
+
+## ⚙️ How It Works
+
+### Incident Response Flow
+
+```javascript
+respondToIncident({ type, severity, symptoms, logs })
+```
+
+**Input:**
+
+```javascript
+{
+  type: 'database-connection',
+  severity: 'high',        // 'low' | 'medium' | 'high' | 'critical'
+  symptoms: ['connection timeout', '503 errors'],
+  logs: ['Connection pool exhausted']
+}
+```
+
+**Output:**
+
+```javascript
+{
+  triage: "...",            // Classification of the incident
+  actions: [...],           // Ordered response steps
+  estimatedImpact: "...",   // Impact assessment
+  communication: "...",     // Stakeholder template
+  postmortem: "..."         // Postmortem template
+}
+```
+
+### Response Structure
+
+| Field | Purpose | Example |
+| --- | --- | --- |
+| `triage` | จำแนกประเภท incident | "Database connection failure — high severity" |
+| `actions` | ลำดับขั้นตอน response | `["1. Check connection pool", "2. Restart pool", ...]` |
+| `estimatedImpact` | ประเมินผลกระทบ | "High — affects all API endpoints" |
+| `communication` | แจ้ง stakeholders | "Incident declared: Database connection issue..." |
+| `postmortem` | วิเคราะห์หลัง incident | "Timeline, root cause, action items..." |
+
+### Severity Mapping
+
+| Severity | Impact Level | Response Time | Actions Count |
+| --- | --- | --- | --- |
+| `low` | Minimal | 24 hours | 2-3 |
+| `medium` | Moderate | 4 hours | 3-4 |
+| `high` | Significant | 1 hour | 4+ |
+| `critical` | Severe | Immediate | 5+ |
+
+---
+
+## 💡 Example: Responding to a Database Incident
+
+**Input:**
+
+```javascript
+const incident = {
+  type: 'database-connection',
+  severity: 'high',
+  symptoms: ['connection timeout', '503 errors', 'slow queries'],
+  logs: ['Connection pool exhausted', 'Timeout after 30s'],
+};
+```
+
+**Output:**
+
+```javascript
+const response = respondToIncident(incident);
+// {
+//   triage: "DATABASE-CONNECTION [HIGH] — Connection pool exhaustion causing timeouts",
+//   actions: [
+//     "1. Verify connection pool status and current connections",
+//     "2. Check for connection leaks in recent deployments",
+//     "3. Scale connection pool if needed",
+//     "4. Monitor recovery metrics"
+//   ],
+//   estimatedImpact: "HIGH — All API requests affected, potential data loss window",
+//   communication: "Incident [HIGH]: Database connection pool exhausted. Impact: All API endpoints. ETA for resolution: investigating.",
+//   postmortem: "## Incident Report\n### Timeline\n### Root Cause\n### Action Items\n### Prevention"
+// }
+```
+
+**Edge case — low severity (must still triage!):**
+
+```javascript
+const lowIncident = { type: 'minor', severity: 'low', symptoms: ['slight delay'] };
+const lowResponse = respondToIncident(lowIncident);
+// triage ต้องมี content — ไม่ใช่ empty string!
+// lowResponse.triage.length > 0  ✅
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Skipping triage for low severity**
+> "Low severity ไม่ต้อง triage ก็ได้"
+> → Low severity อาจเป็น symptom ของปัญหาใหญ่ — triage เสมอ
+
+**Mistake 2: Actions not ordered by priority**
+> "ใส่ action ทั้งหมดลงไป ไม่ต้องเรียง"
+> → Actions ต้องเรียงตามลำดับความสำคัญ — 诊断 ก่อน, fix ทีหลัง
+
+**Mistake 3: Empty communication template**
+> "Stakeholder ไม่ต้องรู้หรอก"
+> → Communication template ต้องมี — stakeholders ต้องรู้สถานะเพื่อ plan
+
+**Mistake 4: Missing postmortem**
+> "แก้เสร็จก็จบ"
+> → Postmortem คือสิ่งที่ป้องกัน incident เดิมเกิดซ้ำ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-113-incident-responder" />
+
+---
+
+## 🏋️ Quest: Production Incident Responder
+
+Now it's time to practice! Build a structured incident response system.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-113-incident-responder
    cd quest-113-incident-responder
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณ — สังเกต TODO stub สำหรับ `respondToIncident()`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `respondToIncident(incident)`:
+   - `triage`: จำแนก incident จาก type + severity
+   - `actions`: ลำดับ response steps (array of strings)
+   - `estimatedImpact`: ประเมินจาก severity level
+   - `communication`: template สำหรับ stakeholders
+   - `postmortem`: template สำหรับ post-incident analysis
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ**: ทดสอบกับ `severity: 'low'` — triage ต้องมี content เสมอ
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า "low severity still gets triage" ล้มเหลว — ตรวจสอบว่าคุณไม่ได้ skip triage เมื่อ severity เป็น 'low'
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Triage ต้อง mention incident type — ไม่ใช่ generic message
+- Actions ควรจำนวน 3+ สำหรับ high severity incidents
+- **Edge case สำคัญ**: severity 'low' ยังต้อง triage — อย่า skip!
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

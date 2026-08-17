@@ -5,22 +5,160 @@ description: "Implement cosine similarity search"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 21: Semantic Search Builder
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Implement cosine similarity search
+<Badge text="medium" variant="caution" /> <Badge text="30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "Understand cosine similarity as the foundation of vector search",
+  "Implement cosine similarity with proper vector normalization",
+  "Build a semantic search function that finds the most relevant document",
+  "Recognize why normalization matters for comparing vectors of different magnitudes"
+]} />
+
+---
+
+## 📖 Concept: Cosine Similarity
+
+Cosine similarity คือ metric ที่วัดความ相似ระหว่าง two vectors โดยดูที่มุมระหว่าง vectors แทนที่จะดูระยะห่าง — ทำให้ไม่ affected by magnitude
+
+ใน RAG systems, ทุก document ถูกแปลงเป็น vector (embedding) เมื่อ query เข้ามา เราคำนวณ cosine similarity ระหว่าง query vector กับ document vectors แล้วเลือกอันที่ similar ที่สุด
+
+คิดเหมือน martial arts: Cosine similarity ไม่ได้วัดว่าท่าไหน "แรงกว่า" แต่วัดว่าท่าไหน "เหมือนกันมากกว่า" — ท่าเตะเล็ก ๆ กับท่าเตะใหญ่ถ้ามุมเดียวกัน ก็ similar
+
+---
+
+## ⚙️ How It Works
+
+### The Cosine Similarity Formula
+
+```
+cosine_similarity(A, B) = (A · B) / (|A| × |B|)
+
+Where:
+- A · B = dot product (sum of element-wise products)
+- |A| = magnitude (sqrt of sum of squares)
+- Result ranges from -1 (opposite) to 1 (identical)
+```
+
+### Why Normalization Matters
+
+```
+A = [1, 0],  B = [1, 0]     → similarity = 1.0
+A = [100, 0], B = [100, 0]  → similarity = 1.0 (same direction!)
+A = [1, 0],  B = [0, 1]     → similarity = 0.0 (orthogonal)
+A = [1, 0],  B = [-1, 0]    → similarity = -1.0 (opposite)
+```
+
+Without normalization, dot product would give different results for vectors of different magnitudes pointing in the same direction.
+
+### Search Workflow
+
+```
+1. Compute cosine similarity for each document
+         ↓
+2. Rank documents by similarity score
+         ↓
+3. Return the most similar document
+```
+
+---
+
+## 💡 Example: Implementing Semantic Search
+
+**Step 1: Cosine similarity**
+
+```javascript
+function cosineSimilarity(vecA, vecB) {
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+  
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    magnitudeA += vecA[i] * vecA[i];
+    magnitudeB += vecB[i] * vecB[i];
+  }
+  
+  magnitudeA = Math.sqrt(magnitudeA);
+  magnitudeB = Math.sqrt(magnitudeB);
+  
+  if (magnitudeA === 0 || magnitudeB === 0) return 0;
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+```
+
+**Step 2: Search function**
+
+```javascript
+function search(query, documents) {
+  let bestScore = -Infinity;
+  let bestDoc = documents[0];
+  
+  for (const doc of documents) {
+    const score = cosineSimilarity(query.embedding, doc.embedding);
+    if (score > bestScore) {
+      bestScore = score;
+      bestDoc = doc;
+    }
+  }
+  
+  return bestDoc;
+}
+```
+
+**Step 3: Verify**
+
+```bash
+node test.js
+# Test: identical vectors → 1
+# Test: orthogonal vectors → 0
+# Test: opposite vectors → -1
+# Test: magnitude invariant
+# Test: search returns most similar doc
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Using dot product without normalization**
+> `dotProduct(A, B)` gives different scores for [1,0]·[1,0] vs [100,0]·[100,0]
+→ Always normalize by magnitudes to get cosine similarity.
+
+**Mistake 2: Division by zero**
+> One vector is all zeros → magnitude = 0 → NaN
+→ Check for zero-magnitude vectors and return 0.
+
+**Mistake 3: Comparing wrong fields**
+> `search(query.text, docs)` instead of `search(query.embedding, docs)`
+→ Always compare embeddings, not raw text.
+
+**Mistake 4: Not returning the full document**
+> Returning just the similarity score instead of the document
+→ Return the document object so the caller can use its content.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-21-semantic-search" />
+
+---
+
+## 🏋️ Quest: Semantic Search Builder
+
+Now it's time to build a semantic search engine!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-21-semantic-search
    cd quest-21-semantic-search
@@ -28,39 +166,30 @@ Implement cosine similarity search
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `cosineSimilarity(vecA, vecB)` และ `search(query, documents)`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ:** ทดสอบ magnitude invariance — [1,0] กับ [100,0] ต้องได้ similarity เดียวกัน
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Cosine similarity คือ foundation ของ vector search ทุก system — เข้าใจแล้วจะเข้าใจว่า RAG ค้นหาข้อมูลอย่างไร
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ: normalization ต้องถูกต้อง, zero vectors ต้องไม่ crash, search คืน document ที่ดีที่สุด
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

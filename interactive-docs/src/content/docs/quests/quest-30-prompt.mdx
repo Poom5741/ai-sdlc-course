@@ -1,66 +1,201 @@
 ---
 title: "Quest 30 - Prompt-for-Code Refiner"
-description: "Refine prompts for better code"
+description: "Refine prompts to generate better code"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 30: Prompt-for-Code Refiner
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Refine prompts for better code
+<Badge text="easy" variant="success" /> <Badge text="15 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-30-prompt-refiner
-   cd quest-30-prompt-refiner
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Understanding why first-draft prompts rarely produce optimal code",
+  "Adding specificity to vague prompts (parameters, types, edge cases)",
+  "Iterating on prompts based on output quality",
+  "The engineering habit: Iterate on Prompts — refinement leads to better results"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: Prompt Refinement — เขียน prompt ให้ดีพอที่ AI จะเข้าใจ
+
+Prompt-for-Code Refiner คือการ **ปรับปรุง prompt ที่คลุมเครือให้ชัดเจนขึ้น** — เพราะ prompt ที่สั้นและคลุมเครือ = code ที่ AI เขียนก็จะคลุมเครือตามไปด้วย
+
+คิดง่ายๆ: ถ้าบอกช่างซ่อมรถว่า "รถมีปัญหา" เขาจะงง — แต่ถ้าบอกว่า "เครื่องยนต์สตาร์ทไม่ติดตอนเช้า อากาศเย็น" เขาจะแก้ได้ทันที
+
+Prompt refinement คือการเปลี่ยนจาก:
+
+```
+❌ "write a function"
+```
+
+เป็น:
+
+```
+✅ "write a function that takes an array of numbers, 
+    returns the average, and throws an error for empty arrays"
+```
+
+---
+
+## ⚙️ How It Works
+
+### Prompt Refinement Workflow
+
+```
+1. ได้ prompt คลุมเครือ (badPrompt)
+         ↓
+2. วิเคราะห์ว่าขาดอะไร (parameters? types? edge cases?)
+         ↓
+3. เพิ่ม specificity
+         ↓
+4. ตรวจสอบว่า prompt ใหม่ดีกว่าเดิม
+```
+
+### What Makes a Prompt "Bad"?
+
+**Missing parameters** — ไม่บอกว่ารับ input อะไร
+
+```
+❌ "write a function"
+✅ "write a function that takes a string and returns its reverse"
+```
+
+**Missing types** — ไม่บอก data types
+
+```
+❌ "write a sorting function"
+✅ "write a function that takes an array of numbers and returns them sorted ascending"
+```
+
+**Missing edge cases** — ไม่บอกว่าต้อง handle อะไร
+
+```
+❌ "write a login function"
+✅ "write a login function that validates email format, checks password length >= 8, and throws on invalid credentials"
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: ดู prompt คลุมเครือ**
+
+```javascript
+const badPrompt = "write a function";
+```
+
+**Step 2: วิเคราะห์และเพิ่ม specificity**
+
+```javascript
+function refinePrompt(badPrompt) {
+  // วิเคราะห์ว่า prompt คลุมเครือตรงไหน
+  const hasFunction = /function/i.test(badPrompt);
+  const hasParams = /\(.*\)|parameter|input|arg/i.test(badPrompt);
+  const hasType = /string|number|array|object|boolean/i.test(badPrompt);
+  const hasReturn = /return|output|result/i.test(badPrompt);
+
+  let refined = badPrompt;
+
+  // เพิ่ม specificity ตามที่ขาด
+  if (hasFunction && !hasParams) {
+    refined += ' that takes an array of numbers as input';
+  }
+  if (!hasType) {
+    refined += ' and returns a number';
+  }
+  if (!hasReturn) {
+    refined += ' (the sum of all elements)';
+  }
+
+  return refined;
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: ตรวจสอบ** — prompt ใหม่ต้องยาวกว่าเดิมและมี specificity
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: คืน prompt เดิมโดยไม่แก้ไข**
+> "prompt ดูโอเคแล้ว"
+> → Test จะ fail เพราะ expects prompt ที่ยาวกว่าเดิม
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: เพิ่ม word ที่ไม่ได้เพิ่ม specificity**
+> "write a function that does things with stuff"
+> → ต้องเพิ่ม parameters, types, edge cases — ไม่ใช่แค่ word คลุมเครือ
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: ไม่ใส่ parentheses หรือ parameter names**
+> "write a function for sorting"
+> → ต้องมี parameter description เช่น "(array of numbers)"
+
+**Mistake 4: ไม่ test prompt ใหม่**
+> "เขียน prompt ใหม่แล้ว น่าจะดี"
+> → ต้องรัน test เพื่อตรวจสอบว่า prompt ใหม่ดีกว่าจริง
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-30-prompt-refiner" />
+
+---
+
+## 🏋️ Quest: Prompt-for-Code Refiner
+
+ตอนนี้ถึงเวลาฝึกฝน! ปรับปรุง prompt ที่คลุมเครือให้ชัดเจน
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-30-prompt-refiner
+   cd quest-30-prompt-refiner
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `refinePrompt(badPrompt)` ที่ปรับปรุง prompt ให้ชัดเจนขึ้น
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด
+
+5. ตรวจสอบว่า prompt ใหม่ยาวกว่าเดิมและมี specificity
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Prompt ที่ดี = prompt ที่ AI เข้าใจทันทีไม่ต้องเดา — ยิ่ง specific ยิ่งได้ code ที่ตรง
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Prompt ใหม่ต้องยาวกว่าเดิมและมี parameters, types, หรือ edge cases
+- ตรวจสอบว่า prompt ใหม่ไม่ใช่แค่ word คลุมเครือเพิ่มเข้าไป
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

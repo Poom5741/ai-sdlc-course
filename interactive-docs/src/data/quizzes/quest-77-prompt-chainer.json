@@ -1,0 +1,38 @@
+{
+  "questId": "quest-77-prompt-chainer",
+  "questions": [
+    {
+      "question": "ถ้า step ที่ 2 ของ prompt chain fail ควรทำอย่างไร?",
+      "choices": [
+        "ข้าม step 2 แล้วไป step 3",
+        "ลอง step 2 อีกครั้งโดยไม่ทำอะไร",
+        "หยุด chain ทั้งหมด — ทุก step ขึ้นอยู่กับ step ก่อนหน้า",
+        "Return output ของ step 1 แทน"
+      ],
+      "answer": 2,
+      "explanation": "Failure ต้องหยุด chain ทั้งหมด — output ของ step แต่ละตัวขึ้นอยู่กับ step ก่อนหน้า ถ้า step ไหน fail ข้อมูลจะไม่ครบสำหรับ step ถัดไป"
+    },
+    {
+      "question": "ทำไม prompt chaining ถึงมีประโยชน์กว่า prompt เดียว?",
+      "choices": [
+        "เพราะใช้ token น้อยกว่า",
+        "เพราะแต่ละ step โฟกัสอย่างเดียว — debug ง่ายขึ้น, optimize แยกกันได้",
+        "เพราะ LLMs ทำงานได้เร็วกว่า",
+        "เพราะไม่ต้องเขียน tests"
+      ],
+      "answer": 1,
+      "explanation": "การแบ่งเป็นหลาย steps ช่วยให้แต่ละ step มี Single Responsibility — debug ง่าย (รู้ทันทีว่า fail ตรงไหน) และ optimize แยกกันได้"
+    },
+    {
+      "question": "prompt chain ควรบันทึกข้อมูลอะไรบ้าง?",
+      "choices": [
+        "แค่ output สุดท้าย",
+        "input/output ของทุก step + status + duration",
+        "แค่ errors",
+        "ไม่ต้องบันทึกอะไร"
+      ],
+      "answer": 1,
+      "explanation": "History recording ช่วย debug — เก็บ input/output, status (success/fail), และ duration ของทุก step จะช่วยให้รู้ว่า chain fail ตรงไหนและทำไม"
+    }
+  ]
+}

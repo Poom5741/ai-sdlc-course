@@ -1,0 +1,38 @@
+{
+  "questId": "quest-29-requirements-analyzer",
+  "questions": [
+    {
+      "question": "เพราะอะไร requirements ที่คลุมเครือจึงเป็นปัญหาใหญ่?",
+      "choices": [
+        "เพราะทำให้ document ดูสั้นเกินไป",
+        "เพราะ requirements คลุมเครือ = code ที่ผิดตั้งแต่ต้น — สร้างผิดตั้งแต่開始",
+        "เพราะทำให้ PM ดูไม่ดี",
+        "เพราะเป็นแค่ปัญหาเล็กๆ ที่แก้ได้ทีหลัง"
+      ],
+      "answer": 1,
+      "explanation": "Requirements ที่คลุมเครือ = code ที่ผิดตั้งแต่ต้น — ยิ่งพบปัญหาเร็ว ยิ่งแก้ถูก (5 นาทีตอน design vs 5 วันตอน production)"
+    },
+    {
+      "question": "Requirements แบบไหนจะได้ score ต่ำกว่า 80?",
+      "choices": [
+        "Requirements ที่มี numbers ชัดเจน เช่น 'load time < 1.5s'",
+        "Requirements ที่ใช้คำคลุมเครือ เช่น 'fast', 'user-friendly', 'lots of users'",
+        "Requirements ที่เขียนยาวเกิน 500 คำ",
+        "Requirements ที่เขียนเป็นภาษาไทย"
+      ],
+      "answer": 1,
+      "explanation": "Requirements ที่ใช้คำคลุมเครือ (fast, user-friendly, lots of) = ไม่ specific, ไม่ measurable → score ต้องต่ำ (< 80)"
+    },
+    {
+      "question": "Suggestion ที่ดีควรเป็นอย่างไร?",
+      "choices": [
+        "กว้างๆ เช่น 'make it more specific'",
+        "Specific และ actionable เช่น 'Define response time < 200ms for 95th percentile'",
+        "ยาวมากเพื่อให้ดูมีสาระ",
+        "เขียนแค่ 'improve requirements'"
+      ],
+      "answer": 1,
+      "explanation": "Suggestions ต้อง specific และ actionable — เช่น 'Define response time < 200ms' แทนที่จะเขียนแค่ 'make it faster'"
+    }
+  ]
+}

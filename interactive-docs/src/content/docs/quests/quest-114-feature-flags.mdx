@@ -1,66 +1,239 @@
 ---
-title: "Feature Flag System"
-description: "Feature flags with AI-driven rollout suggestions"
+title: "Quest 114 - Feature Flag System"
+description: "Feature flags with AI-driven rollout suggestions — เปิด/ปิด features อย่างมั่นใจ"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Feature Flag System
+# Quest 114: Feature Flag System
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Feature flags with AI-driven rollout suggestions
+<LearningObjectives items={[
+  "How feature flags enable safe, gradual rollouts of new features",
+  "Why deterministic hashing (not Math.random) is essential for consistent user experience",
+  "How to implement percentage-based rollouts with rule-based targeting",
+  "The engineering habit of shipping small, testing with real users before full rollout"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Feature Flags for Safe Deployment
+
+ทุกคนเคย experience แบบนี้ — deploy feature ใหม่, production ล่ม, rollback ทั้งระบบ **Feature Flags** คือ solution: แยก code deployment จาก feature activation
+
+```
+Deploy code ──────→ code is live (but hidden behind flag)
+     │
+     ▼
+Enable flag ──────→ feature appears for users
+     │
+     ▼
+Gradual rollout ──→ 10% → 50% → 100%
+     │
+     ▼
+Disable flag ─────→ instant rollback (no redeploy!)
+```
+
+**ทำไม Feature Flags ถึง Powerful?**
+
+1. **Separation** — deploy code ได้โดยไม่ต้องเปิด feature ให้ user
+2. **Gradual Rollout** — เปิดให้ 10% ของ user ก่อน เพื่อ catch issues
+3. **Instant Rollback** — ปิด flag ทันที ไม่ต้อง redeploy
+4. **A/B Testing** — ใช้ flags เปรียบเทียบ user experience
+
+### Rule-Based Targeting
+
+นอกจาก percentage-based rollout ยังมี **rules** ที่เปิด feature ให้ user เฉพาะกลุ่ม เช่น:
+
+- เปิดให้ staging environment ก่อน production
+- เปิดให้ internal users ก่อน public
+- เปิดให้ users ใน特定 region
+
+---
+
+## ⚙️ How It Works
+
+### Two Functions
+
+```javascript
+const flag = createFeatureFlag('new-ui', { percentage: 50 });
+const result = evaluateFlag(flag, { userId: 'user-1', environment: 'production' });
+// { enabled: true/false, reason: '...' }
+```
+
+### createFeatureFlag(name, config)
+
+สร้าง flag object ที่มี:
+
+- `name` — ชื่อ flag
+- `config` — settings:
+  - `percentage` — % ของ users ที่เปิด (0-100)
+  - `rules` — rule-based targeting array
+
+### evaluateFlag(flag, context)
+
+ตัดสินใจว่า flag เปิดสำหรับ user นี้หรือไม่:
+
+```
+1. Check rules ก่อน
+   │
+   ├─ Rule match? → enabled = true
+   │
+   ▼
+2. Check percentage (deterministic hash)
+   │
+   ├─ hash(userId) % 100 < percentage? → enabled = true
+   │
+   ▼
+3. Default → enabled = false
+```
+
+### Deterministic Hashing — สำคัญมาก
+
+```javascript
+// ❌ WRONG: Math.random() — user เปลี่ยนผลทุกครั้ง!
+evaluateFlag(flag, ctx1);  // true
+evaluateFlag(flag, ctx1);  // false — ผลเปลี่ยน!
+
+// ✅ CORRECT: hash(userId) — user เดียวกันได้ผลเดิมเสมอ
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) % 100;
+  }
+  return hash;
+}
+evaluateFlag(flag, ctx1);  // true
+evaluateFlag(flag, ctx1);  // true — ผลเดิม!
+```
+
+---
+
+## 💡 Example: Gradual Rollout
+
+**Create flags:**
+
+```javascript
+// 100% rollout — ทุก user เห็น
+const fullFlag = createFeatureFlag('full', { percentage: 100 });
+evaluateFlag(fullFlag, { userId: 'u1', environment: 'production' });
+// { enabled: true, reason: '...' }
+
+// 0% rollout — ไม่มี user เห็น
+const zeroFlag = createFeatureFlag('zero', { percentage: 0 });
+evaluateFlag(zeroFlag, { userId: 'u1', environment: 'production' });
+// { enabled: false, reason: '...' }
+
+// 50% rollout — ประมาณครึ่งหนึ่ง
+const flag50 = createFeatureFlag('test50', { percentage: 50 });
+```
+
+**Test deterministic behavior:**
+
+```javascript
+// Same user → same result (always!)
+evaluateFlag(flag50, { userId: 'user-1', environment: 'production' });
+evaluateFlag(flag50, { userId: 'user-1', environment: 'production' });
+// Both results are identical ✅
+```
+
+**Rule-based targeting:**
+
+```javascript
+const ruleFlag = createFeatureFlag('beta', {
+  percentage: 0,  // 0% for everyone
+  rules: [{ key: 'environment', value: 'staging' }]  // but 100% for staging
+});
+
+evaluateFlag(ruleFlag, { userId: 'u1', environment: 'staging' });
+// { enabled: true } — rule match!
+
+evaluateFlag(ruleFlag, { userId: 'u1', environment: 'production' });
+// { enabled: false } — no rule match, percentage is 0
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Using Math.random() for feature flag decisions**
+> "Math.random() < 0.5 for 50% — easy!"
+> → Result changes every call! User sees feature disappear/reappear. ใช้ deterministic hash
+
+**Mistake 2: Not handling 100% and 0% edge cases**
+> "100% works like any other percentage"
+> → 100% ต้อง always return true, 0% always return false — no hash needed
+
+**Mistake 3: Ignoring rule-based targeting**
+> "Just use percentage, rules are too complex"
+> → Rules สำคัญสำหรับ staging/production split และ internal user testing
+
+**Mistake 4: Not providing a reason in evaluateFlag result**
+> "enabled true/false ก็พอ"
+> → `reason` string ช่วย debugging — รู้ว่า flag เปิดเพราะ rule หรือ percentage
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-114-feature-flags" />
+
+---
+
+## 🏋️ Quest: Feature Flag System
+
+Now it's time to practice! Build a feature flag system with deterministic rollout.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-114-feature-flags
    cd quest-114-feature-flags
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณ — สังเกต TODO stubs สำหรับ `createFeatureFlag()` และ `evaluateFlag()`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createFeatureFlag(name, config)`:
+   - Return flag object ที่มี `name` และ `config`
+   - ใช้ default config ถ้าไม่ได้ส่งมา
 
-4. ตรวจสอบ solution ของคุณ:
+4. Implement `evaluateFlag(flag, context)`:
+   - ตรวจ rules ก่อน — ถ้า rule match ให้ return true
+   - ตรวจ percentage — ใช้ **deterministic hash** ของ userId (ไม่ใช่ Math.random!)
+   - Return `{ enabled: boolean, reason: string }`
+
+5. **สำคัญ**: ทดสอบว่า userId เดียวกันได้ผลเดิมเสมอ (deterministic)
+
+6. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า "deterministic: same user gets same result" ล้มเหลว — ตรวจสอบว่าคุณใช้ hash ของ userId ไม่ใช่ Math.random()
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- **สำคัญมาก**: ใช้ deterministic hash สำหรับ user assignment — ห้ามใช้ Math.random()!
+- 100% rollout ต้อง always enable, 0% rollout ต้อง always disable
+- Rules ควร check ก่อน percentage
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

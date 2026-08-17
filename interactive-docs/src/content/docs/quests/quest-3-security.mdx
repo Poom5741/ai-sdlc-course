@@ -5,62 +5,174 @@ description: "Compare different AI coding tools"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 3: Compare AI Tools
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Compare different AI coding tools
+<LearningObjectives items={[
+  "How to run the same prompt across multiple AI tools",
+  "Why different tools produce different outputs for the same task",
+  "How to write a structured comparison document",
+  "The engineering habit: CALIBRATE YOUR TOOLS"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Comparing AI Tools
+
+ไม่ใช่ AI tool ทุกตัวจะเหมาะกับทุกงาน เช่นเดียวกับช่างไม้ที่มีทั้งเลื่อย สิ่ว และค้อน — แต่ละเครื่องมือมีจุดแข็งของตัวเอง
+
+การ **เปรียบเทียบ AI tools** ช่วยให้คุณรู้ว่า tool ไหนดีกว่าสำหรับงานอะไร เช่น Copilot อาจเขียน code ได้เร็ว但在 edge cases อาจพลาด, Claude Code อาจเขียน code ได้ละเอียดกว่า但ช้ากว่า
+
+วิธีที่ดีที่สุดคือ **รัน prompt เดียวกันใน 2+ tools แล้วเปรียบเทียบผลลัพธ์** — ไม่ใช่แค่อ่านรีวิว
+
+---
+
+## ⚙️ How It Works
+
+### The Comparison Workflow
+
+```
+1. Write ONE clear prompt (e.g., "write a sortByKey function")
+         ↓
+2. Run the SAME prompt in Tool A and Tool B
+         ↓
+3. Copy the outputs side by side
+         ↓
+4. Write a structured comparison document
+         ↓
+5. Evaluate: which was better, and WHY?
+```
+
+### ตัวอย่าง Prompt ที่ดี
+
+```javascript
+// Prompt ที่ชัดเจนและเฉพาะเจาะจง
+"Write a JavaScript function called sortByKey that takes an array of objects 
+and a key string, and returns a new array sorted by that key in ascending order. 
+Handle edge cases: empty array, missing key, non-array input."
+```
+
+### ตัวอย่าง Comparison Matrix
+
+| Criteria | Tool A | Tool B |
+| --- | --- | --- |
+| ความเร็ว | ⚡ เร็วมาก | 🐢 ช้ากว่าเล็กน้อย |
+| ความถูกต้อง | ✅ ถูกต้อง | ✅ ถูกต้องเหมือนกัน |
+| Edge cases | ❌ ลืม null check | ✅ จัดการครบ |
+| ความสวยงาม | 📝 โค้ดสะอาด | 📝 โค้ดมี comment มากกว่า |
+| ราคา | 💰 ฟรี | 💰 $20/เดือน |
+
+---
+
+## 💡 Example: Running the Same Prompt
+
+**ขั้นตอนที่ 1: เขียน prompt เดียว**
+
+```javascript
+// ใช้ prompt เดียวกันในทุก tool
+"Write a function that validates email addresses using regex. 
+Return true for valid emails, false for invalid. 
+Handle edge cases: empty string, null, undefined."
+```
+
+**ขั้นตอนที่ 2: เปรียบเทียบผลลัพธ์**
+
+```javascript
+// Tool A output:
+function validateEmail(email) {
+  if (!email) return false;
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+// Tool B output:
+function validateEmail(email) {
+  if (typeof email !== 'string') return false;
+  if (email.length === 0) return false;
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
+}
+```
+
+**ขั้นตอนที่ 3: วิเคราะห์**
+
+Tool B ดีกว่าเพราะ:
+
+- ตรวจสอบ `typeof email !== 'string'` (จัดการ null/undefined ได้ดีกว่า)
+- Regex ละเอียดกว่า (จำกัด characters ที่ใช้ได้)
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: เปรียบเทียบ prompt ต่างกัน**
+> ใช้ prompt ต่างกันในแต่ละ tool แล้วบอกว่า tool หนึ่งดีกว่า
+> → ต้องใช้ prompt เดียวกันเสมอ
+
+**Mistake 2: ดูแค่ความเร็ว**
+> "Tool A เร็วกว่า เลยดีกว่า"
+> → ต้องดูความถูกต้อง, edge cases, ราคาด้วย
+
+**Mistake 3: ไม่เขียน comparison document**
+> เปรียบเทียบในหัวแล้วลืม
+> → เขียน comparison.md เพื่อเป็นบันทึก
+
+**Mistake 4: ยอมรับผลลัพธ์แรกโดยไม่ test**
+> เห็นโค้ดสวยแล้วคิดว่าดี
+> → ต้องรัน test จริงเสมอ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-3-security" />
+
+---
+
+## 🏋️ Quest: Compare AI Tools
+
+รัน prompt เดียวกันใน 2+ AI tools แล้วเขียน comparison document
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-03-compare-tools
    cd quest-03-compare-tools
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เลือก prompt จาก instructions ใน `problem.js`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. รัน prompt เดียวกันใน AI tools อย่างน้อย 2 ตัว (เช่น Copilot, Claude Code, ChatGPT)
 
-4. ตรวจสอบ solution ของคุณ:
+4. เขียน `comparison.md` ตาม structure ที่กำหนด:
+   - Tool:  tool ที่ใช้
+   - Output: ผลลัพธ์จากแต่ละ tool
+   - Better: tool ไหนดีกว่า
+   - Why: เหตุผล
+
+5. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าไม่มี access หลาย tools ลองใช้ ChatGPT free + GitHub Copilot free — แค่ 2 ตัวก็เพียงพอ
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ prompt เดียวกันเสมอ — อย่าเปลี่ยน prompt ระหว่าง tools
+- เขียน comparison.md ตาม structure ที่ problem.js ระบุ
+- ดู不仅仅是ความเร็ว — ต้องดู edge cases, ความถูกต้อง, และราคาด้วย
+- ถ้าติดขัด ลองดู example comparison ใน solution directory

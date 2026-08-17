@@ -1,66 +1,196 @@
 ---
 title: "Quest 74 - Few-Shot Template Builder"
-description: "Build few-shot prompt templates"
+description: "สร้าง prompt templates ด้วยตัวอย่าง"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 74: Few-Shot Template Builder
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Build few-shot prompt templates
+<LearningObjectives items={[
+  "เข้าใจว่า few-shot prompting ทำงานอย่างไรและทำไมถึงมีประสิทธิภาพ",
+  "สร้าง prompt templates ที่มีตัวอย่างครบถ้วนและถูกต้อง",
+  "รู้จักจัดลำดับตัวอย่างเพื่อผลลัพธ์ที่ดีที่สุด",
+  "เข้าใจข้อจำกัดของ few-shot vs zero-shot prompting"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Few-Shot Prompting
+
+**Few-shot prompting** คือการให้ตัวอย่าง (examples) แก่ AI ก่อนที่จะให้ทำ task จริง — เหมือนการสอนเด็กด้วยตัวอย่างก่อนให้ทำแบบฝึกหัด
+
+แทนที่จะอธิบายยาวเหยียดว่า "ช่วยแปลง sentence เป็น sentiment" — แค่แสดง 2-3 ตัวอย่างให้ดู AI จะเข้าใจ pattern และทำตามได้ทันที
+
+**Why it works:** LLMs เรียนรู้จาก context ที่ให้ ยิ่งมีตัวอย่างที่ดี ยิ่งได้ผลลัพธ์ที่แม่นยำ — เรียกว่า "Learning in context"
+
+```
+Zero-shot:  "Classify this text" → AI เดา pattern เอง → อาจผิด
+Few-shot:   "ตัวอย่าง 1, 2, 3"    → AI จับ pattern ได้ → แม่นยำกว่า
+```
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ Few-Shot Prompt
+
+```
+Few-Shot Template Structure:
+┌──────────────────────────────────┐
+│ 1. Task Description              │
+│    → "Classify sentiment"        │
+├──────────────────────────────────┤
+│ 2. Example 1 (Input → Output)   │
+│    → "I love it" → positive     │
+├──────────────────────────────────┤
+│ 3. Example 2 (Input → Output)   │
+│    → "It's terrible" → negative │
+├──────────────────────────────────┤
+│ 4. New Input (ไม่มี Output)      │
+│    → "It's okay" → ?            │
+└──────────────────────────────────┘
+```
+
+### ทำไม Examples ถึงสำคัญกว่า Instructions
+
+| วิธี | ผลลัพธ์ |
+| ------ | ---------- |
+| "Classify the sentiment of text" | AI อาจเข้าใจผิดว่า classify คืออะไร |
+| ให้ตัวอย่าง 2-3 ตัวก่อน | AI เห็น pattern ทันที ไม่ต้องเดา |
+
+**ตัวอย่าง:** ถ้าต้องการให้ AI แปลง input เป็น output ที่มีรูปแบบเฉพาะ — การแสดง 1 ตัวอย่างชัดๆ ดีกว่าการอธิบาย 10 บรรทัด
+
+---
+
+## 💡 Example: สร้าง Few-Shot Template
+
+```javascript
+function buildFewShotTemplate(examples, task, input) {
+  // เริ่มจาก task description
+  let prompt = `Task: ${task}\n\nExamples:\n`;
+
+  // เพิ่มตัวอย่างทีละตัว
+  for (let i = 0; i < examples.length; i++) {
+    prompt += `Input: ${examples[i].input}\n`;
+    prompt += `Output: ${examples[i].output}\n\n`;
+  }
+
+  // เพิ่ม input ใหม่ (ยังไม่มี output)
+  prompt += `Now:\nInput: ${input}\nOutput:`;
+
+  return prompt;
+}
+```
+
+**ตัวอย่างการใช้งาน:**
+
+```javascript
+const examples = [
+  { input: "I love this product!", output: "positive" },
+  { input: "This is terrible", output: "negative" },
+  { input: "It's okay I guess", output: "neutral" }
+];
+
+const prompt = buildFewShotTemplate(
+  examples,
+  "Classify the sentiment of the text",
+  "This movie was absolutely fantastic"
+);
+// Result:
+// Task: Classify the sentiment of the text
+//
+// Examples:
+// Input: I love this product!
+// Output: positive
+//
+// Input: This is terrible
+// Output: negative
+//
+// Input: It's okay I guess
+// Output: neutral
+//
+// Now:
+// Input: This movie was absolutely fantastic
+// Output:
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ใส่ task description**
+> เริ่มจาก examples เลยโดยไม่บอกว่า task คืออะไร
+> → AI ไม่รู้ว่าต้องทำอะไรกับ input ใหม่
+
+**Mistake 2: ลำดับ examples ผิด**
+> ใส่ตัวอย่างที่ hardest ก่อน
+> → AI จับ pattern ได้ยาก ควรเริ่มจากง่ายไปยาก
+
+**Mistake 3: ใส่examples น้อยเกินไป (zero-shot เมื่อควร few-shot)**
+> ไม่ใส่ examples เลยเพราะ "AI น่าจะเข้าใจ"
+> → สำหรับ task ที่มีรูปแบบเฉพาะ ตัวอย่างช่วยได้มาก
+
+**Mistake 4: ลืมใส่ input ใหม่ในตอนท้าย**
+> ใส่ examples แล้วจบเลย ไม่มี "Now: Input: ..."
+> → AI ไม่รู้ว่าต้องตอบอะไร
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-74-few-shot" />
+
+---
+
+## 🏋️ Quest: Few-Shot Template Builder
+
+ถึงเวลาฝึกฝน! สร้าง few-shot template builder
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-74-few-shot
    cd quest-74-few-shot
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `buildFewShotTemplate(examples, task, input)` ที่:
+   - เริ่มจาก task description
+   - เพิ่มทุก examples ตามลำดับ (Input/Output pairs)
+   - ใส่ input ใหม่ในตอนท้าย (รอ output)
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองสร้าง prompt ด้วยมือก่อน แล้วดูว่ารูปแบบตรงกับที่ tests คาดหวังหรือไม่ — สังเกตว่ามี `\n` ตรงไหนบ้าง
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- เริ่มจาก task description แล้วค่อยเพิ่ม examples ทีละตัว
+- อย่าลืม `\n` ระหว่าง examples — รูปแบบต้องตรงกับที่ tests คาดหวัง
+- Input ใหม่ต้องมี "Now:" นำหน้า และจบด้วย "Output:" (รอ AI เติม)
+- ทดสอบด้วย examples หลายขนาด — 0, 1, 3, 5 ตัวอย่าง

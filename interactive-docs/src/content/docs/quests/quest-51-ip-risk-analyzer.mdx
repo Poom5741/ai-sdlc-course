@@ -5,22 +5,134 @@ description: "Analyze licensing and copyright risks"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 51: IP Risk Analyzer
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Analyze licensing and copyright risks
+<LearningObjectives items={[
+  "Understand IP risks specific to AI-generated code",
+  "Build a license compatibility matrix for common open-source licenses",
+  "Learn to identify copyright risk scenarios when using AI tools",
+  "Create a decision framework for when to use AI-generated code safely"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI-Generated Code and IP Risks — The Legal Minefield
+
+AI coding tools เรียนรู้จาก code นับล้านๆ บรรทัด — รวมถึง code ที่มี license แตกต่างกัน คำถามสำคัญคือ: **ถ้า AI generate code ที่คล้ายกับ copyrighted code ใครเป็นเจ้าของ? และคุณละเมิด license หรือไม่?**
+
+ปัญหาคือ: คุณไม่สามารถรู้ได้ว่า AI สร้าง code มาจาก training data ชิ้นไหน — และถ้า code ที่ AI generate มาคล้ายกับ GPL-licensed code คุณอาจต้อง open-source โค้ดของคุณเอง
+
+Think of it like a chef who learned recipes from hundreds of restaurants: if they accidentally recreate someone's signature dish, the original restaurant might sue. You need to know which recipes are safe to use and which come with strings attached.
+
+---
+
+## ⚙️ How It Works
+
+### Common License Types
+
+| License | Can Use Commercially? | Must Open Source? | Key Restriction |
+| --- | --- | --- | --- |
+| **MIT** | ✅ Yes | ❌ No | Must include license notice |
+| **Apache 2.0** | ✅ Yes | ❌ No | Must state changes |
+| **GPL v3** | ✅ Yes | ✅ Yes (if distributed) | Copyleft — derivative works must be GPL |
+| **LGPL** | ✅ Yes | ✅ Only for LGPL parts | More permissive than GPL |
+| **AGPL** | ✅ Yes | ✅ Yes (even SaaS) | Network copyleft |
+
+### License Compatibility Matrix
+
+```
+MIT → ✅ Compatible with: Apache, BSD, ISC
+GPL → ❌ Incompatible with: MIT, Apache (without open sourcing)
+AGPL → ❌ Incompatible with: most commercial licenses
+Apache 2.0 → ⚠️ Compatible with MIT, but patent clauses apply
+```
+
+### AI-Specific IP Risk Scenarios
+
+```
+1. AI generates code similar to GPL-licensed code
+   → Risk: You may need to open-source your entire project
+   → Mitigation: Use code scanning tools, review AI output carefully
+
+2. AI reproduces copyrighted API design
+   → Risk: Oracle v. Google (API copyright is complex)
+   → Mitigation: Document your design decisions independently
+
+3. AI uses training data without proper attribution
+   → Risk: Training data licensing is legally unsettled
+   → Mitigation: Track which AI tools you use and their ToS
+```
+
+---
+
+## 💡 Example: License Compatibility Analysis
+
+```markdown
+## License Compatibility Matrix
+
+| Your Project | + MIT Code | + Apache Code | + GPL Code | + AGPL Code |
+| --- | --- | --- | --- | --- |
+| MIT | ✅ Safe | ✅ Safe | ⚠️ Must GPL | ❌ Must AGPL |
+| Apache | ✅ Safe | ✅ Safe | ⚠️ Must GPL | ❌ Must AGPL |
+| GPL | ✅ Safe | ✅ Safe | ✅ Safe | ❌ Must AGPL |
+| Proprietary | ✅ Safe | ✅ Safe | ❌ Can't use | ❌ Can't use |
+
+## Decision Framework
+
+Before using AI-generated code, ask:
+
+1. **License Check**: What license does the AI tool's ToS specify?
+2. **Code Provenance**: Can you trace where the code came from?
+3. **Similarity Analysis**: Does the code match known licensed patterns?
+4. **Commercial Impact**: Would using this code create legal liability?
+5. **Attribution**: Do you need to credit any upstream sources?
+```
+
+**Key insight:** The decision framework helps you evaluate AI-generated code systematically, not just hope for the best.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Assuming AI-generated code is "original"**
+> "AI created it, so it must be new"
+> → AI generates code based on training data. It may reproduce patterns from copyrighted sources without attribution.
+
+**Mistake 2: Ignoring license compatibility**
+> "MIT and GPL are both open source, so they're compatible"
+> → GPL requires derivative works to be GPL. Mixing GPL into a proprietary project forces you to open-source everything.
+
+**Mistake 3: Not reading AI tool's Terms of Service**
+> "I just use the tool, I don't read the ToS"
+> → AI tools have different IP policies. Some claim ownership of output, others grant you full rights. Know what you're agreeing to.
+
+**Mistake 4: No IP review in code review**
+> "Code review is about functionality, not legal stuff"
+> → IP review should be part of your review process. A single GPL-licensed snippet can change your entire project's licensing obligations.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-51-ip-risk-analyzer" />
+
+---
+
+## 🏋️ Quest: IP Risk Analyzer
+
+วิเคราะห์ licensing และ copyright risks สำหรับ AI-generated code — AI มักจะไม่ consideration license compatibility เมื่อ generate code!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-51-ip-risk-analyzer
    cd quest-51-ip-risk-analyzer
@@ -28,9 +140,15 @@ Analyze licensing and copyright risks
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. เขียน `ip-risk-analysis.md` ที่ครอบคลุม:
+   - License compatibility matrix (อย่างน้อย 3 licenses)
+   - Copyright risk scenarios สำหรับ AI-generated code
+   - Attribution requirements
+   - Risk mitigation strategies
+   - Decision framework สำหรับการใช้ AI-generated code
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +179,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- GPL ≠ MIT — GPL บังคับให้ derivative works ต้องเป็น GPL ด้วย
+- อ่าน AI tool's Terms of Service — แต่ละ tool มี IP policy ต่างกัน
+- สร้าง decision framework ที่ชัดเจนก่อนใช้ AI-generated code ใน production
+- ถ้าติดขัด ลองนึกว่าถ้า code ที่ AI generate มาคล้ายกับ GPL code ผลลัพธ์จะเป็นยังไง

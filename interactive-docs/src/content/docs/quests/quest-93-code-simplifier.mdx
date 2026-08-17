@@ -5,22 +5,142 @@ description: "Reduce cyclomatic complexity while preserving behavior"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Code Simplifier
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to reduce cyclomatic complexity without changing behavior",
+  "Why redundant else blocks after return/throw should be removed",
+  "How to simplify if/else boolean patterns into direct returns",
+  "When to keep else blocks (side effects) vs when to remove them"
+]} />
 
-Reduce cyclomatic complexity while preserving behavior
+## 📖 Concept: Cyclomatic Complexity & Simplification
 
----
+Cyclomatic complexity คือจำนวน path ที่เป็นไปได้ใน function — ยิ่งมี if/else ซ้อนกันเยอะ โค้ดก็ยิ่งอ่านยากและมี bug ซ่อนอยู่ AI coding tools ช่วย refactoring ได้ดี แต่ถ้าไม่เข้าใจว่า **"preserving behavior" หมายถึงอะไร** คุณจะ refactoring ผิดโดยไม่รู้ตัว
 
-## วิธีทำ
+หลักการสำคัญคือ: **refactoring คือการเปลี่ยนโครงสร้างโดยไม่เปลี่ยนผลลัพธ์** — ถ้า function ต้อง return `true` เมื่อ `x > 0` คุณต้อง return เหมือนเดิม แค่เขียนสั้นลง
+
+Think of it like martial arts — you're learning to deliver the same punch with less wasted motion. The technique is identical; only the efficiency changes.
+
+## ⚙️ How It Works
+
+### The Code Simplification Workflow
+
+1. **Identify redundant patterns** — if/else returning boolean, redundant else after return
+2. **Apply transformation** — use regex or AST-based patterns to simplify
+3. **Verify behavior is preserved** — run tests to ensure nothing changed
+
+### The Three Common Patterns
+
+**Pattern 1: if/else returning true/false → return condition directly**
+
+```javascript
+// ❌ Before: verbose
+function isPositive(n) {
+  if (n > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// ✅ After: direct return
+function isPositive(n) {
+  return n > 0;
+}
+```
+
+**Pattern 2: Redundant else after return**
+
+```javascript
+// ❌ Before: else is redundant after return
+function f(x) {
+  if (x) {
+    return 1;
+  } else {
+    return 2;
+  }
+}
+
+// ✅ After: early return pattern
+function f(x) {
+  if (x) return 1;
+  return 2;
+}
+```
+
+**Pattern 3: Keep else for side effects**
+
+```javascript
+// ✅ This else MUST stay — side effects matter
+if (x) {
+  doSomething();
+} else {
+  doOther();  // Don't remove this!
+}
+```
+
+## 💡 Example: Walkthrough
+
+Here's how the `simplify` function transforms code:
+
+```javascript
+// Input: verbose if/else
+const code = `function isPositive(n) {
+  if (n > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}`;
+
+// The solution identifies the boolean pattern and simplifies
+// Input:  if (condition) { return true; } else { return false; }
+// Output: return condition
+
+// Result: clean, direct return
+const simplified = `function isPositive(n) {
+  return n > 0;
+}`;
+```
+
+The key insight: `if (n > 0) return true else return false` is exactly the same as `return n > 0`. No behavior change, just less code.
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Removing else when if has no return**
+> "ถ้ามี else ก็ลบออกไปเลย"
+> → **Keep else** when the if-block has side effects (function calls, assignments) but no return
+
+**Mistake 2: Simplifying code with side effects**
+> "if/else returning values → simplify to ternary"
+> → ถ้ามี side effects (console.log, DOM manipulation) ห้ามใช้ ternary — มันจะไม่ execute ทั้งสองฝั่ง
+
+**Mistake 3: Breaking nested conditionals**
+> "ลบ else ทุกที่ที่เห็น"
+> → Nested if/else ต้องระวัง — ลบผิดชั้นจะเปลี่ยน logic ทั้งหมด
+
+**Mistake 4: Not testing edge cases**
+> "Simplify แล้วก็จบ"
+> → รัน `node test.js` เสมอ — เวลา behavior ผิด โค้ดจะดูถูกต้องแต่ผลลัพธ์ผิด
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-93-code-simplifier" />
+
+## 🏋️ Quest: Code Simplifier
+
+Now it's time to practice! Reduce cyclomatic complexity while preserving behavior.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-93-code-simplifier
    cd quest-93-code-simplifier
@@ -31,36 +151,18 @@ Reduce cyclomatic complexity while preserving behavior
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge cases — ตรวจสอบว่า code ที่มี side effects (ไม่มี return) ยังคงมี else block อยู่
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- ตรวจสอบว่า `simplify` function รับ input เป็น string ของ code — มันเป็น code-to-code transformer
+- Pattern สำคัญ: `if (cond) { return true; } else { return false; }` → `return cond`
+- Edge case: code ที่มี side effects (ไม่มี return ใน if block) ต้องไม่ถูก simplify
 - ถ้าติดขัด ดู `_solution/solution.js`

@@ -1,66 +1,196 @@
 ---
-title: "AI Bias Auditor"
-description: "Compute fairness metrics for AI predictions"
+title: "Quest 103 - AI Bias Auditor"
+description: "Compute fairness metrics for AI predictions to detect bias across groups"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# AI Bias Auditor
+# Quest 103: AI Bias Auditor
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Compute fairness metrics for AI predictions
+<LearningObjectives items={[
+  "Why measuring fairness across groups is essential for responsible AI",
+  "How to compute demographic parity and equalized odds",
+  "The difference between group-level fairness metrics and global averages",
+  "How bias can hide behind seemingly 'fair' aggregate numbers"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Fairness Metrics
+
+AI systems make decisions that affect real people — loan approvals, hiring recommendations, medical diagnoses. When these systems treat different demographic groups unequally, it's called **algorithmic bias**. The problem is, bias can hide in plain sight. A system might have 90% overall accuracy, but if it's 95% accurate for one group and only 75% for another, that's a serious fairness issue.
+
+**Fairness metrics** quantify these disparities. Two of the most important are:
+
+- **Demographic Parity**: Do different groups get positive predictions at the same rate? If a hiring AI recommends 40% of Group A but only 15% of Group B, demographic parity is violated.
+- **Equalized Odds**: Among people who actually qualify, does the AI correctly identify them at the same rate across groups? If the AI catches 90% of qualified candidates from Group A but only 60% from Group B, equalized odds is violated.
+
+The key insight is that fairness must be measured **between groups**, not by averaging everything together. Averages mask disparity.
+
+---
+
+## ⚙️ How It Works
+
+### The Fairness Computation Pipeline
+
+```
+1. Collect predictions with group labels
+         ↓
+2. Group predictions by demographic group
+         ↓
+3. Compute per-group statistics:
+   - Positive prediction rate
+   - True positive rate
+         ↓
+4. Compare metrics across groups
+         ↓
+5. Report disparities (demographic parity gap, equalized odds gap)
+```
+
+### Why Group-Level Metrics Matter
+
+Consider a simple example with 10 predictions per group:
+
+| Group | Total | Predicted Positive | Actually Positive | True Positives |
+| --- | --- | --- | --- | --- |
+| Group A | 10 | 8 | 5 | 5 |
+| Group B | 10 | 3 | 5 | 2 |
+
+- **Group A** positive rate: 80% | True positive rate: 100%
+- **Group B** positive rate: 30% | True positive rate: 40%
+- **Demographic parity gap**: 80% - 30% = **0.50** (large disparity)
+- **Equalized odds gap**: 100% - 40% = **0.60** (large disparity)
+
+If you averaged everything together, you'd see "70% positive rate" and miss the fact that Group B is being systematically underserved.
+
+---
+
+## 💡 Example: Computing Fairness Metrics
+
+Here's how to compute fairness metrics in JavaScript:
+
+**Step 1: Group predictions by demographic**
+
+```javascript
+const groups = {};
+for (const p of predictions) {
+  if (!groups[p.group]) groups[p.group] = [];
+  groups[p.group].push(p);
+}
+```
+
+**Step 2: Compute per-group statistics**
+
+```javascript
+for (const name of Object.keys(groups)) {
+  const preds = groups[name];
+  const total = preds.length;
+  const positivePredicted = preds.filter(p => p.predicted).length;
+  const actualPositive = preds.filter(p => p.actual);
+  const truePositives = actualPositive.filter(p => p.predicted).length;
+
+  groupStats[name] = {
+    positiveRate: positivePredicted / total,
+    truePositiveRate: actualPositive.length > 0
+      ? truePositives / actualPositive.length
+      : 0,
+  };
+}
+```
+
+**Step 3: Compute the gap between groups**
+
+```javascript
+const positiveRates = groupNames.map(g => groupStats[g].positiveRate);
+const demographicParity = Math.max(...positiveRates) - Math.min(...positiveRates);
+
+const tprRates = groupNames.map(g => groupStats[g].truePositiveRate);
+const equalizedOdds = Math.max(...tprRates) - Math.min(...tprRates);
+```
+
+A gap of 0 means perfect fairness. Larger gaps indicate greater disparity.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Averaging across all groups**
+> "Overall accuracy is 85%, so the model is fair"
+> → Averages mask group-level disparities. Always compute metrics per group first, then compare.
+
+**Mistake 2: Ignoring groups with small sample sizes**
+> "Group C only has 2 predictions, so skip it"
+> → Small groups matter too. Report the sample size alongside metrics so others can judge reliability.
+
+**Mistake 3: Confusing demographic parity with equalized odds**
+> "They both measure fairness, so they're the same"
+> → They measure different things. Demographic parity checks prediction rates; equalized odds checks accuracy among qualified individuals. A model can satisfy one but violate the other.
+
+**Mistake 4: Rounding away the problem**
+> "The gap is only 0.003, so it's negligible"
+> → Even small gaps can have large real-world impact when applied to thousands of decisions. Report exact values and let stakeholders decide the threshold.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-103-bias-auditor" />
+
+---
+
+## 🏋️ Quest: AI Bias Auditor
+
+Now it's time to practice! Implement a fairness metrics calculator for AI predictions.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-103-bias-auditor
    cd quest-103-bias-auditor
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `computeFairnessMetrics(predictions)` that:
+   - Groups predictions by demographic group
+   - Computes positive prediction rate and true positive rate per group
+   - Calculates demographic parity gap and equalized odds gap
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` and read the failures carefully
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The key insight is that fairness must be computed BETWEEN groups, not by averaging. If your code only computes a single global metric, you're missing the point.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Fairness metrics ต้องคำนวณระหว่างกลุ่ม (between groups) ไม่ใช่ค่าเฉลี่ยรวม
+- Demographic parity = ความแตกต่างของ positive prediction rates
+- Equalized odds = ความแตกต่างของ true positive rates
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

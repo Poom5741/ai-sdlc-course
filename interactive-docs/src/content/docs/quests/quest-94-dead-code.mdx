@@ -5,22 +5,115 @@ description: "Find and safely remove unused code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Dead Code Eliminator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to identify unused functions, variables, and imports in JavaScript code",
+  "Why exported functions are NOT dead code even if unused locally",
+  "How to safely eliminate dead code without breaking module boundaries",
+  "The difference between locally unused and globally unreachable code"
+]} />
 
-Find and safely remove unused code
+## 📖 Concept: Dead Code & Safe Elimination
 
----
+Dead code คือ code ที่เขียนไว้แต่ไม่เคยถูกเรียกใช้ — มันเหมือนนักสู้ที่อยู่ในค่ายแต่ไม่เคยลงสนาม ดูเหมือนไม่เป็นอะไร แต่จริงๆ แล้วมันเพิ่ม maintenance burden และซ่อน bug
 
-## วิธีทำ
+ปัญหาคือ AI tools มักจะ suggest ให้ลบ **ทุก function ที่ดูไม่ถูกเรียก** — แต่มันลืม考慮ว่า exported function อาจถูกใช้โดย module อื่น ที่มองไม่เห็นในโค้ดที่กำลัง refactor
+
+Think of dead code elimination like cleaning out your dojo equipment room. You want to throw away what's truly unused, but you must NOT throw away tools that other dojos are borrowing through shared exports.
+
+## ⚙️ How It Works
+
+### The Dead Code Analysis Workflow
+
+1. **Parse the code** — extract function declarations, variable declarations, and imports
+2. **Build a dependency graph** — map which identifiers reference which declarations
+3. **Mark exports as alive** — anything exported via `module.exports` or `export` is NOT dead
+4. **Identify dead code** — declarations with no references and no exports
+
+### What Counts as Dead Code?
+
+```javascript
+// ✅ DEAD: unused function (never called, not exported)
+function unusedHelper() { return 1; }
+
+// ❌ NOT DEAD: used by another function
+function used() { return usedHelper2(); }
+function usedHelper2() { return 2; }
+
+// ❌ NOT DEAD: exported (may be used by other modules)
+function helper() { return 1; }
+module.exports = { helper };
+```
+
+### Detection Strategy
+
+```javascript
+function findDeadCode(code) {
+  // 1. Find all function declarations: function xxx()
+  // 2. Find all variable declarations: const/let/var xxx =
+  // 3. Find all imports: require("...") or import ...
+  // 4. Find all exports: module.exports = { ... }
+  // 5. Check: is each declaration referenced elsewhere?
+  // 6. Check: is each declaration exported?
+  // 7. If not referenced AND not exported → it's dead code
+}
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+// Input code
+const code = `function unused() { return 1; }
+function used() { return used2(); }
+function used2() { return 2; }`;
+
+// Analysis:
+// - "unused" → never called, not exported → DEAD ❌
+// - "used" → called by nobody? Wait, it IS referenced... no, nobody calls used()
+// - "used2" → called by used() → NOT dead ✅
+
+// Output:
+[{ name: 'unused', type: 'function' }]
+```
+
+Key edge case: `module.exports = { helper }` means `helper` is exported — even if no other code in this file calls it, it's NOT dead code.
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging exported functions as dead code**
+> "helper ไม่ถูกเรียกในไฟล์นี้ → ลบเลย"
+> → Exported functions ถูกใช้โดย module อื่น — **ห้ามลบ**
+
+**Mistake 2: Not handling `require()` imports**
+> "fs ไม่ถูกใช้ → ยังไม่ใช่ dead code เพราะ require ไม่ได้ declare"
+> → `const fs = require("fs")` ถ้าไม่ใช้ fs ที่ไหนเลย → มันเป็น dead import ✅
+
+**Mistake 3: Only checking function names**
+> "ลบทุก function ที่ไม่เห็นว่าถูกเรียก"
+> → ต้องตรวจสอบ **variable declarations** และ **imports** ด้วย
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้เช็คว่า code ว่าง"
+> → Always handle empty input — return empty array
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-94-dead-code" />
+
+## 🏋️ Quest: Dead Code Eliminator
+
+Now it's time to practice! Find and safely remove unused code.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-94-dead-code
    cd quest-94-dead-code
@@ -31,36 +124,18 @@ Find and safely remove unused code
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — ตรวจสอบว่า exported function ไม่ถูก flag เป็น dead code
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `findDeadCode(code)` รับ string ของ code และ return array ของ `{ name, type }`
+- Exported function (ผ่าน `module.exports`) ไม่ใช่ dead code — ต้อง check exports ก่อน
+- ต้อง detect ทั้ง function, variable, และ import
 - ถ้าติดขัด ดู `_solution/solution.js`

@@ -1,66 +1,235 @@
 ---
 title: "Quest 81 - Prompt Evaluation Framework"
-description: "Evaluate prompt quality systematically"
+description: "ประเมินคุณภาพ prompt อย่างเป็นระบบ"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 81: Prompt Evaluation Framework
 
-<Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
-
-## เป้าหมาย
-
-Evaluate prompt quality systematically
+<Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจว่า \"รู้สึกว่าดี\" ไม่ใช่ metric ที่เชื่อถือได้",
+  "สร้าง evaluation framework ที่ใช้ test cases และ scoring",
+  "รู้จัก penalize คำตอบที่มี content ต้องห้าม",
+  "เข้าใจว่า systematic evaluation ช่วย improve prompt ได้อย่างไร"
+]} />
+
+---
+
+## 📖 Concept: Prompt Evaluation
+
+**Prompt Evaluation** คือกระบวนการทดสอบว่า prompt ให้ผลลัพธ์ที่ดีและ consistent หรือไม่ — ไม่ใช่แค่ "ลองใช้ดูแล้วรู้สึกดี"
+
+ลองนึกภาพเหมือน QA testing — คุณไม่บอกว่า " app ดูสวยดี" แล้ว ship คุณต้องเขียน tests ที่บอกชัดเจนว่า "ถ้า input นี้ ต้องได้ output นี้"
+
+**หลักการสำคัญ:** "It feels right" is not a metric. You need test cases.
+
+```
+Evaluation Framework:
+┌────────────────────────────────────┐
+│ 1. Test Cases (input → expected)  │
+│    → ชุด input ที่คาดหวังผลลัพธ์ชัดเจน │
+├────────────────────────────────────┤
+│ 2. Scoring Rules                   │
+│    → วิธีคิดคะแนน (match +2, penalty)│
+├────────────────────────────────────┤
+│ 3. Forbidden Content               │
+│    → สิ่งที่ห้ามมีใน output          │
+├────────────────────────────────────┤
+│ 4. Summary                         │
+│    → คะแนนรวม + pass/fail          │
+└────────────────────────────────────┘
+```
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Evaluation
+
+```
+Prompt + Test Cases
+    ↓
+1. Run prompt กับทุก test cases
+    ↓
+2. เช็คว่า output ตรงกับ expected ไหม (match score)
+    ↓
+3. เช็คว่า output มี forbidden content ไหม (penalty)
+    ↓
+4. คำนวณ total score
+    ↓
+5. Return { scores, total, passed }
+```
+
+### ตัวอย่าง Test Case
+
+```javascript
+const testCases = [
+  {
+    input: "What is 2+2?",
+    expected: "4",           // output ต้องมีคำนี้
+    forbidden: ["five", "six"] // output ห้ามมีคำเหล่านี้
+  },
+  {
+    input: "Capital of France?",
+    expected: "Paris",
+    forbidden: ["London", "Berlin"]
+  }
+];
+```
+
+---
+
+## 💡 Example: Evaluation Framework ใน Action
+
+```javascript
+function createPromptEvaluator(testCases) {
+  return {
+    evaluate(output, testCase) {
+      let score = 0;
+      const issues = [];
+
+      // Match check — output ต้องมี expected string
+      if (output.includes(testCase.expected)) {
+        score += 2;
+      } else {
+        issues.push(`Missing expected: "${testCase.expected}"`);
+      }
+
+      // Penalty — output ห้ามมี forbidden words
+      if (testCase.forbidden) {
+        for (const word of testCase.forbidden) {
+          if (output.toLowerCase().includes(word.toLowerCase())) {
+            score -= 1;
+            issues.push(`Contains forbidden: "${word}"`);
+          }
+        }
+      }
+
+      return { score, issues };
+    },
+
+    runAll(promptFn) {
+      const results = [];
+
+      for (const testCase of testCases) {
+        const output = promptFn(testCase.input);
+        const { score, issues } = this.evaluate(output, testCase);
+
+        results.push({
+          input: testCase.input,
+          output,
+          expected: testCase.expected,
+          score,
+          issues,
+          passed: issues.length === 0
+        });
+      }
+
+      const total = results.reduce((sum, r) => sum + r.score, 0);
+      const passed = results.every(r => r.passed);
+
+      return { results, total, passed };
+    }
+  };
+}
+
+// ตัวอย่างการใช้งาน
+const evaluator = createPromptEvaluator([
+  { input: "2+2?", expected: "4", forbidden: ["five"] },
+  { input: "Capital of France?", expected: "Paris", forbidden: ["London"] }
+]);
+
+// promptFn คือ function ที่รับ input แล้ว return output
+const result = evaluator.runAll((input) => {
+  if (input === "2+2?") return "The answer is 4";
+  if (input === "Capital of France?") return "Paris is the capital";
+  return "I don't know";
+});
+
+console.log(result);
+// { results: [
+//   { input: "2+2?", output: "The answer is 4", score: 2, issues: [], passed: true },
+//   { input: "Capital of France?", output: "Paris is the capital", score: 2, issues: [], passed: true }
+// ], total: 4, passed: true }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่มี test cases ที่ชัดเจน**
+> คิดว่า "ลองใช้ดูแล้วน่าจะดี"
+> → ไม่มี objective metric — คุณจะไม่รู้ว่า prompt ดีขึ้นจริงหรือไม่
+
+**Mistake 2: ไม่ penalize forbidden content**
+> แค่เช็คว่า output มี expected string ไหม
+> → output อาจมีข้อมูลผิด/อันตราย แต่ยังได้คะแนนดี
+
+**Mistake 3: ไม่รวม test case ที่ fail**
+> ตอน evaluate ข้าม test cases ที่ fail
+> → ไม่เห็นภาพรวมว่า prompt ตรงไหนอ่อน
+
+**Mistake 4: คิดคะแนนเท่ากันทุก test case**
+> ไม่ weight ตาม difficulty
+> → easy test case ได้คะแนนเท่า hard — ไม่สะท้อนคุณภาพจริง
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-81-prompt-eval" />
+
+---
+
+## 🏋️ Quest: Prompt Evaluation Framework
+
+ถึงเวลาฝึกฝน! สร้าง evaluation framework สำหรับ prompt
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-81-prompt-eval
    cd quest-81-prompt-eval
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createPromptEvaluator(testCases)` ที่ return object ที่มี:
+   - `evaluate(output, testCase)` — คัดคะแนน output เทียบกับ test case
+   - `runAll(promptFn)` — รันทุก test cases แล้วรวมคะแนน
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก evaluate() ก่อน — ทดสอบกับ 1 test case แล้วค่อยเพิ่ม runAll()
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- evaluate() ต้องเช็ค 2 อย่าง: match (output มี expected string) และ forbidden (output ห้ามมี certain words)
+- Match = +2 คะแนน, Forbidden match = -1 คะแนน
+- runAll() ต้องรันทุก test cases แล้วรวม total score
+- ทดสอบด้วย output ที่มีทั้ง expected และ forbidden — ต้องได้ทั้ง +2 และ -1
+- Return `{ results, total, passed }` — passed = true ถ้าทุก test case ไม่มี issues

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-21-semantic",
+  "questions": [
+    {
+      "question": "Why does cosine similarity measure semantic similarity better than Euclidean distance for text embeddings?",
+      "choices": [
+        "Cosine similarity is always faster to compute",
+        "Cosine similarity measures the angle between vectors, making it invariant to magnitude — so a short and long document about the same topic score similarly",
+        "Euclidean distance cannot work with high-dimensional vectors",
+        "Cosine similarity converts text to numerical values"
+      ],
+      "answer": 1,
+      "explanation": "Cosine similarity focuses on direction (angle) rather than magnitude (length). Two documents about the same topic but different lengths will have similar embedding directions, so cosine similarity captures their semantic closeness regardless of document length."
+    },
+    {
+      "question": "What does a cosine similarity score of 0 between two embedding vectors indicate?",
+      "choices": [
+        "The two documents are identical",
+        "The two vectors are orthogonal (perpendicular), meaning the documents are semantically unrelated",
+        "One of the vectors is invalid",
+        "The documents have the same length"
+      ],
+      "answer": 1,
+      "explanation": "A cosine similarity of 0 means the vectors are orthogonal — they point in completely independent directions. In semantic terms, this indicates the documents share no meaningful topical overlap."
+    },
+    {
+      "question": "In a semantic search workflow, what happens after computing cosine similarity between a query vector and all document vectors?",
+      "choices": [
+        "All documents are returned regardless of score",
+        "Documents are ranked by similarity score and the top-k most similar are returned as search results",
+        "The query vector is deleted from memory",
+        "The document embeddings are retrained"
+      ],
+      "answer": 1,
+      "explanation": "After computing similarity scores, results are ranked in descending order and the top-k (e.g., top-5 or top-10) most similar documents are returned. These retrieved chunks then provide context for the LLM to generate an answer."
+    }
+  ]
+}

@@ -5,18 +5,147 @@ description: "Compute optimal parameter allocation"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 14: Scaling Laws Calculator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Compute optimal parameter allocation
+<LearningObjectives items={[
+  "Understand Chinchilla scaling laws and compute-optimal training",
+  "Calculate optimal parameter and data allocation from a compute budget",
+  "Recognize when a model is over-parameterized or under-trained",
+  "Make informed decisions about model size vs. training data tradeoffs"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Scaling Laws
+
+ก่อนจะ train model ขนาดใหญ่ เราต้องถามก่อนว่า — **ควรจัดสรร compute budget ให้กับ model size หรือ training data มากกว่ากัน?** Scaling Laws ให้คำตอบ
+
+Chinchilla scaling laws (DeepMind, 2022) ค้นพบว่า optimal allocation คือ model parameters (N) และ training tokens (D) ควรขยายเท่ากันตาม compute budget (C):
+
+```
+N ≈ 0.3 × C^0.5    (parameters)
+D ≈ 0.3 × C^0.5    (tokens)
+```
+
+นี่คือเหตุผลที่ GPT-4 ไม่ได้ใหญ่ที่สุด — มัน balanced ระหว่าง model size กับ data quantity อย่างชาญฉลาด
+
+คิดเหมือน martial arts: คุณไม่ได้ฝึกแต่ท่าเตะหนัก ๆ โดยไม่คิดเรื่องความอึด Scaling laws คือสมดุลระหว่าง power กับ endurance
+
+---
+
+## ⚙️ How It Works
+
+### The Scaling Law Workflow
+
+```
+1. Receive compute budget C (in FLOPs)
+         ↓
+2. Compute optimal parameters: N ≈ 0.3 × C^0.5
+         ↓
+3. Compute optimal tokens: D ≈ 0.3 × C^0.5
+         ↓
+4. Compare N vs D to determine ratio
+         ↓
+5. Return: { parameters, tokens, ratio }
+```
+
+### Understanding the Ratio
+
+The `ratio` field tells you whether the allocation is balanced:
+
+| Ratio | Meaning | Problem |
+| --- | --- | --- |
+| `compute-optimal` | N and D are balanced | Ideal allocation |
+| `over-parameterized` | Too many params, not enough data | Model memorizes instead of learning |
+| `under-trained` | Too much data, too few params | Model can't capture patterns |
+
+### Why This Matters in Practice
+
+```
+Budget: 1e18 FLOPs
+
+Optimal:  parameters ≈ 9.5M,  tokens ≈ 9.5M
+Over-param: 50M params, 1M tokens → memorization
+Under-trained: 1M params, 50M tokens → underfitting
+```
+
+---
+
+## 💡 Example: Computing Optimal Allocation
+
+**Step 1: Implement the scaling law**
+
+```javascript
+function computeOptimal(computeBudget) {
+  const N = 0.3 * Math.pow(computeBudget, 0.5);
+  const D = 0.3 * Math.pow(computeBudget, 0.5);
+  
+  return {
+    parameters: N,
+    tokens: D,
+    ratio: 'compute-optimal'
+  };
+}
+```
+
+**Step 2: Verify with different budgets**
+
+```javascript
+// Large budget
+computeOptimal(1e18)  // ~9.5M params, ~9.5M tokens
+
+// Small budget
+computeOptimal(1e15)  // ~949K params, ~949K tokens
+// Smaller budget → smaller model (sanity check)
+```
+
+**Step 3: Run the tests**
+
+```bash
+node test.js
+# Verifies scaling law formula
+# Checks smaller budget → smaller model
+# Validates ratio classification
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Using wrong exponent**
+> "C^0.5 looks arbitrary, maybe it's C^0.3?"
+→ The 0.5 exponent comes from Chinchilla research. Don't guess — use the empirical formula.
+
+**Mistake 2: Not returning all three fields**
+> "Just returning parameters is enough"
+→ Return `{ parameters, tokens, ratio }` — the ratio field is essential for evaluation.
+
+**Mistake 3: Ignoring the ratio classification**
+> "Parameters and tokens are calculated, that's enough"
+→ Classify whether the allocation is compute-optimal, over-parameterized, or under-trained.
+
+**Mistake 4: Integer-only allocation**
+> "I'll round everything to integers"
+→ Keep floating-point precision for the parameters and tokens. Rounding too early loses accuracy.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-14-scaling-laws-calculator" />
+
+---
+
+## 🏋️ Quest: Scaling Laws Calculator
+
+Now it's time to implement Chinchilla scaling laws!
 
 <Steps>
 
@@ -29,40 +158,31 @@ Compute optimal parameter allocation
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `computeOptimal(computeBudget)` — คำนวณ optimal parameter/data allocation
 
-4. ตรวจสอบ solution ของคุณ:
+4. ทดสอบกับ budget หลายขนาด — ต้องมี scaling ที่ถูกต้อง
+
+5. ตรวจสอบ solution ของคุณ:
 
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Scaling laws ไม่ใช่แค่ theory — มันกำหนดว่า company ไหนจะ train model ได้คุ้มค่าที่สุด
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้สูตร Chinchilla: N ≈ 0.3 × C^0.5, D ≈ 0.3 × C^0.5
+- ตรวจสอบ edge cases: budget ต่างขนาด, ratio classification
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -5,22 +5,125 @@ description: "Auto-detect security issues in code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Security Review Automator
+# Quest 85: Security Review Automator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Auto-detect security issues in code
+<LearningObjectives items={[
+  "How to build automated security scanners that catch common vulnerabilities",
+  "Why Security by Default means catching issues before they reach production",
+  "How to detect hardcoded secrets, eval usage, HTTP without TLS, and prototype pollution",
+  "The critical difference between reading secrets and hardcoding them"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Security by Default
+
+The OWASP Top 10 lists the most critical web application security risks. Many of them — injection, broken authentication, sensitive data exposure — can be caught by simple pattern matching in source code. A security review automator scans code for these patterns and flags them before the code ever reaches production.
+
+The core principle is **Security by Default**: instead of relying on developers to remember every security rule, you automate the checks. Just like linting catches style issues automatically, security scanning catches vulnerability patterns automatically.
+
+The tricky part is **context**. A naive scanner flags every line containing `password` as a hardcoded secret — but `const { password } = req.body` is *reading* a password from a request, not hardcoding one. **Context-aware scanning** is what separates a useful security tool from a noisy one.
+
+---
+
+## ⚙️ How It Works
+
+### Security Patterns We Detect
+
+| Pattern | Severity | Example |
+| --- | --- | --- |
+| Hardcoded secrets | critical | `password = "admin123"` |
+| `eval()` usage | critical | `eval(userInput)` |
+| HTTP without TLS | high | `fetch("http://api.example.com")` |
+| Missing input validation | high | `req.body` without sanitization |
+| Prototype pollution | high | `Object.assign({}, userInput)` |
+
+### Context Matters
+
+```javascript
+// ❌ HARDCODED SECRET — this is dangerous
+const password = "admin123";
+
+// ✅ READING FROM REQUEST — this is normal
+const { password } = req.body;
+
+// ❌ EVAL WITH USER INPUT — critical vulnerability
+eval(req.query.code);
+
+// ✅ JSON.parse (safe alternative)
+JSON.parse(req.query.data);
+```
+
+---
+
+## 💡 Example: Security Review in Action
+
+Consider this Express.js route handler:
+
+```javascript
+app.post('/login', (req, res) => {
+  const api_key = "sk-12345";
+  const query = `SELECT * FROM users WHERE name='${req.body.name}'`;
+  eval(req.body.callback);
+  fetch("http://api.internal/verify");
+  Object.assign(config, req.body.settings);
+});
+```
+
+A security scanner would flag:
+
+```json
+[
+  { "severity": "critical", "type": "hardcoded-secret", "line": 2, "message": "Hardcoded API key detected" },
+  { "severity": "critical", "type": "eval-usage", "line": 4, "message": "eval() with user input — SQL injection risk" },
+  { "severity": "high", "type": "http-no-tls", "line": 5, "message": "HTTP without TLS — data transmitted in plaintext" },
+  { "severity": "high", "type": "prototype-pollution", "line": 6, "message": "Object.assign with user input — prototype pollution risk" }
+]
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging destructured imports as hardcoded secrets**
+> "Line has `password` in it → hardcoded secret!"
+> → `const { password } = req.body` is READING from a request, not hardcoding. Check whether the assignment comes from a literal string or from an external source.
+
+**Mistake 2: Ignoring severity levels**
+> "All security issues are critical"
+> → A hardcoded password is critical. A missing `removeEventListener` is medium. Treating everything as critical means developers start ignoring alerts.
+
+**Mistake 3: Only checking variable names, not values**
+> "It's called `password` so it must be a secret"
+> → A variable named `password` holding `req.body.password` is fine. A variable named `pw` holding `"admin123"` is dangerous. Check the VALUE, not just the name.
+
+**Mistake 4: Missing HTTP scheme detection**
+> "I'll just check for `http://` anywhere in the code"
+> → `http://` in a comment is different from `http://` in a `fetch()` call. Focus on HTTP requests specifically, not all text.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-85-security-review" />
+
+---
+
+## 🏋️ Quest: Security Review Automator
+
+Now it's time to practice! Build a security scanner for source code.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-85-security-review
    cd quest-85-security-review
@@ -28,39 +131,35 @@ Auto-detect security issues in code
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `securityReview(code)` function that detects:
+   - Hardcoded passwords/secrets (`password=`, `secret=`, `api_key=`, `token=`)
+   - `eval()` usage
+   - HTTP without TLS (`http://` in fetch/axios/request)
+   - Prototype pollution (`Object.assign` with user input)
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Critical edge case:** Don't flag destructured imports like `const { password } = req.body`
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The hardest part is distinguishing `password = "secret"` (hardcoded) from `const { password } = req.body` (reading). Look at what's on the RIGHT side of the assignment.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่าค่ามาจาก literal string หรือจาก external source
+- `const { password } = req.body` คือการอ่าน ไม่ใช่ hardcoding
+- ตรวจสอบ `http://` เฉพาะใน HTTP requests (`fetch`, `axios`, `request`) ไม่ใช่ทุกที่
+- ดู severity levels ที่ problem.js กำหนด — อย่าทำทุกอย่างเป็น critical

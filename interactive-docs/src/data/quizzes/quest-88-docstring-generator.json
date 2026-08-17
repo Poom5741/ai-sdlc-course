@@ -1,0 +1,38 @@
+{
+  "questId": "quest-88-docstring-generator",
+  "questions": [
+    {
+      "question": "Why should a docstring generator NOT add @param tags for functions with no parameters?",
+      "choices": [
+        "Empty parameter lists don't need documentation at all",
+        "Adding @param with undefined is misleading and noisy — the function clearly takes no arguments",
+        "JSDoc doesn't support @param tags",
+        "TypeScript handles this automatically"
+      ],
+      "answer": 1,
+      "explanation": "A function with no parameters should have a docstring with only a description and possibly @returns. Adding @param tags for non-existent parameters is incorrect documentation that confuses developers reading the docs."
+    },
+    {
+      "question": "Which JavaScript function styles should a docstring generator handle?",
+      "choices": [
+        "Only `function foo() {}` declarations",
+        "Regular functions, arrow functions, and async functions",
+        "Only class methods",
+        "Only TypeScript functions"
+      ],
+      "answer": 1,
+      "explanation": "Modern JavaScript uses multiple function styles: `function foo() {}`, `const foo = () => {}`, and `async function foo() {}`. A good generator handles all three."
+    },
+    {
+      "question": "What is the purpose of the JSDoc @returns tag?",
+      "choices": [
+        "It documents what the function prints to console",
+        "It describes the function's return value type and purpose",
+        "It tells the compiler to add a return statement",
+        "It's optional and rarely used"
+      ],
+      "answer": 1,
+      "explanation": "The @returns tag documents what value the function returns and what it represents. This is essential for API documentation — developers need to know what to expect from calling a function."
+    }
+  ]
+}

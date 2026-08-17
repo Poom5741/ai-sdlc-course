@@ -1,66 +1,187 @@
 ---
 title: "Quest 64 - Tool Registry System"
-description: "Dynamic tool loading and dispatch"
+description: "สร้างระบบ registry สำหรับจัดการและเรียกใช้ tools แบบ dynamic"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 64: Tool Registry System
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Dynamic tool loading and dispatch
+<LearningObjectives items={[
+  "สร้าง Tool Registry ที่จัดการ registration และ dispatch ของ tools",
+  "เข้าใจ dynamic tool loading — tools ที่เพิ่มได้ตอน runtime",
+  "รู้จัก parameter validation — ตรวจสอบ args ก่อน execute",
+  "ออกแบบ API ที่ allow agents ค้นหา tools ที่เหมาะสม"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Tool Registry Pattern
+
+Tool Registry คือ central hub ที่เก็บ tools ทั้งหมดของ agent — ทำหน้าที่เหมือน "สมุดโทรศัพท์" สำหรับ capabilities ต่างๆ ของระบบ
+
+ใน Agentic Workflows, agent ต้อง **ค้นหา → เลือก → ใช้** tools ต่างๆ แบบ runtime แทนที่จะ hardcode ไว้ Tool Registry ทำให้ agent สามารถ discover และ dispatch tools ได้ตามต้องการ
+
+```javascript
+// Tool แต่ละตัวมี schema บอกว่ารับอะไร
+const calculator = {
+  name: 'calculator',
+  description: 'Perform arithmetic calculations',
+  parameters: {
+    operation: { type: 'string', required: true },
+    a: { type: 'number', required: true },
+    b: { type: 'number', required: true },
+  },
+  execute: (args) => { /* ... */ }
+};
+
+const registry = createToolRegistry();
+registry.register(calculator);
+registry.execute('calculator', { operation: 'add', a: 2, b: 3 }); // 5
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Tool Registry
+
+```
+1. register(tool) — เพิ่ม tool ลง registry พร้อม parameter schema
+         ↓
+2. findTools(query) — ค้นหา tools ที่ตรงกับ keyword
+         ↓
+3. listTools() — แสดง tools ทั้งหมดที่ registered
+         ↓
+4. execute(toolName, args) — เรียกใช้ tool พร้อม validate args ก่อน
+```
+
+### ทำไมต้อง Validate Args?
+
+ถ้าไม่ validate args ก่อน execute agent อาจส่ง arguments ผิดประเภท ทำให้เกิด runtime errors ที่ยากจะ debug:
+
+```javascript
+// ❌ ไม่ validate — อาจ crash
+function execute(toolName, args) {
+  return tools[toolName].execute(args); // args อาจขาด field จำเป็น
+}
+
+// ✅ Validate ก่อน execute
+function execute(toolName, args) {
+  const tool = tools[toolName];
+  for (const [key, schema] of Object.entries(tool.parameters)) {
+    if (schema.required && !(key in args)) {
+      throw new Error(`Missing required parameter: ${key}`);
+    }
+  }
+  return tool.execute(args);
+}
+```
+
+---
+
+## 💡 Example: Tool Registry ใน action
+
+```javascript
+const registry = createToolRegistry();
+
+// Register tools
+registry.register({
+  name: 'search',
+  description: 'Search the web',
+  parameters: {
+    query: { type: 'string', required: true },
+    limit: { type: 'number', required: false },
+  },
+  execute: (args) => `Results for: ${args.query}`,
+});
+
+// Find tools by keyword
+const found = registry.findTools('search');
+// [{ name: 'search', description: 'Search the web', ... }]
+
+// Execute with validation
+registry.execute('search', { query: 'AI agents' }); // ✅ Works
+registry.execute('search', {}); // ❌ Error: Missing required parameter: query
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate required parameters**
+> "Just pass args through"
+> → Registry ต้องตรวจสอบ required parameters ก่อน execute — ไม่เช่นนั้น runtime error
+
+**Mistake 2: Hardcode tools แทนที่จะ register**
+> "I'll just import the tools directly"
+> → Agent ต้อง discover tools ตอน runtime — hardcoding ทำให้ไม่สามารถเพิ่ม/ลบ tools ได้
+
+**Mistake 3: ไม่มี findTools functionality**
+> "listTools ก็พอแล้ว"
+> → Agent อาจมี tools หลายสิบตัว — findTools ช่วยค้นหาจาก keyword ได้เร็วกว่า
+
+**Mistake 4: Return value ไม่ consistent**
+> "execute คืนค่าต่างกันแล้วแต่ tool"
+> → ทุก tool ควร return format ที่ consistent เพื่อให้ agent ใช้งานง่าย
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-64-tool-registry" />
+
+---
+
+## 🏋️ Quest: Tool Registry System
+
+สร้าง Tool Registry ที่จัดการ registration, dispatch, และ validation ของ tools
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-64-tool-registry
    cd quest-64-tool-registry
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createToolRegistry()` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: execute ด้วย parameters ที่ขาด required field
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง agent ที่มี tools 20+ ตัว — findTools ช่วยให้ agent เลือก tool ที่เหมาะสมได้อย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Registry ต้อง validate required parameters ก่อน execute
+- findTools ควรค้นหาจาก name หรือ description
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

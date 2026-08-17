@@ -5,22 +5,116 @@ description: "Generate schema migration scripts"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Database Migration Assistant
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to generate forward (UP) and rollback (DOWN) SQL migration scripts",
+  "Why every migration MUST have a rollback — deploying without one is dangerous",
+  "How to handle add_column, drop_column, and rename_column operations",
+  "The principle of migrating forward: never deploy without a rollback plan"
+]} />
 
-Generate schema migration scripts
+## 📖 Concept: Database Schema Migrations
 
----
+Database migration คือการเปลี่ยนแปลง schema ของ database อย่างมีแบบแผน — เหมือนการเปลี่ยนแปลงท่าไม้ตายของนักสู้ที่ต้องทำอย่างระมัดระวัง ทุกการเปลี่ยนแปลงต้องมี **forward migration** (ทำ) และ **rollback** (ย้อนกลับ)
 
-## วิธีทำ
+หลักการสำคัญ: **MIGRATE FORWARD, ROLLBACK ALWAYS** — ทุก schema change ต้องมีทางถอย. AI tools มักจะ generate แค่ UP SQL แล้วลืม DOWN SQL ซึ่งอันตรายมาก — ถ้า migration fail คุณจะไม่มีทางย้อนกลับ
+
+Think of it like learning a new technique — you must also learn how to safely undo it if it doesn't work. A martial artist who can only attack but never retreat is dangerous to themselves.
+
+## ⚙️ How It Works
+
+### The Migration Generation Workflow
+
+1. **Parse changes** — extract operation type, table, column, data type
+2. **Generate UP SQL** — the forward migration
+3. **Generate DOWN SQL** — the rollback (MUST be generated too)
+4. **Verify both** — ensure UP and DOWN are both non-empty
+
+### Operation Mapping
+
+```javascript
+// add_column: ADD in UP, DROP in DOWN
+{ type: 'add_column', table: 'users', column: 'email', dataType: 'VARCHAR(255)' }
+// UP:   ALTER TABLE users ADD COLUMN email VARCHAR(255);
+// DOWN: ALTER TABLE users DROP COLUMN email;
+
+// drop_column: DROP in UP, ADD in DOWN
+{ type: 'drop_column', table: 'users', column: 'legacy_id' }
+// UP:   ALTER TABLE users DROP COLUMN legacy_id;
+// DOWN: ALTER TABLE users ADD COLUMN legacy_id <type>;
+
+// rename_column: RENAME in UP, reverse in DOWN
+{ type: 'rename_column', table: 'users', column: 'name', newColumn: 'full_name' }
+// UP:   ALTER TABLE users RENAME COLUMN name TO full_name;
+// DOWN: ALTER TABLE users RENAME COLUMN full_name TO name;
+```
+
+### The Critical Rule: DOWN SQL Must Not Be Empty
+
+```javascript
+// ❌ Naive AI output
+{ up: 'ALTER TABLE users ADD COLUMN email VARCHAR(255);', down: '' }
+
+// ✅ Correct output
+{
+  up: 'ALTER TABLE users ADD COLUMN email VARCHAR(255);',
+  down: 'ALTER TABLE users DROP COLUMN email;'
+}
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+const changes = [
+  { type: 'add_column', table: 'users', column: 'email', dataType: 'VARCHAR(255)' },
+  { type: 'drop_column', table: 'users', column: 'legacy_id' }
+];
+
+// Generated migration:
+{
+  up: `ALTER TABLE users ADD COLUMN email VARCHAR(255);
+ALTER TABLE users DROP COLUMN legacy_id;`,
+  down: `ALTER TABLE users DROP COLUMN email;
+ALTER TABLE users ADD COLUMN legacy_id <type>;`
+}
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Leaving DOWN SQL empty**
+> "UP SQL ถูกต้องแล้ว → deploy เลย"
+> → **ทุก migration ต้องมี DOWN SQL** — ไม่มี rollback = ไม่ deploy
+
+**Mistake 2: Not handling rename rollback**
+> "Rename column → UP ถูกต้อง แต่ DOWN ลืม reverse"
+> → Rollback ของ rename คือ rename กลับ: `full_name` → `name`
+
+**Mistake 3: Losing table name**
+> "ลืมใส่ table name ใน SQL"
+> → ทุก ALTER TABLE ต้องระบุ table name อย่างชัดเจน
+
+**Mistake 4: Empty changes crashes**
+> "ไม่ได้ handle changes ว่าง"
+> → Empty changes → return `{ up: '', down: '' }`
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-99-db-migration" />
+
+## 🏋️ Quest: Database Migration Assistant
+
+Now it's time to practice! Generate schema migration scripts.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-99-db-migration
    cd quest-99-db-migration
@@ -31,36 +125,20 @@ Generate schema migration scripts
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — DOWN SQL ต้องไม่ว่างเปล่าเสมอ
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `generateMigration(changes)` รับ array ของ schema changes และ return `{ up, down }`
+- ทุก change ต้อง generate ทั้ง UP และ DOWN SQL
+- `add_column` → UP: ADD, DOWN: DROP
+- `drop_column` → UP: DROP, DOWN: ADD
+- `rename_column` → UP: RENAME TO, DOWN: RENAME BACK
 - ถ้าติดขัด ดู `_solution/solution.js`

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-120-branching-strategy",
+  "questions": [
+    {
+      "question": "When should you use a fast-forward merge?",
+      "choices": [
+        "When both branches have made changes to the same file",
+        "When the source branch's base is the tip of the target branch",
+        "When you want to preserve the exact timeline of commits",
+        "When there are many merge conflicts to resolve"
+      ],
+      "answer": 1,
+      "explanation": "Fast-forward is possible when the source branch's first commit is the same as the target's latest commit — meaning no divergence occurred. This gives a clean, linear history."
+    },
+    {
+      "question": "What causes a merge conflict?",
+      "choices": [
+        "When the source branch has more commits than the target",
+        "When both branches modify the same file",
+        "When you try to merge a feature branch into main",
+        "When the target branch has no commits"
+      ],
+      "answer": 1,
+      "explanation": "Conflicts arise when both branches have changes to the same file. Git cannot automatically determine which version to keep, so manual resolution is needed."
+    },
+    {
+      "question": "What is the difference between 'up-to-date' and 'fast-forward'?",
+      "choices": [
+        "They are the same thing with different names",
+        "Up-to-date means source has no new commits; fast-forward means source has new linear commits",
+        "Up-to-date is for main branch; fast-forward is for feature branches",
+        "Fast-forward requires a merge commit; up-to-date does not"
+      ],
+      "answer": 1,
+      "explanation": "Up-to-date means source has zero commits ahead of target (nothing to merge). Fast-forward means source has new commits that are linear extensions of target's history."
+    }
+  ]
+}

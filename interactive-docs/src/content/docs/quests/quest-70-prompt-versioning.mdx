@@ -1,66 +1,185 @@
 ---
 title: "Quest 70 - Prompt Version Manager"
-description: "A/B test and version prompts"
+description: "สร้างระบบ versioning และ A/B testing สำหรับ prompts"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 70: Prompt Version Manager
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-A/B test and version prompts
+<LearningObjectives items={[
+  "สร้าง prompt manager ที่ version, deploy, rollback prompts",
+  "เข้าใจ A/B testing — ทดสอบ prompt variants พร้อมกัน",
+  "รู้จัก metrics tracking — ติดตาม usage, score, success rate",
+  "ออกแบบ rollback mechanism — ย้อนกลับเมื่อ prompt ใหม่แย่กว่า"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Prompt Versioning
+
+Prompt คือ code — และ code ต้องมี **versioning, A/B testing, และ rollback** เหมือนกัน
+
+ในโลกจริง คุณอาจเปลี่ยน prompt จาก "Write a summary" เป็น "Create a concise summary with bullet points" — แต่จะรู้ได้อย่างไรว่า prompt ใหม่ดีกว่า? **A/B testing** ช่วยได้
+
+```javascript
+const manager = createPromptManager();
+
+// สร้างและ deploy prompt
+const v1 = manager.create('summary', 'Write a summary');
+manager.deploy(v1);
+
+// A/B test กับ variant ใหม่
+const v2 = manager.create('summary', 'Create a concise summary with bullet points');
+const winner = manager.abTest('summary', [v1, v2]);
+// → v2 wins! (score สูงกว่า)
+
+// Rollback ถ้าจำเป็น
+manager.rollback('summary');
+// → กลับไปใช้ v1
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Prompt Version Manager
+
+```
+1. create(name, prompt) — สร้าง version ใหม่
+         ↓
+2. deploy(versionId) — ทำให้ version นั้นเป็น active
+         ↓
+3. abTest(name, variants) — ทดสอบ variants พร้อมกัน
+         ↓
+4. getMetrics(versionId) — ดูผลลัพธ์: uses, avgScore, successRate
+         ↓
+5. rollback(name) — ย้อนกลับไป version ก่อนหน้า
+```
+
+### ทำไมต้อง A/B Test?
+
+ถ้า deploy prompt ใหม่โดยไม่ test คุณไม่รู้ว่ามันดีขึ้นหรือแย่ลง:
+
+```javascript
+// ❌ Deploy ตรงๆ — ไม่รู้ผล
+manager.deploy(newVersion); // อาจแย่กว่าเดิม!
+
+// ✅ A/B test ก่อน — เปรียบเทียบ performance
+const winner = manager.abTest('summary', [oldVersion, newVersion]);
+if (winner === newVersion) {
+  manager.deploy(newVersion);
+} else {
+  // เก็บ version ใหม่ไว้ก่อน ยังไม่ deploy
+}
+```
+
+---
+
+## 💡 Example: Prompt Manager ใน action
+
+```javascript
+const manager = createPromptManager();
+
+// สร้าง prompt versions
+const v1 = manager.create('summary', 'Write a summary');
+const v2 = manager.create('summary', 'Create bullet-point summary');
+
+// Deploy v1
+manager.deploy(v1);
+
+// ดู metrics
+const metrics = manager.getMetrics(v1);
+console.log(metrics);
+// { uses: 10, avgScore: 75, successRate: 0.8 }
+
+// A/B test
+const winner = manager.abTest('summary', [v1, v2]);
+console.log(winner); // 'v2' ถ้า score สูงกว่า
+
+// Rollback
+manager.rollback('summary');
+// → กลับไป v1
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Deploy ล่าสุดโดยไม่ test**
+> "The latest version must be the best"
+> → ไม่เสมอไป! A/B test ก่อน deploy เสมอ
+
+**Mistake 2: ไม่ track metrics**
+> "Just deploy and hope for the best"
+> → Metrics ช่วยให้รู้ว่า prompt ไหนดีกว่า — data-driven decisions
+
+**Mistake 3: Rollback ไม่ได้**
+> "We can always fix forward"
+> → Rollback สำคัญมาก — เมื่อ prompt ใหม่แย่กว่า ต้องย้อนกลับได้
+
+**Mistake 4: A/B test ไม่ได้ run พร้อมกัน**
+> "Test v1 แล้วค่อย test v2"
+> → A/B test ต้อง run พร้อมกัน — ไม่งั้น variable อื่นๆ จะ bias ผลลัพธ์
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-70-prompt-versioning" />
+
+---
+
+## 🏋️ Quest: Prompt Version Manager
+
+สร้างระบบ versioning, A/B testing, และ rollback สำหรับ prompts
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-70-prompt-versioning
    cd quest-70-prompt-versioning
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createPromptManager()` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: rollback กลับไป version ก่อนหน้า, A/B test เลือก winner ถูกต้อง
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง scenario ที่ deploy prompt ใหม่แล้ว score แย่ลง — rollback ของคุณทำงานไหม?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- แต่ละ version ควรมี unique ID และ metadata
+- A/B test ต้อง track performance ของแต่ละ variant
+- Rollback ต้องย้อนกลับไป deployed version ก่อนหน้า
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-68-llm-evaluator",
+  "questions": [
+    {
+      "question": "LLM-as-a-Judge ทำหน้าที่อะไร?",
+      "choices": [
+        "สร้าง LLM ใหม่",
+        "ใช้ LLM evaluate output ของ LLM อีกตัวด้วย calibrated scoring",
+        "รัน LLM tests",
+        "optimize LLM performance"
+      ],
+      "answer": 1,
+      "explanation": "LLM-as-a-Judge ใช้ LLM ในการ evaluate output ของ LLM อีกตัว — เร็วกว่า manual evaluation และ consistent ถ้า calibrated อย่างถูกต้อง"
+    },
+    {
+      "question": "Suspicious score detection ทำอะไร?",
+      "choices": [
+        "ตรวจจับ LLM ที่ช้า",
+        "ตรวจจับ systematic bias เช่น ให้คะแนนสูงเกินไปสำหรับ output คุณภาพต่ำ",
+        "ตรวจจับ duplicate scores",
+        "ตรวจจับ negative scores"
+      ],
+      "answer": 1,
+      "explanation": "LLM มัก generous เกินไป — ทุก output ได้ A suspicious score detection จับ pattern ที่ score ไม่สมเหตุสมผล (เช่น output สั้นมากแต่ได้ 95)"
+    },
+    {
+      "question": "Weighted scoring หมายถึงอะไร?",
+      "choices": [
+        "ให้คะแนนทุก criterion เท่ากัน",
+        "คำนวณ score = sum(score × weight) โดย weight สะท้อนความสำคัญของแต่ละ criterion",
+        "ใช้ weight เป็นตัวคูณ speed",
+        " weight = จำนวน criteria"
+      ],
+      "answer": 1,
+      "explanation": "บาง criterion สำคัญกว่า (เช่น accuracy สำคัญกว่า format) weighted scoring ให้ weight ที่เหมาะสมกับความสำคัญ"
+    }
+  ]
+}

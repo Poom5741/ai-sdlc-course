@@ -1,0 +1,38 @@
+{
+  "questId": "quest-78-context-engineering",
+  "questions": [
+    {
+      "question": "หลักการสำคัญของ context engineering คืออะไร?",
+      "choices": [
+        "ใส่ทุก documents ที่มีเข้าไปใน prompt",
+        "Relevant context = Better context (ไม่ใช่ More context = Better)",
+        "ใช้ documents ตัวแรกที่เจอ",
+        "ไม่ต้องเลือก documents — ใส่ทั้งหมด"
+      ],
+      "answer": 1,
+      "explanation": "หลักการสำคัญคือ Relevant context = Better context — ข้อมูลเยอะไม่ได้แปลว่าดี ต้องเลือกเฉพาะสิ่งที่เกี่ยวข้องที่สุด"
+    },
+    {
+      "question": "ถ้า documents ทั้งหมดรวมกันเกิน maxTokens ควรทำอย่างไร?",
+      "choices": [
+        "ตัด documents ที่ length ยาวที่สุดออก",
+        "เลือก documents ที่ relevance สูงสุดก่อน แล้วหยุดเมื่อเกิน budget",
+        "เพิ่ม maxTokens ให้เท่ากับ total tokens ของทุก documents",
+        "สุ่มเลือก documents"
+      ],
+      "answer": 1,
+      "explanation": "ควร sort by relevance แล้วเลือกทีละตัว (สูงสุดก่อน) — หยุดเมื่อรวมกันเกิน maxTokens และ track ว่า documents ไหนถูก dropped"
+    },
+    {
+      "question": "ทำไมต้อง track dropped documents?",
+      "choices": [
+        "เพื่อความสวยงาม",
+        "เพื่อ debug ว่าทำไมคำตอบถึงไม่ดี — อาจเพราะ documents ที่เกี่ยวข้องถูกทิ้งไป",
+        "เพื่อส่ง documents ที่เหลือไปให้ LLM ตัวอื่น",
+        "ไม่จำเป็นต้อง track"
+      ],
+      "answer": 1,
+      "explanation": "การ track dropped documents ช่วย debug — ถ้าคำตอบไม่ดี อาจเพราะ documents ที่เกี่ยวข้องถูกทิ้งเพราะ token budget เต็ม"
+    }
+  ]
+}

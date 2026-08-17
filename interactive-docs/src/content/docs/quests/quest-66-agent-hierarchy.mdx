@@ -1,66 +1,176 @@
 ---
 title: "Quest 66 - Hierarchical Agent Team"
-description: "Manager-worker agent hierarchy"
+description: "สร้าง manager-worker agent hierarchy ที่ scale ได้"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 66: Hierarchical Agent Team
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Manager-worker agent hierarchy
+<LearningObjectives items={[
+  "สร้าง manager-worker hierarchy ที่ decompose งานและ assign ให้ workers",
+  "เข้าใจ task decomposition — แบ่งงานใหญ่เป็นงานย่อย",
+  "รู้จัก result validation — manager ต้อง verify ผลลัพธ์ก่อน accept",
+  "ออกแบบ parallel execution ที่ workers ทำงานพร้อมกัน"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Manager-Worker Hierarchy
+
+Manager-Worker Pattern คือ hierarchical structure ที่ **manager จัดการงาน** และ **workers ทำงาน** — เหมือนหัวหน้าทีมที่แบ่งงานให้ลูกทีม
+
+ทำไม pattern นี้ถึงสำคัญ? เพราะ **agent ตัวเดียวมี limits** — context window, ความเร็ว, ความแม่นยำ แต่ถ้ามี manager ที่ decompose งานแล้วให้ workers หลายคนทำงานพร้อมกัน ประสิทธิภาพจะสูงขึ้นมาก
+
+```javascript
+const team = createTeam(manager, workers);
+const result = team.execute('Write a comprehensive report on AI trends');
+// Manager: decompose → [research, outline, draft, review]
+// Workers: แต่ละคนรับ subtask หนึ่งตัว
+// Manager: validate ผลลัพธ์จากทุกคน
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Manager-Worker
+
+```
+1. manager.decompose(task) — แบ่ง task เป็น subtasks[]
+         ↓
+2. manager.assign(subtasks, workers) — assign subtask ให้แต่ละ worker
+         ↓
+3. Workers execute พร้อมกัน (parallel)
+         ↓
+4. manager.validate(results) — ตรวจสอบผลลัพธ์จากทุก worker
+         ↓
+5. ถ้า accepted → return results + summary
+   ถ้า rejected → retry หรือ assign ใหม่
+```
+
+### ทำไม Manager ต้อง Validate?
+
+ถ้า manager รับผลลัพธ์จาก workers โดยไม่ validate คุณภาพจะไม่保证:
+
+```javascript
+// ❌ ไม่ validate — รับทุกอย่าง
+const results = workers.map(w => w.execute(subtask));
+return { results, summary: 'done' };
+
+// ✅ Validate ก่อน accept
+const results = workers.map(w => w.execute(subtask));
+const { accepted, rejected } = manager.validate(results);
+if (rejected.length > 0) {
+  // retry หรือ assign ใหม่
+}
+return { results: accepted, summary: 'done with validation' };
+```
+
+---
+
+## 💡 Example: Team แบบ step-by-step
+
+```javascript
+const manager = {
+  decompose: (task) => ['research', 'outline', 'draft'],
+  assign: (subtasks, workers) => subtasks.map((st, i) => ({
+    task: st,
+    worker: workers[i % workers.length]
+  })),
+  validate: (results) => ({
+    accepted: results.filter(r => r.quality > 0.7),
+    rejected: results.filter(r => r.quality <= 0.7),
+  })
+};
+
+const workers = [
+  { name: 'Alice', execute: (task) => ({ task, output: '...', quality: 0.9 }) },
+  { name: 'Bob', execute: (task) => ({ task, output: '...', quality: 0.5 }) },
+];
+
+const team = createTeam(manager, workers);
+const result = team.execute('Write a report');
+// Alice's work accepted, Bob's rejected (quality 0.5)
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate ผลลัพธ์จาก workers**
+> "Workers know what they're doing"
+> → Manager ต้อง validate ทุกผลลัพธ์ — ไม่เช่นนั้น quality ไม่保证
+
+**Mistake 2: Assign งานทุกอย่างให้ worker เดียว**
+> "One fast worker is better than three slow ones"
+> → Hierarchy มีไว้เพื่อ parallel execution — ใช้ workers หลายคนทำงานพร้อมกัน
+
+**Mistake 3: Manager ทำงานเองแทนที่จะ assign**
+> "I'll just do it myself, it's faster"
+> → Manager ควร decompose และ assign — ไม่ใช่ทำงานเอง (นั่นคือ job ของ workers)
+
+**Mistake 4: ไม่มี feedback loop**
+> "Just collect results and return"
+> → ถ้า worker ล้มเหลว manager ต้อง assign ใหม่ — ไม่ใช่ ignored
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-66-agent-hierarchy" />
+
+---
+
+## 🏋️ Quest: Hierarchical Agent Team
+
+สร้าง manager-worker team ที่ decompose, assign, validate งาน
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-66-agent-hierarchy
    cd quest-66-agent-hierarchy
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createTeam(manager, workers)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: manager.validate ปฏิเสธ results บางส่วน
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง scenario ที่ worker สร้าง output คุณภาพต่ำ — manager จัดการอย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Manager ต้อง decompose task ก่อน assign — ไม่ใช่ส่ง task ตรงให้ workers
+- Validate results จาก workers ก่อน accept — ถ้า rejected ต้อง retry
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

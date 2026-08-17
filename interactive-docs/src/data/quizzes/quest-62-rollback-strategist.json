@@ -1,0 +1,38 @@
+{
+  "questId": "quest-62-rollback-strategist",
+  "questions": [
+    {
+      "question": "Why must deployment promotion require the previous environment to pass a health check?",
+      "choices": [
+        "It makes the deployment process take longer, which is safer",
+        "Promoting unhealthy code to the next environment spreads the problem further",
+        "Health checks are only needed in production",
+        "It's a legal requirement for all cloud deployments"
+      ],
+      "answer": 1,
+      "explanation": "If staging is unhealthy and you promote to production, you're knowingly deploying broken code. Health checks at each stage ensure problems are caught and fixed before reaching users."
+    },
+    {
+      "question": "What should a rollback operation return?",
+      "choices": [
+        "Just a boolean indicating success or failure",
+        "The previous version, success status, and a descriptive message",
+        "A new deployment ID for the rolled-back version",
+        "The full git diff between versions"
+      ],
+      "answer": 1,
+      "explanation": "A rollback should return structured information: whether it succeeded, what version was restored, and a human-readable message. This helps incident responders understand what happened."
+    },
+    {
+      "question": "Why is tracking deployment history important?",
+      "choices": [
+        "It makes the deployment manager look more complete",
+        "It records every environment transition so you can answer 'when did this version reach production?'",
+        "History is required for database migrations only",
+        "It automatically generates release notes"
+      ],
+      "answer": 1,
+      "explanation": "During incidents, you need to know exactly when a version moved through each environment. History tracks every transition with timestamps, enabling root cause analysis and audit trails."
+    }
+  ]
+}

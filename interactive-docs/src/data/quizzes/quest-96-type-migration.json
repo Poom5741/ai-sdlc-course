@@ -1,0 +1,38 @@
+{
+  "questId": "quest-96-type-migration",
+  "questions": [
+    {
+      "question": "When migrating `function add(a, b) { return a + b; }` to TypeScript, what type should `a` and `b` have?",
+      "choices": [
+        "any",
+        "string",
+        "number",
+        "unknown"
+      ],
+      "answer": 2,
+      "explanation": "Parameter ถูกใช้ใน `a + b` (addition) — บ่งบอกว่าเป็น number. ใช้ specific type (number) แทน any เพื่อให้ TypeScript check ได้จริง"
+    },
+    {
+      "question": "What should happen to `var x = 1;` during JavaScript → TypeScript migration?",
+      "choices": [
+        "Keep it as var",
+        "Remove it entirely",
+        "Convert to const (or let if reassigned)",
+        "Convert to any"
+      ],
+      "answer": 2,
+      "explanation": "`var` มีปัญหาเรื่อง scoping (function-scoped, hoisted) — แปลงเป็น `const` (หรือ `let` ถ้ามี reassignment) เป็นส่วนหนึ่งของ modernization"
+    },
+    {
+      "question": "Why is using `: any` for all parameters bad in TypeScript migration?",
+      "choices": [
+        "It makes code run slower",
+        "It defeats the purpose of type safety — TypeScript won't catch type errors",
+        "It causes syntax errors",
+        "TypeScript doesn't support any"
+      ],
+      "answer": 1,
+      "explanation": "`any` ปิด type checking ทั้งหมด — TypeScript จะไม่ catch type errors เลย. ถ้าจะ migrate เป็น TypeScript ต้องใช้ specific types (number, string, boolean) จากการ infer usage"
+    }
+  ]
+}

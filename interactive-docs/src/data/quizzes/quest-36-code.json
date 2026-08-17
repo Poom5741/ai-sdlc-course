@@ -1,0 +1,38 @@
+{
+  "questId": "quest-36-code",
+  "questions": [
+    {
+      "question": "Code migration ด้วย AI ควรเริ่มจากอะไร?",
+      "choices": [
+        "เขียนโค้ดใหม่ตั้งแต่ต้น",
+        "วิเคราะห์ source code เพื่อจับ semantic meaning",
+        "แปลง syntax ตรงๆ ทีละบรรทัด",
+        "Copy-paste แล้วแก้ syntax"
+      ],
+      "answer": 1,
+      "explanation": "AI จับ semantic meaning ได้ดี — ไม่ใช่แค่แปล syntax แต่เข้าใจว่าโค้ดทำอะไร แล้วหา equivalent ใน target language"
+    },
+    {
+      "question": "ความท้าทายไหนที่ AI มักจะพลาดในการ code migration?",
+      "choices": [
+        "การแปลง variable names",
+        "Edge cases ใน error handling",
+        "การเปลี่ยน comment language",
+        "การลบ whitespace"
+      ],
+      "answer": 1,
+      "explanation": "Error handling ต่างกันมาก giữa languages — Python try/except ≠ JS try/catch ในรายละเอียด และ AI มักจะมองข้าม edge cases"
+    },
+    {
+      "question": "หลัง AI แปลงโค้ดเสร็จ สิ่งสำคัญที่สุดที่ต้องทำคืออะไร?",
+      "choices": [
+        "Deploy ทันที",
+        "ทดสอบ logic เทียบกับต้นฉบับ โดยเฉพาะ edge cases",
+        "ลบต้นฉบับ",
+        "เขียน documentation"
+      ],
+      "answer": 1,
+      "explanation": "AI output เป็น starting point — ต้อง verify logic เทียบกับต้นฉบับเสมอ โดยเฉพาะ edge cases ที่ AI อาจมองข้าม"
+    }
+  ]
+}

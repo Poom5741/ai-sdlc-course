@@ -5,22 +5,179 @@ description: "Audit packages for known vulnerabilities"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 49: Dependency Vulnerability Auditor
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Audit packages for known vulnerabilities
+<LearningObjectives items={[
+  "Understand why every npm dependency is a potential attack surface",
+  "Build an auditor that checks packages against a vulnerability database",
+  "Learn to match semver version ranges against known vulnerable versions",
+  "Recognize that devDependencies are also security-relevant"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Dependencies Are Attack Surface
+
+ทุกๆ npm package ที่คุณ install คือ code ที่คุณ trust — code ที่คุณไม่ได้เขียนเอง แต่ให้มันรันใน application ของคุณ เรียกว่า **supply chain attack surface**
+
+ถ้า package ที่คุณใช้มี vulnerability ผู้โจมตีสามารถ exploit ได้ผ่าน code ของคุณ โดยที่คุณไม่รู้ตัว
+
+```json
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "^4.17.21",
+    "old-package": "^1.2.3"  // ← มี known vulnerability!
+  }
+}
+```
+
+```bash
+# npm สร้าง audit report ให้
+$ npm audit
+
+old-package@1.2.3
+  Severity: high
+  Prototype Pollution - https://npmjs.com/advisories/123
+```
+
+Think of dependencies like ingredients in a restaurant: if one ingredient is contaminated, every dish that uses it is unsafe. You need to check every ingredient, not just the ones you cook with directly.
+
+---
+
+## ⚙️ How It Works
+
+### The Audit Pipeline
+
+```
+1. Read package.json (dependencies + devDependencies)
+         ↓
+2. For each package, check against vulnerability database
+         ↓
+3. Match version ranges against vulnerable versions
+         ↓
+4. Classify severity (critical > high > medium > low)
+         ↓
+5. Return structured report with fix recommendations
+```
+
+### Semver Range Matching
+
+Version ranges สำคัญมาก — `^1.2.3` หมายถึง `>=1.2.3 <2.0.0`:
+
+| Range | Includes 1.2.5? | Includes 2.0.0? | Includes 1.1.0? |
+| --- | --- | --- | --- |
+| `^1.2.3` | ✅ | ❌ | ❌ |
+| `~1.2.3` | ✅ | ❌ | ❌ |
+| `1.2.3` | ✅ (exact) | ❌ | ❌ |
+| `>=1.2.3` | ✅ | ✅ | ❌ |
+
+### Why devDependencies Matter Too
+
+```json
+{
+  "devDependencies": {
+    "webpack": "^5.88.0",  // ← runs during build
+    "jest": "^29.6.0"      // ← runs during test
+  }
+}
+```
+
+devDependencies run during build and test — if they're compromised, attackers can inject code into your build pipeline. The famous `event-stream` incident (2018) was a devDependency that stole cryptocurrency.
+
+---
+
+## 💡 Example: Building a Vulnerability Auditor
+
+```javascript
+function auditDependencies(packageJson, vulnDb) {
+  const allDeps = {
+    ...packageJson.dependencies,
+    ...packageJson.devDependencies,
+  };
+  const devDepNames = new Set(Object.keys(packageJson.devDependencies || {}));
+
+  const results = [];
+  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+
+  for (const [pkg, version] of Object.entries(allDeps)) {
+    const vuln = vulnDb[pkg];
+    if (!vuln) continue;
+
+    // Check if installed version is in vulnerable range
+    if (isVersionInRange(version, vuln.versions)) {
+      results.push({
+        package: pkg,
+        installed: version,
+        severity: vuln.severity,
+        fix: vuln.fix,
+        devOnly: devDepNames.has(pkg),
+      });
+    }
+  }
+
+  // Sort by severity
+  results.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+
+  return {
+    total: Object.keys(allDeps).length,
+    vulnerable: results.length,
+    results,
+  };
+}
+
+function isVersionInRange(installed, vulnerableVersions) {
+  // Simplified semver check — in production, use semver library
+  const clean = installed.replace(/^[~^>=<]+/, '');
+  return vulnerableVersions.some(v => clean.startsWith(v));
+}
+```
+
+**Key insight:** The auditor checks BOTH dependencies and devDependencies, and marks devDependencies with `devOnly: true` so developers can prioritize accordingly.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Only checking dependencies**
+> "devDependencies aren't deployed, so they're safe"
+> → devDependencies run during build and test. A compromised build tool can inject backdoors into your production code.
+
+**Mistake 2: Ignoring semver ranges**
+> "Package version is 1.2.3, vulnerability is in 1.2.0"
+> → You must understand semver ranges. `^1.2.0` includes `1.2.3`, so a vulnerability in `1.2.0` affects all versions in that range.
+
+**Mistake 3: Not sorting by severity**
+> "Just list all vulnerable packages"
+> → Without severity sorting, developers don't know what to fix first. Critical vulnerabilities need immediate attention.
+
+**Mistake 4: Trusting "no known vulnerabilities"**
+> "npm audit says everything is fine"
+> → New vulnerabilities are discovered daily. Audit regularly, not just once. Subscribe to security advisories.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-49-dependency-auditor" />
+
+---
+
+## 🏋️ Quest: Dependency Vulnerability Auditor
+
+สร้าง auditor ที่ตรวจ package.json against vulnerability database — AI มักจะลืม devDependencies หรือไม่ handle semver ranges ถูกต้อง!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-49-dependency-auditor
    cd quest-49-dependency-auditor
@@ -28,9 +185,15 @@ Audit packages for known vulnerabilities
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `auditDependencies(packageJson, vulnDb)` ที่:
+   - Check ทั้ง dependencies และ devDependencies
+   - Match version ranges against vulnerable versions
+   - Mark devDependencies ด้วย `devOnly: true`
+   - Sort results by severity (critical > high > medium > low)
+   - Return `{ total, vulnerable, results: [...] }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +224,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อย่าลืม check devDependencies — พวกนี้รันตอน build/test ก็อันตรายได้
+- ใช้ semver library หรือเขียน simple version comparison สำหรับ version range matching
+- Sort results โดย severity เพื่อให้ developer รู้ว่าควรแก้อะไรก่อน
+- ถ้าติดขัด ลองนึกว่าถ้า dependency ที่คุณใช้มี vulnerability ผู้โจมตีจะ exploit ยังไง

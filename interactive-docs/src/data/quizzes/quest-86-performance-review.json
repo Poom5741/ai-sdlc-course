@@ -1,0 +1,38 @@
+{
+  "questId": "quest-86-performance-review",
+  "questions": [
+    {
+      "question": "Why is `readFileSync` at module level generally acceptable, but inside a request handler it's not?",
+      "choices": [
+        "Module-level code runs faster",
+        "Module-level sync operations run once at startup; request handlers run for every user request",
+        "readFileSync is only slow on Linux",
+        "It doesn't matter — both are equally bad"
+      ],
+      "answer": 1,
+      "explanation": "Module-level readFileSync runs once when the server starts — a one-time delay is acceptable. Inside a request handler, it blocks the event loop for every single user request, causing the server to be unresponsive under load."
+    },
+    {
+      "question": "What is the N+1 query problem?",
+      "choices": [
+        "Querying the database one too many times",
+        "Running 1 query to fetch a list, then N separate queries for each item in the list",
+        "Having more than one database table",
+        "Using SQL instead of NoSQL"
+      ],
+      "answer": 1,
+      "explanation": "N+1 queries happen when you fetch a list of items (1 query) then make a separate database call for each item (N queries). A single JOIN or batch query is much more efficient."
+    },
+    {
+      "question": "Why is `JSON.parse(JSON.stringify(obj))` considered a performance anti-pattern?",
+      "choices": [
+        "It's slower than a simple assignment",
+        "It serializes the entire object to a string then parses it back — wasteful for large payloads",
+        "It doesn't work with nested objects",
+        "It's been deprecated in modern JavaScript"
+      ],
+      "answer": 1,
+      "explanation": "JSON.parse(JSON.stringify()) creates an intermediate string representation of the entire object. For large or deeply nested objects, this is significantly slower and more memory-intensive than using structuredClone() or a targeted copy."
+    }
+  ]
+}

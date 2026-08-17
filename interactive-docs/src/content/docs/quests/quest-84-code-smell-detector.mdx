@@ -5,22 +5,129 @@ description: "Identify common code smells in source code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Code Smell Detector
+# Quest 84: Code Smell Detector
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Identify common code smells in source code
+<LearningObjectives items={[
+  "How to identify common code smells programmatically",
+  "Why code smells are signals for refactoring, not bugs to fix",
+  "How to detect long functions, deep nesting, magic numbers, and duplicated code",
+  "How to categorize findings by type and severity for actionable output"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Code Smells
+
+A "code smell" is a surface-level indicator that something might be wrong with your code — not a bug, but a sign that the code could be cleaner, more maintainable, or easier to understand. The term was popularized by Martin Fowler in his classic book *Refactoring*.
+
+Code smells are like **bad posture** — you can function with them, but over time they lead to pain. A 200-line function works today, but when someone needs to modify it next month, they'll struggle to understand it. Magic numbers work until the requirements change and you have to find every instance.
+
+The beauty of code smell detection is that **many smells follow detectable patterns**. While a human needs to understand the code's intent to judge quality, certain structural patterns — long functions, deep nesting, excessive parameters — are almost always worth flagging.
+
+---
+
+## ⚙️ How It Works
+
+### Common Code Smells
+
+| Smell | Detection Signal | Why It's Bad |
+| --- | --- | --- |
+| Long function | > 30 lines | Hard to understand, test, and maintain |
+| Deep nesting | > 3 levels of indentation | Logic is hard to follow |
+| Magic numbers | Unnamed numeric literals | Meaning is unclear, changes are error-prone |
+| Too many parameters | > 4 parameters | Function does too much |
+| Long method chains | > 3 chained calls | Tight coupling, hard to debug |
+
+### Detection Approach
+
+```
+1. Parse the source code
+         ↓
+2. Analyze structural patterns (function length, nesting depth, etc.)
+         ↓
+3. Flag deviations from clean code standards
+         ↓
+4. Categorize each smell with type, line number, and severity
+         ↓
+5. Output actionable findings
+```
+
+---
+
+## 💡 Example: Detecting Code Smells
+
+Consider this problematic code:
+
+```javascript
+function processUserData(users, config, callback, extra) {
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].active) {
+      if (users[i].age > 18) {
+        if (users[i].role === 'admin') {
+          const discount = 0.25;
+          console.log('Processing admin:', users[i].name);
+          // ... 50 more lines of logic
+        }
+      }
+    }
+  }
+}
+```
+
+A code smell detector would flag:
+
+```json
+[
+  { "type": "too-many-params", "line": 1, "severity": "medium", "message": "Function has 4 parameters — consider using an options object" },
+  { "type": "deep-nesting", "line": 4, "severity": "high", "message": "Nesting depth of 3 — consider early returns or extraction" },
+  { "type": "magic-number", "line": 7, "severity": "medium", "message": "Magic number 0.25 — extract to a named constant" },
+  { "type": "console.log", "line": 8, "severity": "warning", "message": "Debug output left in code" }
+]
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging every function as "too long"**
+> "Any function over 5 lines is suspicious"
+> → Set reasonable thresholds. 30+ lines is a reasonable trigger for "long function." Too sensitive = noise that developers ignore.
+
+**Mistake 2: Only checking line count, not nesting depth**
+> "The function is only 10 lines, so it's fine"
+> → A 10-line function with 5 levels of nesting is harder to read than a 40-line function with flat structure. Check BOTH.
+
+**Mistake 3: Reporting smells without context**
+> "Found a code smell on line 12"
+> → Tell developers WHY it's a smell and what to do about it. "Magic number 42 — extract to a constant like `MAX_RETRY_COUNT`" is actionable. "Found issue" is not.
+
+**Mistake 4: Ignoring severity levels**
+> "All code smells are equally bad"
+> → Deep nesting in business logic is a high severity smell. A slightly long comment is low severity. Categorize so teams can prioritize.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-84-code-smell-detector" />
+
+---
+
+## 🏋️ Quest: Code Smell Detector
+
+Now it's time to practice! Build a code smell detector.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-84-code-smell-detector
    cd quest-84-code-smell-detector
@@ -28,39 +135,29 @@ Identify common code smells in source code
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `detectSmells(code)` function based on the README and test expectations
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Read README.md first for the full contract — which smells to detect and the expected output format.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ README.md สำหรับ output format ที่ต้องการ
+- นึกถึง threshold ที่สมเหตุสมผล — อย่า flag ทุกอย่าง
+- ลองเขียน code smell ตัวอย่างแล้ว run detector ของคุณดู
+- ถ้าติดขัด ลองเริ่มจาก smell ที่ง่ายที่สุดก่อน แล้วค่อยเพิ่ม

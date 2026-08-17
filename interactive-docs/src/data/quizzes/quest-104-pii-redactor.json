@@ -1,0 +1,38 @@
+{
+  "questId": "quest-104-pii-redactor",
+  "questions": [
+    {
+      "question": "Why should `test@example.com` NOT be redacted as PII?",
+      "choices": [
+        "It's too short to be a real email",
+        "It's example/test data, not a real person's email address",
+        "The regex doesn't match it",
+        "Example emails are allowed by GDPR"
+      ],
+      "answer": 1,
+      "explanation": "`test@example.com` is a standard example email used in documentation and testing. Redacting it would add noise to logs without protecting any real person's privacy."
+    },
+    {
+      "question": "What should a PII redactor return?",
+      "choices": [
+        "Only the redacted text",
+        "Only the count of PII items found",
+        "Both the redacted text and a summary of what was found",
+        "A boolean indicating whether PII was found"
+      ],
+      "answer": 2,
+      "explanation": "Stakeholders need the redacted text for safe sharing AND a summary of what was found (e.g., 2 emails, 1 phone, 1 SSN) to understand the PII exposure level."
+    },
+    {
+      "question": "How does context-aware name detection reduce false positives?",
+      "choices": [
+        "It only detects names longer than 5 characters",
+        "It anchors detection to phrases like 'My name is' or 'I'm'",
+        "It only detects names from a pre-approved list",
+        "It requires names to appear at the start of a sentence"
+      ],
+      "answer": 1,
+      "explanation": "By anchoring name detection to context clues like 'My name is' or 'I'm', we reduce false positives from randomly capitalized words that aren't actually names."
+    }
+  ]
+}

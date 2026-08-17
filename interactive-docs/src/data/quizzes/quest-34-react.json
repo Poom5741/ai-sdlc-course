@@ -1,0 +1,38 @@
+{
+  "questId": "quest-34-react",
+  "questions": [
+    {
+      "question": "ReAct pattern ประกอบด้วยขั้นตอนหลักอะไรบ้าง?",
+      "choices": [
+        "Plan → Code → Test → Deploy",
+        "Observe → Reason → Act → Observe result",
+        "Read → Write → Review → Merge",
+        "Think → Search → Execute → Return"
+      ],
+      "answer": 1,
+      "explanation": "ReAct (Reason + Act) มี 4 ขั้นตอน: Observe environment → Reason about goal → Act with tool → Observe result แล้ววนซ้ำ"
+    },
+    {
+      "question": "ทำไม ReAct ดีกว่า Chain-of-Thought ธรรมดา?",
+      "choices": [
+        "ReAct คิดเร็วกว่า",
+        "ReAct ไม่ต้องใช้ tools",
+        "ReAct interact กับโลกจริงและ observe results",
+        "ReAct ใช้ memory น้อยกว่า"
+      ],
+      "answer": 2,
+      "explanation": "Chain-of-Thought คิดเป็นขั้นตอนแต่ไม่ได้ interact กับโลกจริง — ReAct ทำทั้งคู่ ทำให้ถูกต้องกว่า"
+    },
+    {
+      "question": "ใน ReAct agent ทำไม observation จึงสำคัญ?",
+      "choices": [
+        "เพื่อให้ agent ดูเท่",
+        "เพื่อเก็บ context ที่ใช้ตัดสินใจครั้งถัดไป",
+        "เพื่อลดเวลา execution",
+        "เพื่อไม่ต้อง reason ซ้ำ"
+      ],
+      "answer": 1,
+      "explanation": "Observation คือ context ที่ agent ใช้ตัดสินใจครั้งต่อไป — ถ้าไม่มี observation agent จะวนซ้ำแบบไม่รู้ตัว"
+    }
+  ]
+}

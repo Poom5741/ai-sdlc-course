@@ -5,22 +5,118 @@ description: "Migrate Express routes to Fastify"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Framework Migration
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to convert Express route definitions to Fastify equivalents",
+  "Why req/res parameter names must change to request/reply",
+  "How to handle res.status(N).send() → reply.code(N).send() conversions",
+  "Why migrating one route at a time is safer than rewriting the whole app"
+]} />
 
-Migrate Express routes to Fastify
+## 📖 Concept: Framework Migration (Express → Fastify)
 
----
+Framework migration คือการเปลี่ยน web framework จากตัวหนึ่งไปอีกตัวหนึ่ง — เหมือนการเปลี่ยนจาก karate เป็น taekwondo ท่าพื้นฐานยังเหมือนเดิม แต่ syntax และ conventions ต่างกัน
 
-## วิธีทำ
+Express ยังคงเป็น framework ที่ใช้มากที่สุด แต่ Fastify มี performance ดีกว่าหลายเท่า migration ต้องทำ **incrementally** — wrap existing routes แล้ว migrate ทีละ route, อย่า rewrite ทั้ง app พร้อมกัน
+
+Think of it like switching martial arts styles — the fighting principles are similar (punches, kicks, blocks), but the terminology and form differ. You wouldn't forget how to block just because your new style calls it something different.
+
+## ⚙️ How It Works
+
+### The Migration Mapping
+
+```javascript
+// Express → Fastify conversions
+
+// 1. app.get → fastify.get
+app.get('/users', handler)        →  fastify.get('/users', handler)
+
+// 2. req.body → request.body
+const d = req.body;               →  const d = request.body;
+
+// 3. res.send() → reply.send()
+res.send('ok');                   →  reply.send('ok');
+
+// 4. res.status(N).send() → reply.code(N).send()
+res.status(200).send('ok');       →  reply.code(200).send('ok');
+
+// 5. Handler params: (req, res) → (request, reply)
+(req, res) => { ... }             →  (request, reply) => { ... }
+```
+
+### The Critical Rule: Status Codes Must Convert
+
+```javascript
+// ❌ Naive AI: converts res.send but forgets res.status(N)
+app.get('/test', (req, res) => {
+  res.status(200).send('ok');
+});
+// After naive conversion:
+fastify.get('/test', (request, reply) => {
+  reply.send('ok');  // WRONG! Lost the status code
+});
+
+// ✅ Correct conversion
+fastify.get('/test', (request, reply) => {
+  reply.code(200).send('ok');  // CORRECT
+});
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+// Input
+const code = `app.get('/users', (req, res) => {
+  res.status(200).send('ok');
+});`;
+
+// Conversion steps:
+// 1. app.get → fastify.get
+// 2. req → request, res → reply
+// 3. res.status(200).send() → reply.code(200).send()
+
+// Output
+const converted = `fastify.get('/users', (request, reply) => {
+  reply.code(200).send('ok');
+});`;
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Forgetting status code conversion**
+> "res.send แปลงแล้ว → จบ"
+> → `res.status(N).send()` ต้องกลายเป็น `reply.code(N).send()` — อย่าลืม status code
+
+**Mistake 2: Not updating handler parameter names**
+> "เปลี่ยน app.get แล้วแต่ลืมเปลี่ยน req/res"
+> → Handler params ต้องเปลี่ยน: `(req, res)` → `(request, reply)`
+
+**Mistake 3: Rewriting entire app at once**
+> "เปลี่ยนทุก route พร้อมกันเลย"
+> → Migrate ทีละ route — wrap existing routes แล้ว replace ทีละตัว
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle code ว่าง"
+> → Empty input → return empty string
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-100-framework-migration" />
+
+## 🏋️ Quest: Framework Migration
+
+Now it's time to practice! Migrate Express routes to Fastify.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-100-framework-migration
    cd quest-100-framework-migration
@@ -31,36 +127,19 @@ Migrate Express routes to Fastify
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — res.status(N).send() ต้องกลายเป็น reply.code(N).send()
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `expressToFastify(code)` รับ Express code string และ return Fastify code string
+- แปลง `app.get/post` → `fastify.get/post`
+- แปลง `req` → `request`, `res` → `reply`
+- `res.status(N).send()` → `reply.code(N).send()` — อย่าลืม status code
 - ถ้าติดขัด ดู `_solution/solution.js`

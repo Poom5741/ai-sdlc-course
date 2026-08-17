@@ -1,0 +1,38 @@
+{
+  "questId": "quest-74-few-shot",
+  "questions": [
+    {
+      "question": "Few-shot prompting คืออะไร?",
+      "choices": [
+        "การใส่ instructions ยาวๆ เพื่ออธิบาย task",
+        "การให้ตัวอย่าง (examples) แก่ AI ก่อนให้ทำ task จริง",
+        "การใช้ zero examples แล้วหวังว่า AI จะเข้าใจ",
+        "การใช้ many-shot prompting (100+ examples)"
+      ],
+      "answer": 1,
+      "explanation": "Few-shot prompting คือการให้ 2-3 ตัวอย่างแก่ AI เพื่อให้จับ pattern ก่อนทำ task จริง — เหมือนการสอนเด็กด้วยตัวอย่างก่อนให้ทำแบบฝึกหัด"
+    },
+    {
+      "question": "ใน few-shot template ขั้นตอนสุดท้ายก่อนที่ AI จะตอบคืออะไร?",
+      "choices": [
+        "ใส่ task description อีกครั้ง",
+        "ใส่ examples เพิ่มอีก",
+        "ใส่ input ใหม่ (ยังไม่มี output) รอ AI เติม",
+        "ปิด prompt เลยไม่ต้องใส่อะไรเพิ่ม"
+      ],
+      "answer": 2,
+      "explanation": "ขั้นตอนสุดท้ายคือใส่ input ใหม่โดยยังไม่มี output — เช่น \"Now:\\nInput: ...\\nOutput:\" — เพื่อบอก AI ว่าถึงเวลาตอบแล้ว"
+    },
+    {
+      "question": "ทำไม examples ถึงสำคัญกว่า instructions?",
+      "choices": [
+        "เพราะ instructions ยาวเกินไป",
+        "เพราะ LLMs เรียนรู้จาก context — ตัวอย่างช่วยให้ AI เห็น pattern ทันที ไม่ต้องเดา",
+        "เพราะ instructions ใช้ไม่ได้กับ LLMs",
+        "เพราะ examples ใช้ token น้อยกว่า"
+      ],
+      "answer": 1,
+      "explanation": "LLMs เรียนรู้จาก context ที่ให้ — ตัวอย่างช่วยให้ AI เห็น input→output pattern ทันที เร็วกว่าและแม่นกว่าการอธิบายเป็นคำ"
+    }
+  ]
+}

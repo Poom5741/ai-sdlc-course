@@ -5,22 +5,132 @@ description: "Migrate REST endpoints to GraphQL resolvers"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # API Migration Tool
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to convert REST route definitions to GraphQL schema and resolvers",
+  "Why GET routes become Query resolvers and POST routes become Mutation resolvers",
+  "How to generate GraphQL type definitions from REST endpoint parameters",
+  "Why incremental migration beats wholesale rewrites"
+]} />
 
-Migrate REST endpoints to GraphQL resolvers
+## 📖 Concept: REST → GraphQL Migration
 
----
+REST API migration คือการเปลี่ยนจาก REST endpoints ที่มี multiple URLs เป็น GraphQL ที่มี single endpoint — เหมือนการเปลี่ยนจาก many small techniques เป็น one unified fighting style แต่ **migration ต้องทำอย่าง incrementally** — อย่า rewrite ทุก endpoint พร้อมกัน
 
-## วิธีทำ
+หลักการสำคัญ: **GET → Query, POST → Mutation** — นี่คือ semantic mapping ที่ถูกต้อง. AI tools มักจะ convert ทุกอย่างเป็น Query ซึ่งผิด — POST endpoints ต้องกลายเป็น Mutation เพราะมันมี side effects
+
+Think of it like converting a library of individual forms into a single powerful form — each REST endpoint becomes a GraphQL field, but the semantics (read vs write) must be preserved exactly.
+
+## ⚙️ How It Works
+
+### The Migration Workflow
+
+1. **Parse REST routes** — extract method, path, name, params
+2. **Generate GraphQL types** — create schema with Query and Mutation types
+3. **Map methods** — GET → Query, POST → Mutation
+4. **Generate resolvers** — wrap existing logic in resolver functions
+5. **Verify** — ensure all routes are mapped correctly
+
+### REST → GraphQL Mapping
+
+```javascript
+// REST definition
+{ method: 'GET', path: '/users', name: 'getUsers', params: [] }
+{ method: 'POST', path: '/users', name: 'createUser', params: ['name', 'email'] }
+
+// GraphQL schema
+type Query {
+  getUsers: String
+}
+
+type Mutation {
+  createUser(name: String!, email: String!): String
+}
+
+// Resolvers
+{
+  Query: { getUsers: (parent, args) => { ... } },
+  Mutation: { createUser: (parent, args) => { ... } }
+}
+```
+
+### The Critical Rule: POST → Mutation
+
+```javascript
+// ❌ Naive AI: all routes become Query
+type Query {
+  getUsers: String
+  createUser(name: String!, email: String!): String  // WRONG!
+}
+
+// ✅ Correct: POST becomes Mutation
+type Query {
+  getUsers: String
+}
+type Mutation {
+  createUser(name: String!, email: String!): String   // CORRECT
+}
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+const routes = [
+  { method: 'GET', path: '/users', name: 'getUsers', params: [] },
+  { method: 'POST', path: '/users', name: 'createUser', params: ['name', 'email'] }
+];
+
+// Analysis:
+// - GET /users → Query.getUsers
+// - POST /users → Mutation.createUser
+// - createUser params: name, email → add to Mutation type
+
+// Output:
+{
+  schema: 'type Query {\n  getUsers: String\n}\ntype Mutation {\n  createUser(name: String!, email: String!): String\n}',
+  resolvers: {
+    Query: { getUsers: [Function] },
+    Mutation: { createUser: [Function] }
+  }
+}
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Converting POST to Query**
+> "ทุก route กลายเป็น Query"
+> → POST endpoints มี side effects — ต้องเป็น **Mutation**
+
+**Mistake 2: Forgetting to generate resolvers**
+> "Schema ถูกต้องแต่ resolvers ว่าง"
+> → ทุก field ใน schema ต้องมี resolver function
+
+**Mistake 3: Not including parameters in type definition**
+> "ลืมใส่ params ใน GraphQL type"
+> → Parameters ต้องถูก map เป็น GraphQL arguments: `(name: String!, email: String!)`
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle routes ว่าง"
+> → Empty routes → return `{ schema: '', resolvers: {} }`
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-98-api-migration" />
+
+## 🏋️ Quest: API Migration Tool
+
+Now it's time to practice! Migrate REST endpoints to GraphQL resolvers.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-98-api-migration
    cd quest-98-api-migration
@@ -31,36 +141,18 @@ Migrate REST endpoints to GraphQL resolvers
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — POST routes ต้องเป็น Mutation ไม่ใช่ Query
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `restToGraphQL(routes)` รับ array ของ route objects และ return `{ schema, resolvers }`
+- GET → Query, POST → Mutation — นี่คือ rule ที่ต้อง遵守
+- Parameters ต้องถูก map เป็น GraphQL arguments
 - ถ้าติดขัด ดู `_solution/solution.js`

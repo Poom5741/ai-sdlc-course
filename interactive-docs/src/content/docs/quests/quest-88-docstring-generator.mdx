@@ -5,22 +5,146 @@ description: "Generate JSDoc/TSDoc from function signatures"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Docstring Generator
+# Quest 88: Docstring Generator
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate JSDoc/TSDoc from function signatures
+<LearningObjectives items={[
+  "How to automatically generate JSDoc/TSDoc documentation from function signatures",
+  "Why Documenting the Contract makes code self-describing",
+  "How to extract function names, parameters, and return types from source code",
+  "The edge case of empty parameter lists and why they should have no @param tags"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Documenting the Contract
+
+Every function has a **contract** — it takes certain inputs, does something, and returns an output. JSDoc/TSDoc docstrings formalize this contract in a standardized format that IDEs, linters, and documentation generators can understand.
+
+A good docstring tells you:
+
+- **What** the function does (description)
+- **What it needs** (parameters with types and descriptions)
+- **What it returns** (return type and description)
+
+Writing docstrings by hand is tedious — most developers skip it. But an AI-powered docstring generator can parse function signatures and produce accurate documentation automatically. The key challenge is **accuracy**: the generator must infer types and descriptions from the code itself, not invent them.
+
+Think of docstrings as **the API manual for your function** — without it, every developer who uses your function has to read the implementation to understand what it does.
+
+---
+
+## ⚙️ How It Works
+
+### Docstring Generation Pipeline
+
+```
+1. Parse source code to find function declarations
+         ↓
+2. Extract function name, parameters, and return context
+         ↓
+3. Infer types from parameter names and usage patterns
+         ↓
+4. Generate JSDoc block with @param and @returns tags
+         ↓
+5. Insert docstrings above each function
+```
+
+### JSDoc Format
+
+```javascript
+/**
+ * Processes user data and returns formatted results.
+ * @param {Array} users - Array of user objects
+ * @param {Object} options - Configuration options
+ * @returns {Array} Formatted user data
+ */
+function processUsers(users, options) { ... }
+```
+
+---
+
+## 💡 Example: Generating Docstrings
+
+Given this code:
+
+```javascript
+function calculateDiscount(price, rate) {
+  return price * (1 - rate);
+}
+
+const processData = async (items, config) => {
+  // ...
+  return results;
+};
+```
+
+A docstring generator should produce:
+
+```javascript
+/**
+ * Calculates discounted price.
+ * @param {number} price - Original price
+ * @param {number} rate - Discount rate
+ * @returns {number} Discounted price
+ */
+function calculateDiscount(price, rate) {
+  return price * (1 - rate);
+}
+
+/**
+ * Processes data asynchronously.
+ * @param {Array} items - Items to process
+ * @param {Object} config - Configuration
+ * @returns {Promise} Processed results
+ */
+const processData = async (items, config) => {
+  // ...
+  return results;
+};
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Generating @param tags for empty parameter lists**
+> "Function has no params, but I'll add @param with undefined"
+> → If a function takes no parameters, there should be NO @param tags. An empty docstring with just a description is correct.
+
+**Mistake 2: Only handling one function style**
+> "I'll only parse `function foo() {}` declarations"
+> → Modern JavaScript uses arrow functions, async functions, and method shorthand. Handle all three styles.
+
+**Mistake 3: Ignoring existing docstrings**
+> "I'll overwrite whatever's there"
+> → If a function already has a docstring, don't duplicate it. Only generate for undocumented functions.
+
+**Mistake 4: Inventing types instead of inferring**
+> "I'll guess the type from the parameter name"
+> → Infer from context. If the parameter is used in `array.map()`, it's likely an array. If used in arithmetic, it's a number. Be honest about uncertainty.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-88-docstring-generator" />
+
+---
+
+## 🏋️ Quest: Docstring Generator
+
+Now it's time to practice! Build a JSDoc generator.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-88-docstring-generator
    cd quest-88-docstring-generator
@@ -28,39 +152,32 @@ Generate JSDoc/TSDoc from function signatures
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `generateDocstring(code)` function that:
+   - Parses function signatures (regular, arrow, async)
+   - Generates JSDoc blocks with `@param` and `@returns` tags
+   - Handles empty parameter lists correctly (no @param tags)
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Use regex to extract function signatures. Start with regular functions, then add arrow functions and async functions.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ regex เพื่อ extract function signatures — เริ่มจาก `function name(params)` ก่อน
+- อย่า generate `@param` สำหรับ function ที่ไม่มี parameters
+- ตรวจสอบทั้ง `function`, arrow function (`const f = () => {}`), และ `async`
+- ลอง parse signature ด้วยมือก่อนเขียน code — คุณจะเห็น edge cases

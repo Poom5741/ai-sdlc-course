@@ -5,22 +5,128 @@ description: "Identify microservice boundaries in a monolith"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Monolith Splitter
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to analyze a monolithic codebase and identify natural microservice boundaries",
+  "Why modules with shared dependencies should be grouped together, not split apart",
+  "How to determine domain-driven service groupings from dependency graphs",
+  "Why splitting by domain (business capability) is better than splitting by layer"
+]} />
 
-Identify microservice boundaries in a monolith
+## 📖 Concept: Monolith to Microservices
 
----
+Monolith splitting คือการแบ่ง application ขนาดใหญ่ออกเป็น services เล็กๆ — เหมือนการแบ่งโรงยิมขนาดใหญ่ออกเป็นหลายห้อง训练 แต่ **การ split ต้องทำอย่างถูกที่** — ถ้า split ผิดจุด คุณจะสร้าง distributed monolith ที่แย่กว่าเดิม
 
-## วิธีทำ
+หลักการสำคัญ: **SPLIT BY DOMAIN, NOT BY LAYER** — services ควร ownership business capability (เช่น users, orders, inventory) ไม่ใช่แค่ technical layer (เช่น "database layer", "API layer"). AI tools มักจะ split ทุก module เป็น service แยกกัน ซึ่งผิด — modules ที่ share dependencies ควรอยู่ด้วยกัน
+
+Think of it like separating a multi-discipline martial arts school into specialized dojos — you group by fighting style (boxing, grappling, striking), not by equipment type (gloves room, mat room).
+
+## ⚙️ How It Works
+
+### The Analysis Workflow
+
+1. **Parse modules** — extract name, dependencies, and routes
+2. **Group by shared dependencies** — modules with same dependencies = same service
+3. **Assign domain reasons** — each service needs a clear business justification
+4. **Verify coverage** — all modules must be accounted for
+
+### Dependency-Based Grouping
+
+```javascript
+const modules = [
+  { name: 'auth', dependencies: ['users-db'], routes: ['/login'] },
+  { name: 'users', dependencies: ['users-db'], routes: ['/users'] },
+  { name: 'orders', dependencies: ['orders-db', 'inventory-db'], routes: ['/orders'] },
+  { name: 'inventory', dependencies: ['inventory-db'], routes: ['/inventory'] },
+];
+
+// Analysis:
+// - auth + users both depend on users-db → same service
+// - orders depends on orders-db + inventory-db → separate service
+// - inventory depends on inventory-db → separate service
+
+// Result:
+[
+  { service: 'service-1', modules: ['auth', 'users'], reason: 'User domain — shares user database' },
+  { service: 'service-2', modules: ['orders'], reason: 'Order domain — shares order database' },
+  { service: 'service-3', modules: ['inventory'], reason: 'Inventory domain — shares inventory database' }
+]
+```
+
+### The Critical Rule: Don't Split Everything
+
+```javascript
+// ❌ Naive AI: every module becomes its own service
+[
+  { service: 'service-1', modules: ['auth'] },
+  { service: 'service-2', modules: ['users'] },      // WRONG! Shares users-db with auth
+  { service: 'service-3', modules: ['orders'] },
+  { service: 'service-4', modules: ['inventory'] }
+]
+
+// ✅ Correct: group by shared dependencies
+[
+  { service: 'service-1', modules: ['auth', 'users'] },  // CORRECT
+  { service: 'service-2', modules: ['orders'] },
+  { service: 'service-3', modules: ['inventory'] }
+]
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+const modules = [
+  { name: 'auth', dependencies: ['users-db'], routes: ['/login'] },
+  { name: 'users', dependencies: ['users-db'], routes: ['/users'] }
+];
+
+// Analysis:
+// - Both modules depend on users-db
+// - Same dependency → same service
+// - Domain reason: "User domain — shares user database"
+
+// Output:
+[
+  { service: 'service-1', modules: ['auth', 'users'], reason: 'User domain — shares user database' }
+]
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Splitting every module into its own service**
+> "ทุก module = 1 service"
+> → Modules ที่ share dependencies ต้องอยู่ด้วยกัน — มิฉะนั้นจะเกิด distributed monolith
+
+**Mistake 2: Not providing domain reasons**
+> "Split แล้วแต่ไม่บอกว่าทำไม"
+> → ทุก service ต้องมี reason ที่ชัดเจน — "User domain", "Order domain", ฯลฯ
+
+**Mistake 3: Missing modules in output**
+> "บาง module หายไป"
+> → ตรวจสอบว่า **ทุก module** ถูก account for ใน output
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle modules ว่าง"
+> → Empty modules → return empty array
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-101-monolith-splitter" />
+
+## 🏋️ Quest: Monolith Splitter
+
+Now it's time to practice! Identify microservice boundaries in a monolith.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-101-monolith-splitter
    cd quest-101-monolith-splitter
@@ -31,36 +137,19 @@ Identify microservice boundaries in a monolith
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — ตรวจสอบว่า modules ที่ share dependencies ถูก group เข้าด้วยกัน
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `analyzeMonolith(modules)` รับ array ของ modules และ return array ของ services
+- Modules ที่ share dependencies ต้องอยู่ใน service เดียวกัน
+- ทุก service ต้องมี `service`, `modules`, และ `reason` fields
+- ตรวจสอบว่าทุก module ถูก account for
 - ถ้าติดขัด ดู `_solution/solution.js`

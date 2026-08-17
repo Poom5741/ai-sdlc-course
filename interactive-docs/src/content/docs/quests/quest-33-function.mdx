@@ -1,26 +1,176 @@
 ---
 title: "Quest 33 - Function Calling Implementer"
-description: "Implement function calling"
+description: "Implement function calling for LLM tool use"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 33: Function Calling Implementer
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Implement function calling
+<LearningObjectives items={[
+  "เข้าใจ concept ของ function calling ใน LLM tool use",
+  "สร้าง function schema ที่มี name, description, parameters ครบถ้วน",
+  "เขียน validate function ที่ตรวจสอบ arguments ได้ถูกต้อง",
+  "เรียนรู้ว่า structured outputs ทำให้ LLM return ข้อมูลที่เชื่อถือได้"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Function Calling ใน LLM
+
+Function calling คือความสามารถที่ให้ LLM เรียกใช้ functions ที่เรากำหนดไว้ได้ แทนที่จะ return แค่ free-form text — LLM จะ return structured data ที่เราใช้ต่อได้ทันที
+
+ลองนึกภาพว่าคุณกำลังสร้าง chatbot ที่ต้อง check ราคาสินค้า แทนที่ LLM จะตอบแบบ "ราคาน่าจะประมาณ 200 บาท" — function calling ทำให้มัน return ข้อมูลแบบ `{ action: "checkPrice", params: { productId: "ABC" } }` ซึ่งเราเอาไปเรียก API จริงได้เลย
+
+นี่คือหัวใจของ **structured outputs** — การที่ LLM ไม่ได้แค่ "เดา" แต่ return ข้อมูลในรูปแบบที่ program ของเรา validate และใช้งานได้จริง
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ Function Schema
+
+ทุก function ที่ LLM จะเรียกใช้ต้องมี schema ที่บอกว่า:
+
+```javascript
+{
+  name: "getWeather",        // ชื่อ function
+  description: "...",        // อธิบายว่า function ทำอะไร
+  parameters: {              // ข้อมูลที่ต้องการ
+    type: "object",
+    properties: {
+      city: { type: "string", description: "City name" },
+      units: { type: "string", enum: ["celsius", "fahrenheit"] }
+    },
+    required: ["city"]
+  }
+}
+```
+
+### Flow ของ Function Calling
+
+```
+1. LLM ได้รับ user request
+         ↓
+2. LLM ตัดสินใจว่าต้องเรียก function ไหน
+         ↓
+3. LLM return structured output ตาม schema
+         ↓
+4. Code ของเรา validate arguments
+         ↓
+5. เรียก function จริง แล้ว return result ให้ LLM
+```
+
+### การ Validate Arguments
+
+ส่วนสำคัญคือ `validate(args)` — เราต้องตรวจสอบว่า LLM ส่ง arguments มาครบและถูก type:
+
+```javascript
+function validate(args) {
+  // ตรวจสอบ required fields
+  if (!args.city || typeof args.city !== 'string') return false;
+  // ตรวจสอบ enum values
+  if (args.units && !['celsius', 'fahrenheit'].includes(args.units)) return false;
+  return true;
+}
+```
+
+---
+
+## 💡 Example: สร้าง Function Schema
+
+```javascript
+function defineFunction(name, description, parameters) {
+  return {
+    name,
+    description,
+    parameters,
+    validate(args) {
+      if (typeof args !== 'object' || args === null) return false;
+      
+      // ตรวจสอบ required parameters
+      const required = parameters.required || [];
+      for (const field of required) {
+        if (!(field in args)) return false;
+      }
+      
+      // ตรวจสอบ types
+      for (const [key, schema] of Object.entries(parameters.properties || {})) {
+        if (key in args) {
+          if (schema.type === 'string' && typeof args[key] !== 'string') return false;
+          if (schema.type === 'number' && typeof args[key] !== 'number') return false;
+          if (schema.enum && !schema.enum.includes(args[key])) return false;
+        }
+      }
+      
+      return true;
+    }
+  };
+}
+
+// ตัวอย่างการใช้งาน
+const getWeather = defineFunction(
+  'getWeather',
+  'Get current weather for a city',
+  {
+    type: 'object',
+    properties: {
+      city: { type: 'string', description: 'City name' },
+      units: { type: 'string', enum: ['celsius', 'fahrenheit'] }
+    },
+    required: ['city']
+  }
+);
+
+getWeather.validate({ city: 'Bangkok' });          // true ✅
+getWeather.validate({ city: 'Bangkok', units: 'celsius' }); // true ✅
+getWeather.validate({ units: 'celsius' });          // false ❌ (city missing)
+getWeather.validate({ city: 123 });                 // false ❌ (wrong type)
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate required fields**
+> "ส่ง parameters ไปแล้ว LLM น่าจะส่งมาครบ"
+> → LLM บางครั้งจะ omit required fields หรือส่ง null — ต้อง validate เสมอ
+
+**Mistake 2: ไม่ตรวจสอบ enum values**
+> "ถ้า LLM ส่ง string มา ก็ปล่อยผ่าน"
+> → LLM อาจส่งค่าที่ไม่อยู่ใน enum — เช่น ส่ง "farenheit" แทน "fahrenheit"
+
+**Mistake 3: ลืม return validate function**
+> "schema ดูดีแล้ว ไม่ต้องมี validate ก็ได้"
+> → Validate คือ safety net — ถ้าไม่มี invalid arguments จะเข้า system จริงและทำให้เกิด bugs
+
+**Mistake 4: ทำ schema กำกวมเกินไป**
+> "description ยาวๆ ดีกว่าสั้นๆ"
+> → LLM เข้าใจ description ที่กระชับและชัดเจนได้ดีกว่า — ระบุ parameter types และ constraints ให้ครบ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-33-function" />
+
+---
+
+## 🏋️ Quest: Function Calling Implementer
+
+พร้อมแล้วลุยเลย! Implement function calling สำหรับ LLM tool use
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-33-function-calling
    cd quest-33-function-calling
@@ -28,39 +178,28 @@ Implement function calling
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `defineFunction(name, description, parameters)` ที่ return `{ name, description, parameters, validate(args) }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** อ่าน Learning Objectives ข้างบนอีกครั้ง — นี่คือ skill ที่ใช้ได้จริงในการสร้าง AI agents
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ดูตัวอย่าง function schema ใน section "How It Works"
+- อย่าลืม validate `required` fields และ `type` checking
+- ถ้าติดขัด ลอง test กับ inputs หลายแบบ — ทั้ง valid และ invalid

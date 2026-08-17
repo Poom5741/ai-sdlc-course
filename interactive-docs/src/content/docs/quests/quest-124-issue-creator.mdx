@@ -1,66 +1,186 @@
 ---
-title: "Issue Creator"
+title: "Quest 124 - Issue Creator"
 description: "GitHub issue JSON with templates"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Issue Creator
+# Quest 124: Issue Creator
 
 <Badge text="easy" variant="success" /> <Badge text="15 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-GitHub issue JSON with templates
+<LearningObjectives items={[
+  "The structure of a GitHub issue: title, body, labels, assignees",
+  "How to create issue templates with structured sections",
+  "Why labels for type and priority help with project organization",
+  "How AI can generate issue JSON from natural language descriptions"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: GitHub Issues & Templates
+
+GitHub Issues เป็นเครื่องมือจัดการงานพื้นฐาน — ทุก bug, feature request, และ task ควรอยู่ใน issue เพื่อให้ทีม track ได้ แต่ถ้าทุกคนเขียน issue ไม่เหมือนกัน มันจะกลายเป็นข้อมูลที่ใช้ไม่ได้
+
+Issue templates แก้ปัญหานี้โดยให้โครงสร้างมาตรฐาน: Description, Reproduction Steps, Expected Behavior, Actual Behavior
+
+Think of issue templates like a dojo intake form — every new student fills out the same form so the instructor knows their level, goals, and any injuries. Consistent format = actionable information.
+
+---
+
+## ⚙️ How It Works
+
+### GitHub Issue JSON Structure
+
+```javascript
+{
+  title: "Login button not responding on mobile",
+  body: "## Description\n\nThe login button doesn't respond...\n\n## Reproduction Steps\n\n1. Open mobile browser...",
+  labels: ["bug", "P0"],
+  assignees: [],
+  state: "open"
+}
+```
+
+### Label Mapping
+
+| Issue Type | Label |
+| --- | --- |
+| bug | `bug` |
+| feature | `enhancement` |
+| task | `chore` |
+
+| Priority | Label |
+| --- | --- |
+| high | `P0` |
+| medium | `P1` |
+| low | `P2` |
+
+---
+
+## 💡 Example: Creating an Issue
+
+```javascript
+const TYPE_LABELS = { bug: 'bug', feature: 'enhancement', task: 'chore' };
+const PRIORITY_LABELS = { high: 'P0', medium: 'P1', low: 'P2' };
+
+function createIssue(title, description, type, priority) {
+  const labels = [];
+  if (TYPE_LABELS[type]) labels.push(TYPE_LABELS[type]);
+  if (PRIORITY_LABELS[priority]) labels.push(PRIORITY_LABELS[priority]);
+
+  const body = `## Description
+
+${description}
+
+## Reproduction Steps
+
+1. (Describe the steps to reproduce)
+2. (Include environment details)
+3. (Include any error messages)
+
+## Expected Behavior
+
+(What should happen instead)
+
+## Actual Behavior
+
+(What actually happens)
+`;
+
+  return {
+    title,
+    body,
+    labels,
+    assignees: [],
+    state: 'open',
+  };
+}
+
+// Usage:
+createIssue(
+  "Login fails on mobile",
+  "The login button does not respond on iOS Safari",
+  "bug",
+  "high"
+);
+```
+
+**Key insight:** AI อาจสร้าง issue ที่ดูดีแต่ไม่มี structured sections — template ที่ดีต้องมีทุก section ที่จำเป็นสำหรับ debugging
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ map type/priority เป็น labels**
+> AI สร้าง issue โดยไม่ translate type เป็น GitHub label
+> → Issue ไม่มี label = จัดการยาก
+
+**Mistake 2: Body ไม่มี structured sections**
+> AI เขียน body เป็น paragraph เดียว
+> → ไม่มี reproduction steps = developer แก้ไขยาก
+
+**Mistake 3: ใช้ type ที่ไม่ valid**
+> AI ใช้ "error" แทน "bug" หรือ "improvement" แทน "feature"
+> → ไม่ match label mapping
+
+**Mistake 4: ลืม set state เป็น 'open'**
+> AI ไม่ set state field
+> → Default อาจไม่ใช่ 'open'
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-124-issue-creator" />
+
+---
+
+## 🏋️ Quest: Issue Creator
+
+Now it's time to practice! Create well-structured GitHub issues.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-124-issue-creator
    cd quest-124-issue-creator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createIssue(title, description, type, priority)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge cases เกี่ยวกับ labels และ body structure
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกว่าคุณเป็น developer ที่ได้รับ issue นี้ — คุณจะมีข้อมูลพอที่จะ debug ไหม?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า labels ถูก map อย่างถูกต้อง (type → label, priority → label)
+- Body ต้องมี structured sections: Description, Reproduction Steps, Expected/Actual Behavior
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-3-security",
+  "questions": [
+    {
+      "question": "When comparing AI tools, what is the most important rule?",
+      "choices": [
+        "Use the most expensive tool",
+        "Run the exact same prompt in both tools",
+        "Always trust the first output",
+        "Compare tools based on marketing claims"
+      ],
+      "answer": 1,
+      "explanation": "A fair comparison requires running the identical prompt across tools. Different prompts produce different outputs, making comparison meaningless."
+    },
+    {
+      "question": "Your comparison.md document should include which sections?",
+      "choices": [
+        "Only the final recommendation",
+        "Tool, Output, Better, Why",
+        "Just a list of tools used",
+        "Code snippets from each tool"
+      ],
+      "answer": 1,
+      "explanation": "The quest requires four sections: Tool (which tools you used), Output (what each produced), Better (which was better), and Why (your reasoning)."
+    },
+    {
+      "question": "What does 'CALIBRATE YOUR TOOLS' mean?",
+      "choices": [
+        "Always use the cheapest tool available",
+        "Know which tool is better for which job and why",
+        "Use only one tool for everything",
+        "Avoid using AI tools altogether"
+      ],
+      "answer": 1,
+      "explanation": "Different AI tools have different strengths. Calibrating your tools means understanding each tool's capabilities so you can choose the right one for each task."
+    }
+  ]
+}

@@ -5,22 +5,135 @@ description: "Generate changelog from git commit messages"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Changelog Generator
+# Quest 91: Changelog Generator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate changelog from git commit messages
+<LearningObjectives items={[
+  "How to generate categorized changelogs from conventional commit messages",
+  "Why Automate Release Notes produces more accurate and consistent changelogs",
+  "How to parse conventional commit prefixes (feat, fix, docs, refactor, chore)",
+  "The critical edge case of breaking changes (feat!) needing their own section"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Automate Release Notes
+
+Every release needs a changelog, but manually writing release notes is tedious and error-prone. Developers forget what they changed, mis-categorize commits, and miss breaking changes. **Changelog Generator** automates this by parsing conventional commit messages and categorizing them into structured sections.
+
+Conventional Commits is a specification for commit messages: `type(scope): description`. Common types include `feat` (new features), `fix` (bug fixes), `docs` (documentation), `refactor` (code restructuring), and `chore` (maintenance).
+
+The most critical detail: **breaking changes** (commits with `!` like `feat!: remove deprecated API`) must be in their own section. These are changes that can break existing code, and users need to know about them first.
+
+---
+
+## ⚙️ How It Works
+
+### Changelog Generation Pipeline
+
+```
+1. Parse commit messages (hash, message, date)
+         ↓
+2. Extract conventional commit type (feat, fix, docs, etc.)
+         ↓
+3. Detect breaking changes (type followed by !)
+         ↓
+4. Categorize commits into sections
+         ↓
+5. Generate markdown with categorized entries
+```
+
+### Commit Categories
+
+| Prefix | Section | Description |
+| --- | --- | --- |
+| `feat!:` | ⚠ Breaking Changes | Breaking new features |
+| `feat:` | Features | New functionality |
+| `fix:` | Bug Fixes | Bug corrections |
+| `docs:` | Documentation | Doc changes |
+| `refactor:` | Refactors | Code restructuring |
+| `chore:` | Chores | Maintenance tasks |
+| Other | Other Changes | Uncategorized |
+
+---
+
+## 💡 Example: Generating a Changelog
+
+Given these commits:
+
+```javascript
+const commits = [
+  { hash: "a1b2c3d", message: "feat!: remove deprecated API endpoints", date: "2024-01-15" },
+  { hash: "e4f5g6h", message: "feat: add user profile page", date: "2024-01-14" },
+  { hash: "i7j8k9l", message: "fix: resolve login timeout issue", date: "2024-01-13" },
+  { hash: "m0n1o2p", message: "docs: update API reference", date: "2024-01-12" },
+  { hash: "q3r4s5t", message: "chore: upgrade dependencies", date: "2024-01-11" }
+];
+```
+
+The generator should produce:
+
+```markdown
+# Changelog
+
+## ⚠ Breaking Changes
+- remove deprecated API endpoints (a1b2c3d) 2024-01-15
+
+## Features
+- add user profile page (e4f5g6h) 2024-01-14
+
+## Bug Fixes
+- resolve login timeout issue (i7j8k9l) 2024-01-13
+
+## Documentation
+- update API reference (m0n1o2p) 2024-01-12
+
+## Chores
+- upgrade dependencies (q3r4s5t) 2024-01-11
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Mixing breaking changes with regular features**
+> "feat! is just a feat, so I'll put it with features"
+> → Breaking changes (`feat!:`) MUST be in their own section. They represent backward-incompatible changes that can break existing code. Mixing them hides critical information.
+
+**Mistake 2: Not stripping the type prefix from the message**
+> "The entry shows 'feat: add user profile' instead of just 'add user profile'"
+> → Once you've categorized the commit, remove the prefix from the display message. The section heading already tells the reader the type.
+
+**Mistake 3: Ignoring commits without conventional format**
+> "random message" — what do I do with this?
+> → Put non-conventional commits in "Other Changes". Don't crash or skip them silently.
+
+**Mistake 4: Empty sections cluttering the output**
+> "There are no documentation changes, but I'll still show the section"
+> → Only include sections that have entries. An empty "Documentation" section is noise.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-91-changelog-generator" />
+
+---
+
+## 🏋️ Quest: Changelog Generator
+
+Now it's time to practice! Build a changelog generator from conventional commits.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-91-changelog-generator
    cd quest-91-changelog-generator
@@ -28,39 +141,32 @@ Generate changelog from git commit messages
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `generateChangelog(commits)` function that:
+   - Parses conventional commit prefixes (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
+   - Separates breaking changes (`feat!:`) into their own section
+   - Generates categorized markdown output
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Check for the `!` before the `:` to detect breaking changes. The pattern is `type!: message`.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ `feat!:` (breaking change) ก่อน `feat:` (regular feature)
+- อย่าลืม strip type prefix ออกจาก commit message ตอนแสดงผล
+- commits ที่ไม่มี conventional format ให้ใส่ใน "Other Changes"
+- อย่าแสดง sections ที่ว่างเปล่า — มี entries ถึงจะแสดง

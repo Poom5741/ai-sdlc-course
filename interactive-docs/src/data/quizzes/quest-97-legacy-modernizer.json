@@ -1,0 +1,38 @@
+{
+  "questId": "quest-97-legacy-modernizer",
+  "questions": [
+    {
+      "question": "When converting `.then()` chains to async/await, what keyword must be added to the function?",
+      "choices": [
+        "yield",
+        "await",
+        "async",
+        "promise"
+      ],
+      "answer": 2,
+      "explanation": "Function ที่ใช้ `await` ต้องมี `async` keyword — เป็น requirement ของ JavaScript syntax. ถ้าลืมใส่ async จะเกิด SyntaxError"
+    },
+    {
+      "question": "Should synchronous code like `function add(a, b) { return a + b; }` be wrapped in try/catch during modernization?",
+      "choices": [
+        "Yes — all functions should have try/catch",
+        "No — only async operations need try/catch",
+        "Yes — for safety",
+        "Only if the function is exported"
+      ],
+      "answer": 1,
+      "explanation": "Synchronous code (ไม่มี await, callback, .then()) ไม่ต้อง wrap ใน try/catch — มันไม่มี async error ที่ต้องจัดการ. Wrapping sync code ใน try/catch เป็น anti-pattern"
+    },
+    {
+      "question": "What does the modernize function convert callback-based error handling to?",
+      "choices": [
+        "Promise rejection",
+        "Error event emission",
+        "try/catch blocks",
+        "Error callbacks"
+      ],
+      "answer": 2,
+      "explanation": "Callback error handling (if (err) throw err) กลายเป็น try/catch blocks — อ่านง่ายกว่าและเป็น modern JavaScript pattern"
+    }
+  ]
+}

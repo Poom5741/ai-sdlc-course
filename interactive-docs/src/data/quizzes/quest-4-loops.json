@@ -1,0 +1,38 @@
+{
+  "questId": "quest-4-loops",
+  "questions": [
+    {
+      "question": "Why is `text.split(' ')` not accurate for token counting?",
+      "choices": [
+        "It's too slow for large texts",
+        "It doesn't separate punctuation from words",
+        "It counts uppercase letters differently",
+        "It can't handle empty strings"
+      ],
+      "answer": 1,
+      "explanation": "Splitting by space treats 'Hello, world!' as 2 tokens, but it should be 4 tokens (Hello, comma, world, exclamation). Punctuation must be separated from words."
+    },
+    {
+      "question": "How should consecutive punctuation like '!!!' be tokenized?",
+      "choices": [
+        "Three separate tokens: !, !, !",
+        "One grouped token: !!!",
+        "Zero tokens (ignore punctuation)",
+        "Two tokens: ! and !!"
+      ],
+      "answer": 1,
+      "explanation": "Consecutive punctuation should be grouped into a single token. This matches how most real tokenizers handle repeated punctuation marks."
+    },
+    {
+      "question": "What is the token count for an empty string?",
+      "choices": [
+        "1 (the empty string itself)",
+        "-1 (invalid input)",
+        "0",
+        "undefined"
+      ],
+      "answer": 2,
+      "explanation": "An empty string contains zero tokens. The function must explicitly handle this edge case and return 0."
+    }
+  ]
+}

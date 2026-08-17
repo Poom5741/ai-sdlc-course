@@ -1,66 +1,198 @@
 ---
-title: "Multimodal Input Processor"
-description: "Process combined text and image inputs"
+title: "Quest 108 - Multimodal Input Processor"
+description: "Process combined text and image inputs into a unified format"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Multimodal Input Processor
+# Quest 108: Multimodal Input Processor
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Process combined text and image inputs
+<LearningObjectives items={[
+  "How to process combined text and image inputs into a unified format",
+  "Why images have a fixed high token cost regardless of content length",
+  "How to estimate token usage across different modalities",
+  "The importance of token limits when building multimodal prompts"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Handling Multiple Modalities
+
+Modern AI doesn't just process text — it handles images, audio, and video together in a single request. This is called **multimodal processing**. When you send a request to GPT-4V or Claude with both text and images, the system must handle each input type differently while producing a unified output.
+
+The key insight is that **different modalities have different token costs**. Text tokens scale with content length (~4 characters per token), but images have a fixed cost (typically 1000 tokens per image in simplified models). This means two images cost the same whether they're simple icons or complex photographs.
+
+A **multimodal input processor** separates text and image inputs, estimates token usage, and generates a combined prompt with `[IMAGE]` placeholders where images should appear.
+
+---
+
+## ⚙️ How It Works
+
+### The Multimodal Processing Pipeline
+
+```
+1. Receive mixed input array
+         ↓
+2. Separate text parts from image parts
+         ↓
+3. Count tokens:
+   - Text: ceil(content.length / 4)
+   - Images: 1000 tokens each (fixed)
+         ↓
+4. Build combined prompt with [IMAGE] placeholders
+         ↓
+5. Check against token limit (default: 4000)
+         ↓
+6. Return unified output structure
+```
+
+### Why Images Have Fixed Token Cost
+
+Text tokens depend on content:
+
+```
+"Hello"      → 1-2 tokens
+"Hello world" → 2-3 tokens
+"A 500-word essay..." → ~125 tokens
+```
+
+Image tokens are fixed because the model processes images through a vision encoder that produces a standard number of tokens, regardless of image complexity. This is why you must budget carefully when mixing text and images.
+
+---
+
+## 💡 Example: Processing Multimodal Inputs
+
+Here's how to implement a multimodal processor:
+
+**Step 1: Separate text and images**
+
+```javascript
+const textParts = [];
+const imageRefs = [];
+const combinedParts = [];
+
+for (const input of inputs) {
+  if (input.type === 'text') {
+    textParts.push(input.content);
+    combinedParts.push(input.content);
+  } else if (input.type === 'image') {
+    imageRefs.push({ content: input.content, metadata: input.metadata || {} });
+    combinedParts.push('[IMAGE]');
+  }
+}
+```
+
+**Step 2: Estimate token count**
+
+```javascript
+const IMAGE_TOKEN_COST = 1000;
+const CHARS_PER_TOKEN = 4;
+const MAX_TOKENS = 4000;
+
+let tokens = 0;
+for (const input of inputs) {
+  if (input.type === 'text') {
+    tokens += Math.ceil(input.content.length / CHARS_PER_TOKEN);
+  } else if (input.type === 'image') {
+    tokens += IMAGE_TOKEN_COST;
+  }
+}
+```
+
+**Step 3: Build the unified output**
+
+```javascript
+return {
+  textParts,
+  imageRefs,
+  combined: combinedParts.join(' '),
+  tokens: Math.min(tokens, MAX_TOKENS),
+};
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Counting image tokens based on content length**
+> "This image description is 20 tokens, so the image is 20 tokens"
+> → Images have a fixed token cost (1000 tokens each), regardless of their content or description length.
+
+**Mistake 2: Ignoring the token limit**
+> "Just send everything, the API will handle it"
+> → Token limits exist for a reason. Exceeding them causes truncation or errors. Always check and warn.
+
+**Mistake 3: Not generating [IMAGE] placeholders**
+> "I separated text and images, that's enough"
+> → The combined prompt needs `[IMAGE]` markers so the model knows where to expect visual input.
+
+**Mistake 4: Returning empty arrays for no input**
+> "If there's no input, just return nothing"
+> → Always return the full structure with empty arrays and 0 tokens. Callers expect a consistent shape.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-108-multimodal-processor" />
+
+---
+
+## 🏋️ Quest: Multimodal Input Processor
+
+Now it's time to practice! Build a processor that handles mixed text and image inputs.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-108-multimodal-processor
    cd quest-108-multimodal-processor
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `processMultimodal(inputs)` that:
+   - Separates text and image inputs into their respective arrays
+   - Estimates token count (text: ~4 chars/token, images: 1000 tokens each)
+   - Generates combined prompt with `[IMAGE]` placeholders
+   - Respects the default 4000 token limit
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` and read the failures carefully
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The most common mistake is treating images like text for token counting. Images always cost 1000 tokens each, regardless of content.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Images ราคา 1000 tokens ต่อภาพเสมอ — ไม่เกี่ยวกับ content length
+- Text ราคา ~4 ตัวอักษรต่อ token
+- สร้าง combined prompt ด้วย `[IMAGE]` placeholders
+- ตรวจสอบ token limit (default 4000)
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

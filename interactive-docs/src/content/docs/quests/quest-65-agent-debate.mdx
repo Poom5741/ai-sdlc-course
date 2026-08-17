@@ -1,66 +1,183 @@
 ---
 title: "Quest 65 - Multi-Agent Debate System"
-description: "Agents debate and reach consensus"
+description: "สร้างระบบ debate ที่ agents ถกเถียงกันจนถึง consensus"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 65: Multi-Agent Debate System
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Agents debate and reach consensus
+<LearningObjectives items={[
+  "ออกแบบ multi-agent debate ที่ agents ถกเถียงกันรอบละรอบ",
+  "เข้าใจ adversarial agents — ความขัดแย้งทำให้คุณภาพดีขึ้น",
+  "ติดตาม argument influence — ใครโน้มน้าวใคร",
+  "สร้าง consensus detection และ winner selection"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Adversarial Agent Debate
+
+Adversarial Debate คือ technique ที่ให้ **multiple agents ถกเถียงกัน** เพื่อค้นหาจุดอ่อนใน argument ของแต่ละฝ่าย — เหมือนการอภิปรายในชั้นศาล
+
+ทำไมถึงมีประสิทธิภาพ? เพราะ **agent ตัวเดียวมักจะ missed biases และ logical gaps** ของตัวเอง แต่เมื่อมี adversarial agent อีกตัวมา challenge argument เหล่านั้น จุดอ่อนจะถูกเปิดเผย
+
+```javascript
+// ตัวอย่าง debate
+const agents = [
+  { name: 'Alice', stance: 'pro-AI', argue: (history) => 'AI will automate...' },
+  { name: 'Bob', stance: 'anti-AI', argue: (history) => 'AI creates unemployment...' },
+];
+
+const result = debate(agents, 'Should we adopt AI?', 3);
+// { rounds: [...], consensus: false, winner: 'Alice' }
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Multi-Agent Debate
+
+```
+1. แต่ละ agent เขียน argument สำหรับ round แรก (เห็น topic เท่านั้น)
+         ↓
+2. Round ถัดไป: แต่ละ agent เห็น history ทั้งหมด (argument ก่อนหน้า)
+         ↓
+3. Agent สามารถ counter หรือ concede ต่อ argument ก่อนหน้า
+         ↓
+4. ตรวจสอบ consensus: ทุก agents เห็นตรงกัน? หรือครบ maxRounds?
+         ↓
+5. ตัดสิน winner: agent ที่มี "votes" มากที่สุด (agents อื่น concede)
+```
+
+### ทำไมต้องติดตาม Argument Influence?
+
+ถ้า debate เก็บแค่ arguments โดยไม่ track ว่าใครโน้มน้าวใคร我们就จะไม่รู้ว่า **argument ไหนมี impact จริง**:
+
+```javascript
+// ❌ แค่เก็บ arguments — ไม่รู้ impact
+const rounds = [
+  { agent: 'Alice', argument: 'AI improves efficiency' },
+  { agent: 'Bob', argument: 'AI creates unemployment' },
+];
+
+// ✅ Track concessions — รู้ว่าใครโน้มน้าวใคร
+const rounds = [
+  { agent: 'Alice', argument: 'AI improves efficiency' },
+  { agent: 'Bob', argument: 'AI creates unemployment', conceded: ['Alice'] },
+  // Bob โน้มน้าว Alice ให้ concede
+];
+```
+
+---
+
+## 💡 Example: Debate แบบ step-by-step
+
+```javascript
+const agents = [
+  {
+    name: 'Optimist',
+    stance: 'positive',
+    argue: (history) => {
+      if (history.length === 0) return 'Technology always improves lives';
+      return 'Despite challenges, the benefits outweigh costs';
+    }
+  },
+  {
+    name: 'Skeptic',
+    stance: 'negative',
+    argue: (history) => {
+      if (history.length === 0) return 'Technology creates dependency';
+      if (history.some(h => h.agent === 'Optimist')) {
+        return 'I concede the benefits exist, but risks remain';
+      }
+      return 'History shows technology disrupts more than it helps';
+    }
+  }
+];
+
+const result = debate(agents, 'Is technology beneficial?', 3);
+// Optimist might win if Skeptic concedes
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ส่ง history ให้ agents**
+> "Each agent argues independently"
+> → Debate ต้องให้ agents เห็น arguments ก่อนหน้า — ไม่เช่นนั้นไม่ใช่ debate
+
+**Mistake 2: ไม่ track concessions**
+> "Just collect all arguments"
+> → ต้องรู้ว่า agent ไหน concede ต่อ argument ไหน — นี่คือ scoring mechanism
+
+**Mistake 3: Winner เกินจำนวน agents**
+> "The winner is the agent with the best argument"
+> → Winner ต้องมาจาก agents ที่มีอยู่จริง — ไม่ใช่คิดขึ้นมา
+
+**Mistake 4: ไม่มี maxRounds guard**
+> "Debate จนกว่าจะมี consensus"
+> → เหมือน Agent Loop — ต้องมี maxRounds เพื่อป้องกัน infinite debate
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-65-agent-debate" />
+
+---
+
+## 🏋️ Quest: Multi-Agent Debate System
+
+สร้างระบบ debate ที่ agents ถกเถียงกันรอบละรอบ จนถึง consensus หรือครบจำนวนรอบ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-65-agent-debate
    cd quest-65-agent-debate
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `debate(agents, topic, maxRounds)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: agents ทุกตัว concede, ไม่มี consensus
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง scenario ที่ Alice convince Bob ให้เปลี่ยนstance — ใครควรเป็น winner?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Agents ต้องเห็น full history ทุกรอบ (argument ก่อนหน้าของทุกคน)
+- ต้อง track "votes" — แต่ละ agent ที่ concede ให้ใคร = 1 vote
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

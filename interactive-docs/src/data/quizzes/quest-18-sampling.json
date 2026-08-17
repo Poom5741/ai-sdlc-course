@@ -1,0 +1,38 @@
+{
+  "questId": "quest-18-sampling",
+  "questions": [
+    {
+      "question": "What effect does increasing the temperature parameter have on text generation?",
+      "choices": [
+        "It makes the output more deterministic and repetitive",
+        "It flattens the probability distribution, making lower-probability tokens more likely and increasing output diversity",
+        "It increases the number of tokens generated",
+        "It makes the model only choose the highest-probability token"
+      ],
+      "answer": 1,
+      "explanation": "Temperature scales the logits before softmax. Higher temperature (e.g., 1.5+) flattens the distribution, making rare tokens more likely. Lower temperature (e.g., 0.2) sharpens it toward the top token, making output more focused."
+    },
+    {
+      "question": "How does top-k sampling differ from top-p (nucleus) sampling?",
+      "choices": [
+        "Top-k selects the k most probable tokens; top-p selects the smallest set of tokens whose cumulative probability exceeds p",
+        "Top-k and top-p are identical algorithms with different names",
+        "Top-k filters by token length; top-p filters by probability",
+        "Top-p only works with temperature = 0"
+      ],
+      "answer": 0,
+      "explanation": "Top-k always considers exactly k tokens regardless of probability spread. Top-p is adaptive — it includes as many tokens as needed to reach probability mass p, so the candidate set size varies depending on how confident the model is."
+    },
+    {
+      "question": "When would you use temperature = 0 (greedy decoding) in production?",
+      "choices": [
+        "When you want the most creative and diverse outputs",
+        "When you need deterministic, reproducible outputs for tasks like code generation, classification, or factual Q&A",
+        "When training the model for the first time",
+        "When you want to explore the full vocabulary distribution"
+      ],
+      "answer": 1,
+      "explanation": "Temperature 0 always picks the highest-probability token, making output fully deterministic. This is ideal for production tasks requiring consistency and reproducibility, like extracting structured data or generating code."
+    }
+  ]
+}

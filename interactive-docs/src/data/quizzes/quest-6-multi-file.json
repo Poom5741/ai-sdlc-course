@@ -1,0 +1,38 @@
+{
+  "questId": "quest-6-multi-file",
+  "questions": [
+    {
+      "question": "What are the two types of hallucination findings?",
+      "choices": [
+        "True and False",
+        "contradicts and unsupported",
+        "major and minor",
+        "factual and emotional"
+      ],
+      "answer": 1,
+      "explanation": "A claim 'contradicts' a known fact when it directly opposes it, and is 'unsupported' when no fact in knownFacts relates to it."
+    },
+    {
+      "question": "Should opinions like 'I think AI is great' be flagged as hallucinations?",
+      "choices": [
+        "Yes, all statements should be checked",
+        "No, only factual assertions should be checked",
+        "Only if they contradict a known fact",
+        "It depends on the confidence level"
+      ],
+      "answer": 1,
+      "explanation": "The quest specifies to only check factual claims. Opinions, greetings, and subjective statements should be skipped — flagging them would produce false positives."
+    },
+    {
+      "question": "When a claim contradicts a known fact, what should the result include?",
+      "choices": [
+        "Just the claim and reason",
+        "The claim, reason, and the contradicting fact",
+        "Only the contradicting fact",
+        "A boolean true/false"
+      ],
+      "answer": 1,
+      "explanation": "The result should include the claim text, the reason ('contradicts'), and the actual known fact that contradicts it — providing evidence for the finding."
+    }
+  ]
+}

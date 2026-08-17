@@ -1,0 +1,38 @@
+{
+  "questId": "quest-37-intent",
+  "questions": [
+    {
+      "question": "Intent-spec test generation คืออะไร?",
+      "choices": [
+        "การเขียน tests จาก source code",
+        "การใช้ AI แปลง natural language requirements เป็น test cases",
+        "การรัน tests แบบอัตโนมัติ",
+        "การ generate code จาก tests"
+      ],
+      "answer": 1,
+      "explanation": "Intent-spec คือการบอก AI ว่า feature ควรทำอะไร แล้ว AI 生成 test specs ที่ครอบคลุมทั้ง happy path, edge cases, และ error cases"
+    },
+    {
+      "question": "Test specs ที่ดีควร cover อะไรบ้าง?",
+      "choices": [
+        "Happy path เท่านั้น",
+        "Happy path + edge cases + error cases",
+        "Error cases เท่านั้น",
+        "Implementation details"
+      ],
+      "answer": 1,
+      "explanation": "Production bugs มักเกิดจาก error paths — tests ควร cover ทั้ง success cases, edge cases, และ failure cases"
+    },
+    {
+      "question": "ทำไม tests ควรเขียนจาก intent แทนจาก code?",
+      "choices": [
+        "เขียนง่ายกว่า",
+        "Tests ควร verify behavior ไม่ใช่ implementation — code อาจเปลี่ยน แต่ intent ไม่เปลี่ยน",
+        "เร็วกว่า",
+        "ไม่ต้องอ่าน code"
+      ],
+      "answer": 1,
+      "explanation": "Tests ที่เขียนจาก intent จะ verify behavior — ถ้า code เปลี่ยน implementation แต่ behavior เดิม tests ยังผ่าน แสดงว่าถูกต้อง"
+    }
+  ]
+}

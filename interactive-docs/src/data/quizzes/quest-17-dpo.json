@@ -1,0 +1,38 @@
+{
+  "questId": "quest-17-dpo",
+  "questions": [
+    {
+      "question": "What does DPO (Direct Preference Optimization) optimize directly?",
+      "choices": [
+        "The model's inference speed",
+        "The language model's parameters using a loss function derived from human preference pairs (chosen vs. rejected responses)",
+        "The hardware configuration for training",
+        "The vocabulary size of the tokenizer"
+      ],
+      "answer": 1,
+      "explanation": "DPO reformulates the RLHF objective into a simple classification loss: it increases the probability of preferred (chosen) responses while decreasing the probability of rejected responses, using a reference model to prevent distribution drift."
+    },
+    {
+      "question": "What role does the reference model (π_ref) play in the DPO loss function?",
+      "choices": [
+        "It generates the training data for the preference pairs",
+        "It acts as an anchor to prevent the policy model from deviating too far from the base model during optimization",
+        "It computes the final evaluation metrics after training",
+        "It replaces the need for human annotators"
+      ],
+      "answer": 1,
+      "explanation": "The reference model is a frozen copy of the base model. The DPO loss includes a KL divergence penalty against this reference, preventing the model from collapsing to trivial solutions or drifting too far from the original distribution."
+    },
+    {
+      "question": "In DPO, what is a 'preference pair'?",
+      "choices": [
+        "Two different models compared on the same input",
+        "A pair of responses to the same prompt, labeled as chosen (preferred) and rejected (not preferred)",
+        "A pair of prompts with identical responses",
+        "A training epoch paired with a validation epoch"
+      ],
+      "answer": 1,
+      "explanation": "DPO training requires preference data: for each prompt, there's a chosen response (what a human preferred) and a rejected response (what was less preferred). The loss function learns to increase the gap between their probabilities."
+    }
+  ]
+}

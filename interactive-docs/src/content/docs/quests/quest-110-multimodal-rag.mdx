@@ -1,66 +1,178 @@
 ---
-title: "Multimodal RAG System"
-description: "RAG system that handles text, images, and tables"
+title: "Quest 110 - Multimodal RAG System"
+description: "Build a RAG system that retrieves relevant documents from text, images, and tables"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Multimodal RAG System
+# Quest 110: Multimodal RAG System
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-RAG system that handles text, images, and tables
+<LearningObjectives items={[
+  "How to build a RAG system that handles text, images, and tables in a unified interface",
+  "Why different data types need different scoring strategies",
+  "How to use metadata-based scoring for images and column-name matching for tables",
+  "The importance of visual query boosting for image retrieval"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Unified Retrieval Across Modalities
+
+**RAG (Retrieval-Augmented Generation)** systems find relevant documents from a corpus and use them to answer queries. Most RAG systems only handle text, but real-world knowledge bases contain **mixed content** — text documents, images with alt text and tags, and tables with column headers and data.
+
+The challenge is that each content type needs a different scoring strategy. You can't score an image the same way you score a text document. Text scoring uses keyword overlap, but images need metadata-based matching (alt text, tags), and tables need column-name matching.
+
+**Unified retrieval** means one function that handles all types, using type-specific scoring internally. Think of it like a martial artist who can fight in any style — the interface is consistent, but the technique adapts to the opponent.
+
+---
+
+## ⚙️ How It Works
+
+### The Multimodal RAG Pipeline
+
+```
+1. Receive query + mixed document corpus
+         ↓
+2. For each document, apply type-specific scoring:
+   - Text: keyword overlap with query
+   - Image: metadata match + visual query boost
+   - Table: column name matching
+         ↓
+3. Combine scores across all types
+         ↓
+4. Sort by score (highest first)
+         ↓
+5. Return ranked results with scores and reasons
+```
+
+### Type-Specific Scoring Strategies
+
+| Document Type | Scoring Method | Why |
+| --- | --- | --- |
+| Text | Keyword overlap with query words | Direct content matching |
+| Image | Metadata (alt text, tags) + visual boost | Images don't have text content; metadata is the proxy |
+| Table | Column name matching | Tables have structure; column names indicate what data they contain |
+
+The **visual query boost** is critical: when a user asks "show me a sunset photo," images should score higher because the query contains visual language ("show," "photo," "sunset").
+
+---
+
+## 💡 Example: Scoring Each Document Type
+
+Here's how to score each type with type-specific strategies:
+
+**Text scoring — keyword overlap**
+
+```javascript
+const textWords = doc.content.toLowerCase().split(/\s+/);
+const overlap = queryWords.filter(w => textWords.includes(w)).length;
+score = overlap / Math.max(queryWords.length, 1);
+reason = `Text keyword overlap: ${overlap}/${queryWords.length}`;
+```
+
+**Image scoring — metadata + visual boost**
+
+```javascript
+const metaText = [doc.metadata?.alt, ...(doc.metadata?.tags || [])].join(' ');
+const imgWords = metaText.toLowerCase().split(/\s+/);
+const overlap = queryWords.filter(w => imgWords.includes(w)).length;
+const visualBoost = /\b(show|see|look|image|photo)\b/i.test(query) ? 1.5 : 1;
+score = (overlap / Math.max(queryWords.length, 1)) * visualBoost;
+```
+
+**Table scoring — column name matching**
+
+```javascript
+const colText = (doc.metadata?.columns || []).join(' ').toLowerCase();
+const colWords = colText.split(/\s+/);
+const overlap = queryWords.filter(w => colWords.includes(w)).length;
+score = overlap / Math.max(queryWords.length, 1);
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Scoring all documents the same way**
+> "Just do keyword overlap for everything"
+> → Images don't have searchable text content. You need metadata-based scoring for images and column-name matching for tables.
+
+**Mistake 2: Ignoring visual queries**
+> "The query is 'show me a sunset' — treat it like any other query"
+> → Queries with visual language ("show," "see," "look," "photo") should boost image scores. This is how users expect retrieval to work.
+
+**Mistake 3: Not including a reason in results**
+> "Just return the score"
+> → Results without reasons are opaque. Users need to understand WHY a document was ranked highly.
+
+**Mistake 4: Not sorting results by score**
+> "Return them in the order they were checked"
+> → RAG results must be sorted by relevance score so the most relevant documents come first.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-110-multimodal-rag" />
+
+---
+
+## 🏋️ Quest: Multimodal RAG System
+
+Now it's time to practice! Build a RAG system that handles text, images, and tables.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-110-multimodal-rag
    cd quest-110-multimodal-rag
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `multimodalRAG(documents, query)` that:
+   - Scores text documents using keyword overlap
+   - Scores images using metadata (alt text, tags) with visual query boost
+   - Scores tables using column name matching
+   - Returns sorted results with `{ id, type, score, reason }`
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` and read the failures carefully
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** This is a hard quest. Start by implementing text scoring (simplest), then add image metadata scoring, then table column matching. Each type builds on the same pattern but with different data sources.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Text scoring: keyword overlap กับ query words
+- Image scoring: ใช้ metadata (alt text, tags) + visual query boost
+- Table scoring: ใช้ column name matching
+- Visual queries ("show me", "look at") ควร boost image scores
+- แต่ละ result ต้องมี id, type, score, reason
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

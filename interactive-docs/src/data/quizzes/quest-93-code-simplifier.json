@@ -1,0 +1,38 @@
+{
+  "questId": "quest-93-code-simplifier",
+  "questions": [
+    {
+      "question": "Which pattern can be simplified to a direct return?",
+      "choices": [
+        "if (x) { console.log('yes'); } else { console.log('no'); }",
+        "if (n > 0) { return true; } else { return false; }",
+        "if (x) { doSomething(); }",
+        "while (x > 0) { x--; }"
+      ],
+      "answer": 1,
+      "explanation": "if (condition) { return true; } else { return false; } สามารถเขียนใหม่เป็น return condition ได้เลย — เพราะผลลัพธ์เหมือนกันทุกประการ"
+    },
+    {
+      "question": "When should you NOT remove an else block during simplification?",
+      "choices": [
+        "When the if-block returns a value",
+        "When the else-block is empty",
+        "When the if-block has side effects but no return",
+        "When the condition is a simple boolean"
+      ],
+      "answer": 2,
+      "explanation": "ถ้า if-block มี side effects (function calls, assignments) แต่ไม่มี return, else block ยังจำเป็น — การลบจะเปลี่ยน behavior ของโค้ด"
+    },
+    {
+      "question": "What is cyclomatic complexity?",
+      "choices": [
+        "The number of lines in a function",
+        "The number of possible execution paths through code",
+        "The speed of code execution",
+        "The memory usage of a function"
+      ],
+      "answer": 1,
+      "explanation": "Cyclomatic complexity คือจำนวน path ที่เป็นไปได้ใน function — ยิ่งมี if/else ซ้อนกันเยอะ complexity ก็ยิ่งสูง ทำให้อ่านยากและมี bug ซ่อนอยู่"
+    }
+  ]
+}

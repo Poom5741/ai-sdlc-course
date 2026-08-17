@@ -1,0 +1,38 @@
+{
+  "questId": "quest-27-risk-identifier",
+  "questions": [
+    {
+      "question": "Risk Identification ที่ดีควรทำตอนไหน?",
+      "choices": [
+        "หลังจากเขียน code เสร็จแล้ว",
+        "ตอน production กำลังมีปัญหา",
+        "ก่อนเริ่มเขียน code — ยิ่งเร็ว ยิ่งแก้ถูก",
+        "ตอน code review เท่านั้น"
+      ],
+      "answer": 2,
+      "explanation": "ปัญหาที่พบตอน design แก้ได้ใน 5 นาที แต่ปัญหาที่พบตอน production แก้ได้ใน 5 วัน — ยิ่งเรารู้เร็ว ยิ่งแก้ถูก"
+    },
+    {
+      "question": "Risk แต่ละตัวควรมีองค์ประกอบอะไรบ้าง?",
+      "choices": [
+        "ชื่อ risk เท่านั้น",
+        "Risk (ปัญหา), Severity (ความรุนแรง), Mitigation (วิธีแก้)",
+        "Error code และ stack trace",
+        "Budget และ timeline"
+      ],
+      "answer": 1,
+      "explanation": "Risk แต่ละตัวต้องมี 3 อย่าง: risk (ปัญหาที่อาจเกิด), severity (low/medium/high), mitigation (วิธีป้องกันหรือแก้ไข)"
+    },
+    {
+      "question": "เพราะอะไร mitigation strategy จึงสำคัญ?",
+      "choices": [
+        "เพราะทำให้ risk list ดูยาวขึ้น",
+        "เพราะถ้าไม่มี mitigation ก็แค่ list ปัญหาโดยไม่มีทางแก้",
+        "เพราะ PM ต้องการรายงาน",
+        "เพราะเป็น formal requirement ที่ต้องทำ"
+      ],
+      "answer": 1,
+      "explanation": "Mitigation คือส่วนที่ทำให้ risk identification มีค่า — ถ้ารู้ว่ามี risk แต่ไม่มีวิธีแก้ ก็แค่ list ปัญหาโดยไม่มีประโยชน์จริง"
+    }
+  ]
+}

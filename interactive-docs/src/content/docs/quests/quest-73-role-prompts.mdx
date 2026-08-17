@@ -1,66 +1,239 @@
 ---
 title: "Quest 73 - Role Prompt Library"
-description: "System prompts for different roles"
+description: "สร้าง system prompts สำหรับแต่ละบทบาท"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 73: Role Prompt Library
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-System prompts for different roles
+<LearningObjectives items={[
+  "เข้าใจว่า role prompts กำหนดพฤติกรรมของ AI อย่างไร",
+  "เขียน system prompt ที่มี persona, constraints, และ output format ชัดเจน",
+  "รู้จักแยกบทบาทของ AI ออกจากกันอย่างชัดเจน",
+  "รู้ว่าทำไม generic prompt ถึงไม่เพียงพอสำหรับงานเฉพาะทาง"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Role Prompts
+
+**Role prompts** คือ system prompts ที่กำหนดตัวตน (persona) ของ AI ว่า "เป็นใคร" ทำหน้าที่อะไร มีข้อจำกัดอะไรบ้าง และต้องตอบออกมาในรูปแบบไหน
+
+ลองนึกภาพเหมือนการนัดหมายพนักงานใหม่ — ถ้าคุณบอกแค่ว่า "ช่วยทำงานหน่อย" AI จะทำได้ generic มาก แต่ถ้าบอกว่า "คุณเป็น security auditor ที่เชี่ยวชาญ OWASP Top 10 ตรวจสอบโค้ดแล้วจัดลำดับช่องโหว่ตาม severity" — คำตอบที่ได้จะต่างกันอย่างชัดเจน
+
+Role prompt ที่ดีมี 3 องค์ประกอบหลัก:
+
+1. **Persona** — ใคร ทำอะไร เชี่ยวชาญอะไร
+2. **Constraints** — ห้ามทำอะไร ไม่ควรทำอะไร
+3. **Output format** — ตอบออกมาในรูปแบบไหน
+
+---
+
+## ⚙️ How It Works
+
+### ทำไม Role ถึงสำคัญ
+
+```
+Generic prompt → AI เป็น "ผู้ช่วยทั่วไป" → คำตอบ generic ไม่เฉพาะเจาะจง
+     ↓
+Role prompt    → AI เป็น "security auditor" → คำตอบเจาะลึก มีลำดับความสำคัญ
+```
+
+**ตัวอย่างที่เห็นภาพ:**
+
+| Prompt | ผลลัพธ์ |
+| -------- | ---------- |
+| "ตรวจสอบโค้ดนี้" | "โค้ดนี้ดูโอเค อาจมี bug เล็กน้อย" |
+| "คุณเป็น security auditor — ตรวจสอบโค้ดนี้ตาม OWASP" | "CRITICAL: SQL injection ใน line 42. HIGH: ไม่มี input validation..." |
+
+### ส่วนประกอบของ Role Prompt ที่ดี
+
+```
+Role Prompt Structure:
+┌─────────────────────────────────┐
+│ 1. Persona (คุณเป็นใคร)         │
+│    → "คุณเป็น senior code reviewer" │
+├─────────────────────────────────┤
+│ 2. Expertise (เชี่ยวชาญอะไร)    │
+│    → "เชี่ยวชาญ JavaScript, security" │
+├─────────────────────────────────┤
+│ 3. Constraints (ห้ามทำอะไร)     │
+│    → "ห้ามแก้โค้ดโดยตรง"         │
+├─────────────────────────────────┤
+│ 4. Output Format (ตอบแบบไหน)   │
+│    → "ตอบเป็น bullet points"    │
+└─────────────────────────────────┘
+```
+
+---
+
+## 💡 Example: สร้าง Role Prompt สำหรับ Code Reviewer
+
+**ผิด — Generic prompt (ไม่มี role):**
+
+```javascript
+// AI จะตอบแบบ generic มาก
+"You are a helpful assistant. Review this code."
+```
+
+**ถูก — Role prompt ที่ชัดเจน:**
+
+```javascript
+function createRolePrompt(role) {
+  const roles = {
+    'code-reviewer': `You are a senior code reviewer with 10+ years of experience.
+    
+Persona: You are meticulous, constructive, and focus on maintainability.
+Expertise: JavaScript, TypeScript, React, Node.js, design patterns.
+
+Constraints:
+- Do NOT rewrite the code — only suggest improvements
+- Do NOT approve code that has any security issues
+- Always explain WHY something is a problem
+
+Output Format:
+- Group findings by severity: 🔴 Critical → 🟡 Warning → 🔵 Suggestion
+- Each finding: line number, issue, suggestion, why it matters`,
+
+    'security-auditor': `You are a security auditor specialized in OWASP Top 10.
+
+Persona: You are paranoid by nature — assume every input is malicious.
+Expertise: SQL injection, XSS, CSRF, authentication flaws, cryptography.
+
+Constraints:
+- Do NOT ignore any potential vulnerability, even unlikely ones
+- Do NOT suggest "it's probably fine" — always err on the side of caution
+- Rate every finding by CVSS score
+
+Output Format:
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- For each: vulnerability type, location, exploit scenario, fix`,
+
+    'doc-writer': `You are a technical writer who makes complex things simple.
+
+Persona: You write for developers who are busy and need answers fast.
+Expertise: API documentation, README files, code comments.
+
+Constraints:
+- Do NOT use jargon without explaining it
+- Do NOT write more than 3 sentences per concept
+- Always include a code example
+
+Output Format:
+- One paragraph summary
+- Code example
+- Common pitfalls`,
+
+    'test-generator': `You are a QA engineer who thinks of edge cases others miss.
+
+Persona: You are suspicious of all code and assume it will break.
+Expertise: Jest, Mocha, edge cases, boundary testing.
+
+Constraints:
+- Do NOT write happy-path-only tests
+- Do NOT skip error cases
+- Every function needs at least one edge case test
+
+Output Format:
+- describe/it blocks with descriptive names
+- Arrange/Act/Assert pattern
+- Comment explaining what edge case is being tested`
+  };
+
+  if (!roles[role]) {
+    throw new Error(`Unknown role: ${role}. Available: ${Object.keys(roles).join(', ')}`);
+  }
+
+  return roles[role];
+}
+```
+
+**สิ่งที่สังเกต:**
+
+- แต่ละ role มี persona ต่างกันชัดเจน
+- มี constraints ที่ห้าม AI ทำบางอย่าง
+- มี output format ที่บังคับรูปแบบคำตอบ
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ prompt เดียวกันสำหรับทุก role**
+> "You are a helpful assistant. Review the code."
+> → ทุก role ได้คำตอบเหมือนกัน — ไม่มีความแตกต่าง
+
+**Mistake 2: ลืมใส่ constraints**
+> "คุณเป็น security auditor"
+> → AI จะ "ช่วย" แก้โค้ดให้ด้วย ทั้งที่ role นี้แค่ตรวจสอบ ไม่แก้
+
+**Mistake 3: ไม่ระบุ output format**
+> ปล่อยให้ AI เลือกรูปแบบเอง
+> → ได้คำตอบยาวเหยียด ไม่เป็นระเบียบ ใช้ต่อยางยาก
+
+**Mistake 4: ไม่ throw error สำหรับ unknown roles**
+> ถ้า role ไม่รู้จัก ให้ return prompt generic แทน
+> → โค้ดที่ใช้ prompt จะไม่รู้ว่าได้ prompt ผิด
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-73-role-prompts" />
+
+---
+
+## 🏋️ Quest: Role Prompt Library
+
+ถึงเวลาฝึกฝน! สร้าง role prompt library สำหรับ 4 บทบาท
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-73-role-prompts
    cd quest-73-role-prompts
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createRolePrompt(role)` ที่รองรับ 4 บทบาท:
+   - `'code-reviewer'`
+   - `'security-auditor'`
+   - `'doc-writer'`
+   - `'test-generator'`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ:** ตรวจสอบให้แน่ใจว่าแต่ละ role มี persona, constraints, และ output format ที่ต่างกัน
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าติดขัด ลองกลับไปอ่านส่วน "How It Works" — สังเกตว่าแต่ละ role มีองค์ประกอบครบทั้ง 4 ข้อหรือไม่
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- เริ่มจาก role ที่คุณเข้าใจมากที่สุด (เช่น code-reviewer) แล้วค่อยๆ เพิ่ม role อื่น
+- แต่ละ role ต้องมี constraints ที่ห้าม AI ทำบางอย่าง — นี่คือหัวใจของ role prompt
+- ถ้า role ไม่รู้จัก ต้อง `throw new Error()` — อย่า return prompt generic
+- ทดสอบด้วย prompt เดียวกันทั้ง 4 role — ถ้าได้คำตอบคล้ายกัน แปลว่า prompts ไม่ต่างกันพอ

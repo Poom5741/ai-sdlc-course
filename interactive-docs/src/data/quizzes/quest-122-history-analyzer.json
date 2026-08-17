@@ -1,0 +1,38 @@
+{
+  "questId": "quest-122-history-analyzer",
+  "questions": [
+    {
+      "question": "How do you detect a force push from git log data?",
+      "choices": [
+        "Check if the commit hash is longer than usual",
+        "Check if a commit's parent doesn't match the previous commit by the same author",
+        "Check if the commit message contains 'force'",
+        "Check if the commit was made on a weekend"
+      ],
+      "answer": 1,
+      "explanation": "A force push rewrites history by changing commit parents. If an author's new commit has a parent that doesn't match their last known commit hash, it means history was rewritten."
+    },
+    {
+      "question": "What does a 'revert' in a commit message typically indicate?",
+      "choices": [
+        "A new feature was added",
+        "Some previously committed code was undone",
+        "The commit was squashed",
+        "The author changed their email"
+      ],
+      "answer": 1,
+      "explanation": "A revert commit undoes changes from a previous commit. While reverts are sometimes necessary, frequent reverts may indicate issues with code quality or review processes."
+    },
+    {
+      "question": "Why must you filter out missing dates before sorting?",
+      "choices": [
+        "JavaScript sort() throws on undefined values",
+        "undefined values sort to the end by default, giving wrong ranges",
+        "Missing dates indicate force pushes",
+        "Date filtering improves performance"
+      ],
+      "answer": 0,
+      "explanation": "Some log entries may not have a date field. Calling .sort() on an array with undefined values can produce unexpected results or errors. Filter(Boolean) removes falsy values first."
+    }
+  ]
+}

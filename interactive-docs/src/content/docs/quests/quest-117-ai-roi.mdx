@@ -1,66 +1,220 @@
 ---
-title: "AI ROI Calculator"
-description: "Calculate ROI of AI development tools"
+title: "Quest 117 - AI ROI Calculator"
+description: "Calculate ROI of AI development tools — คำนวณผลตอบแทนจากการลงทุน AI"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# AI ROI Calculator
+# Quest 117: AI ROI Calculator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Calculate ROI of AI development tools
+<LearningObjectives items={[
+  "How to calculate the financial ROI of AI development tools with concrete formulas",
+  "Why break-even analysis is crucial — when does the investment start paying off?",
+  "How to handle edge cases: negative ROI, zero costs, and infinite break-even",
+  "The engineering habit of MEASURE EVERYTHING — data-driven decisions beat gut feelings"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: ROI — Return on Investment
+
+**ROI (Return on Investment)** คือสูตรที่บอกว่า "invest ไป 1 บาท ได้กลับมาเท่าไหร่"
+
+```
+ROI = (Savings - Cost) / Cost × 100%
+
+ถ้า ROI = 150%  →  ทุก ฿1 ลงทุน ได้กลับ ฿2.50
+ถ้า ROI = -50%  →  ทุก ฿1 ลงทุน ขาดทุน ฿0.50
+```
+
+**สำหรับ AI tools ROI:**
+
+```
+┌──────────────────────────────────────────┐
+│           AI ROI Calculation              │
+│                                          │
+│  COST = teamSize × monthlyCost × months  │
+│                                          │
+│  SAVINGS = teamSize × hoursSaved          │
+│            × hourlyRate × weeks           │
+│                                          │
+│  ROI = (Savings - Cost) / Cost × 100%   │
+│                                          │
+│  Break-even = Cost / weeklySavings       │
+└──────────────────────────────────────────┘
+```
+
+### Break-Even Analysis
+
+**Break-even point** คือเวลาที่ savings เท่ากับ cost — หลังจากจุดนี้ทุกบาทคือ profit
+
+ถ้า ROI เป็น negative → break-even = **Infinity** (ไม่มีวันคุ้ม!)
+
+---
+
+## ⚙️ How It Works
+
+### Input Parameters
+
+```javascript
+{
+  teamSize: 10,                    // จำนวน developers
+  monthlyCostPerDev: 20,           // ค่าใช้จ่าย AI tool ต่อคนต่อเดือน ($)
+  hoursSavedPerDevPerWeek: 5,      // เวลาที่บันทึกได้ต่อคนต่อสัปดาห์
+  hourlyRate: 75,                  // ค่าแรงต่อชั่วโมง ($)
+  weeksInQuarter: 13               // จำนวนสัปดาห์ใน 1 quarter
+}
+```
+
+### Formulas
+
+```javascript
+// Total cost (3 months / 1 quarter)
+totalCost = teamSize × monthlyCostPerDev × 3
+
+// Total savings (per quarter)
+totalSavings = teamSize × hoursSavedPerDevPerWeek × hourlyRate × weeksInQuarter
+
+// Net benefit
+netBenefit = totalSavings - totalCost
+
+// ROI percentage
+roi = (totalSavings - totalCost) / totalCost × 100
+
+// Break-even weeks
+weeklySavingsPerTeam = teamSize × hoursSavedPerDevPerWeek × hourlyRate
+breakEvenWeeks = totalCost / weeklySavingsPerTeam
+```
+
+### Edge Cases
+
+| Scenario | ROI | Break-even |
+| --- | --- | --- |
+| Good ROI (savings > cost) | Positive % | Finite weeks |
+| Bad ROI (cost > savings) | Negative % | `Infinity` |
+| Zero cost | N/A | `0` or `Infinity` |
+| Zero savings | `-100%` | `Infinity` |
+
+---
+
+## 💡 Example: Calculating AI Tool ROI
+
+**Scenario: Good investment**
+
+```javascript
+const result = calculateROI({
+  teamSize: 10,
+  monthlyCostPerDev: 20,        // $20/dev/month
+  hoursSavedPerDevPerWeek: 5,   // 5 hours saved/dev/week
+  hourlyRate: 75,               // $75/hour
+  weeksInQuarter: 13
+});
+
+// totalCost = 10 × 20 × 3 = $600
+// totalSavings = 10 × 5 × 75 × 13 = $48,750
+// roi = (48750 - 600) / 600 × 100 = 8,025%
+// breakEvenWeeks = 600 / (10 × 5 × 75) = 0.16 weeks
+```
+
+**Scenario: Bad investment**
+
+```javascript
+const badResult = calculateROI({
+  teamSize: 10,
+  monthlyCostPerDev: 200,       // $200/dev/month — expensive!
+  hoursSavedPerDevPerWeek: 1,   // only 1 hour saved
+  hourlyRate: 25,               // low hourly rate
+  weeksInQuarter: 13
+});
+
+// totalCost = 10 × 200 × 3 = $6,000
+// totalSavings = 10 × 1 × 25 × 13 = $3,250
+// roi = (3250 - 6000) / 6000 × 100 = -45.83%
+// breakEvenWeeks = Infinity  ← ไม่มีวันคุ้ม!
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Not handling negative ROI**
+> "ROI is always positive because AI is good"
+> → ถ้า cost > savings ROI จะ negative — code ต้อง handle case นี้
+
+**Mistake 2: Returning a number instead of Infinity for impossible break-even**
+> `breakEvenWeeks = -1` (or 0) for negative ROI
+> → ใช้ `Infinity` — สื่อความหมายว่า "ไม่มีวัน break-even"
+
+**Mistake 3: Ignoring edge cases**
+> "Normal inputs always work"
+> → ต้อง handle: zero cost, zero savings, negative values
+
+**Mistake 4: Not rounding results**
+> `roi: 8025.123456789`
+> → Round to 2 decimal places เพื่อ readability
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-117-ai-roi" />
+
+---
+
+## 🏋️ Quest: AI ROI Calculator
+
+Now it's time to practice! Build an ROI calculator for AI tools.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-117-ai-roi
    cd quest-117-ai-roi
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor — สังเกตว่า `calculateROI()` มีอยู่แล้วแต่ต้อง verify implementation
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ทำความเข้าใจ formulas:
+   - `totalCost = teamSize × monthlyCostPerDev × 3` (1 quarter)
+   - `totalSavings = teamSize × hoursSavedPerDevPerWeek × hourlyRate × weeksInQuarter`
+   - `roi = (totalSavings - totalCost) / totalCost × 100`
+   - `breakEvenWeeks = totalCost / weeklySavingsPerTeam`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ**: ตรวจสอบ edge cases:
+   - Negative ROI → breakEvenWeeks ต้องเป็น `Infinity`
+   - Zero savings → breakEvenWeeks ต้องเป็น `Infinity`
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า "break-even is Infinity for negative ROI" ล้มเหลว — ตรวจสอบว่าคุณ return `Infinity` (ไม่ใช่ `-1` หรือ `0`) เมื่อ ROI < 0
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ROI formula: `(savings - cost) / cost × 100` — ตรวจสอบเครื่องหมาย
+- Break-even สำหรับ negative ROI ต้องเป็น `Infinity` — ห้าม return number
+- Round results: `Math.round(roi * 100) / 100` สำหรับ 2 decimal places
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

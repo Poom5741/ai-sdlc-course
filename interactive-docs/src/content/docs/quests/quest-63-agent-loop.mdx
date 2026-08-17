@@ -1,66 +1,187 @@
 ---
 title: "Quest 63 - Agent Loop Builder"
-description: "Generate-review-fix agent loop"
+description: "สร้าง generate-review-fix agent loop ที่หมุนวนจนกว่าจะผ่าน"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 63: Agent Loop Builder
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate-review-fix agent loop
+<LearningObjectives items={[
+  "เข้าใจ Agent Loop รูปแบบ generate → review → fix",
+  "รู้จัก max iterations guard ป้องกัน infinite loop",
+  "ติดตาม iteration history และ feedback ระหว่าง loop",
+  "สร้าง workflow ที่ terminates อย่างถูกต้องแม้ reviewer ไม่เคย approve"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Agent Loop Pattern
+
+Agent Loop คือหนึ่งใน pattern ที่สำคัญที่สุดของ Agentic Workflows — มันคือรอบการทำงานที่ agent **สร้างงาน → ตรวจสอบ → แก้ไข → วนซ้ำ** จนกว่าจะได้ผลลัพธ์ที่ยอมรับได้
+
+ลองนึกภาพว่าคุณกำลังเขียนบทความ — คุณเขียนร่างแรก แล้วให้ editor ตรวจสอบ ถ้า editor บอกว่ายังไม่ดีพอ คุณก็แก้ไขแล้วส่งตรวจสอบอีกครั้ง **Agent Loop ทำแบบเดียวกันแต่เป็น code**
+
+```javascript
+// วงจร Agent Loop
+const result = agentLoop(generator, reviewer, maxIterations);
+// generator:  สร้าง draft จาก feedback ก่อนหน้า
+// reviewer:   ตรวจสอบ draft แล้ว approve/reject พร้อม feedback
+// maxIterations: จำนวนรอบสูงสุด (ป้องกัน infinite loop!)
+```
+
+สิ่งที่สำคัญคือ **ทุก loop ต้องมี exit condition** — ไม่เช่นนั้นถ้า reviewer ไม่เคย approve loop จะทำงานตลอดกาล
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Agent Loop
+
+```
+1. generator สร้าง draft จาก 'initial' (รอบแรก) หรือ feedback ก่อนหน้า
+         ↓
+2. reviewer ตรวจสอบ draft
+         ↓
+3. ถ้า approved === true → หยุด loop, return result
+         ↓
+4. ถ้า approved === false → บันทึก history, วนซ้ำกับ feedback ใหม่
+         ↓
+5. ถ้า iterations >= maxIterations → หยุด loop, return draft สุดท้าย
+```
+
+### ทำไมต้องมี Max Iterations?
+
+ในโลกจริง reviewer อาจไม่เคยพอใจ หรือ generator อาจไม่สามารถสร้างงานที่ดีพอได้ ถ้าไม่มี max iterations guard:
+
+```javascript
+// ❌ อันตราย! Loop ไม่มีวันหยุด
+while (!review.approved) {
+  result = generator(review.feedback);
+  review = reviewer(result);
+}
+```
+
+```javascript
+// ✅ ปลอดภัย — มี guard
+for (let i = 0; i < maxIterations; i++) {
+  result = generator(feedback);
+  review = reviewer(result);
+  if (review.approved) break;
+}
+```
+
+---
+
+## 💡 Example: Agent Loop ใน action
+
+```javascript
+// Generator: สร้าง draft จาก feedback
+function generator(feedback) {
+  if (feedback === 'initial') return 'draft v1';
+  if (feedback.includes('more detail')) return 'draft v2 — with more detail';
+  return 'final draft';
+}
+
+// Reviewer: ตรวจสอบ draft
+function reviewer(draft) {
+  if (draft.includes('final')) return { approved: true, feedback: '' };
+  return { approved: false, feedback: 'need more detail' };
+}
+
+// Run the loop
+const result = agentLoop(generator, reviewer, 5);
+console.log(result);
+// {
+//   result: 'final draft',
+//   iterations: 3,
+//   history: [
+//     { iteration: 1, draft: 'draft v1', approved: false, feedback: 'need more detail' },
+//     { iteration: 2, draft: 'draft v2 — with more detail', approved: false, feedback: 'need more detail' },
+//     { iteration: 3, draft: 'final draft', approved: true, feedback: '' }
+//   ]
+// }
+```
+
+**สังเกต:** ทุก iteration ถูกบันทึกใน history — ทำให้เราเห็นว่า feedback แต่ละรอบเปลี่ยนแปลง draft อย่างไร
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่มี max iterations guard**
+> "Reviewer ต้อง approve สักวัน"
+> → ไม่เสมอไป! ต้องมี max iterations เพื่อป้องกัน infinite loop
+
+**Mistake 2: ไม่ส่ง feedback ให้ generator**
+> generator ได้รับ 'initial' ทุกรอบ
+> → ต้องส่ง feedback จาก review ก่อนหน้าให้ generator เพื่อให้รู้ว่าต้องแก้ไขอะไร
+
+**Mistake 3: ไม่บันทึก iteration history**
+> "แค่ return result ก็พอ"
+> → History ช่วย debug และเข้าใจว่า loop ทำงานอย่างไร — มันคือ audit trail
+
+**Mistake 4: คิดว่า iteration = ความล้มเหลว**
+> "Loop หลายรอบ = ไม่ดี"
+> → ไม่จริง! Agent loop ที่ดี **ควร** วนหลายรอบ — นั่นคือจุดประสงค์ของมัน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-63-agent-loop" />
+
+---
+
+## 🏋️ Quest: Agent Loop Builder
+
+สร้าง Agent Loop ที่หมุนวน generate → review → fix จนกว่าจะผ่าน หรือครบจำนวนรอบ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-63-agent-loop
    cd quest-63-agent-loop
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `agentLoop(generator, reviewer, maxIterations)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** อ่าน failing tests อย่างละเอียด — โดยเฉพาะ never-approve edge case
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าติดขัด ลองนึกถึง scenario ที่ reviewer ไม่เคย approve — loop ของคุณจะหยุดเมื่อไหร่?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case สำคัญ: ถ้า reviewer ไม่เคย approve, loop ต้องหยุดที่ maxIterations
+- ทดสอบด้วย generator ที่ return ค่าเดิมเสมอ — loop ยังทำงานถูกต้องไหม?
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

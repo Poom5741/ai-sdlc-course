@@ -1,66 +1,196 @@
 ---
-title: "Voice-to-Code Pipeline Design"
-description: "Design a voice-to-code system architecture"
+title: "Quest 109 - Voice-to-Code Pipeline Design"
+description: "Design a voice-to-code system architecture for converting speech to working code"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Voice-to-Code Pipeline Design
+# Quest 109: Voice-to-Code Pipeline Design
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design a voice-to-code system architecture
+<LearningObjectives items={[
+  "How to design a multi-layer pipeline for converting speech to code",
+  "Why design before building is critical for complex systems",
+  "How to handle STT misrecognition and intent ambiguity",
+  "The importance of a verification layer before applying generated code"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Design Before Building
+
+**Voice-to-code** is one of the most ambitious multimodal AI applications: you speak, and code appears. But behind this seemingly simple interaction lies a complex pipeline with multiple layers, each introducing potential errors. Speech-to-text can mishear words, intent parsing can misunderstand context, and code generation can produce subtle bugs.
+
+**Design before building** means mapping out each layer of the system before writing a single line of code. This engineering habit prevents you from discovering fundamental architectural problems halfway through implementation. It's the coding equivalent of studying your opponent before entering the ring.
+
+A voice-to-code pipeline typically has five layers: **Speech-to-Text → Intent Parsing → Code Generation → Verification → Application**. Each layer transforms the input and passes it forward, with error handling at every step.
+
+---
+
+## ⚙️ How It Works
+
+### The Five-Layer Pipeline
+
+```
+1. Speech-to-Text (STT) Layer
+   - User speaks: "Create a function that sorts an array"
+   - STT outputs: "Create a function that sorts an array"
+         ↓
+2. Intent Parsing Layer
+   - Extracts: action=create, target=function, operation=sort, parameter=array
+         ↓
+3. Code Generation Layer
+   - Generates: function sortArray(arr) { return arr.sort((a,b) => a-b); }
+         ↓
+4. Verification Layer
+   - Tests the generated code against sample inputs
+         ↓
+5. Application Layer
+   - Inserts code into the editor with user confirmation
+```
+
+### Where Things Go Wrong
+
+| Layer | Common Error | Example |
+| --- | --- | --- |
+| STT | Misrecognition | "sort" heard as "short" |
+| Intent | Ambiguity | "sort" = sort in place or return new array? |
+| Code Gen | Subtle bugs | Missing edge case handling |
+| Verification | False positive | Test passes but code has a race condition |
+
+Each layer must have error handling and feedback loops to catch and correct mistakes.
+
+---
+
+## 💡 Example: Designing Each Layer
+
+**Layer 1: Speech-to-Text**
+
+Considerations:
+
+- Which STT model? (Whisper, Google STT, Azure Speech)
+- How to handle accents and background noise?
+- Streaming vs batch processing?
+
+```
+Design decision: Use OpenAI Whisper with streaming for low latency.
+Fallback: If confidence < 0.7, ask user to repeat.
+```
+
+**Layer 2: Intent Parsing**
+
+The intent parser converts natural language into structured commands:
+
+```javascript
+// Input: "Create a function that sorts an array of numbers"
+// Output:
+{
+  action: 'create',
+  type: 'function',
+  name: 'sortArray',
+  parameters: ['arr: number[]'],
+  returns: 'number[]',
+  body: 'return arr.sort((a, b) => a - b);'
+}
+```
+
+**Layer 3: Verification**
+
+```javascript
+// Test the generated code before applying
+function verifyCode(code, testCases) {
+  for (const test of testCases) {
+    const result = eval(`(${code})(${test.input})`);
+    if (JSON.stringify(result) !== JSON.stringify(test.expected)) {
+      return { passed: false, failure: test };
+    }
+  }
+  return { passed: true };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Skipping the design phase**
+> "I'll figure out the architecture as I go"
+> → Voice-to-code has too many interacting layers to wing it. Design the full pipeline first.
+
+**Mistake 2: No verification layer**
+> "The code looks right, apply it"
+> → Generated code can have subtle bugs. Always verify with test cases before inserting into the editor.
+
+**Mistake 3: Ignoring STT errors**
+> "STT is accurate enough"
+> → STT misrecognizes words, especially technical terms. Build in confidence checks and confirmation steps.
+
+**Mistake 4: Not considering latency**
+> "It doesn't matter if it takes 10 seconds"
+> → Voice interaction requires low latency. Streaming STT and incremental code generation keep the experience responsive.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-109-voice-to-code" />
+
+---
+
+## 🏋️ Quest: Voice-to-Code Pipeline Design
+
+Now it's time to practice! Design a voice-to-code system architecture.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-109-voice-to-code
    cd quest-109-voice-to-code
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` to read the design requirements
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Create `voice-to-code.md` with all seven required sections:
+   - Architecture Overview
+   - Speech-to-Text Layer
+   - Intent Parsing Layer
+   - Code Generation Layer
+   - Verification Layer
+   - Latency Considerations
+   - Error Handling
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` to validate your document structure
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Think about real-world constraints. Voice interaction demands low latency, and STT makes mistakes. Design your system to handle these realities gracefully.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- นี่เป็น design quest — งานจริงอยู่ใน `voice-to-code.md`
+- ครอบคลุมทั้ง 7 sections: architecture, STT, intent, code gen, verification, latency, error handling
+- คิดถึง real-world constraints: low latency, STT errors, ambiguous intent
+- Verification layer สำคัญมาก — อย่า apply code โดยไม่ทดสอบ
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

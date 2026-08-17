@@ -1,66 +1,195 @@
 ---
-title: "Accessibility Checker"
-description: "Audit code for accessibility violations"
+title: "Quest 106 - Accessibility Checker"
+description: "Audit HTML code for accessibility violations and generate actionable reports"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Accessibility Checker
+# Quest 106: Accessibility Checker
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Audit code for accessibility violations
+<LearningObjectives items={[
+  "Why accessibility is not optional — it's a legal and ethical requirement",
+  "How to detect common accessibility violations (missing alt, labels, button text, heading skips)",
+  "How to distinguish decorative elements from meaningful content",
+  "How to generate structured violation reports with severity levels"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Web Accessibility (a11y)
+
+**Accessibility (a11y)** means making your web content usable by everyone, including people with disabilities. Screen readers, keyboard navigation, and assistive technologies rely on proper HTML structure to interpret content. When you skip alt text on images, leave form inputs unlabeled, or create empty buttons, you're locking out users who depend on these tools.
+
+Accessibility isn't just nice to have — it's a **legal requirement** under laws like the ADA (Americans with Disabilities Act) and the European Accessibility Act. But more importantly, it's the right thing to do. The martial arts metaphor applies: a true master considers all opponents, not just the most common ones.
+
+An **accessibility checker** scans HTML and identifies violations — missing attributes, structural issues, and semantic errors. Each violation is classified by severity: **error** (blocks access) vs **warning** (degrades experience but doesn't block).
+
+---
+
+## ⚙️ How It Works
+
+### The Accessibility Audit Pipeline
+
+```
+1. Parse HTML line by line
+         ↓
+2. Check each element against rules:
+   - <img> without alt (unless role="presentation")
+   - <input> without label or aria-label
+   - <button> without text content
+         ↓
+3. Scan document structure for heading level skips
+         ↓
+4. Classify each violation (error / warning)
+         ↓
+5. Return structured report with rule, severity, line, message
+```
+
+### Why Decorative Images Are Different
+
+An `<img>` without `alt` is usually an error — screen readers will announce the file name, which is useless. But a **decorative image** (purely visual, no informational value) should have `role="presentation"` to tell screen readers to skip it. The checker must distinguish between:
+
+```html
+<!-- Error: meaningful image without alt -->
+<img src="chart.png">
+
+<!-- OK: decorative image marked as presentation -->
+<img src="border.png" role="presentation">
+```
+
+---
+
+## 💡 Example: Detecting Accessibility Violations
+
+Here's how to detect common violations with regex-based scanning:
+
+**Step 1: Images without alt text**
+
+```javascript
+if (/<img\b/.test(line) && !/alt\s*=/.test(line) && !/role\s*=\s*["']presentation["']/.test(line)) {
+  results.push({
+    rule: 'img-alt',
+    severity: 'error',
+    line: i + 1,
+    message: 'Image must have alt attribute',
+  });
+}
+```
+
+**Step 2: Inputs without labels**
+
+```javascript
+if (/<input\b/.test(line) && !/aria-label/.test(line) && !/id\s*=/.test(line)) {
+  results.push({
+    rule: 'input-label',
+    severity: 'error',
+    line: i + 1,
+    message: 'Input must have associated label',
+  });
+}
+```
+
+**Step 3: Heading level skips**
+
+```javascript
+// Track heading levels across the document
+const headings = [...html.matchAll(/<h(\d)[^>]*>/gi)];
+for (let i = 1; i < headings.length; i++) {
+  if (headings[i].level - headings[i - 1].level > 1) {
+    results.push({
+      rule: 'heading-skip',
+      severity: 'warning',
+      line: lineNum,
+      message: `Heading level skip from h${headings[i-1].level} to h${headings[i].level}`,
+    });
+  }
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging decorative images as errors**
+> "This `<img>` has no alt, so it's a violation"
+> → If it has `role="presentation"`, it's intentionally decorative. Skip it. False positives erode trust in the checker.
+
+**Mistake 2: Only checking images, ignoring inputs and buttons**
+> "I added alt text checking, that covers accessibility"
+> → Accessibility includes form labels, button text, heading structure, and more. Check all major violation types.
+
+**Mistake 3: Reporting violations without line numbers**
+> "There's a missing alt somewhere in the HTML"
+> → Violations without line numbers are useless for fixing. Always include the line number.
+
+**Mistake 4: Treating all violations as the same severity**
+> "Every violation is an error"
+> → Heading skips are warnings (degraded experience) while missing alt on images are errors (blocks access). Severity helps prioritize fixes.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-106-accessibility-checker" />
+
+---
+
+## 🏋️ Quest: Accessibility Checker
+
+Now it's time to practice! Build an HTML accessibility auditor that detects violations and generates structured reports.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-106-accessibility-checker
    cd quest-106-accessibility-checker
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `checkAccessibility(html)` that:
+   - Detects `<img>` without alt (skip decorative images with `role="presentation"`)
+   - Detects `<input>` without labels or aria-label
+   - Detects empty `<button>` elements
+   - Detects heading level skips (e.g., h1 → h3)
+   - Returns an array of `{ rule, severity, line, message }` objects
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` and read the failures carefully
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** This is a hard quest. Focus on getting the four main violation types working correctly. Don't forget that heading skips are checked across the entire document, not per-element.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Decorative images ที่มี `role="presentation"` ไม่ต้องมี alt — อย่า flag เป็น error
+- ตรวจ 4 violation types: img-alt, input-label, button-text, heading-skip
+- Heading skips ต้องตรวจ across entire document ไม่ใช่ per-element
+- แต่ละ violation ต้องมี rule, severity, line, message
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

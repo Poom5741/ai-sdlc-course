@@ -5,62 +5,146 @@ description: "Implement self-attention mechanism"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 9: Self-Attention Implementation
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Implement self-attention mechanism
+<LearningObjectives items={[
+  "How self-attention works in transformers (Q, K, V calculation)",
+  "Why scaling by sqrt(d_k) is critical for stable training",
+  "How to implement matrix operations for attention",
+  "The engineering habit: UNDERSTAND THE MATH"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Self-Attention
+
+Self-attention เป็นหัวใจของ Transformer architecture — มันช่วยให้ model รู้ว่า token ไหนควร "attention" กับ token ไหน
+
+Think of it like this: เมื่อคุณอ่านประโยค "The cat sat on the mat" สมองของคุณจะรู้ว่า "cat" เกี่ยวข้องกับ "sat" มากกว่า "the" — self-attention ทำแบบเดียวกันแต่ในระดับ numbers
+
+---
+
+## ⚙️ How It Works
+
+### The QKV Formula
+
+```
+Q = tokens x Wq        (Query — ถามว่า "ฉันกำลังมองหาอะไร?")
+K = tokens x Wk        (Key — บอกว่า "ฉันมีอะไรให้?")
+V = tokens x Wv        (Value — ข้อมูลจริงที่ส่งต่อ)
+
+scores = Q x K^T / sqrt(d_k)   (คำนวณความคล้ายคลึง)
+weights = softmax(scores)       (แปลงเป็น probabilities)
+output = weights x V            (รวมข้อมูลตาม attention weights)
+```
+
+### ตัวอย่าง Matrix Operations
+
+```javascript
+// tokens: [3 tokens, 4 dimensions]
+const tokens = [
+  [1, 0, 1, 0],  // token 1
+  [0, 1, 0, 1],  // token 2
+  [1, 1, 0, 0]   // token 3
+];
+
+// Wq, Wk, Wv: [4 dimensions, 3 query/key/value dimensions]
+const Wq = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]];
+const Wk = [[0, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1]];
+const Wv = [[1, 0, 1], [0, 1, 0], [1, 1, 0], [0, 0, 1]];
+
+// Q = tokens x Wq
+// scores = Q x K^T / sqrt(3)
+// weights = softmax(scores)
+// output = weights x V
+```
+
+---
+
+## 💡 Example: Scaling Factor
+
+```javascript
+// ทำไมต้อง sqrt(d_k)?
+
+// ถ้าไม่ scale: scores จะมีค่าใหญ่ -> softmax saturation -> gradients หาย
+// ถ้า scale: scores อยู่ใน range ที่เหมาะสม -> softmax ทำงานดี
+
+const d_k = 4;  // dimension ของ key
+const scalingFactor = Math.sqrt(d_k);  // = 2
+
+// scores ที่ไม่ scale: [10, 20, 30] -> softmax ~ [0, 0, 1] (saturation)
+// scores ที่ scale แล้ว: [5, 10, 15] -> softmax ~ [0.01, 0.04, 0.95] (ดีกว่า)
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ลืม scaling factor**
+> คำนวณ attention โดยไม่หารด้วย sqrt(d_k)
+> -> gradients จะ explode ทำให้ training ไม่ stable
+
+**Mistake 2: คำนวณ matrix multiplication ผิด**
+> คูณ matrix ผิด dimension
+> -> ต้อง check dimensions ตลอด: (seq_len x d_k) x (d_k x seq_len)
+
+**Mistake 3: ไม่ implement softmax**
+> ใช้ raw scores แทน probabilities
+> -> ต้อง softmax เพื่อให้ weights รวมเป็น 1
+
+**Mistake 4: ไม่ handle edge cases**
+> ไม่ test กับ sequence length 1, empty tokens
+> -> ต้อง test edge cases
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-9-self-attention" />
+
+---
+
+## 🏋️ Quest: Self-Attention Implementation
+
+เขียน function ที่คำนวณ self-attention ด้วย Q, K, V
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-09-self-attention
    cd quest-09-self-attention
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `selfAttention(tokens, Wq, Wk, Wv)` ตาม formula
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ: scaling factor, matrix dimensions, softmax
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI ไม่ include scaling factor ให้บอกว่า "Don't forget to divide by sqrt(d_k)!"
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี formula ระบุไว้
+- ต้อง implement: matrix multiplication, scaling, softmax
+- ทดสอบกับ scaling factor — ถ้าไม่ scale training จะไม่ stable
+- ถ้าติดขัด ลอง search "scaled dot-product attention"

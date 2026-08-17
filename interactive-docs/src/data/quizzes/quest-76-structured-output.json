@@ -1,0 +1,38 @@
+{
+  "questId": "quest-76-structured-output",
+  "questions": [
+    {
+      "question": "ทำไม LLMs มักใส่ JSON ใน markdown code blocks?",
+      "choices": [
+        "เพราะ parser บังคับให้ใส่",
+        "เพราะเป็น default behavior ของ LLMs เมื่อ generate JSON",
+        "เพราะ user ต้องการ",
+        "เพราะ system prompt สั่งให้ใส่"
+      ],
+      "answer": 1,
+      "explanation": "LLMs มักจะ wrap JSON ใน ```json fences โดย default — ดังนั้น parser ต้อง extract JSON ออกจาก code blocks ก่อน parse"
+    },
+    {
+      "question": "Type coercion ใน structured output parser คืออะไร?",
+      "choices": [
+        "การแปลง type ของ JavaScript variables",
+        "การแปลง string \"42\" เป็น number 42, หรือ string \"true\" เป็น boolean true",
+        "การ validate schema",
+        "การ parse JSON จาก code blocks"
+      ],
+      "answer": 1,
+      "explanation": "Type coercion คือการแปลงค่าจาก type หนึ่งไปอีก type — เช่น LLM ตอบ \"age\": \"25\" (string) แต่เราต้องการ number 25"
+    },
+    {
+      "question": "ขั้นตอนไหนควรทำก่อนในการ parse structured output?",
+      "choices": [
+        "ค้นหา JSON ใน code blocks",
+        "ลอง JSON.parse() ตรงๆ ก่อน",
+        "ทำ type coercion",
+        "Validate required fields"
+      ],
+      "answer": 1,
+      "explanation": "ควรลอง parse ตรงๆ ก่อน — ถ้า LLM ตอบ plain JSON โดยไม่มี code blocks จะได้ผลทันทีโดยไม่ต้อง extract"
+    }
+  ]
+}

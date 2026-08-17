@@ -5,62 +5,189 @@ description: "Prioritize files for context"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 31: Context Window Manager
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Prioritize files for context
+<LearningObjectives items={[
+  "Understanding that not all files are equally relevant to a task",
+  "Prioritizing files based on relevance to the current task",
+  "Managing token budgets to stay within context window limits",
+  "The engineering habit: Prioritize Context — give AI the most relevant files first"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Context Window — จัดกระเป๋าให้พอดีก่อนออกศึก
 
-<Steps>
+Context Window Manager คือการ **เลือกเฉพาะไฟล์ที่เกี่ยวข้องที่สุด** สำหรับ AI ทำงาน — เพราะ **AI มี context window จำกัด** ถ้าใส่ไฟล์ทุกไฟล์เข้าไป AI จะ "ลืม" ไฟล์สำคัญ
 
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-31-context-window-manager
-   cd quest-31-context-window-manager
-   ```
+คิดง่ายๆ: เหมือนการจัดกระเป๋าเดินทาง — ถ้าใส่ทุกอย่างเข้าไปกระเป๋าจะระเบิด ต้องเลือกเฉพาะสิ่งที่จำเป็น
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+AI tools (เช่น Cursor, Claude Code) มี token limit — ถ้า project มีไฟล์ 100 ไฟล์ แต่ context window ใส่ได้แค่ 20 ไฟล์ เราต้อง **เลือก 20 ไฟล์ที่เกี่ยวข้องที่สุด**
 
 ---
 
-## การตรวจสอบ
+## ⚙️ How It Works
+
+### Context Window Management Workflow
+
+```
+1. รับ file list (ชื่อ, tokens, relevance score)
+         ↓
+2. รับ task description
+         ↓
+3. รับ maxTokens budget
+         ↓
+4. เรียงตาม relevance → เลือกจนเต็ม budget
+         ↓
+5. คืน selected filenames
+```
+
+### Selection Strategy
+
+**Rule 1: เรียงตาม relevance score**
+
+```javascript
+// ❌ Bad: เลือกไฟล์แบบสุ่ม
+// ✅ Good: เลือกไฟล์ที่ relevance สูงสุดก่อน
+```
+
+**Rule 2: ไม่เกิน token budget**
+
+```javascript
+// ❌ Bad: ใส่ไฟล์ทุกไฟล์จนเกิน budget
+// ✅ Good: หยุดเมื่อ total tokens >= maxTokens
+```
+
+**Rule 3: คืน filenames ใน priority order**
+
+```javascript
+// ❌ Bad: คืน array ว่าง
+// ✅ Good: คืน ['auth.js', 'db.js'] เรียงตาม relevance
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: ดู file list และ task**
+
+```javascript
+const files = [
+  { name: 'auth.js', tokens: 500, relevance: 0.9 },
+  { name: 'utils.js', tokens: 300, relevance: 0.3 },
+  { name: 'db.js', tokens: 400, relevance: 0.7 }
+];
+const task = 'fix login bug';
+const maxTokens = 800;
+```
+
+**Step 2: เรียงตาม relevance และเลือกตาม budget**
+
+```javascript
+function prioritizeFiles(files, task, maxTokens) {
+  // เรียงตาม relevance score (สูงสุดก่อน)
+  const sorted = [...files].sort((a, b) => b.relevance - a.relevance);
+
+  const selected = [];
+  let totalTokens = 0;
+
+  for (const file of sorted) {
+    if (totalTokens + file.tokens <= maxTokens) {
+      selected.push(file.name);
+      totalTokens += file.tokens;
+    }
+  }
+
+  return selected;
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: ตรวจสอบ** — auth.js (relevance 0.9, 500 tokens) ต้องถูกเลือก, utils.js (relevance 0.3) อาจถูกตัดถ้า budget ใกล้เต็ม
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: คืน array ว่าง**
+> "ยังไม่รู้จะเลือกไฟล์ไหน"
+> → คืน array ว่าง = ไม่ได้ทำอะไรเลย — test จะ fail ทันที
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: ไม่ sort ตาม relevance**
+> "เลือกไฟล์ตามลำดับเดิม"
+> → ต้อง sort ตาม relevance score เพื่อให้ไฟล์ที่เกี่ยวข้องที่สุดมาก่อน
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: ไม่ check token budget**
+> "ใส่ไฟล์ทุกไฟล์เข้าไป"
+> → ต้อง check ว่า total tokens ไม่เกิน maxTokens
+
+**Mistake 4: ไม่考虑 task relevance**
+> "เลือกไฟล์ที่ใหญ่ที่สุด"
+> → ต้อง consider relevance กับ task ไม่ใช่ size — ไฟล์เล็กแต่เกี่ยวข้องดีกว่าไฟล์ใหญ่แต่ไม่เกี่ยว
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-31-context-window-manager" />
+
+---
+
+## 🏋️ Quest: Context Window Manager
+
+ตอนนี้ถึงเวลาฝึกฝน! จัดการ context window โดยเลือกไฟล์ที่เกี่ยวข้องที่สุด
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-31-context-window-manager
+   cd quest-31-context-window-manager
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `prioritizeFiles(files, task, maxTokens)` ที่เลือกไฟล์ตาม relevance ภายใน budget
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Context window ที่ดี = ไฟล์ที่เกี่ยวข้องที่สุดมาก่อน — ไม่ใช่ทุกไฟล์
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ต้อง sort ไฟล์ตาม relevance score (สูงสุดก่อน)
+- ตรวจสอบว่า total tokens ไม่เกิน maxTokens
+- auth.js (relevance 0.9) ต้องถูกเลือกก่อน utils.js (relevance 0.3)
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

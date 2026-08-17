@@ -1,0 +1,38 @@
+{
+  "questId": "quest-16-finetuning-pipeline",
+  "questions": [
+    {
+      "question": "What are the three stages of LLM fine-tuning in order?",
+      "choices": [
+        "RLHF → SFT → DPO",
+        "DPO → RLHF → SFT",
+        "SFT → RLHF → DPO",
+        "SFT → DPO → RLHF"
+      ],
+      "answer": 2,
+      "explanation": "The standard pipeline is SFT (teach task behavior) → RLHF (align with human preferences) → DPO (fine-tune without reward model)."
+    },
+    {
+      "question": "What data format does the SFT stage require?",
+      "choices": [
+        "Chosen vs rejected response pairs",
+        "Human preference rankings",
+        "Instruction-response pairs",
+        "Raw unstructured text"
+      ],
+      "answer": 2,
+      "explanation": "SFT uses supervised learning on instruction-response pairs, teaching the model to follow specific instructions."
+    },
+    {
+      "question": "Why is DPO preferred over RLHF in some cases?",
+      "choices": [
+        "DPO requires more training data",
+        "DPO eliminates the need for a separate reward model",
+        "DPO always produces better results",
+        "DPO is faster to implement but less effective"
+      ],
+      "answer": 1,
+      "explanation": "DPO optimizes directly on preference data without training a reward model first, simplifying the pipeline while maintaining alignment quality."
+    }
+  ]
+}

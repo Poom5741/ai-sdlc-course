@@ -1,0 +1,38 @@
+{
+  "questId": "quest-16-finetuning",
+  "questions": [
+    {
+      "question": "What is the typical progression of fine-tuning techniques from simplest to most advanced?",
+      "choices": [
+        "DPO → RLHF → SFT",
+        "SFT → RLHF → DPO",
+        "RLHF → SFT → DPO",
+        "SFT → DPO → RLHF"
+      ],
+      "answer": 1,
+      "explanation": "The standard progression is Supervised Fine-Tuning (SFT) with labeled examples, then RLHF (Reinforcement Learning from Human Feedback) for alignment, and finally DPO (Direct Preference Optimization) which simplifies RLHF by removing the reward model."
+    },
+    {
+      "question": "What is the main advantage of DPO over traditional RLHF?",
+      "choices": [
+        "DPO requires more training data than RLHF",
+        "DPO eliminates the need for a separate reward model by directly optimizing on preference data",
+        "DPO only works with text-to-image models",
+        "DPO is slower to train but produces better results"
+      ],
+      "answer": 1,
+      "explanation": "DPO (Direct Preference Optimization) combines the reward modeling and RL steps into a single supervised learning objective, making it simpler, more stable, and computationally cheaper than the full RLHF pipeline."
+    },
+    {
+      "question": "Why is SFT (Supervised Fine-Tuning) typically the first step before RLHF or DPO?",
+      "choices": [
+        "SFT makes the model smaller and faster",
+        "SFT teaches the model the desired output format and basic task behavior, providing a strong foundation for subsequent alignment",
+        "SFT is required by law before any model deployment",
+        "SFT removes all harmful content from the model"
+      ],
+      "answer": 1,
+      "explanation": "SFT on high-quality instruction-response pairs teaches the model the task format and expected behavior. Without this baseline, RLHF/DPO would struggle because the model wouldn't know the basic structure of good responses."
+    }
+  ]
+}

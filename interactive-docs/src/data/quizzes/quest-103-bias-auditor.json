@@ -1,0 +1,38 @@
+{
+  "questId": "quest-103-bias-auditor",
+  "questions": [
+    {
+      "question": "What is demographic parity?",
+      "choices": [
+        "Different groups have equal true positive rates",
+        "Different groups receive positive predictions at the same rate",
+        "The overall model accuracy is above 90%",
+        "Each group has the same number of samples"
+      ],
+      "answer": 1,
+      "explanation": "Demographic parity measures whether different groups receive positive predictions at similar rates. If Group A gets 40% positive predictions and Group B gets 15%, that's a demographic parity violation."
+    },
+    {
+      "question": "Why is computing a single global fairness metric misleading?",
+      "choices": [
+        "Global metrics are always wrong",
+        "Averages mask disparities between different groups",
+        "Global metrics only work for binary classification",
+        "You need at least 10 groups for a global metric"
+      ],
+      "answer": 1,
+      "explanation": "A system can have 85% overall accuracy but be 95% accurate for one group and 70% for another. Computing per-group metrics and comparing them reveals disparities that averages hide."
+    },
+    {
+      "question": "How do you compute the demographic parity gap?",
+      "choices": [
+        "Average the positive rates across all groups",
+        "Subtract the minimum positive rate from the maximum positive rate",
+        "Count how many groups have exactly the same rate",
+        "Divide the total positive predictions by total predictions"
+      ],
+      "answer": 1,
+      "explanation": "The demographic parity gap is the difference between the highest and lowest positive prediction rates across groups. A gap of 0 means perfect parity; larger gaps indicate greater disparity."
+    }
+  ]
+}

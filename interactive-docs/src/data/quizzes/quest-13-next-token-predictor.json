@@ -1,0 +1,38 @@
+{
+  "questId": "quest-13-next-token-predictor",
+  "questions": [
+    {
+      "question": "What is the core principle behind next-token prediction in LLMs?",
+      "choices": [
+        "Random token selection from vocabulary",
+        "Predicting the most likely next token given the preceding context",
+        "Memorizing entire documents word by word",
+        "Generating tokens based on the user's emotional state"
+      ],
+      "answer": 1,
+      "explanation": "Next-token prediction is the foundation of all LLMs. Given a context, the model predicts the most probable next token based on patterns learned during training."
+    },
+    {
+      "question": "What should a bigram model return when the context is empty?",
+      "choices": [
+        "An empty string",
+        "Throw an error",
+        "The most common word in the training corpus",
+        "A random word from the vocabulary"
+      ],
+      "answer": 2,
+      "explanation": "When there's no context to match against, the best fallback is the most common word in the corpus. This provides a reasonable baseline prediction."
+    },
+    {
+      "question": "Why is case normalization important in next-token prediction?",
+      "choices": [
+        "It makes the code run faster",
+        "It prevents 'The' and 'the' from being treated as different tokens",
+        "It reduces memory usage",
+        "It's required by JavaScript syntax"
+      ],
+      "answer": 1,
+      "explanation": "Without case normalization, the same word with different capitalization would be counted separately, reducing prediction accuracy. Always normalize to lowercase before matching."
+    }
+  ]
+}

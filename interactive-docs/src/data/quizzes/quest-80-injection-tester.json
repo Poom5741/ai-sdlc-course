@@ -1,0 +1,38 @@
+{
+  "questId": "quest-80-injection-tester",
+  "questions": [
+    {
+      "question": "Prompt injection attack คืออะไร?",
+      "choices": [
+        "การ inject โค้ดเข้าไปใน database",
+        "การพยายามหลอก LLM ให้ทำในสิ่งที่ไม่ควรทำ โดยการแทรก instructions ใหม่ใน input",
+        "การ inject virus เข้าไปใน computer",
+        "การเปลี่ยน model ของ LLM"
+      ],
+      "answer": 1,
+      "explanation": "Prompt injection คือ technique ที่ผู้ใช้พยายาม \"หลอก\" LLM ให้ทำตาม instructions ใหม่ที่แทรกเข้ามา — เช่น \"Ignore previous instructions\""
+    },
+    {
+      "question": "ทำไม encoding attacks (Base64) ถึงอันตราย?",
+      "choices": [
+        "เพราะ Base64 เร็วกว่า plain text",
+        "เพราะ keyword filter ที่เช็ค plain text จะไม่จับ text ที่ encode แล้ว",
+        "เพราะ Base64 ใช้ token น้อยกว่า",
+        "เพราะ LLMs ไม่เข้าใจ Base64"
+      ],
+      "answer": 1,
+      "explanation": "Keyword filter ที่เช็ค plain text จะไม่จับ malicious text ที่ encode เป็น Base64 — attacker ใช้เทคนิคนี้เพื่อ bypass defense"
+    },
+    {
+      "question": "ทำไมถึงต้องมี multiple layers of defense?",
+      "choices": [
+        "เพราะ defense เดียวแพงเกินไป",
+        "เพราะ attacks หลายประเภท bypass  defense ตัวเดียวได้ — ต้องมี layers ป้องกันซ้อนกัน",
+        "เพราะ LLMs ต้องการ defenses หลายตัว",
+        "เพราะเป็น best practice เท่านั้น ไม่จำเป็นจริง"
+      ],
+      "answer": 1,
+      "explanation": "Defense in depth — keyword filter ป้องกัน basic attacks, encoded check ป้องกัน Base64 attacks, ฯลฯ — แต่ละ defense ป้องกัน attack ต่างกัน"
+    }
+  ]
+}

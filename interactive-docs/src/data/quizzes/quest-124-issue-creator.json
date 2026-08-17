@@ -1,0 +1,27 @@
+{
+  "questId": "quest-124-issue-creator",
+  "questions": [
+    {
+      "question": "What is the purpose of using structured sections (Description, Reproduction Steps, etc.) in GitHub issues?",
+      "choices": [
+        "To make the issue look professional",
+        "To ensure consistent, actionable information for developers who need to fix it",
+        "To satisfy GitHub's minimum requirements for issue creation",
+        "To automatically close the issue when fixed"
+      ],
+      "answer": 1,
+      "explanation": "Structured sections ensure every issue contains the key information needed to understand and fix the problem: what happened, how to reproduce it, and what was expected."
+    },
+    {
+      "question": "What label should a 'bug' type issue with 'high' priority receive?",
+      "choices": [
+        "[\"error\", \"urgent\"]",
+        "[\"bug\", \"P0\"]",
+        "[\"defect\", \"critical\"]",
+        "[\"bug\", \"high\"]"
+      ],
+      "answer": 1,
+      "explanation": "Using the standard mapping: bug type → 'bug' label, high priority → 'P0' label. These labels enable filtering and automation in GitHub Projects."
+    }
+  ]
+}

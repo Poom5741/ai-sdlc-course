@@ -5,22 +5,130 @@ description: "Score how useful a code review is"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Review Quality Scorer
+# Quest 87: Review Quality Scorer
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Score how useful a code review is
+<LearningObjectives items={[
+  "How to quantify the quality of code review comments",
+  "Why not all review comments are equally useful",
+  "How to score reviews based on actionability, specificity, and constructive feedback",
+  "How to distinguish high-value feedback from nitpicking"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Measuring Review Quality
+
+Not all code reviews are created equal. Some reviewers write thoughtful, actionable feedback that makes the code better. Others write vague comments like "this is wrong" or spend 20 minutes debating variable names while ignoring a potential SQL injection. **Review quality scoring** helps teams understand how effective their review process really is.
+
+A high-quality review comment is:
+
+- **Specific** — points to the exact issue, not vague concerns
+- **Actionable** — suggests what to do, not just what's wrong
+- **Constructive** — framed as improvement, not criticism
+- **Appropriate** — focuses on real issues, not style preferences
+
+Think of it like **grading a black belt exam** — you're not just checking if techniques were performed, you're evaluating the quality, precision, and effectiveness of each movement.
+
+---
+
+## ⚙️ How It Works
+
+### Review Quality Dimensions
+
+| Dimension | High Quality | Low Quality |
+| --- | --- | --- |
+| Actionability | "Extract this into a helper function" | "This doesn't look right" |
+| Specificity | "Line 12: the regex doesn't handle escaped quotes" | "Fix the regex" |
+| Constructiveness | "Consider using a Map here for O(1) lookups" | "This is inefficient" |
+| Focus | Catches real bugs and design issues | Nitpicks formatting only |
+
+### Scoring Approach
+
+```
+1. Parse review comments
+         ↓
+2. Analyze each comment for quality signals
+         ↓
+3. Score on dimensions: actionability, specificity, constructiveness
+         ↓
+4. Weight scores and produce overall quality rating
+         ↓
+5. Identify the best and worst comments for coaching
+```
+
+---
+
+## 💡 Example: Scoring Review Comments
+
+Consider these review comments on a PR:
+
+```javascript
+// Comment 1: Low quality
+// "This is wrong."
+
+// Comment 2: High quality
+// "The regex on line 15 doesn't handle escaped quotes.
+//  Consider using: /\"\"/g or switching to a proper parser."
+
+// Comment 3: Medium quality
+// "Maybe add error handling here?"
+
+// Comment 4: High quality
+// "This loop is O(n²) because of the .find() inside.
+//  Since `users` is already an array, use a Map for O(1) lookups:
+//  const userMap = new Map(users.map(u => [u.id, u]))"
+```
+
+| Comment | Actionable | Specific | Constructive | Score |
+| --- | --- | --- | --- | --- |
+| #1 "This is wrong" | ❌ | ❌ | ❌ | 0/3 |
+| #2 Regex fix | ✅ | ✅ | ✅ | 3/3 |
+| #3 Error handling | ⚠️ | ❌ | ✅ | 1.5/3 |
+| #4 Performance fix | ✅ | ✅ | ✅ | 3/3 |
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Counting all comments as equal quality**
+> "The reviewer left 10 comments, so they did a good job"
+> → 10 vague "fix this" comments are worse than 3 specific, actionable ones. Quality > quantity.
+
+**Mistake 2: Only checking for bug reports**
+> "Good reviews catch bugs"
+> → Good reviews also suggest improvements, identify design patterns, and ask clarifying questions. Bugs are only one dimension.
+
+**Mistake 3: Ignoring tone and constructiveness**
+> "The feedback was technically correct, so it's good"
+> → "This is terrible" is technically feedback. Framing matters — constructive feedback is more likely to be adopted.
+
+**Mistake 4: Treating all code areas equally**
+> "A comment about indentation is as important as one about security"
+> → Focus on substantive issues (logic, security, performance) over stylistic ones. A scorer should weight accordingly.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-87-review-quality" />
+
+---
+
+## 🏋️ Quest: Review Quality Scorer
+
+Now it's time to practice! Build a review quality scoring system.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-87-review-quality
    cd quest-87-review-quality
@@ -28,39 +136,29 @@ Score how useful a code review is
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `scoreReview(comments)` function based on the README and test expectations
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Read the README.md for the full scoring criteria and expected output format. This quest requires careful attention to the scoring dimensions.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ README.md สำหรับ scoring criteria ที่สมบูรณ์
+- นึกถึง review comment ที่คุณเคยได้รับ — อะไรทำให้มันมีประโยชน์?
+- ลองนิยาม rules สำหรับแต่ละ dimension ก่อนเริ่ม implement
+- ถ้าติดขัด ลองเขียน review comments ตัวอย่างแล้ว score ด้วยมือก่อน

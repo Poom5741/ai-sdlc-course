@@ -1,0 +1,38 @@
+{
+  "questId": "quest-10-fix-harden",
+  "questions": [
+    {
+      "question": "What problem does positional encoding solve in Transformer models?",
+      "choices": [
+        "It reduces the number of parameters needed in the model",
+        "It gives the model awareness of token order, since self-attention alone is permutation-invariant",
+        "It replaces the need for tokenization",
+        "It speeds up the training process by skipping layers"
+      ],
+      "answer": 1,
+      "explanation": "Self-attention treats input as a set, not a sequence — it doesn't know that 'I love cats' differs from 'cats love I'. Positional encoding injects position information so the model understands token order."
+    },
+    {
+      "question": "What are the key properties of sinusoidal positional encoding?",
+      "choices": [
+        "It uses random values that change each training step",
+        "It uses sine and cosine functions of different frequencies, allowing the model to learn relative positions via linear transformations",
+        "It assigns a fixed integer to each position and adds it directly to the embedding",
+        "It only works for sequences shorter than 512 tokens"
+      ],
+      "answer": 1,
+      "explanation": "Sinusoidal encoding uses sine for even dimensions and cosine for odd dimensions at varying frequencies. This allows the model to attend to relative positions because PE(pos+k) can be expressed as a linear function of PE(pos)."
+    },
+    {
+      "question": "Why does sinusoidal positional encoding allow models to generalize to sequence lengths not seen during training?",
+      "choices": [
+        "Because it uses learned embeddings that interpolate between positions",
+        "Because the sinusoidal pattern is periodic and predictable, so the model can extrapolate to longer positions",
+        "Because it pads all sequences to a fixed length",
+        "Because it only encodes relative positions, not absolute ones"
+      ],
+      "answer": 1,
+      "explanation": "Sinusoidal functions produce a deterministic, periodic pattern. Since the pattern extends mathematically beyond training lengths, the model can generalize to longer sequences without retraining."
+    }
+  ]
+}

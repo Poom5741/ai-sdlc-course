@@ -5,22 +5,133 @@ description: "Sync tests with refactored code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Test Migration
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to update test code when source code is refactored (renamed, moved, removed)",
+  "Why word-boundary-aware replacement prevents corrupting similar identifiers",
+  "How to handle import path updates when modules are moved",
+  "Why tests must follow code — broken tests are worse than no tests"
+]} />
 
-Sync tests with refactored code
+## 📖 Concept: Test Migration with Refactoring
 
----
+Test migration คือการอัพเดท test code ให้ตรงกับ source code ที่เปลี่ยนไป — เหมือนการอัพเดทคู่มือฝึกสอนหลังจากเปลี่ยน technique ใหม่ ถ้า source code เปลี่ยนชื่อ function แต่ test ยังเรียกชื่อเก่า = tests จะ fail ทันที
 
-## วิธีทำ
+หลักการสำคัญ: **TESTS FOLLOW CODE** — เมื่อ refactoring, tests ต้อง update ให้ตรง. AI tools มักจะทำ **global string replace** ซึ่งอันตราย — ถ้า rename `get` เป็น `fetch`, global replace จะเปลี่ยน `getter` เป็น `fetchter` (substring corruption)
+
+Think of it like updating a martial arts manual after your master renames a technique — every reference must be updated precisely, or students will get confused and practice the wrong move.
+
+## ⚙️ How It Works
+
+### The Test Migration Workflow
+
+1. **Parse changes** — extract type (rename/move/remove), old name, new name/path
+2. **Apply transformations** — word-boundary-aware rename, path update, line removal
+3. **Verify** — ensure no substring corruption
+
+### The Three Operations
+
+**Rename — word-boundary-aware replacement:**
+
+```javascript
+// ❌ Naive: global string replace
+"getData" → "fetchData"  // CORRECT
+"getter" → "fetchter"    // WRONG! Substring corruption
+
+// ✅ Correct: word-boundary regex
+const regex = new RegExp(`\\b${escapeRegex('get')}\\b`, 'g');
+"getData".replace(regex, 'fetchData')  // → "fetchData" ✅
+"getter".replace(regex, 'fetchData')   // → "getter" ✅ (untouched)
+```
+
+**Move — update import paths:**
+
+```javascript
+// Before
+const { helper } = require("./old-module.js");
+
+// After move
+const { helper } = require("./new-module.js");
+```
+
+**Remove — delete test lines referencing removed code:**
+
+```javascript
+// Before
+test("removedFunc", () => { expect(removedFunc()).toBe(1); });
+test("keepFunc", () => { expect(keepFunc()).toBe(2); });
+
+// After remove removedFunc
+test("keepFunc", () => { expect(keepFunc()).toBe(2); });
+```
+
+### The Critical Rule: Word Boundaries
+
+```javascript
+// ❌ Naive: .replace('get', 'fetch')
+"const { get } = require('./problem.js');"
+"test('getter works', () => { expect(getter()).toBe(1); });"
+// After naive replace:
+"const { fetch } = require('./problem.js');"
+"test('fetchter works', () => { expect(fetchter()).toBe(1); });"  // CORRUPTED!
+
+// ✅ Correct: word-boundary regex
+// "get" matches only as whole word, not inside "getter"
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+const tests = `const { getData } = require("./problem.js");
+test("getData works", () => { expect(getData()).toBe(1); });`;
+
+const changes = [{ type: 'rename', oldName: 'getData', newName: 'fetchData' }];
+
+// Word-boundary regex: \bgetData\b → fetchData
+// "getData" matches (whole word) ✅
+// No substring issues
+
+// Output:
+const updated = `const { fetchData } = require("./problem.js");
+test("fetchData works", () => { expect(fetchData()).toBe(1); });`;
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Global string replace without word boundaries**
+> "String.replace(oldName, newName) ทุกที่"
+> → `get` → `fetch` จะทำให้ `getter` กลายเป็น `fetchter` — ใช้ word-boundary regex
+
+**Mistake 2: Not escaping regex special characters**
+> "new RegExp(oldName, 'g')"
+> → ถ้า oldName มี special chars (`.`, `*`, `+`) regex จะพัง — ต้อง escape ก่อน
+
+**Mistake 3: Not removing test lines for removed code**
+> "Rename สำเร็จแต่ลืมลบ test ของ removed function"
+> → `remove` operation ต้องลบ test lines ที่ reference removed function
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle tests ว่าง"
+> → Empty tests → return empty string
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-102-test-migration" />
+
+## 🏋️ Quest: Test Migration
+
+Now it's time to practice! Sync tests with refactored code.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-102-test-migration
    cd quest-102-test-migration
@@ -31,36 +142,19 @@ Sync tests with refactored code
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — ตรวจสอบว่า rename "get" ไม่ทำให้ "getter" กลายเป็น "fetchter"
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `migrateTests(oldTests, changes)` รับ test code string และ array ของ changes
+- Rename ต้องใช้ word-boundary-aware replacement — อย่าใช้ simple string replace
+- Move operation ต้อง update import paths
+- Remove operation ต้องลบ test lines ที่ reference removed function
 - ถ้าติดขัด ดู `_solution/solution.js`

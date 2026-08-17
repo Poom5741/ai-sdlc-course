@@ -1,0 +1,38 @@
+{
+  "questId": "quest-79-meta-prompt",
+  "questions": [
+    {
+      "question": "Meta-prompt คืออะไร?",
+      "choices": [
+        "Prompt ที่ยาวเป็นพิเศษ",
+        "Prompt ที่สร้าง prompt อื่น — เหมือน template สำหรับสร้าง templates",
+        "Prompt ที่ใช้กับ meta AI เท่านั้น",
+        "Prompt ที่ถาม AI ว่า prompt นี้ดีไหม"
+      ],
+      "answer": 1,
+      "explanation": "Meta-prompt คือ prompt ที่ generate prompt ใหม่จาก template — เหมือนแม่พิมพ์ที่หล่อชิ้นส่วนได้หลายร้อยชิ้น"
+    },
+    {
+      "question": "ทำไม meta-prompt generator ต้องมี validate() method?",
+      "choices": [
+        "เพื่อความสวยงามของ code",
+        "เพื่อเช็คว่า prompt ที่ generate ออกมาครบองค์ประกอบ (role, constraints, format)",
+        "เพื่อแปลงภาษาของ prompt",
+        "เพื่อส่ง prompt ไปให้ LLM"
+      ],
+      "answer": 1,
+      "explanation": "Validate ช่วยเช็คว่า prompt ที่ generate ออกมาครบองค์ประกอบ — ถ้าไม่มี role หรือ constraints prompt จะไม่มีคุณภาพ"
+    },
+    {
+      "question": "improve() method ใน meta-prompt generator ควรทำอะไร?",
+      "choices": [
+        "Return prompt เดิมโดยไม่เปลี่ยน",
+        "ลบ prompt แล้วสร้างใหม่",
+        "เพิ่ม feedback เข้าไปใน prompt เพื่อปรับปรุง",
+        "แปลง prompt เป็น JSON"
+      ],
+      "answer": 2,
+      "explanation": "improve() ควรเพิ่ม feedback เข้าไปใน prompt เพื่อปรับปรุงคุณภาพ — ถ้า return prompt เดิมจะไม่มีค่าจริง"
+    }
+  ]
+}

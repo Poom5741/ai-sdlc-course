@@ -5,22 +5,136 @@ description: "Generate README from codebase structure"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# README Generator
+# Quest 89: README Generator
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate README from codebase structure
+<LearningObjectives items={[
+  "How to generate structured README documentation from codebase metadata",
+  "Why README as Code means generating docs from structure, not memory",
+  "How to produce hierarchical file listings that show project organization",
+  "The importance of standard README sections: Overview, Structure, Getting Started, License"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: README as Code
+
+Every project needs a README, but most READMEs are written once and never updated. As the codebase evolves, the README falls out of sync — wrong setup instructions, missing files, outdated descriptions. **README as Code** solves this by generating the README from the actual codebase structure.
+
+Instead of manually maintaining a README, you generate it from file metadata. When new files are added, the README updates automatically. When the project structure changes, the documentation reflects the current state.
+
+Think of it like a **map that updates itself** — instead of drawing a map by hand and watching it become outdated, you have a system that reads the actual terrain and generates an accurate map every time.
+
+---
+
+## ⚙️ How It Works
+
+### README Generation Pipeline
+
+```
+1. Scan codebase for files and directories
+         ↓
+2. Collect metadata: name, path, type, description
+         ↓
+3. Build hierarchical structure (tree)
+         ↓
+4. Generate markdown sections
+         ↓
+5. Output complete README.md
+```
+
+### Required Sections
+
+| Section | Source | Purpose |
+| --- | --- | --- |
+| # Title | Project name | Identity |
+| ## Overview | Generated summary | What the project does |
+| ## Project Structure | File tree | How it's organized |
+| ## Getting Started | Placeholder | How to set it up |
+| ## License | Fixed | Legal terms |
+
+---
+
+## 💡 Example: Generating a README
+
+Given this file metadata:
+
+```javascript
+const files = [
+  { name: "src", path: "src/", type: "dir", description: "Source code" },
+  { name: "index.js", path: "src/index.js", type: "file", description: "Entry point" },
+  { name: "utils.js", path: "src/utils.js", type: "file", description: "Utility functions" },
+  { name: "test", path: "test/", type: "dir", description: "Tests" },
+  { name: "README.md", path: "README.md", type: "file" },
+  { name: "package.json", path: "package.json", type: "file" }
+];
+```
+
+The generator should produce:
+
+```markdown
+# Project
+
+## Overview
+A project with source code and tests.
+
+## Project Structure
+├── src/
+│   ├── index.js — Entry point
+│   └── utils.js — Utility functions
+├── test/
+├── README.md
+└── package.json
+
+## Getting Started
+<!-- Add setup instructions here -->
+
+## License
+<!-- Add license information here -->
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Listing all files flat instead of hierarchical**
+> "I'll just list every file in a bullet list"
+> → A flat list of 50 files is unreadable. Show hierarchy with tree-style indentation — directories should contain their children.
+
+**Mistake 2: Including every tiny file**
+> "node_modules, .git, and dist should be in the structure"
+> → Filter out build artifacts, dependencies, and hidden directories. Only include source files, configs, and documentation.
+
+**Mistake 3: Generating generic, useless descriptions**
+> "This file contains code"
+> → If the metadata includes descriptions, use them. If not, infer from the filename (e.g., `utils.js` → "Utility functions").
+
+**Mistake 4: Missing required sections**
+> "I'll just generate the file tree"
+> → A README needs more than structure. Include Overview, Getting Started, and License even as placeholders — they signal that the project is well-organized.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-89-readme-generator" />
+
+---
+
+## 🏋️ Quest: README Generator
+
+Now it's time to practice! Build a README generator from file metadata.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-89-readme-generator
    cd quest-89-readme-generator
@@ -28,39 +142,34 @@ Generate README from codebase structure
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `generateReadme(files)` function that:
+   - Takes an array of file metadata objects
+   - Generates a hierarchical project structure (tree-style)
+   - Includes all required sections (Title, Overview, Structure, Getting Started, License)
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Critical edge case:** Show directory hierarchy with indentation, not a flat list
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Build the tree structure first, then format it as markdown. Separating data from formatting makes the code cleaner.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- แยก data structure (tree) ออกจาก formatting (markdown) — ทำทีละขั้น
+- อย่าลืม filter ไฟล์ที่ไม่จำเป็น เช่น node_modules, .git
+- สร้าง tree structure ก่อน แล้ว render เป็น markdown ทีหลัง
+- ตรวจสอบ test cases เพื่อดูว่า output format ที่ต้องการเป็นอย่างไร

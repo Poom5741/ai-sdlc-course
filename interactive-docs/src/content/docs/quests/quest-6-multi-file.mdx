@@ -5,62 +5,156 @@ description: "Detect AI fabricated information"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 6: Hallucination Detector
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Detect AI fabricated information
+<LearningObjectives items={[
+  "Why AI models hallucinate (fabricate information)",
+  "How to detect claims that contradict known facts",
+  "How to distinguish factual claims from opinions",
+  "The engineering habit: VERIFY BEFORE TRUST"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Hallucination
+
+AI models มีแนวโน้มจะ **hallucinate** — สร้างข้อมูลที่ดูน่าเชื่อถือแต่ไม่เป็นจริง เช่น บอกว่า "Einstein ได้ Nobel Prize สาขา Physics ในปี 1921" (จริง) แต่ก็อาจบอกว่า "Einstein เกิดในปี 1885" (ผิด — จริงๆ คือ 1879)
+
+ปัญหาคือ AI จะ **พูดด้วยความมั่นใจเสมอ** แม้จะโกหก ดังนั้นเราต้องมี system ที่ตรวจสอบข้อเท็จจริง (fact-checking) กับ known sources
+
+---
+
+## ⚙️ How It Works
+
+### Hallucination Detection Workflow
+
+```
+1. แยก factual claims จาก text
+         ↓
+2. เปรียบเทียบแต่ละ claim กับ knownFacts
+         ↓
+3. จัดประเภท: 'contradicts' หรือ 'unsupported'
+         ↓
+4. Return array of findings
+```
+
+### ประเภท Hallucination
+
+| ประเภท | ตัวอย่าง | ผลลัพธ์ |
+| --- | --- | --- |
+| **Contradicts** | "Einstein เกิด 1885" (จริง: 1879) | `{ claim: "...", reason: 'contradicts', fact: "Einstein เกิด 1879" }` |
+| **Unsupported** | "Einstein เคยไปญี่ปุ่น" (ไม่มี fact ยืนยัน) | `{ claim: "...", reason: 'unsupported' }` |
+| **Supported** | "Einstein ได้ Nobel Prize" (มี fact ยืนยัน) | ไม่ถูก flag |
+
+---
+
+## 💡 Example: Detection in Practice
+
+```javascript
+function detectHallucinations(text, knownFacts) {
+  const findings = [];
+  
+  // แยก sentences (claims)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    
+    // ตรวจสอบว่าเป็น factual claim หรือไม่
+    if (isFactualClaim(trimmed)) {
+      // เปรียบเทียบกับ knownFacts
+      const match = knownFacts.find(fact => 
+        fact.toLowerCase().includes(trimmed.toLowerCase()) ||
+        trimmed.toLowerCase().includes(fact.toLowerCase())
+      );
+      
+      if (!match) {
+        findings.push({ claim: trimmed, reason: 'unsupported' });
+      }
+    }
+  }
+  
+  return findings;
+}
+
+// Helper: ตรวจสอบว่าเป็น factual claim หรือ opinion
+function isFactualClaim(sentence) {
+  const opinionIndicators = ['I think', 'I believe', 'maybe', 'perhaps', 'in my opinion'];
+  return !opinionIndicators.some(indicator => 
+    sentence.toLowerCase().includes(indicator.toLowerCase())
+  );
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ตรวจจับทุก statement**
+> คิดว่าทุกประโยคเป็น factual claim
+> → ต้องแยก opinions ออก (I think, I believe, maybe)
+
+**Mistake 2: ไม่ check contradictions**
+> เจอ unsupported แต่ลืม check contradictions
+> → ต้องตรวจสอบทั้ง 2 ประเภท
+
+**Mistake 3: Case sensitivity**
+> เปรียบเทียบแบบ case-sensitive ทำให้พลาด matches
+> → ต้อง `.toLowerCase()` เปรียบเทียบ
+
+**Mistake 4: ไม่ return fact ที่ contradicts**
+> บอกว่า contradicts แต่ไม่บอกว่า fact จริงคืออะไร
+> → ต้อง return `fact` field ด้วย
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-6-multi-file" />
+
+---
+
+## 🏋️ Quest: Hallucination Detector
+
+เขียน function ที่ตรวจจับ AI hallucinations จากข้อความ
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-06-hallucination-detector
    cd quest-06-hallucination-detector
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `detectHallucinations(text, knownFacts)` ตาม instructions
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ: contradictions, unsupported claims, opinions
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI ตรวจจับทุก statement ให้บอกว่าต้องแยก opinions ออกด้วย
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี rules ระบุไว้
+- ต้อง return array ของ objects ที่มี: claim, reason, fact (optional)
+- แยก factual claims จาก opinions — ไม่ต้องตรวจจับ opinions
+- ทดสอบ contradictions, unsupported claims, mixed text

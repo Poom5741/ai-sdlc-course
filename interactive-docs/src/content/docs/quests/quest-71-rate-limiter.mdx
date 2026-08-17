@@ -1,66 +1,179 @@
 ---
 title: "Quest 71 - Rate Limiter for LLM APIs"
-description: "Token bucket rate limiter"
+description: "สร้าง token bucket rate limiter สำหรับ保護 LLM API budget"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 71: Rate Limiter for LLM APIs
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Token bucket rate limiter
+<LearningObjectives items={[
+  "สร้าง token bucket rate limiter ที่ refill tokens ตามเวลา",
+  "เข้าใจ token bucket algorithm — consume, refill, max capacity",
+  "รู้จัก retry-after calculation — บอกว่าต้องรอนานแค่ไหน",
+  "ออกแบบ rate limiter ที่ป้องกัน budget overrun"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Token Bucket Rate Limiter
+
+Rate Limiter คือ guardian ของ LLM API budget — มันป้องกันไม่ให้ app ของคุณ **ยิง API เร็วเกินไป** จนเกิน rate limit หรือหมด budget
+
+Token Bucket Algorithm ทำงานแบบนี้:
+
+- Bucket มี tokens สูงสุด `maxTokens`
+- Tokens refill ช้าๆ ตามเวลา (`refillRate` tokens/วินาที)
+- ทุก request ต้อง consume tokens — ถ้าไม่พอ = denied
+
+```javascript
+const limiter = createRateLimiter({
+  maxTokens: 10,
+  refillRate: 2, // 2 tokens ต่อวินาที
+});
+
+limiter.consume(5); // { allowed: true, remaining: 5, retryAfter: 0 }
+limiter.consume(8); // { allowed: false, remaining: 5, retryAfter: 1.5 }
+```
+
+---
+
+## ⚙️ How It Works
+
+### Token Bucket Algorithm
+
+```
+1. consume(tokens) — พยายามใช้ tokens
+         ↓
+2. ถ้า tokens >= allowed → allowed! deduct tokens
+   ถ้า tokens < allowed → denied! คำนวณ retryAfter
+         ↓
+3. Refill — tokens กลับมาช้าๆ ตาม refillRate
+         ↓
+4. available() — ดูว่ามี tokens เท่าไหร่ตอนนี้
+         ↓
+5. reset() — รีเซ็ต bucket เต็มใหม่
+```
+
+### Token Bucket vs Fixed Window
+
+```javascript
+// ❌ Fixed Window — ไม่ refill ตามเวลา
+// ใช้ 10 requests ต่อนาที แล้ว reset ทุกนาที
+// ปัญหา: ใช้ 10 requests ใน 1 วินาทีแรก = รอ 59 วินาที
+
+// ✅ Token Bucket — refill ช้าๆ
+// ใช้ tokens ได้เรื่อยๆ จนกว่าจะหมด
+// refill 2 tokens/วินาที = รอไม่นานก็ใช้ได้ใหม่
+```
+
+---
+
+## 💡 Example: Rate Limiter ใน action
+
+```javascript
+const limiter = createRateLimiter({
+  maxTokens: 10,
+  refillRate: 2, // 2 tokens ต่อวินาที
+});
+
+// เริ่มต้นด้วย tokens เต็ม
+console.log(limiter.available()); // 10
+
+// ใช้ 5 tokens
+const r1 = limiter.consume(5);
+console.log(r1);
+// { allowed: true, remaining: 5, retryAfter: 0 }
+
+// ใช้อีก 8 tokens — ไม่พอ!
+const r2 = limiter.consume(8);
+console.log(r2);
+// { allowed: false, remaining: 5, retryAfter: 1.5 }
+// ต้องรอ 1.5 วินาที ถึงจะมี tokens พอ (3 tokens needed ÷ 2/sec = 1.5s)
+
+// รีเซ็ต
+limiter.reset();
+console.log(limiter.available()); // 10
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ fixed window แทน token bucket**
+> "Reset ทุกวินาทีก็พอ"
+> → Token bucket refill ช้าๆ — ไม่ใช่ reset ทั้งหมดพร้อมกัน
+
+**Mistake 2: ไม่คำนวณ retryAfter**
+> "Just deny when no tokens"
+> → ต้องบอกว่าต้องรอนานแค่ไหน — app จะได้ retry ถูกเวลา
+
+**Mistake 3: Refill ไม่ได้ update ตามเวลาจริง**
+> "Refill เมื่อมี request เท่านั้น"
+> → Refill ต้องคำนวณจาก elapsed time — ไม่ใช่แค่ตอน request
+
+**Mistake 4: Max tokens ไม่ limit**
+> "Tokens ไม่มีวันหมด"
+> → Bucket ต้องมี maxTokens — ไม่เช่นนั้น refill ไม่จำกัด = ไม่ใช่ rate limit
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-71-rate-limiter" />
+
+---
+
+## 🏋️ Quest: Rate Limiter for LLM APIs
+
+สร้าง token bucket rate limiter ที่ refill tokens ตามเวลาจริง
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-71-rate-limiter
    cd quest-71-rate-limiter
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createRateLimiter(config)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: tokens refill ตามเวลาจริง (ไม่ใช่ reset ทั้งหมด)
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง scenario ที่ผ่านไป 3 วินาที — tokens ควร refill 6 tokens (3s × 2/s) ไม่ใช่ reset เป็น 10
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Refill ต้องคำนวณจาก elapsed time: `tokens += elapsed * refillRate`
+- Tokens ต้องไม่เกิน maxTokens
+- retryAfter = `(tokensNeeded - available) / refillRate`
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

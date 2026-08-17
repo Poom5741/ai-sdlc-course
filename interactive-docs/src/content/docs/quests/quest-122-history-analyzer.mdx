@@ -1,66 +1,196 @@
 ---
-title: "Git History Analyzer"
+title: "Quest 122 - Git History Analyzer"
 description: "Parse git log and detect bad patterns"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Git History Analyzer
+# Quest 122: Git History Analyzer
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Parse git log and detect bad patterns
+<LearningObjectives items={[
+  "How to parse git log data into structured format",
+  "Detecting force pushes from broken parent chains",
+  "Identifying revert, squash, and merge patterns in commit messages",
+  "Computing contributor statistics from commit history"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Git History Analysis
+
+Git history ไม่ได้มีไว้แค่ดู — มันเป็น **ข้อมูลเชิงลึก** เกี่ยวกับสุขภาพของโปรเจคของคุณ ถ้าคุณรู้วิธีอ่านมัน คุณจะเห็นลวดลายที่ซ่อนอยู่: force pushes ที่บ่งบอกว่าใครบางคน rewrote history, reverts ที่บอกว่ามี bug ถูก push ขึ้นไป, และ merge commits ที่บอกว่าทีมกำลัง merge บ่อยเกินไป
+
+Think of git history like an opponent's fight record — every past match tells you patterns, weaknesses, and habits. An experienced fighter reads the history; a novice just looks at the latest win.
+
+---
+
+## ⚙️ How It Works
+
+### Detecting Bad Patterns
+
+```
+1. FORCE PUSH DETECTION
+   ถ้า commit ของ author X มี parent ที่ไม่ตรงกับ previous commit ของ X
+   → มี force push เกิดขึ้น
+
+2. REVERT DETECTION
+   commit message ที่มี "revert" → มี code ถูก undo
+
+3. SQUASH DETECTION
+   commit message ที่มี "squash" หรือ "fixup" → มี commit ถูก combine
+
+4. MERGE DETECTION
+   commit message ที่ขึ้นต้นด้วย "merge" → merge commit
+```
+
+### Contributor Statistics
+
+```javascript
+{
+  contributors: { "Alice": 45, "Bob": 32 },
+  stats: {
+    totalCommits: 77,
+    uniqueAuthors: 2,
+    dateRange: "2024-01-01 to 2024-03-15"
+  }
+}
+```
+
+---
+
+## 💡 Example: Analyzing Git History
+
+```javascript
+function analyzeGitHistory(logs) {
+  const warnings = [];
+  const contributors = {};
+  const authorLastHash = {};
+
+  // Track contributor counts
+  for (const log of logs) {
+    contributors[log.author] = (contributors[log.author] || 0) + 1;
+  }
+
+  // Detect force pushes and bad patterns
+  for (let i = 0; i < logs.length; i++) {
+    const log = logs[i];
+
+    // Force push: parent doesn't match previous commit by same author
+    if (log.parent && authorLastHash[log.author]) {
+      if (log.parent !== authorLastHash[log.author]) {
+        warnings.push(`force push detected: ${log.author} commit ${log.hash}`);
+      }
+    }
+    authorLastHash[log.author] = log.hash;
+
+    // Message pattern detection
+    const msg = log.message || '';
+    if (/revert/i.test(msg)) {
+      warnings.push(`revert detected in commit ${log.hash}`);
+    }
+    if (/squash|fixup/i.test(msg)) {
+      warnings.push(`squash detected in commit ${log.hash}`);
+    }
+    if (/^merge/i.test(msg)) {
+      warnings.push(`merge commit detected: ${log.hash}`);
+    }
+  }
+
+  // Date range
+  const dates = logs.map(l => l.date).filter(Boolean).sort();
+  const dateRange = dates.length > 0
+    ? `${dates[0]} to ${dates[dates.length - 1]}`
+    : '';
+
+  return {
+    contributors,
+    warnings,
+    stats: {
+      totalCommits: logs.length,
+      uniqueAuthors: Object.keys(contributors).length,
+      dateRange,
+    },
+  };
+}
+```
+
+**Key insight:** Force push detection อาศัยการเปรียบเทียบ parent hash — ถ้า parent ของ commit ปัจจุบันไม่ตรงกับ hash ของ previous commit จาก author คนเดียวกัน → มี force push เกิดขึ้น
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ track parent chain ต่อ author**
+> AI นับ commits แต่ไม่ track ว่าแต่ละ author มี last hash อะไร
+> → Force push ไม่ถูก detect
+
+**Mistake 2: ตรวจแค่ commit hash ไม่เช็ค parent**
+> AI เช็คว่า hash มีค่า แต่ไม่เช็คว่า parent chain ต่อเนื่อง
+> → Broken chains ไม่ถูกจับ
+
+**Mistake 3: ไม่ handle empty logs array**
+> AI เขียนโค้ดที่ assuming logs.length > 0 เสมอ
+> → Empty array ทำให้ crash
+
+**Mistake 4: ไม่ filter date ก่อน sort**
+> บาง log ไม่มี date field → sort พัง
+> → ต้อง filter Boolean ก่อน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-122-history-analyzer" />
+
+---
+
+## 🏋️ Quest: Git History Analyzer
+
+Now it's time to practice! Analyze git history for bad patterns and contributor stats.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-122-history-analyzer
    cd quest-122-history-analyzer
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `analyzeGitHistory(logs)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ force push detection logic
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Force push detection คือหัวใจของ quest นี้ — ถ้าคุณ track `authorLastHash` ได้ถูกต้อง ที่เหลือจะง่ายขึ้นมาก
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: force push detection ต้อง track last hash ต่อ author
+- อย่าลืม handle empty logs array
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

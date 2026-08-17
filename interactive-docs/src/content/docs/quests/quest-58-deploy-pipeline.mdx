@@ -5,62 +5,168 @@ description: "Design deployment pipeline architecture"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 58: Deployment Pipeline Designer
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design deployment pipeline architecture
+<LearningObjectives items={[
+  "How to design a deployment pipeline with at least 5 stages",
+  "Why gate criteria at each stage prevent broken code from reaching production",
+  "How environment progression (dev → staging → prod) catches issues early",
+  "The importance of rollback strategy and monitoring integration"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Deployment Pipeline Architecture
+
+A deployment pipeline is a series of automated gates that every code change must pass through before reaching production. Think of it like a martial arts belt progression — you don't skip from white to black belt. Each stage proves you're ready for the next one.
+
+The key engineering habit is: **pipeline as gatekeeper.** Every change must pass through automated checks before reaching production. No exceptions, no shortcuts. The pipeline is the team's shared quality contract.
+
+---
+
+## ⚙️ How It Works
+
+### The 5+ Stage Pipeline
+
+```
+Code Commit
+    ↓
+[Stage 1: Build] → Compile, bundle, create artifacts
+    ↓ Gate: Build succeeds, no compilation errors
+[Stage 2: Test] → Unit tests, integration tests
+    ↓ Gate: All tests pass, coverage ≥ threshold
+[Stage 3: Security Scan] → SAST, dependency audit, secret scanning
+    ↓ Gate: No critical/high vulnerabilities
+[Stage 4: Staging Deploy] → Deploy to staging environment
+    ↓ Gate: Smoke tests pass, health checks green
+[Stage 5: Production Deploy] → Canary/rolling/blue-green deploy
+    ↓ Gate: Error rate < threshold, latency within bounds
+[Stage 6: Post-Deploy Monitor] → Watch metrics for 15-30 min
+    ↓ Gate: No anomaly alerts
+✅ Live
+```
+
+### Why Each Stage Matters
+
+| Stage | Catches | Cost of skipping |
+| --- | --- | --- |
+| Build | Syntax errors, missing deps | Broken artifact reaches tests |
+| Test | Logic bugs, regressions | Users find the bugs |
+| Security | Vulnerabilities, secrets | Data breach, compliance violation |
+| Staging | Environment-specific issues | "Works on my machine" in prod |
+| Production | Runtime errors, performance | Outage, data loss |
+| Monitoring | Latent issues | Slow degradation unnoticed |
+
+---
+
+## 💡 Example: Pipeline Design Document
+
+```markdown
+## Pipeline Stages
+
+### 1. Build
+- Trigger: git push to main
+- Actions: npm ci, npm run build, create Docker image
+- Gate: Build succeeds, image created
+
+### 2. Test
+- Actions: npm test, npm run test:integration
+- Gate: 100% tests pass, coverage ≥ 80%
+
+### 3. Security Scan
+- Actions: npm audit, gitleaks scan, Snyk test
+- Gate: No critical/high CVEs, no leaked secrets
+
+### 4. Staging Deploy
+- Actions: Deploy to staging cluster, run smoke tests
+- Gate: Health check passes, smoke tests green
+
+### 5. Production Deploy
+- Strategy: Canary (10% → 50% → 100%)
+- Gate: Error rate < 1%, p95 latency < 500ms
+
+### 6. Post-Deploy Monitor
+- Actions: Watch dashboards for 30 minutes
+- Gate: No anomaly alerts triggered
+
+## Rollback Strategy
+- Automatic rollback if error rate > 5% during canary
+- Manual rollback: revert last deployment, previous version auto-restored
+- Database migrations: backward-compatible only, separate rollback scripts
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Skipping stages**
+> "Let's just deploy straight to prod to save time"
+> → Each skipped stage is a bug that reaches users. The time you save is dwarfed by the time you spend on incident response.
+
+**Mistake 2: No gate criteria**
+> "The pipeline runs but doesn't block on failure"
+> → A pipeline that doesn't block is just a suggestion. Define clear pass/fail criteria for each stage.
+
+**Mistake 3: Missing rollback strategy**
+> "We'll figure out how to roll back if something goes wrong"
+> → By the time something goes wrong, you need a plan NOW — not a plan you're writing while your service is down.
+
+**Mistake 4: No monitoring integration**
+> "Deploy and pray"
+> → Post-deploy monitoring catches issues that automated tests miss: memory leaks, latency spikes, error rate increases.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-58-deploy-pipeline" />
+
+---
+
+## 🏋️ Quest: Deployment Pipeline Designer
+
+Now it's time to practice! Design a deployment pipeline architecture with at least 5 stages.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-58-deploy-pipeline
    cd quest-58-deploy-pipeline
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor — it describes the pipeline requirements
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Write `deploy-pipeline.md` covering: pipeline stages (5+), gate criteria, rollback strategy, environment progression, and monitoring integration
 
-4. ตรวจสอบ solution ของคุณ:
+4. Make sure each stage has clear pass/fail criteria — a pipeline without gates is just a suggestion
+
+5. Verify the design meets all requirements described in `problem.js`
+
+6. When ready, submit your solution:
+
    ```bash
-   node test.js
+   npx bluebeltdojo submit
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Think about what happens when each stage fails. Who gets notified? Does the pipeline stop? What's the rollback path? A good pipeline design answers these questions for every stage.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — ต้องมี pipeline stages อย่างน้อย 5 stages
+- ทุก stage ต้องมี gate criteria ที่ชัดเจน (pass/fail)
+- ต้องมี rollback strategy — คิดว่าถ้า production พังจะทำยังไง
+- ต้องมี environment progression: dev → staging → prod
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

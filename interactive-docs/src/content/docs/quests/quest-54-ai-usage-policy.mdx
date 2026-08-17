@@ -5,62 +5,154 @@ description: "Generate organizational AI usage policies"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 54: AI Usage Policy Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate organizational AI usage policies
+<LearningObjectives items={[
+  "How to write a comprehensive AI usage policy for an organization",
+  "Why policies must cover approved tools, prohibited uses, and data handling",
+  "How attribution and disclosure requirements protect the team",
+  "The importance of enforcement mechanisms and review cadence"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Usage Policy
+
+An AI usage policy is a document that tells your team: "Here's how we use AI tools, here's what's off-limits, and here's what happens if you break the rules." Without one, every developer makes their own judgment calls — some conservative, some reckless.
+
+Think of it like a dojo's training rules. Without clear rules, some students train safely while others injure themselves and others. A policy sets the *defaults* for the entire team. What you permit, you encourage. What you prohibit, you prevent.
+
+The key insight: **policy drives culture.** A well-written AI usage policy doesn't just list rules — it shapes how the entire organization thinks about AI. It answers questions before they're asked: Can I paste customer data into ChatGPT? Can I commit AI-generated code without review? Can I use AI to write performance reviews?
+
+---
+
+## ⚙️ How It Works
+
+### The Six Pillars of an AI Usage Policy
+
+```
+1. Approved Tools & Permitted Uses
+   → Which AI tools are allowed and for what purposes
+         ↓
+2. Prohibited Uses (at least 5 specific prohibitions)
+   → What you absolutely cannot do with AI
+         ↓
+3. Data Handling Rules
+   → What can/cannot be sent to external AI services
+         ↓
+4. Attribution & Disclosure
+   → When and how to disclose AI involvement
+         ↓
+5. Consequences
+   → What happens when the policy is violated
+         ↓
+6. Review Cadence
+   → How often the policy is updated
+```
+
+### Why Each Pillar Matters
+
+**Approved tools** — Without a whitelist, developers might use tools that haven't been security-vetted. One tool might send data to servers in jurisdictions with weak privacy laws.
+
+**Prohibited uses** — "Don't do bad things" isn't specific enough. You need explicit prohibitions like: don't paste customer PII into AI tools, don't use AI for disciplinary actions, don't generate code that mimics copyrighted material without review.
+
+**Data handling** — This is where most real-world incidents happen. A developer pastes a database schema with customer names into a free-tier AI tool. The data is now on someone else's server.
+
+---
+
+## 💡 Example: Policy Sections in Practice
+
+```markdown
+## Approved AI Tools
+- GitHub Copilot (Business tier — no code retention)
+- Claude (Team plan — data not used for training)
+- Internal LLM (no restrictions)
+
+## Prohibited Uses
+1. Do NOT paste customer PII, credentials, or proprietary algorithms into ANY AI tool
+2. Do NOT use AI to generate performance reviews or disciplinary documents
+3. Do NOT commit AI-generated code without human review
+4. Do NOT use AI to draft legal contracts without legal team approval
+5. Do NOT use free-tier AI tools for company work (data retention risk)
+
+## Data Handling
+- PUBLIC data: Can be sent to any approved AI tool
+- INTERNAL data: Only approved tools with data processing agreements
+- CONFIDENTIAL data: Only internal LLM or approved tools with explicit DPA
+- RESTRICTED data: NEVER send to external AI services
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Writing a policy that's too vague**
+> "Use AI tools responsibly"
+> → Vague policies are unenforceable. Be specific: name the tools, name the prohibitions, name the consequences.
+
+**Mistake 2: Forgetting the consequences section**
+> "Here are the rules... but nothing happens if you break them"
+> → Without enforcement, a policy is just a suggestion. Define consequences: warnings, training, access revocation.
+
+**Mistake 3: Not defining data classification levels**
+> "Don't send sensitive data to AI"
+> → What counts as "sensitive"? Define clear categories: public, internal, confidential, restricted.
+
+**Mistake 4: No review cadence**
+> "We wrote the policy in 2024 and never updated it"
+> → AI tools change fast. Review and update the policy at least quarterly.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-54-ai-usage-policy" />
+
+---
+
+## 🏋️ Quest: AI Usage Policy Generator
+
+Now it's time to practice! Write an organizational AI usage policy that covers all six pillars.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-54-ai-usage-policy
    cd quest-54-ai-usage-policy
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor — it describes the policy requirements
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Write `ai-usage-policy.md` covering all six pillars: approved tools, prohibited uses, data handling, attribution, consequences, and review cadence
 
-4. ตรวจสอบ solution ของคุณ:
+4. Make sure you have at least **5 specific prohibitions** (not just "use AI responsibly")
+
+5. Verify the policy meets all requirements described in `problem.js`
+
+6. When ready, submit your solution:
+
    ```bash
-   node test.js
+   npx bluebeltdojo submit
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Think about real-world scenarios. What would a junior developer accidentally do with AI that could cause a data breach? That's the scenario your policy must prevent.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี 6 pillars ที่ต้องครอบคลุม
+- เขียน prohibited uses อย่างน้อย 5 ข้อ ให้เฉพาะเจาะจง (เช่น "อย่า paste PII" ไม่ใช่ "ใช้ AI อย่างระมัดระวัง")
+- นึกถึง scenario จริง: นักพัฒนา junior อาจทำอะไรผิดกับ AI ได้บ้าง? นโยบายต้องป้องกันสิ่งนั้น
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

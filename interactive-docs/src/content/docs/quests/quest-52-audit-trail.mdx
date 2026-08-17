@@ -5,22 +5,167 @@ description: "Implement audit logging with filtering"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 52: Audit Trail System
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Implement audit logging with filtering
+<LearningObjectives items={[
+  "Implement an audit logging system that records all critical actions",
+  "Build multi-criteria query filtering for audit log entries",
+  "Learn to generate statistics from audit data for compliance reporting",
+  "Understand why audit trails are essential for incident investigation"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Audit Everything — When Things Go Wrong
+
+กฎทองของ compliance: **ถ้าไม่มี log ก็ไม่มีหลักฐาน** เมื่อเกิด security incident, data breach, หรือ compliance audit — สิ่งแรกที่ทุกคนถามคือ "เกิดอะไรขึ้น? ใครทำ? เมื่อไหร่?" ถ้าไม่มี audit trail คำตอบคือ "ไม่รู้"
+
+Audit trail คือ sequential record ของทุก action ที่เกิดขึ้นในระบบ — ใครทำอะไร เมื่อไหร่ ด้วยผลลัพธ์อะไร ใช้เป็น evidence สำหรับ compliance (SOC2, GDPR, HIPAA) และเป็นเครื่องมือสำคัญสำหรับ incident investigation
+
+Think of it like a black box on an airplane: you hope you never need it, but when something goes wrong, it's the only way to understand what happened.
+
+---
+
+## ⚙️ How It Works
+
+### Audit Log Entry Structure
+
+```javascript
+{
+  id: 'audit-001',
+  timestamp: '2024-01-15T10:30:00Z',
+  action: 'user.login',
+  userId: 'user-123',
+  details: {
+    ip: '192.168.1.100',
+    userAgent: 'Mozilla/5.0...',
+    success: true,
+  },
+  result: 'success',
+}
+```
+
+### Query System Architecture
+
+```
+1. Log entry arrives
+         ↓
+2. Store with timestamp, action, userId
+         ↓
+3. Query by: userId, action, date range
+         ↓
+4. Filter results (AND logic for multiple criteria)
+         ↓
+5. Return filtered entries
+```
+
+### Statistics Generation
+
+```
+Query: All entries
+         ↓
+Aggregate by action type → { login: 45, logout: 42, ... }
+Aggregate by user → { user-123: 20, user-456: 15, ... }
+Count total → 127
+         ↓
+Return { total, byAction, byUser }
+```
+
+---
+
+## 💡 Example: Building an Audit Trail System
+
+```javascript
+function createAuditLog() {
+  const entries = [];
+  let idCounter = 0;
+
+  return {
+    log(action, userId, details = {}) {
+      const entry = {
+        id: `audit-${String(++idCounter).padStart(3, '0')}`,
+        timestamp: new Date().toISOString(),
+        action,
+        userId,
+        details,
+      };
+      entries.push(entry);
+      return entry;
+    },
+
+    query(filters = {}) {
+      return entries.filter(entry => {
+        if (filters.userId && entry.userId !== filters.userId) return false;
+        if (filters.action && entry.action !== filters.action) return false;
+        if (filters.from && entry.timestamp < filters.from) return false;
+        if (filters.to && entry.timestamp > filters.to) return false;
+        return true;
+      });
+    },
+
+    getStats() {
+      const byAction = {};
+      const byUser = {};
+
+      for (const entry of entries) {
+        byAction[entry.action] = (byAction[entry.action] || 0) + 1;
+        byUser[entry.userId] = (byUser[entry.userId] || 0) + 1;
+      }
+
+      return { total: entries.length, byAction, byUser };
+    },
+
+    export() {
+      return JSON.stringify(entries, null, 2);
+    },
+  };
+}
+```
+
+**Key insight:** The `query` method supports multi-criteria filtering — you can filter by userId AND action AND date range simultaneously, which is essential for real-world incident investigation.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Logging but not querying**
+> "We store all logs in Elasticsearch"
+> → Storing logs is useless if you can't query them efficiently. Build the query system alongside the logging system.
+
+**Mistake 2: No timestamp precision**
+> `timestamp: Date.now()` gives milliseconds, but you need ISO format for date range queries. Use `new Date().toISOString()` for consistent formatting.
+
+**Mistake 3: Missing multi-criteria filtering**
+> "We can filter by userId OR action"
+> → Real investigations need AND logic: "show me all login attempts by user-123 in the last 24 hours." Single-criteria filtering isn't enough.
+
+**Mistake 4: No export capability**
+> "Developers can query the database directly"
+> → Compliance auditors and incident responders need export capability. JSON export is the universal format.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-52-audit-trail" />
+
+---
+
+## 🏋️ Quest: Audit Trail System
+
+สร้าง audit logging system ที่ log, query, generate statistics, และ export ได้ — AI มักจะ proposal query ที่ filter ได้แค่ criteria เดียว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-52-audit-trail
    cd quest-52-audit-trail
@@ -28,9 +173,14 @@ Implement audit logging with filtering
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createAuditLog()` ที่มี:
+   - `log(action, userId, details)` — สร้าง entry พร้อม timestamp
+   - `query({ userId, action, from, to })` — filter entries ด้วย multi-criteria
+   - `getStats()` — return `{ total, byAction, byUser }`
+   - `export()` — return JSON string ของ entries ทั้งหมด
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +211,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- `query` ต้อง filter ด้วย AND logic — ทั้ง userId, action, from, to พร้อมกัน
+- ใช้ `new Date().toISOString()` สำหรับ timestamp เพื่อให้ date range comparison ถูกต้อง
+- `getStats()` ต้อง aggregate ทั้ง byAction และ byUser ใน pass เดียว
+- ถ้าติดขัด ลองนึกว่า compliance auditor จะ query audit log ยังไง — นั่นคือสิ่งที่คุณต้อง support

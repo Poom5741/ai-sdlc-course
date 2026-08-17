@@ -1,66 +1,193 @@
 ---
-title: "Branching Strategy"
+title: "Quest 120 - Branching Strategy"
 description: "Branching, merging, and fast-forward"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Branching Strategy
+# Quest 120: Branching Strategy
 
 <Badge text="easy" variant="success" /> <Badge text="20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Branching, merging, and fast-forward
+<LearningObjectives items={[
+  "When to use fast-forward merge vs merge commit",
+  "How to detect if source and target branches have diverged",
+  "How file conflicts arise when both branches modify the same file",
+  "Why choosing the right merge strategy keeps history clean"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Git Branching & Merge Strategies
+
+Git branching เป็นหนึ่งในอาวุธที่ทรงพลังที่สุดของ Git — มันให้คุณแยกโค้ดออกมาทำงานได้โดยไม่กระทบ main branch แต่เมื่อถึงเวลา merge กลับ คุณต้องเลือกกลยุทธ์ที่ถูกต้อง
+
+Think of branches like parallel training paths in a dojo. Two fighters train separately, and eventually they need to synchronize their techniques. Sometimes one just follows the other's lead (fast-forward), and sometimes both have evolved and need to negotiate (merge commit).
+
+---
+
+## ⚙️ How It Works
+
+### Three Merge Strategies
+
+```
+1. FAST-FORWARD — source base = target tip
+   Before:  A → B → C  (target/main)
+                  \
+                   D → E  (source/feature)
+
+   After:   A → B → C → D → E  (main)
+   History: ไม่มี merge commit, สะอาดที่สุด
+
+
+2. MERGE — source & target diverged
+   Before:  A → B → C  (target/main)
+                  \
+                   D → E  (source/feature)
+
+   After:   A → B → C ───┐  (main)
+                  \       │
+                   D → E ─┘  (feature)
+                     F ← merge commit
+
+3. UP-TO-DATE — source base = target tip, no new commits
+   Source has no commits ahead of target → nothing to do
+```
+
+### Conflict Detection
+
+เมื่อทั้ง source และ target แก้ไขไฟล์เดียวกัน เกิด **conflict**:
+
+```javascript
+// source modified: login.js
+// target modified: login.js
+// → CONFLICT! Git ไม่รู้ว่าจะใช้เวอร์ชันไหน
+```
+
+---
+
+## 💡 Example: Planning a Merge Strategy
+
+```javascript
+function planMergeStrategy(source, target, history) {
+  const sourceBase = source.commits[0]; // first commit of source branch
+  const targetTip = target.commits[target.commits.length - 1];
+
+  // Check if source is up-to-date with target
+  if (source.commits.length === 0) {
+    return { strategy: 'up-to-date', reason: 'source has no new commits' };
+  }
+
+  // Fast-forward: source base is the tip of target
+  if (sourceBase === targetTip) {
+    return {
+      strategy: 'fast-forward',
+      reason: 'source base matches target tip — no merge commit needed'
+    };
+  }
+
+  // Diverged: check for conflicts
+  const conflicts = [];
+  for (const hash of source.commits) {
+    const commit = history[hash];
+    if (commit.files) {
+      for (const file of commit.files) {
+        // Check if target also modified this file
+        for (const tHash of target.commits) {
+          const tCommit = history[tHash];
+          if (tCommit.files && tCommit.files.includes(file)) {
+            conflicts.push(file);
+          }
+        }
+      }
+    }
+  }
+
+  if (conflicts.length > 0) {
+    return {
+      strategy: 'merge',
+      reason: 'branches diverged with conflicting changes',
+      conflicts: [...new Set(conflicts)]
+    };
+  }
+
+  return { strategy: 'merge', reason: 'branches diverged, no conflicts' };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Always using merge commit**
+> AI มักจะ return `'merge'` เสมอ แม้ fast-forward จะเป็นไปได้
+> → Fast-forward ให้ history ที่สะอาดกว่า — ใช้เมื่อทำได้
+
+**Mistake 2: ไม่เช็ค conflicts**
+> AI return `'merge'` โดยไม่เช็คว่าทั้งสอง branch แก้ไฟล์เดียวกันหรือไม่
+> → Conflicts ที่ไม่ถูก detect จะทำให้ merge ผิดพลาด
+
+**Mistake 3: Confusing up-to-date with fast-forward**
+> Up-to-date = ไม่มีอะไรใหม่, fast-forward = มี commits ใหม่ที่ linear
+> → สองสถานะนี้ต่างกัน — อย่าสับสน
+
+**Mistake 4: Ignoring the history graph**
+> ไม่ดู commit history ก่อนเลือก strategy
+> → การตัดสินใจที่ดีต้องอาศัยข้อมูลจาก commit graph
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-120-branching-strategy" />
+
+---
+
+## 🏋️ Quest: Branching Strategy
+
+Now it's time to practice! Plan the correct merge strategy for different branch scenarios.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-120-branching-strategy
    cd quest-120-branching-strategy
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `planMergeStrategy(source, target, history)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge case ที่ fast-forward เป็นไปได้
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองวาด branch graph ด้วยมือก่อนเขียนโค้ด — visualizing จะช่วยให้เห็นว่า fast-forward vs merge ต่างกันอย่างไร
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: ถ้า source base === target tip → fast-forward ได้
+- ตรวจสอบว่าทั้งสอง branch แก้ไฟล์เดียวกันหรือไม่เพื่อ detect conflicts
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

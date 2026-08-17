@@ -5,22 +5,138 @@ description: "Structure prompts for reasoning"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 19: Chain-of-Thought Prompter
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Structure prompts for reasoning
+<LearningObjectives items={[
+  "Understand chain-of-thought prompting and why step-by-step reasoning improves accuracy",
+  "Structure prompts that elicit explicit reasoning from LLMs",
+  "Break complex problems into verifiable reasoning steps",
+  "Apply CoT patterns to improve performance on math, logic, and multi-step tasks"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Chain-of-Thought Prompting
+
+Chain-of-Thought (CoT) prompting คือ technique ที่สั่งให้ LLM "คิดให้เห็น" แทนที่จะข้ามไปคำตอบโดยตรง ผลลัพธ์คือ accuracy ที่สูงขึ้นมากสำหรับ tasks ที่ต้องใช้ reasoning
+
+แทนที่จะถาม "2 + 2 เท่ากับเท่าไหร่?" ตรง ๆ CoT จะถามว่า "คิดทีละขั้น: 1) 识别 operation, 2) คำนวณ, 3) ตรวจสอบคำตอบ" ทำให้ model ไม่ข้าม step และมี chance แก้ไขตัวเอง
+
+เหมือน martial arts: แทนที่จะจำ technique ทั้งหมดทีเดียว CoT คือการ breakdown เป็นท่าเล็ก ๆ ที่ฝึกทีละ step จนกลายเป็น muscle memory
+
+---
+
+## ⚙️ How It Works
+
+### The CoT Workflow
+
+```
+1. Receive problem and reasoning steps
+         ↓
+2. Format prompt with structured steps
+   ├── Include the problem statement
+   ├── List reasoning steps explicitly
+   ├── Add "Let's think step by step" pattern
+   └── Separate each step clearly
+         ↓
+3. Return formatted prompt
+         ↓
+4. LLM processes each step sequentially
+         ↓
+5. More accurate final answer
+```
+
+### Why CoT Works
+
+| Approach | Process | Accuracy |
+| --- | --- | --- |
+| Direct prompt | Problem → Answer | Low for complex tasks |
+| CoT prompt | Problem → Step 1 → Step 2 → ... → Answer | High |
+
+CoT forces the model to use its intermediate tokens for computation, not just storage.
+
+---
+
+## 💡 Example: Building a CoT Prompt
+
+**Step 1: Basic structure**
+
+```javascript
+function buildCoTPrompt(problem, steps) {
+  let prompt = `Problem: ${problem}\n\n`;
+  prompt += "Let's think step by step:\n\n";
+  
+  steps.forEach((step, i) => {
+    prompt += `Step ${i + 1}: ${step}\n`;
+  });
+  
+  prompt += "\nNow provide your answer based on the above reasoning.";
+  return prompt;
+}
+```
+
+**Step 2: Usage example**
+
+```javascript
+const prompt = buildCoTPrompt(
+  "What is 2+2?",
+  ["Identify the operation (addition)", "Compute 2+2 = 4", "Verify: 4 is reasonable"]
+);
+```
+
+**Step 3: Verify the output**
+
+```bash
+node test.js
+# Test: contains the problem
+# Test: contains step-by-step indicator
+# Test: contains all steps
+# Test: not just the problem passed through
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Returning the problem as-is**
+> `return problem` without any structuring
+→ CoT requires explicit step structure. Pass-through defeats the purpose.
+
+**Mistake 2: Not including a reasoning indicator**
+> Missing "Let's think step by step" or similar phrase
+→ This phrase triggers the model's reasoning mode. Without it, CoT is less effective.
+
+**Mistake 3: Steps that are too vague**
+> "Think about it" instead of specific reasoning steps
+→ Each step should be a concrete, verifiable action.
+
+**Mistake 4: Not handling empty steps**
+> Crashing when no steps are provided
+→ Always handle the edge case gracefully — return at least the problem with the CoT trigger phrase.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-19-chain-of-thought" />
+
+---
+
+## 🏋️ Quest: Chain-of-Thought Prompter
+
+Now it's time to build structured reasoning prompts!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-19-chain-of-thought
    cd quest-19-chain-of-thought
@@ -28,39 +144,30 @@ Structure prompts for reasoning
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `buildCoTPrompt(problem, steps)` — สร้าง structured reasoning prompt
 
-4. ตรวจสอบ solution ของคุณ:
+4. ทดสอบ edge cases: empty steps, single step, multiple steps
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** CoT prompting คือ one of the simplest but most powerful techniques — ลองกับ math problems แล้วจะเห็นผลทันที
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ: prompt ต้องมี "step by step" indicator และ step ทั้งหมด
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

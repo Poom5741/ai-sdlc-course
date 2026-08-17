@@ -1,66 +1,177 @@
 ---
 title: "Quest 67 - Self-Reflecting Agent"
-description: "Agent that scores its own output quality"
+description: "สร้าง agent ที่ประเมินคุณภาพ output ของตัวเอง"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 67: Self-Reflecting Agent
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Agent that scores its own output quality
+<LearningObjectives items={[
+  "สร้าง agent ที่ generate output แล้ว self-assess คุณภาพ",
+  "เข้าใจ confidence levels — high, medium, low",
+  "รู้จัก retry mechanism — ลองใหม่เมื่อคุณภาพต่ำ",
+  "รู้จัก needsHelp flag — รู้ตัวว่าต้องขอความช่วยเหลือ"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Self-Reflection in Agents
+
+Self-Reflection คือ ability ของ agent ที่จะ **ประเมิน output ของตัวเอง** — เหมือนนักเรียนที่ตรวจงานตัวเองก่อนส่ง
+
+ทำไมถึงสำคัญ? เพราะ **agent ที่ไม่สามารถ self-assess ได้ไม่รู้ว่าเมื่อไหร่ต้องขอความช่วยเหลือ** — มันจะส่ง output คุณภาพต่ำโดยไม่รู้ตัว
+
+```javascript
+const agent = createSelfReflectingAgent(generateFn, evaluateFn);
+const result = agent.generate('Write a summary of AI trends');
+// {
+//   output: '...',
+//   selfScore: 85,        // 0-100
+//   confidence: 'high',   // high/medium/low
+//   needsHelp: false      // true ถ้า confidence === 'low'
+// }
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Self-Reflection
+
+```
+1. generate(task) — สร้าง output
+         ↓
+2. evaluateFn(output) — คำนวณ score (0-100)
+         ↓
+3. ถ้า selfScore >= 60 → return ผลลัพธ์
+         ↓
+4. ถ้า selfScore < 60 → retry ครั้งเดียว
+         ↓
+5. ถ้ายังต่ำ → return พร้อม needsHelp: true
+```
+
+### Confidence Levels
+
+Confidence ไม่ใช่แค่ score — มันเป็น **categorical assessment** ที่ช่วยให้ agent ตัดสินใจ:
+
+```javascript
+function getConfidence(score) {
+  if (score > 80) return 'high';    // มั่นใจในคุณภาพ
+  if (score >= 50) return 'medium';  // พอใช้ได้ แต่อาจต้องปรับปรุง
+  return 'low';                      // ต้องขอความช่วยเหลือ
+}
+
+// needsHelp = confidence === 'low'
+```
+
+---
+
+## 💡 Example: Self-Reflecting Agent ใน action
+
+```javascript
+// Generator: สร้าง output
+const generateFn = (task) => `Generated output for: ${task}`;
+
+// Evaluator: ให้คะแนน
+const evaluateFn = (output) => {
+  if (output.length > 20) return 85;  // ยาว = ดี
+  return 40;                          // สั้น = ไม่ดี
+};
+
+const agent = createSelfReflectingAgent(generateFn, evaluateFn);
+
+// ทดสอบ
+const result = agent.generate('Write a summary');
+console.log(result);
+// {
+//   output: 'Generated output for: Write a summary',
+//   selfScore: 40,           // ต่ำ!
+//   confidence: 'low',
+//   needsHelp: true          // ต้องขอความช่วยเหลือ
+// }
+```
+
+**สังเกต:** Agent รู้ว่า output ของตัวเองมีคุณภาพต่ำ และบอกว่าต้องขอความช่วยเหลือ
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ retry เมื่อคุณภาพต่ำ**
+> "Just report the low score"
+> → Self-reflecting agent ควร retry ครั้งเดียวก่อนรายงาน — ไม่ใช่ยอมแพ้ทันที
+
+**Mistake 2: คิดว่า score สูง = ไม่ต้องทำอะไร**
+> "Score 90, done!"
+> → แม้ score สูง ก็ควรมี logging — เพื่อ debug เมื่อมีปัญหา
+
+**Mistake 3: needsHelp เท่ากับ failure**
+> "needsHelp: true แสดงว่า agent ล้มเหลว"
+> → ไม่จริง! needsHelp คือ self-awareness — รู้ตัวว่าต้องขอความช่วยเหลือ นั่นคือจุดแข็ง
+
+**Mistake 4: ไม่บันทึก selfScore ใน history**
+> "Just return the final result"
+> → Self-score ช่วย debug และเข้าใจว่า agent 评估 output อย่างไร
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-67-self-reflecting" />
+
+---
+
+## 🏋️ Quest: Self-Reflecting Agent
+
+สร้าง agent ที่ generate output แล้ว self-assess คุณภาพ พร้อม retry mechanism
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-67-self-reflecting
    cd quest-67-self-reflecting
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createSelfReflectingAgent(generateFn, evaluateFn)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: retry ครั้งเดียว, คุณภาพยังต่ำ → needsHelp: true
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง scenario ที่ agent generate ได้ score 40 — มันควร retry แล้วกลับมา report อย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Self-reflecting agent ต้อง retry ครั้งเดียวถ้า selfScore < 60
+- Confidence: >80 = high, 50-80 = medium, `<50` = low
+- needsHelp = true เฉพาะเมื่อ confidence === 'low'
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

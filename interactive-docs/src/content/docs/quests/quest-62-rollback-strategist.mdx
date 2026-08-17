@@ -5,62 +5,210 @@ description: "Deployment safety and rollback"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 62: Rollback Strategist
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Deployment safety and rollback
+<LearningObjectives items={[
+  "How to implement a deployment manager that tracks versions and supports rollback",
+  "Why promotion between environments must require health check verification",
+  "How to maintain deployment history across environment transitions",
+  "The principle: always have a rollback plan before deploying"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Deployment Safety & Rollback
+
+Every deployment is a risk. Code that works in staging might fail in production. A rollback strategy is your safety net — it lets you undo a bad deploy quickly and safely. Without one, you're one bad deploy away from a prolonged outage.
+
+The key engineering habit is: **always have a rollback plan.** If you can't roll back, you can't deploy safely. A deployment without a rollback plan is like entering a fight without knowing how to block — you're hoping nothing goes wrong instead of being prepared.
+
+Think of rollback like a dojo's "tap out" mechanism. When a technique isn't working, you tap out immediately rather than risking injury. A rollback lets your system "tap out" when a deployment goes wrong.
+
+---
+
+## ⚙️ How It Works
+
+### The Deployment Manager Lifecycle
+
+```
+deploy(version, changes) → deployId
+    ↓
+promote(deployId, environment)
+    ↓ (requires: previous environment health check passed)
+promote again → next environment
+    ↓
+rollback(deployId) → { success, previousVersion, message }
+    ↓
+getStatus(deployId) → { version, environment, history }
+```
+
+### The Critical Rule: Health Check Before Promotion
+
+```
+deploy(v1.0) → deployId: "d-001"
+promote("d-001", "staging") → true (no previous env to check)
+promote("d-001", "production") → true (staging health check passed)
+promote("d-002", "production") → false (staging health check NOT passed)
+```
+
+A naive implementation allows promotion without checking health:
+
+```javascript
+// ❌ NAIVE: Promotes regardless of health
+promote(deployId, environment) {
+  this.deployments[deployId].environment = environment;
+  return true;  // Always succeeds — dangerous!
+}
+
+// ✅ CORRECT: Checks previous environment health
+promote(deployId, environment) {
+  const deploy = this.deployments[deployId];
+  const prevEnv = this.getPreviousEnvironment(environment);
+  if (prevEnv && !deploy.healthStatus[prevEnv]) {
+    return false;  // Can't promote — previous env not healthy
+  }
+  deploy.environment = environment;
+  deploy.history.push({ environment, timestamp: Date.now() });
+  return true;
+}
+```
+
+---
+
+## 💡 Example: Complete Deployment Manager
+
+```javascript
+function deploymentManager() {
+  const deployments = {};
+
+  function deploy(version, changes) {
+    const id = `d-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    deployments[id] = {
+      version,
+      changes,
+      environment: 'dev',
+      history: [{ environment: 'dev', timestamp: Date.now() }],
+      healthStatus: {},
+      previousVersion: null,
+    };
+    return id;
+  }
+
+  function promote(deployId, environment) {
+    const deploy = deployments[deployId];
+    if (!deploy) return false;
+    
+    const envOrder = ['dev', 'staging', 'production'];
+    const prevIndex = envOrder.indexOf(environment) - 1;
+    const prevEnv = envOrder[prevIndex];
+    
+    if (prevEnv && !deploy.healthStatus[prevEnv]) {
+      return false;  // Previous environment not healthy
+    }
+    
+    deploy.history.push({ environment, timestamp: Date.now() });
+    deploy.environment = environment;
+    return true;
+  }
+
+  function rollback(deployId) {
+    const deploy = deployments[deployId];
+    if (!deploy || !deploy.previousVersion) {
+      return { success: false, previousVersion: null, message: 'No previous version' };
+    }
+    const prev = deploy.previousVersion;
+    deploy.version = prev;
+    return { success: true, previousVersion: prev, message: `Rolled back to ${prev}` };
+  }
+
+  function getStatus(deployId) {
+    const deploy = deployments[deployId];
+    if (!deploy) return null;
+    return { version: deploy.version, environment: deploy.environment, history: deploy.history };
+  }
+
+  return { deploy, promote, rollback, getStatus };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Allowing promote without health check**
+> "Just deploy it, we'll monitor later"
+> → Promotion without health verification is how broken code reaches production. The previous environment MUST be healthy before promoting.
+
+**Mistake 2: Not tracking deployment history**
+> "We know what version is running"
+> → History tracks every environment transition. Without it, you can't answer "when did this version reach production?"
+
+**Mistake 3: No rollback mechanism**
+> "We'll just redeploy the previous version manually"
+> → During an outage, manual processes are slow and error-prone. Automated rollback is instant.
+
+**Mistake 4: Not storing the previous version**
+> "We'll look it up in git"
+> → During an incident, you need the previous version NOW — not after searching through git history. Store it with the deployment record.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-62-rollback-strategist" />
+
+---
+
+## 🏋️ Quest: Rollback Strategist
+
+Now it's time to practice! Build a deployment manager that tracks versions and supports safe rollback.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-62-rollback-strategist
    cd quest-62-rollback-strategist
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `deploymentManager()` that returns an object with `deploy`, `promote`, `rollback`, and `getStatus`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The critical edge case is that naive AI allows promote without checking health status. Promotion MUST require the previous stage to be healthy.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Track environment order as `['dev', 'staging', 'production']`. When promoting to an environment, check that the previous environment in the order has a passing health status. Use `deploy.healthStatus[prevEnv]` to verify.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case ที่สำคัญที่สุด: promote ต้องเช็ค health status ของ environment ก่อนหน้า
+- ใช้ environment order: `['dev', 'staging', 'production']`
+- ต้อง store previous version เพื่อใช้ rollback
+- ต้อง track history ของ environment transitions
+- `deploymentManager()` ต้อง return object ที่มี methods: `deploy`, `promote`, `rollback`, `getStatus`
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

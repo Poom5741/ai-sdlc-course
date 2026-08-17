@@ -1,0 +1,38 @@
+{
+  "questId": "quest-99-db-migration",
+  "questions": [
+    {
+      "question": "What must every database migration include?",
+      "choices": [
+        "Only the forward (UP) SQL",
+        "Both forward (UP) and rollback (DOWN) SQL",
+        "Just a description of changes",
+        "Only the rollback SQL"
+      ],
+      "answer": 1,
+      "explanation": "ทุก migration ต้องมีทั้ง UP (forward) และ DOWN (rollback) SQL — deploy โดยไม่มี rollback plan เป็นสิ่งที่อันตรามาก"
+    },
+    {
+      "question": "What is the rollback SQL for an `add_column` operation?",
+      "choices": [
+        "ALTER TABLE ... ADD COLUMN",
+        "ALTER TABLE ... DROP COLUMN",
+        "DROP TABLE",
+        "CREATE TABLE"
+      ],
+      "answer": 1,
+      "explanation": "Rollback ของ add_column คือ DROP COLUMN — ถ้าเพิ่ม column แล้วมีปัญหา ต้องลบออก rollback เป็นสิ่งที่ตรงกันข้ามกับ forward"
+    },
+    {
+      "question": "Why do naive AI tools often leave DOWN SQL empty?",
+      "choices": [
+        "They don't understand SQL syntax",
+        "They focus on making changes work and forget about rollback safety",
+        "DOWN SQL is optional in most databases",
+        "They generate DOWN SQL in a separate file"
+      ],
+      "answer": 1,
+      "explanation": "AI tools มักจะ generate แค่ UP SQL เพราะมัน focus บน 'making it work' — แต่ production code ต้องมี rollback plan เสมอ"
+    }
+  ]
+}

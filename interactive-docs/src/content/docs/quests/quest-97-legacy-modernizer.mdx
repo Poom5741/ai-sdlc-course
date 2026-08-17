@@ -5,22 +5,146 @@ description: "Modernize callback-based code to async/await"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Legacy Code Modernizer
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to convert .then() promise chains to async/await syntax",
+  "When to add the async keyword to functions that use await",
+  "How to convert callback error handling to try/catch blocks",
+  "Why synchronous code should NOT be wrapped in try/catch"
+]} />
 
-Modernize callback-based code to async/await
+## 📖 Concept: Legacy Code Modernization
 
----
+Legacy code คือโค้ดที่เขียนด้วย pattern เก่า — เหมือนนักสู้ที่ยังใช้ท่าโบราณ ใช้ได้แต่ไม่มีประสิทธิภาพ modernization คือการอัพเดท technique ให้ทันสมัยโดยไม่เปลี่ยนผลลัพธ์
 
-## วิธีทำ
+ใน JavaScript โค้ดเก่ามักจะใช้ **callback-based patterns** (`fs.readFile("f", callback)`) หรือ **`.then()` chains** ซึ่งอ่านยากและจัดการ error ได้ซับซ้อน modernization เปลี่ยนเป็น **async/await** ซึ่งอ่านง่ายเหมือน synchronous code
+
+แต่ **ไม่ใช่ทุก code ต้อง modernize** — synchronous code ที่ไม่มี async operation ไม่ควรถูก wrap ใน try/catch
+
+Think of it like upgrading from wooden training swords to steel — same fighting techniques, but now you have better tools. The martial art hasn't changed; only the equipment has been modernized.
+
+## ⚙️ How It Works
+
+### The Modernization Workflow
+
+1. **Detect async patterns** — `.then()`, `callback`, `fs.readFile`
+2. **Convert .then() → await** — flatten the promise chain
+3. **Add async keyword** — functions using `await` must be `async`
+4. **Convert error handling** — callbacks → try/catch
+5. **Skip synchronous code** — don't modernize what doesn't need it
+
+### Pattern 1: .then() → await
+
+```javascript
+// ❌ Before: nested .then() chains
+fetch(url)
+  .then(r => r.json())
+  .then(data => console.log(data));
+
+// ✅ After: flat async/await
+const r = await fetch(url);
+const data = await r.json();
+console.log(data);
+```
+
+### Pattern 2: Add async keyword
+
+```javascript
+// ❌ Before: function using .then() without async
+function load() {
+  return fetch(url).then(r => r.json());
+}
+
+// ✅ After: async function with await
+async function load() {
+  return await fetch(url).then(r => r.json());
+}
+```
+
+### Pattern 3: Callback → try/catch
+
+```javascript
+// ❌ Before: callback error handling
+fs.readFile("f", (err, data) => {
+  if (err) throw err;
+  cb(data);
+});
+
+// ✅ After: try/catch with await
+try {
+  const data = await fs.promises.readFile("f");
+  cb(data);
+} catch (err) {
+  console.error(err);
+}
+```
+
+### The Critical Rule: Don't Touch Synchronous Code
+
+```javascript
+// ✅ This function is synchronous — leave it alone
+function add(a, b) { return a + b; }
+// Don't wrap it in try/catch!
+
+// ✅ This function is async — modernize it
+function load() { return fetch(url).then(r => r.json()); }
+// Convert to async/await with try/catch
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+// Input
+const code = `function load() {
+  return fetch(url).then(r => r.json());
+}`;
+
+// Analysis:
+// - Function uses .then() → needs async/await
+// - No callback error handling → no try/catch needed
+
+// Output
+const modernized = `async function load() {
+  return await fetch(url).then(r => r.json());
+}`;
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Wrapping synchronous code in try/catch**
+> "Modernize ทุก function → ใส่ try/catch ทุกที่"
+> → Synchronous code (ไม่มี await, callback, .then()) ไม่ต้อง wrap
+
+**Mistake 2: Forgetting async keyword**
+> "ใช้ await แล้วแต่ลืมใส่ async"
+> → Function ที่ใช้ `await` ต้องมี `async` keyword
+
+**Mistake 3: Breaking non-async code**
+> "String replace ทุก .then() โดยไม่เช็ค context"
+> → ตรวจสอบว่า .then() อยู่ใน promise chain จริงๆ ไม่ใช่ string literal
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle code ว่าง"
+> → Empty input → return empty string
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-97-legacy-modernizer" />
+
+## 🏋️ Quest: Legacy Code Modernizer
+
+Now it's time to practice! Modernize callback-based code to async/await.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-97-legacy-modernizer
    cd quest-97-legacy-modernizer
@@ -31,36 +155,19 @@ Modernize callback-based code to async/await
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — synchronous code ไม่ควรถูก wrap ใน try/catch
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `modernize(code)` รับ JavaScript code string และ return modernized code string
+- แปลง `.then()` chains เป็น `await` syntax
+- เพิ่ม `async` keyword ใน function ที่ใช้ `await`
+- Callback error handling → try/catch, เฉพาะ async operations เท่านั้น
 - ถ้าติดขัด ดู `_solution/solution.js`

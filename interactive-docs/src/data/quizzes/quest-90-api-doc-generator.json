@@ -1,0 +1,38 @@
+{
+  "questId": "quest-90-api-doc-generator",
+  "questions": [
+    {
+      "question": "Why must HTTP methods like DELETE stay uppercase in OpenAPI specs?",
+      "choices": [
+        "It's a stylistic preference",
+        "HTTP methods are case-sensitive; lowercasing DELETE makes it look like a JavaScript keyword and breaks API validators",
+        "OpenAPI doesn't support lowercase",
+        "Only GET and POST can be lowercase"
+      ],
+      "answer": 1,
+      "explanation": "HTTP methods are case-sensitive per the HTTP specification. `DELETE` is the correct method name. Lowercasing it to `delete` conflicts with JavaScript's reserved word and breaks OpenAPI validation tools."
+    },
+    {
+      "question": "How does OpenAPI express Express-style route parameters like `/users/:id`?",
+      "choices": [
+        "As `/users/:id` (same syntax)",
+        "As `/users/{id}` (curly brace syntax)",
+        "As `/users/<id>` (angle bracket syntax)",
+        "Parameters are not supported in OpenAPI"
+      ],
+      "answer": 1,
+      "explanation": "OpenAPI uses `{param}` syntax for path parameters, not Express's `:param` syntax. The generator must convert `/users/:id` to `/users/{id}`."
+    },
+    {
+      "question": "What are the minimum required fields for a valid OpenAPI 3.0 spec?",
+      "choices": [
+        "Only paths",
+        "openapi version, info.title, info.version, and paths",
+        "Just the API title",
+        "openapi version and paths only"
+      ],
+      "answer": 1,
+      "explanation": "A valid OpenAPI 3.0 spec requires the `openapi` version string, `info` object with `title` and `version`, and at least an empty `paths` object. Missing any of these causes validation failures."
+    }
+  ]
+}

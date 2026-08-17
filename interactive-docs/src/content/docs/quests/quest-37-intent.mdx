@@ -5,22 +5,163 @@ description: "Generate test specs from intent"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 37: Intent-Spec Test Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate test specs from intent
+<LearningObjectives items={[
+  "เข้าใจว่า intent specification ช่วยสร้าง tests ได้ยังไง",
+  "แปลง natural language requirements เป็น test cases ที่ executable",
+  "ออกแบบ test specs ที่ cover ทั้ง happy path และ edge cases",
+  "เรียนรู้ว่า AI สามารถ generate tests จาก intent ได้ดีกว่าเขียนเอง"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Intent → Test Specification
+
+Intent-spec test generation คือการใช้ AI แปลง "ความตั้งใจ" (intent) ของ feature เป็น test cases ที่พร้อม run
+
+แทนที่คุณจะเขียน tests เองทีละ case — คุณบอก AI ว่า "feature นี้ควรทำอะไร" แล้ว AI จะ generate test specs ที่ครอบคลุมทั้ง:
+
+- **Happy path** — กรณีที่ทุกอย่างถูกต้อง
+- **Edge cases** — กรณีขอบ
+- **Error cases** — กรณีผิดพลาด
+
+เหมือน Ninjutsu master ที่ให้ลูกศิษย์ describe mission → แล้ว master ออก course of action ให้
+
+---
+
+## ⚙️ How It Works
+
+### ขั้นตอน Intent → Test Spec
+
+```
+1. INTENT — บอกว่า feature ควรทำอะไร (natural language)
+         ↓
+2. ANALYSIS — AI วิเคราะห์ requirements
+         ↓
+3. SPEC — สร้าง test scenarios
+         ↓
+4. ASSERTIONS — ระบุ expected behavior
+         ↓
+5. EXECUTABLE — แปลงเป็น runnable tests
+```
+
+### ตัวอย่าง Intent
+
+```javascript
+const intent = {
+  feature: "user login",
+  description: "User can log in with email and password",
+  rules: [
+    "Email must be valid format",
+    "Password must be at least 8 characters",
+    "Return user object on success",
+    "Throw error on invalid credentials"
+  ]
+};
+```
+
+### Test Spec ที่ AI 生成
+
+```javascript
+const testSpecs = [
+  // Happy path
+  { name: "valid email and password", input: { email: "user@test.com", password: "pass1234" }, expected: "success" },
+  
+  // Edge cases
+  { name: "email without @", input: { email: "usertest.com", password: "pass1234" }, expected: "error" },
+  { name: "empty password", input: { email: "user@test.com", password: "" }, expected: "error" },
+  { name: "password too short", input: { email: "user@test.com", password: "pass" }, expected: "error" },
+  
+  // Error cases
+  { name: "non-existent user", input: { email: "nobody@test.com", password: "pass1234" }, expected: "error" },
+  { name: "wrong password", input: { email: "user@test.com", password: "wrong123" }, expected: "error" }
+];
+```
+
+---
+
+## 💡 Example: Intent-to-Tests Function
+
+```javascript
+function generateTestSpecs(intent) {
+  const specs = [];
+  
+  // Happy path — กรณีทุกอย่างถูกต้อง
+  specs.push({
+    name: `${intent.feature} - valid input`,
+    type: 'happy',
+    input: generateValidInput(intent),
+    expected: 'success'
+  });
+  
+  // Edge cases — จาก rules
+  for (const rule of intent.rules) {
+    if (rule.includes('must') || rule.includes('required')) {
+      specs.push({
+        name: `${intent.feature} - violates: ${rule}`,
+        type: 'edge',
+        input: generateInvalidInput(rule),
+        expected: 'error'
+      });
+    }
+  }
+  
+  // Missing input
+  specs.push({
+    name: `${intent.feature} - empty input`,
+    type: 'edge',
+    input: {},
+    expected: 'error'
+  });
+  
+  return specs;
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: สร้าง tests จาก code แทนจาก intent**
+> "ดูโค้ดแล้วเขียน test ตามนั้น"
+> → Tests ควร验证 behavior ไม่ใช่ implementation — เขียนจาก intent แล้วโค้ดต้องผ่าน
+
+**Mistake 2: ไม่ cover error cases**
+> "happy path ผ่านก็พอ"
+> → Production bugs มักเกิดจาก error paths — ต้อง test ทั้ง success และ failure
+
+**Mistake 3: Test specs กำกวมเกินไป**
+> "ควรทำงานถูกต้อง"
+> → ระบุ expected output ให้ชัด — ไม่เช่นนั้น test จะไม่มีความหมาย
+
+**Mistake 4: ไม่ generate edge cases จาก rules**
+> "rules ยาว เขียน test จาก common sense ดีกว่า"
+> → Rules คือ constraints ที่ต้อง test ทุกข้อ — AI ช่วย generate ได้ครบ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-37-intent" />
+
+---
+
+## 🏋️ Quest: Intent-Spec Test Generator
+
+พร้อมแล้วสร้าง tests จาก intent! แปลง requirements เป็น test specs
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-37-intent-spec-generator
    cd quest-37-intent-spec-generator
@@ -28,39 +169,28 @@ Generate test specs from intent
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ generate test specs จาก intent specification
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกว่าถ้าคุณจะ test feature ใหม่ — คุณจะเริ่มจากอะไร? Intent คือจุดเริ่มต้นที่ดี
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- คิดว่า intent แต่ละข้อ map กับ test case ไหนบ้าง
+- อย่าลืม cover ทั้ง happy path, edge cases, และ error cases

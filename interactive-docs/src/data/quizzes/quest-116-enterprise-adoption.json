@@ -1,0 +1,38 @@
+{
+  "questId": "quest-116-enterprise-adoption",
+  "questions": [
+    {
+      "question": "ทำไม Enterprise AI Adoption ต้องมี Pilot Program ก่อน full rollout?",
+      "choices": [
+        "Pilot program ถูกกว่า full rollout",
+        "เพื่อ test tool กับกลุ่มเล็กก่อน — ลด risk ก่อน commitment ครั้งใหญ่",
+        "Pilot program ใช้เวลาสั้นกว่า",
+        "Pilot program ไม่ต้อง training"
+      ],
+      "answer": 1,
+      "explanation": "A pilot program with 3-5 developers over 4 weeks lets you identify issues, measure real impact, and adjust before committing to organization-wide adoption."
+    },
+    {
+      "question": "Rollout Strategy ที่ดีควรเป็นแบบไหน?",
+      "choices": [
+        "Big bang — deploy ให้ทุกคนพร้อมกัน",
+        "Phased — power users → early adopters → general availability",
+        "Random — เลือก developer แบบสุ่ม",
+        "Optional — ใครอยากใช้ก็ใช้"
+      ],
+      "answer": 1,
+      "explanation": "Phased rollout minimizes risk: start with power users who can provide feedback, expand to early adopters, then make it available to everyone with training at each phase."
+    },
+    {
+      "question": "Tool Selection Criteria ควร weight อะไรสูงสุด?",
+      "choices": [
+        "ราคาถูกที่สุด",
+        "Productivity Impact — มันช่วยทีมได้มากแค่ไหน",
+        "Popular ที่สุดใน GitHub",
+        "มี logo สวย"
+      ],
+      "answer": 1,
+      "explanation": "Productivity impact should be weighted highest because the entire purpose of adopting AI tools is to improve developer productivity and team output."
+    }
+  ]
+}

@@ -5,22 +5,163 @@ description: "Generate comprehensive onboarding documentation"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Onboarding Doc Writer
+# Quest 92: Onboarding Doc Writer
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate comprehensive onboarding documentation
+<LearningObjectives items={[
+  "How to generate comprehensive onboarding documentation from project metadata",
+  "Why Document for the Newcomer means writing as if the reader has never seen the codebase",
+  "How to structure onboarding docs with Quick Start, Conventions, Key Files, and First Tasks",
+  "The importance of formatted tech stack details vs. plain lists"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Document for the Newcomer
+
+The best engineering teams make it easy for new members to become productive quickly. **Onboarding documentation** is the bridge between "I just joined" and "I'm contributing code." A good onboarding doc answers the questions every newcomer asks: What is this project? How do I set it up? Where do I start?
+
+The key principle is **Document for the Newcomer**: write as if the reader has never seen the codebase. Don't assume they know the tech stack, the project structure, or the team conventions. Every assumption you make is a wall the newcomer has to climb over.
+
+An effective onboarding doc is **structured, specific, and actionable** — not a wall of text, but a clear path from "zero" to "first commit."
+
+---
+
+## ⚙️ How It Works
+
+### Onboarding Document Structure
+
+```
+1. Collect project metadata
+         ↓
+2. Generate Welcome section (project name + purpose)
+         ↓
+3. Format Tech Stack (with version/tool details)
+         ↓
+4. Build Quick Start from setup steps
+         ↓
+5. Document Code Conventions
+         ↓
+6. Create Key Files table
+         ↓
+7. Suggest First Tasks for newcomers
+         ↓
+8. Add Team Contacts placeholder
+```
+
+### Required Sections
+
+| Section | Purpose | Content |
+| --- | --- | --- |
+| Welcome | Identity | Project name and greeting |
+| What is this project? | Context | Description and purpose |
+| Tech Stack | Foundation | Languages, frameworks, tools with details |
+| Quick Start | Action | Step-by-step setup instructions |
+| Code Conventions | Culture | Coding standards and team norms |
+| Key Files | Navigation | Important files with their purposes |
+| First Tasks | Onboarding | Easy starter tasks for newcomers |
+| Who to Ask | Support | Team contacts for help |
+
+---
+
+## 💡 Example: Onboarding Document
+
+Given this project info:
+
+```javascript
+const projectInfo = {
+  name: "TaskFlow",
+  description: "A real-time task management app",
+  stack: ["Node.js", "React", "PostgreSQL"],
+  setup: ["npm install", "cp .env.example .env", "npm run db:migrate", "npm start"],
+  conventions: ["Use TypeScript strict mode", "Write tests for all new features"],
+  keyFiles: [
+    { path: "src/index.ts", purpose: "Application entry point" },
+    { path: "src/routes/api.ts", purpose: "API route definitions" }
+  ]
+};
+```
+
+The generator should produce:
+
+```markdown
+# Welcome to TaskFlow
+
+## What is this project?
+A real-time task management app
+
+## Tech Stack
+- Node.js — runtime
+- React — frontend framework
+- PostgreSQL — database
+
+## Quick Start
+1. npm install
+2. cp .env.example .env
+3. npm run db:migrate
+4. npm start
+
+## Code Conventions
+- Use TypeScript strict mode
+- Write tests for all new features
+
+## Key Files
+| File | Purpose |
+| --- | --- |
+| src/index.ts | Application entry point |
+| src/routes/api.ts | API route definitions |
+
+## First Task Suggestions
+1. Fix a labeled "good first issue" bug
+2. Add a test for an existing function
+3. Update documentation for a small feature
+
+## Who to Ask
+<!-- Add team contacts here -->
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Listing tech stack as plain names**
+> "Node.js, React, PostgreSQL"
+> → Include context: "Node.js v18 — runtime", "React — frontend framework", "PostgreSQL — database". A newcomer doesn't know what each tool is for.
+
+**Mistake 2: Missing the "First Tasks" section**
+> "I'll document the project but not suggest where to start"
+> → Newcomers are overwhelmed. Giving them 3 specific starter tasks reduces anxiety and accelerates their first contribution.
+
+**Mistake 3: Generic setup instructions**
+> "npm install && npm start"
+> → Include EVERY step: environment variables, database migrations, API keys. Missing one step means the newcomer is stuck.
+
+**Mistake 4: Writing for experts instead of newcomers**
+> "Everyone knows what a REST API is"
+> → You'd be surprised. Write as if the reader joined from a different tech stack. Explain acronyms, mention versions, and link to documentation.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-92-onboarding-doc" />
+
+---
+
+## 🏋️ Quest: Onboarding Doc Writer
+
+Now it's time to practice! Build a comprehensive onboarding document generator.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-92-onboarding-doc
    cd quest-92-onboarding-doc
@@ -28,39 +169,39 @@ Generate comprehensive onboarding documentation
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `generateOnboarding(projectInfo)` function that generates:
+   - Welcome section with project name
+   - Tech Stack with tool descriptions (not just names)
+   - Quick Start from setup steps
+   - Code Conventions
+   - Key Files table
+   - First Task Suggestions (3 starter tasks)
+   - Who to Ask placeholder
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Critical edge case:** Tech stack should be formatted as "Tool — description", not just "Tool"
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Start with the simpler sections (Welcome, Overview) and work toward the more complex ones (Key Files table, First Tasks). Each section is independent.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Tech stack ต้องมี description — "Node.js — runtime" ไม่ใช่แค่ "Node.js"
+- First Tasks ควรมี 3 ข้อที่ specific และง่ายสำหรับคนใหม่
+- อย่าลืม Key Files ในรูปแบบ table (| File | Purpose |)
+- ลองนึกว่าคุณเป็นคนใหม่ที่เพิ่งเข้าทีม — คุณอยากรู้อะไรบ้าง?
+- ถ้าติดขัด ลองเริ่มจาก section ที่ง่ายที่สุดก่อน

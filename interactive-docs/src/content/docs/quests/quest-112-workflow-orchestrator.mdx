@@ -1,66 +1,238 @@
 ---
-title: "Multi-Tool Workflow Orchestrator"
-description: "Coordinate multiple AI tools in a workflow"
+title: "Quest 112 - Multi-Tool Workflow Orchestrator"
+description: "Coordinate multiple AI tools in a workflow — เชื่อม tools เข้าด้วยกัน"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Multi-Tool Workflow Orchestrator
+# Quest 112: Multi-Tool Workflow Orchestrator
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Coordinate multiple AI tools in a workflow
+<LearningObjectives items={[
+  "How to chain multiple AI tools where each tool's output feeds the next tool's input",
+  "Why fail-fast (stop on first error) is critical for workflow reliability",
+  "How to record steps for auditability — every tool transformation is logged",
+  "The engineering habit of ORCHESTRATE, DON'T OVERBUILD — use existing tools together"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Tool Orchestration
+
+ในโลกจริง เราไม่ได้ใช้ AI tool เดียว — เราใช้หลาย tools ร่วมกัน เช่น code generator → linter → formatter → test runner. **Workflow Orchestrator** คือ pattern ที่เชื่อม tools เหล่านี้เข้าเป็น pipeline เดียว
+
+**Core Principle: ORCHESTRATE, DON'T OVERBUILD**
+
+แทนที่จะสร้าง monolithic solution ที่ทำทุกอย่าง ให้ใช้ tools ที่มีอยู่แล้วเชื่อมต่อกัน:
+
+```
+Input → Tool A → Tool B → Tool C → Result
+          │         │         │
+          └─────────┴─────────┘
+              บันทึก steps ทุก step
+```
+
+**Fail-Fast Pattern** — เมื่อ tool ใด tool หนึ่งล้มเหลว ต้องหยุดทันที ไม่ใช่ continue แล้ว collect error ทีหลัง เพราะ tool ถัดไปอาจ depend บน output ของ tool ที่ล้มเหลว
+
+```
+Input → Tool A → Tool B → 💥 ERROR
+                           │
+                           ▼
+                    STOP + Record error
+                    (Tool C ไม่ถูก execute)
+```
+
+---
+
+## ⚙️ How It Works
+
+### Orchestration Flow
+
+```javascript
+orchestrateWorkflow(tools, input)
+```
+
+**Input:**
+
+- `tools` — array of `{ name, process, async? }` — แต่ละ tool มีชื่อและ function
+- `input` — ค่าเริ่มต้นที่จะส่งเข้า tool ตัวแรก
+
+**Output:**
+
+```javascript
+{
+  result: <final output>,
+  steps: [
+    { tool: 'uppercase', input: 'hello', output: 'HELLO' },
+    { tool: 'addPrefix', input: 'HELLO', output: 'RESULT: HELLO' },
+    // ...
+  ]
+}
+```
+
+### Step-by-Step Execution
+
+```
+1. รับ tools[] และ input
+         ↓
+2. สำหรับแต่ละ tool ใน tools[]:
+   a. บันทึก input ปัจจุบัน
+   b. เรียก tool.process(input)
+   c. บันทึก output
+   d. ใช้ output เป็น input ของ tool ถัดไป
+   e. ถ้า error → หยุดทันที (fail-fast)
+         ↓
+3. Return { result: finalOutput, steps: recordedSteps }
+```
+
+### Edge Case: Fail-Fast
+
+```javascript
+// ❌ Naive: continue หลัง error
+for (const tool of tools) {
+  try {
+    result = tool.process(result);
+  } catch (e) {
+    errors.push(e);  // ยัง continue อยู่!
+  }
+}
+
+// ✅ Correct: stop on error
+for (const tool of tools) {
+  try {
+    result = tool.process(result);
+  } catch (e) {
+    return { result, steps, error: e.message };  // STOP
+  }
+}
+```
+
+---
+
+## 💡 Example: Chaining Text Processing Tools
+
+**Define tools:**
+
+```javascript
+const tools = [
+  { name: 'uppercase', process: (s) => s.toUpperCase() },
+  { name: 'addPrefix', process: (s) => `RESULT: ${s}` },
+  { name: 'addSuffix', process: (s) => `${s}!` },
+];
+```
+
+**Execute workflow:**
+
+```javascript
+const result = orchestrateWorkflow(tools, 'hello');
+// {
+//   result: 'RESULT: HELLO!',
+//   steps: [
+//     { tool: 'uppercase', input: 'hello', output: 'HELLO' },
+//     { tool: 'addPrefix', input: 'HELLO', output: 'RESULT: HELLO' },
+//     { tool: 'addSuffix', input: 'RESULT: HELLO', output: 'RESULT: HELLO!' }
+//   ]
+// }
+```
+
+**Edge case — error in middle:**
+
+```javascript
+const errorTool = { name: 'fail', process: () => { throw new Error('boom'); } };
+const result = orchestrateWorkflow([tools[0], errorTool, tools[2]], 'hello');
+// result.steps.length === 1 (stopped after error)
+// result.error === 'boom'
+```
+
+**Edge case — empty tools:**
+
+```javascript
+orchestrateWorkflow([], 'hello');
+// { result: 'hello', steps: [] }  — input ผ่านมาและกลับไปเลย
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Continue after error instead of fail-fast**
+> "Let me record the error and keep going"
+> → Tool ถัดไปอาจ depend บน output ที่ไม่มี — fail-fast ป้องกัน cascading errors
+
+**Mistake 2: Not recording step inputs/outputs**
+> "Just return the final result"
+> → Steps คือ audit trail — debug และ compliance ต้องการข้อมูลว่าแต่ละ tool ทำอะไร
+
+**Mistake 3: Mutating input directly**
+> `input = tool.process(input)` — แต่ละ step ต้องบันทึก input เดิมก่อน transform
+> → ใช้ variable แยก: `currentInput` vs `output`
+
+**Mistake 4: Not handling empty tools array**
+> "Empty tools won't happen"
+> → Return `{ result: input, steps: [] }` — ส่ง input กลับไปโดยไม่ transform
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-112-workflow-orchestrator" />
+
+---
+
+## 🏋️ Quest: Multi-Tool Workflow Orchestrator
+
+Now it's time to practice! Build a workflow that chains AI tools together.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-112-workflow-orchestrator
    cd quest-112-workflow-orchestrator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณ — สังเกต TODO stub สำหรับ `orchestrateWorkflow()`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `orchestrateWorkflow(tools, input)`:
+   - วนลูปผ่าน tools ตามลำดับ
+   - แต่ละ tool รับ output ของ tool ก่อนหน้า
+   - บันทึก step แต่ละตัว `{ tool, input, output }`
+   - ถ้า tool ไหน error → หยุดทันที + บันทึก error
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ edge cases:
+   - Empty tools array → return input เดิม
+   - Single tool → return ผลลัพธ์จาก tool เดียว
+   - Error in middle → fail-fast, ไม่ continue
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า fail-fast test ล้มเหลว ลองเพิ่ม `try/catch` ใน loop แล้ว return ทันทีเมื่อเจอ error
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- สำคัญมาก: fail-fast — เมื่อ tool ไหน error ต้องหยุดทันที ไม่ใช่ continue
+- บันทึก `{ tool, input, output }` สำหรับแต่ละ step — นี่คือ audit trail
+- ตรวจสอบ edge case: empty tools, single tool, error in middle
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

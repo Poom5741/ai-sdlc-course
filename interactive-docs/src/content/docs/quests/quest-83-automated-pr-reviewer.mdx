@@ -5,22 +5,136 @@ description: "Find common issues in code diffs automatically"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Automated PR Reviewer
+# Quest 83: Automated PR Reviewer
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Find common issues in code diffs automatically
+<LearningObjectives items={[
+  "How to build automated code review tools that catch common issues",
+  "Why human review and automated checks complement each other",
+  "How to detect console.log, TODO comments, magic numbers, and long lines in diffs",
+  "The difference between information, warning, and critical severity levels"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI-Powered Code Review
+
+Code review is one of the most important engineering practices for maintaining code quality. But manual review can be slow, tedious, and inconsistent — reviewers miss things, especially in large diffs. Automated PR reviewers solve this by scanning diffs for known anti-patterns and flagging them before a human even looks.
+
+Think of an automated reviewer as a **first-pass filter** — it catches the obvious stuff (console.log left in, magic numbers, TODO comments) so human reviewers can focus on deeper issues like architecture, logic correctness, and business requirements.
+
+The key insight: **automated review is not a replacement for human review — it's a force multiplier.** A good automated reviewer catches 80% of trivial issues in milliseconds, freeing your team to spend review time on the 20% that actually matters.
+
+---
+
+## ⚙️ How It Works
+
+### The Automated Review Pipeline
+
+```
+1. PR submitted with code diff
+         ↓
+2. Automated reviewer scans each line
+         ↓
+3. Pattern matching against known anti-patterns
+         ↓
+4. Results categorized by severity (info / warning / critical)
+         ↓
+5. Reviewer posts findings as comments
+         ↓
+6. Human reviewer focuses on logic and architecture
+```
+
+### What We Detect
+
+| Pattern | Severity | Why It Matters |
+| --- | --- | --- |
+| `console.log` | warning | Debug logs shouldn't reach production |
+| `TODO/FIXME/HACK` | info | Technical debt markers need attention |
+| Magic numbers | warning | Hardcoded numbers hurt readability |
+| Lines > 120 chars | info | Long lines reduce readability |
+
+### Severity Levels
+
+Not all findings are equal. A good reviewer categorizes issues:
+
+- **info** — Worth noting, but not blocking (long lines, TODO comments)
+- **warning** — Should be fixed before merge (console.log, magic numbers)
+- **critical** — Must not be merged (security vulnerabilities, data leaks)
+
+---
+
+## 💡 Example: Reviewing a Diff
+
+Consider this code diff:
+
+```diff
++function processOrder(items) {
++  const discount = 0.15;
++  console.log('Processing order');
++  // TODO: add validation
++  let total = 0;
++  for (let i = 0; i < items.length; i++) {
++    total += items[i].price * (1 - discount);
++  }
++  return total;
++}
+```
+
+An automated reviewer would catch:
+
+```json
+[
+  { "line": 2, "severity": "warning", "message": "Magic number 0.15 — consider extracting to a constant" },
+  { "line": 3, "severity": "warning", "message": "Remove console.log before merging" },
+  { "line": 4, "severity": "info", "message": "Found TODO comment — consider resolving" }
+]
+```
+
+**Key insight:** The diff parsing is non-trivial — you need to strip the `+`/`-` prefix from each line before pattern matching, but still track the original line number for accurate reporting.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging ALL numbers as magic numbers**
+> "Every literal number is a magic number"
+> → Common values like `0`, `1`, `-1` are usually intentional. Only flag numbers with semantic meaning that should be named constants.
+
+**Mistake 2: Not handling diff prefixes**
+> "I'll just search the raw diff lines"
+> → Diff lines start with `+` or `-`. You must strip these prefixes before pattern matching, or your regex won't match.
+
+**Mistake 3: Treating all findings equally**
+> "Everything is either broken or not broken"
+> → Use severity levels. A TODO comment is informational; a console.log is a warning; hardcoded credentials would be critical. Mix them up and developers stop trusting the tool.
+
+**Mistake 4: No line numbers in results**
+> "I found issues but didn't track where"
+> → Without line numbers, developers can't find the issue. Always track the original line number as you iterate.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-83-automated-pr-reviewer" />
+
+---
+
+## 🏋️ Quest: Automated PR Reviewer
+
+Now it's time to practice! Build an automated diff reviewer.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-83-automated-pr-reviewer
    cd quest-83-automated-pr-reviewer
@@ -28,39 +142,32 @@ Find common issues in code diffs automatically
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `reviewDiff(diff)` function that:
+   - Parses diff lines and strips `+`/`-` prefixes
+   - Detects `console.log`, `TODO/FIXME/HACK`, magic numbers, and long lines
+   - Returns results with line numbers and severity levels
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Start by reading the problem.js comments carefully — the function signature and return format are defined there.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อย่าลืม strip `+`/`-` prefix ก่อน pattern matching
+- ค่า `0`, `1`, `-1` ไม่ควร flag เป็น magic number — ค่าเหล่านี้ใช้กันทั่วไป
+- ติดตาม original line number ตอน iterate ผ่าน lines
+- ถ้าติดขัด ลอง test กับ diff ตัวอย่างสั้นๆ ก่อน

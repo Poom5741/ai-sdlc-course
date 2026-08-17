@@ -5,22 +5,136 @@ description: "Identify when a design pattern fits and apply it"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Design Pattern Applicator
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to recognize common design patterns (Strategy, Observer, Factory, Singleton) from code structure",
+  "Why pattern detection requires confidence scoring, not just keyword matching",
+  "How to distinguish true singletons from plain global variables",
+  "When to suggest a pattern vs when to leave code as-is"
+]} />
 
-Identify when a design pattern fits and apply it
+## 📖 Concept: Pattern Recognition & Applicability
 
----
+Design patterns คือ solution ที่ทดสอบแล้วสำหรับปัญหาที่เกิดซ้ำ — เหมือนท่าไม้ตายที่ใช้ได้ในหลายๆ สถานการณ์ แต่ **ไม่ใช่ทุกปัญหาต้องใช้ pattern** และ **ไม่ใช่ทุก pattern ที่ดูเหมือนจะ fit จริงๆ fit**
 
-## วิธีทำ
+AI tools ช่วย detect patterns ได้ดี แต่มันมักจะ **over-detect** — เห็น global variable ก็บอกว่าเป็น singleton, เห็น if/else ก็บอกว่าเป็น strategy ทุกครั้ง คุณต้องเข้าใจว่า pattern จริงๆ มีหน้าตาเป็นอย่างไร
+
+Think of it like a martial arts master reading an opponent's stance — you don't just see "arm position," you see the entire fighting style and know which counter-moves apply.
+
+## ⚙️ How It Works
+
+### Pattern Detection Strategy
+
+Each pattern has a **structural fingerprint** — specific code shapes that distinguish it from ordinary code:
+
+**Strategy Pattern** — multiple conditional branches on the same variable:
+
+```javascript
+// ❌ Ordinary if/else — NOT strategy
+if (x) { doA(); }
+else { doB(); }
+
+// ✅ Strategy pattern — multiple branches on same variable
+if (type === "fast") { speed = 100; }
+else if (type === "slow") { speed = 10; }
+else if (type === "medium") { speed = 50; }
+```
+
+**Observer Pattern** — event registration + emission:
+
+```javascript
+// ✅ Observer: on() registers, emit() fires
+function on(event, callback) { listeners[event] = callback; }
+function emit(event, data) { listeners[event](data); }
+```
+
+**Factory Pattern** — create function returning different types:
+
+```javascript
+// ✅ Factory: create() returns different classes based on input
+function create(type) {
+  if (type === "cat") return new Cat();
+  if (type === "dog") return new Dog();
+}
+```
+
+**Singleton Pattern** — lazy-initialized static instance:
+
+```javascript
+// ✅ Singleton: getInstance with lazy init
+static instance = null;
+static getInstance() {
+  if (!this.instance) this.instance = new Singleton();
+  return this.instance;
+}
+
+// ❌ NOT singleton: plain global variable
+const config = { debug: true };  // This is just a config object
+```
+
+### Confidence Scoring
+
+Each detection includes a confidence score (0-100) to help you decide:
+
+| Confidence | Meaning |
+| --- | --- |
+| 80-100 | Strong structural match — likely a real pattern |
+| 50-79 | Partial match — investigate further |
+| 0-49 | Weak signal — probably not a pattern |
+
+## 💡 Example: Walkthrough
+
+```javascript
+const code = `if (type === "fast") { speed = 100; }
+else if (type === "slow") { speed = 10; }
+else if (type === "medium") { speed = 50; }`;
+
+// Detection:
+// - Multiple if/else branches on same variable (type)
+// - Pattern: strategy
+// - Reason: "Multiple conditional branches on same variable"
+// - Confidence: 85
+
+// Output:
+{ pattern: 'strategy', reason: 'Multiple conditional branches on same variable', confidence: 85 }
+```
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Over-detecting patterns**
+> "เห็น if/else ก็บอก strategy ทุกครั้ง"
+> → Strategy pattern ต้องมี **multiple branches on the same variable** — if/else ธรรมดาไม่ใช่ strategy
+
+**Mistake 2: Confusing globals with singletons**
+> `const config = { debug: true }` → singleton!
+> → Plain global variables ไม่ใช่ singleton — singleton ต้องมี **lazy initialization** (`getInstance()`)
+
+**Mistake 3: Ignoring confidence scores**
+> "Pattern detected → apply immediately"
+> → ตรวจสอบ confidence score — ต่ำกว่า 50 อาจไม่ใช่ pattern จริง
+
+**Mistake 4: Empty input crashes**
+> "ไม่ได้ handle code ว่าง"
+> → Empty code → return `{ pattern: 'none', reason: 'Empty code', confidence: 0 }`
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-95-design-pattern" />
+
+## 🏋️ Quest: Design Pattern Applicator
+
+Now it's time to practice! Identify when a design pattern fits and apply it.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-95-design-pattern
    cd quest-95-design-pattern
@@ -31,36 +145,18 @@ Identify when a design pattern fits and apply it
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — plain global variables ไม่ใช่ singleton ต้องมี lazy init
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `suggestPattern(code)` return `{ pattern, reason, confidence }`
+- ตรวจสอบ 4 pattern: strategy, observer, factory, singleton
+- Singleton ต้องมี `getInstance()` + static instance — plain config object ไม่นับ
 - ถ้าติดขัด ดู `_solution/solution.js`

@@ -5,62 +5,190 @@ description: "Automate compliance checking"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 55: Compliance Checklist Automator
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Automate compliance checking
+<LearningObjectives items={[
+  "How to automate compliance checking against a checklist using regex patterns",
+  "Why checking ALL files matters — a violation in file #20 is still a violation",
+  "How to classify check severity as 'required' (critical) vs 'recommended' (warning)",
+  "How to provide evidence: the file path and matching line for each result"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Automated Compliance Checking
+
+Compliance checking is the process of verifying that your codebase meets a set of rules — security policies, coding standards, regulatory requirements. Doing this manually is tedious, error-prone, and doesn't scale. A human reviewer might check the first 5 files and call it done. An automated checker checks *every* file.
+
+Think of compliance automation like a security guard doing a building sweep. A tired guard might skip the basement. An automated system checks every floor, every room, every door — every single time. Compliance automation removes human inconsistency from the equation.
+
+The key engineering habit here is: **automate the boring.** Compliance checks are repetitive. They follow the same pattern every time. That's exactly what code is good at.
+
+---
+
+## ⚙️ How It Works
+
+### The Compliance Checking Pipeline
+
+```
+1. Input: codebase (all files) + checklist (rules to check)
+         ↓
+2. For each check in the checklist:
+   - Compile the regex pattern
+   - Search ALL files for matches
+   - Record evidence (file path + matching line)
+         ↓
+3. Classify results:
+   - 'required' check fails → CRITICAL
+   - 'recommended' check fails → WARNING
+         ↓
+4. Output: { passed, failed, skipped, results[] }
+```
+
+### The Critical Edge Case: Check ALL Files
+
+A naive implementation might stop at the first match:
+
+```javascript
+// ❌ NAIVE: Stops at first file
+for (const file of Object.keys(codebase.files)) {
+  if (pattern.test(codebase.files[file])) {
+    return { status: 'passed' };  // Found it! Done!
+  }
+}
+// But what about violations in the OTHER 19 files?
+```
+
+A correct implementation checks every file:
+
+```javascript
+// ✅ CORRECT: Checks ALL files
+const evidence = [];
+for (const [path, content] of Object.entries(codebase.files)) {
+  const match = content.match(pattern);
+  if (match) {
+    evidence.push({ file: path, line: match[0] });
+  }
+}
+// Now we know: this rule passes across the ENTIRE codebase
+```
+
+---
+
+## 💡 Example: Complete Compliance Check
+
+```javascript
+function checkCompliance(codebase, checklist) {
+  const results = [];
+  
+  for (const rule of checklist) {
+    const pattern = new RegExp(rule.check);
+    const evidence = [];
+    
+    // Check EVERY file — not just the first match
+    for (const [path, content] of Object.entries(codebase.files)) {
+      const match = content.match(pattern);
+      if (match) {
+        evidence.push({ file: path, line: match[0] });
+      }
+    }
+    
+    const status = evidence.length > 0 ? 'passed' : 'failed';
+    
+    results.push({
+      id: rule.id,
+      name: rule.name,
+      status,
+      severity: rule.severity,
+      evidence
+    });
+  }
+  
+  return {
+    passed: results.filter(r => r.status === 'passed').length,
+    failed: results.filter(r => r.status === 'failed').length,
+    skipped: 0,
+    results
+  };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Stopping at the first matching file**
+> "I found a match in file 1 — the rule passes!"
+> → A violation in file #20 is still a violation. Check ALL files in the codebase.
+
+**Mistake 2: Not distinguishing severity levels**
+> "All failures are equal"
+> → 'required' failures are critical (block deployment). 'recommended' failures are warnings (should fix but don't block).
+
+**Mistake 3: Missing evidence in results**
+> "The rule failed, but I don't know where"
+> → Always provide the file path and matching line so developers can find and fix the issue.
+
+**Mistake 4: Not handling empty codebases gracefully**
+> "What if there are no files to check?"
+> → An empty codebase should still return valid results with passed=0, failed=0, skipped=0.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-55-compliance-checker" />
+
+---
+
+## 🏋️ Quest: Compliance Checklist Automator
+
+Now it's time to practice! Build an automated compliance checker that evaluates an entire codebase against a checklist.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-55-compliance-checker
    cd quest-55-compliance-checker
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `checkCompliance(codebase, checklist)` that checks **ALL** files against each rule
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** Pay attention to the edge case — naive AI only checks the first matching file. You must check every file.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The function signature is `checkCompliance(codebase, checklist)` where `codebase = { files: { [path]: string } }`. Iterate over `Object.entries(codebase.files)` to check every file.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case ที่สำคัญที่สุด: ต้องตรวจสอบ **ทุกไฟล์** ไม่ใช่แค่ไฟล์แรกที่เจอ
+- ใช้ `Object.entries(codebase.files)` เพื่อวนลูปทุกไฟล์
+- ใช้ `new RegExp(rule.check)` เพื่อ compile regex pattern จาก check string
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

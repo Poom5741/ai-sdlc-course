@@ -1,0 +1,38 @@
+{
+  "questId": "quest-132-worker-env-config",
+  "questions": [
+    {
+      "question": "Secrets (API keys, passwords) ควรเก็บที่ไหนใน Cloudflare Worker project?",
+      "choices": [
+        "ใน wrangler.toml โดยตรง",
+        "ใน .dev.vars เท่านั้น",
+        "ใน environment variables ของ OS",
+        "ใน codebase พร้อม encryption"
+      ],
+      "answer": 1,
+      "explanation": "Secrets ต้องอยู่ใน `.dev.vars` เท่านั้น — ถ้าใส่ใน `wrangler.toml` โดยตรงมันจะถูก commit เข้า git ซึ่งเป็น security risk อย่างมาก"
+    },
+    {
+      "question": "KV binding ต้องมี fields ใดบ้าง?",
+      "choices": [
+        "id เท่านั้น",
+        "id และ name",
+        "id และ preview_id",
+        "binding, id, preview_id, และ environment_id"
+      ],
+      "answer": 2,
+      "explanation": "KV namespace ต้องมีทั้ง `id` (สำหรับ production) และ `preview_id` (สำหรับ preview environment) — ถ้าไม่มี preview_id preview จะ fail"
+    },
+    {
+      "question": "Regex pattern ใดที่ใช้ตรวจจับ secrets ใน wrangler.toml?",
+      "choices": [
+        "/secret|password|key/i",
+        "/(?:API_KEY|SECRET|PASSWORD|TOKEN|DATABASE_URL)\\s*=\\s*[\"'][^\"]+[\"']/i",
+        "/^[A-Z_]+=.+$/",
+        "/\\.(env|vars|secret)/"
+      ],
+      "answer": 1,
+      "explanation": "Pattern ต้องจับทั้ง keyword (API_KEY, SECRET, PASSWORD, TOKEN, DATABASE_URL) และค่าที่ถูก assign ด้วย `=` ตามด้วย quoted string"
+    }
+  ]
+}

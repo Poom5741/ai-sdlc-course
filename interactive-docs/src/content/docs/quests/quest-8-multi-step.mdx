@@ -5,62 +5,176 @@ description: "Create a tool selection matrix"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 8: AI Tool Selection Matrix
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Create a tool selection matrix
+<LearningObjectives items={[
+  "How to evaluate AI tools against specific criteria",
+  "How to create a scoring system for tool comparison",
+  "Why different tools excel at different tasks",
+  "The engineering habit: TOOL SELECTION MATTERS"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Tool Selection Matrix
+
+ไม่ใช่ AI tool ทุกตัวจะเหมาะกับทุกงาน — เช่นเดียวกับช่างไม้ที่มีเครื่องมือหลายอย่าง แต่ละอย่างมีจุดแข็งต่างกัน
+
+**Tool Selection Matrix** คือตารางเปรียบเทียบที่ช่วยให้คุณเลือก tool ที่เหมาะสมกับงาน มี criteria ชัดเจน และ scoring system ที่เป็นธรรม
+
+---
+
+## ⚙️ How It Works
+
+### Criteria ที่ควรพิจารณา
+
+| Criteria | นิยาม | ตัวอย่าง |
+| --- | --- | --- |
+| **Speed** | เร็วแค่ไหน | 2s vs 5s |
+| **Accuracy** | ถูกต้องแค่ไหน | 80% vs 95% |
+| **Cost** | ราคาเท่าไหร่ | ฟรี vs $20/เดือน |
+| **Context Window** | รับ tokens ได้มากแค่ไหน | 4K vs 128K |
+| **Ease of Use** | ใช้งานง่ายแค่ไหน | CLI vs GUI |
+| **Integration** | เชื่อมกับเครื่องมืออื่นได้แค่ไหน | GitHub vs VS Code |
+
+### Scoring System
+
+```javascript
+// คะแนน 1-5
+const scores = {
+  copilot: {
+    speed: 5,      // เร็วมาก
+    accuracy: 4,   // ถูกต้องดี
+    cost: 3,       // $10/เดือน
+    context: 4,    // 128K tokens
+    easeOfUse: 5,  // ใช้งานง่ายใน IDE
+    integration: 5  // GitHub integration
+  },
+  claudeCode: {
+    speed: 3,      // ช้ากว่า
+    accuracy: 5,   // ถูกต้องมาก
+    cost: 3,       // $20/เดือน
+    context: 5,    // 200K tokens
+    easeOfUse: 4,  // CLI based
+    integration: 3  // น้อยกว่า
+  }
+};
+```
+
+---
+
+## 💡 Example: Creating a Matrix
+
+**ขั้นตอนที่ 1: เลือก tools ที่จะเปรียบเทียบ**
+
+```javascript
+// เลือก 3 tools
+const tools = ['GitHub Copilot', 'Claude Code', 'Cursor'];
+```
+
+**ขั้นตอนที่ 2: กำหนด criteria**
+
+```javascript
+const criteria = ['speed', 'accuracy', 'cost', 'contextWindow', 'easeOfUse'];
+```
+
+**ขั้นตอนที่ 3: ให้คะแนน**
+
+```javascript
+// ให้คะแนน 1-5 สำหรับแต่ละ criteria
+const matrix = {
+  'GitHub Copilot': { speed: 5, accuracy: 4, cost: 3, contextWindow: 4, easeOfUse: 5 },
+  'Claude Code':    { speed: 3, accuracy: 5, cost: 3, contextWindow: 5, easeOfUse: 4 },
+  'Cursor':         { speed: 4, accuracy: 4, cost: 4, contextWindow: 4, easeOfUse: 5 }
+};
+```
+
+**ขั้นตอนที่ 4: คำนวณ total score**
+
+```javascript
+function calculateTotal(scores) {
+  return Object.values(scores).reduce((sum, score) => sum + score, 0);
+}
+
+// Copilot: 5+4+3+4+5 = 21
+// Claude Code: 3+5+3+5+4 = 20
+// Cursor: 4+4+4+4+5 = 21
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ให้คะแนน subjective**
+> "Claude ดีกว่าเพราะฉันชอบ"
+> → ต้องมี criteria ชัดเจนและ objective
+
+**Mistake 2: ลืม考虑 limitations**
+> ให้คะแนนแค่จุดแข็ง ไม่ดูจุดอ่อน
+> → ต้อง include limitations ด้วย
+
+**Mistake 3: ไม่ match criteria กับ use case**
+> ใช้ criteria เดียวกันสำหรับทุก use case
+> → ปรับ criteria ตาม use case (prototype vs production)
+
+**Mistake 4: ไม่ update matrix**
+> ใช้ matrix เดิมโดยไม่อัพเดท
+> → AI tools พัฒนาเร็ว ต้อง update บ่อยๆ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-8-tool-selection" />
+
+---
+
+## 🏋️ Quest: AI Tool Selection Matrix
+
+เขียน design document สร้าง tool selection matrix สำหรับ AI coding tools
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-08-tool-selection
    cd quest-08-tool-selection
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เลือก AI tools อย่างน้อย 3 ตัวที่จะเปรียบเทียบ
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. กำหนด criteria อย่างน้อย 5 ข้อ
 
-4. ตรวจสอบ solution ของคุณ:
+4. เขียน `tool-matrix.md` ตาม structure ที่กำหนด:
+   - Tools compared
+   - Criteria and scoring system
+   - Matrix table
+   - Recommendations for use cases
+   - Limitations of each tool
+
+5. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองใช้ tools จริงก่อนให้คะแนน — อย่าให้คะแนนจาก marketing materials
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- เลือก tools ที่คุณรู้จักหรือเคยใช้
+- ให้คะแนนตาม experience จริง ไม่ใช่ marketing
+- ถ้าติดขัด ลอง search "AI coding tools comparison 2024"

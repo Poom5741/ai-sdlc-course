@@ -1,66 +1,202 @@
 ---
 title: "Quest 29 - Requirements Quality Analyzer"
-description: "Analyze requirements quality"
+description: "Analyze requirements for quality issues"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 29: Requirements Quality Analyzer
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Analyze requirements quality
+<Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-29-requirements-analyzer
-   cd quest-29-requirements-analyzer
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Identifying vague, unclear, or incomplete requirements",
+  "Scoring requirement quality on a 0-100 scale",
+  "Generating actionable suggestions to improve weak requirements",
+  "The engineering habit: Validate Requirements — poor requirements lead to building the wrong thing"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: Requirements Quality — ตรวจสอบก่อนสร้าง ดีกว่าสร้างแล้วค่อยแก้
+
+Requirements Quality Analysis คือการ **ตรวจสอบว่า requirements เขียนได้ดีแค่ไหน** ก่อนที่จะเริ่มเขียน code — เพราะ **requirements ที่คลุมเครือ = code ที่ผิดตั้งแต่ต้น**
+
+ทำไมต้อง analyze? เพราะ **ยิ่งพบปัญหาเร็ว ยิ่งแก้ถูก** — ถ้าพบว่า requirements เขียนไม่ชัดตอน design phase แก้ได้ใน 5 นาที แต่ถ้าพบตอน production แก้ได้ใน 5 วัน
+
+Requirements ที่ไม่ดีมีลักษณะเช่น:
+
+| ปัญหา | ตัวอย่าง | แก้ไข |
+| --- | --- | --- |
+| **คลุมเครือ (Vague)** | "system ต้องเร็ว" | "load time < 1.5s บน 3G" |
+| **ไม่ Specific** | "user-friendly" | "users ทำ task สำเร็จภายใน 3 clicks" |
+| **ไม่-measurable** | "ดีขึ้น" | "increase conversion from 32% to 50%" |
+
+---
+
+## ⚙️ How It Works
+
+### Requirements Analysis Workflow
+
+```
+1. รับ requirements text
+         ↓
+2. วิเคราะห์หาปัญหา (vague, unclear, incomplete)
+         ↓
+3. ให้คะแนน quality score (0-100)
+         ↓
+4. เขียน suggestions สำหรับปรับปรุง
+         ↓
+5. ตรวจสอบว่า score สะท้อนคุณภาพจริง
+```
+
+### Quality Dimensions
+
+**Specificity** — requirements ชัดเจนแค่ไหน?
+
+```javascript
+// ❌ Vague: "system should be fast"
+// ✅ Specific: "API response time < 200ms for 95th percentile"
+```
+
+**Measurability** — วัดผลได้จริงหรือไม่?
+
+```javascript
+// ❌ Unmeasurable: "improve user experience"
+// ✅ Measurable: "reduce support tickets by 30%"
+```
+
+**Completeness** — ครอบคลุม enough หรือไม่?
+
+```javascript
+// ❌ Incomplete: "build login feature"
+// ✅ Complete: "login with email/password, forgot password, account lockout after 5 attempts"
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: ดู requirements ที่คลุมเครือ**
+
+```javascript
+const requirements = 'The system should be fast and user-friendly. It needs to handle lots of users.';
+```
+
+**Step 2: วิเคราะห์และให้คะแนน**
+
+```javascript
+function analyzeRequirements(requirements) {
+  const issues = [];
+  const suggestions = [];
+
+  // ตรวจหา vague words
+  if (/fast|quick|speed/i.test(requirements)) {
+    issues.push('Requirements use vague term "fast" without defining specific speed targets');
+    suggestions.push('Define specific performance targets (e.g., response time < 200ms)');
+  }
+
+  if (/user.friendly|easy|simple/i.test(requirements)) {
+    issues.push('Requirements use vague term "user-friendly" without measurable criteria');
+    suggestions.push('Define specific usability metrics (e.g., task completion rate, time on task)');
+  }
+
+  if (/lots of|many|high volume/i.test(requirements)) {
+    issues.push('Requirements use vague scale description without specific numbers');
+    suggestions.push('Define specific user capacity targets (e.g., support 10K concurrent users)');
+  }
+
+  // คำนวณ score
+  const score = Math.max(0, 100 - (issues.length * 20));
+
+  return { score, issues, suggestions };
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: ตรวจสอบ** — requirements คลุมเครือ → score ต้อง < 80
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: ให้คะแนนสูงเกินไปสำหรับ requirements ที่คลุมเครือ**
+> "'system should be fast' → score 85"
+> → Requirements คลุมเครือ = score ต้องต่ำ (< 80) — ไม่งั้น test จะ fail
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: ไม่ identify vague terms**
+> "requirements ดูโอเคแล้ว"
+> → AI ต้อง detect คำว่า "fast", "user-friendly", "lots of" ว่าเป็น vague terms
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: ไม่เขียน suggestions**
+> "รู้ว่ามีปัญหาแต่ไม่บอกว่าแก้ยังไง"
+> → Suggestions ต้อง specific และ actionable
+
+**Mistake 4: คืน issues ว่างเมื่อ requirements ดี**
+> "requirements ดีมาก ไม่มีปัญหา"
+> → ถ้า requirements ดีจริง score ควรสูง (> 80) — แต่ถ้ามี vague terms ต้อง detect
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-29-requirements-analyzer" />
+
+---
+
+## 🏋️ Quest: Requirements Quality Analyzer
+
+ตอนนี้ถึงเวลาฝึกฝน! วิเคราะห์คุณภาพของ requirements
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-29-requirements-analyzer
+   cd quest-29-requirements-analyzer
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `analyzeRequirements(requirements)` ที่วิเคราะห์คุณภาพและให้คะแนน
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด — ตรวจสอบว่า requirements คลุมเครือได้ score < 80
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Requirements ที่คลุมเครือ = code ที่ผิดตั้งแต่ต้น — ยิ่งพบเร็ว ยิ่งแก้ถูก
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า return object มีครบทุก field: `score`, `issues`, `suggestions`
+- requirements คลุมเครือ (เช่น "fast", "user-friendly") ต้องได้ score < 80
+- issues ต้อง detect vague terms และ suggestions ต้อง specific
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

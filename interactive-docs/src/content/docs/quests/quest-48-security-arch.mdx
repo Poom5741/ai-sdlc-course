@@ -5,22 +5,153 @@ description: "Design security architecture for AI apps"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 48: Security Architecture Design
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design security architecture for AI apps
+<LearningObjectives items={[
+  "Design a threat model for an AI application with database and API access",
+  "Plan authentication, authorization, and input validation layers before writing code",
+  "Define output guardrails that prevent AI from performing dangerous actions",
+  "Create an incident response plan outline for security breaches"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Security by Design — Plan Before You Build
+
+ในโลกของ software security สิ่งที่แย่ที่สุดคือ "ยิงก่อนถามทีหลัง" — สร้าง app ก่อนแล้วค่อยนึกถึง security ทีหลัง **Security by Design** คือการวางแผน security controls ตั้งแต่ขั้นตอน design ไม่ใช่ตอน deploy
+
+AI applications มีความท้าทายเฉพาะตัว: model ที่คุณ create อาจ execute API calls, เข้าถึง database, หรือส่ง email ได้ — และถ้า attacker ควบคุม model input ได้ พวกเขาก็ควบคุม action เหล่านั้นได้เช่นกัน
+
+Think of it like building a bank: you don't build the vault first and then wonder where to put the cameras. You design the entire security layout — cameras, locks, guard stations, escape routes — before laying the first brick.
+
+---
+
+## ⚙️ How It Works
+
+### The Threat Modeling Process
+
+```
+1. Identify assets: What are we protecting?
+   → User data, API keys, database, model integrity
+         ↓
+2. Identify threats: What can go wrong?
+   → Prompt injection, data exfiltration, privilege escalation
+         ↓
+3. Identify controls: How do we prevent each threat?
+   → Input validation, output filtering, rate limiting
+         ↓
+4. Document the architecture
+   → Diagrams, policies, response plans
+```
+
+### AI-Specific Threat Categories
+
+| Threat | Description | Example Attack |
+| --- | --- | --- |
+| **Prompt Injection** | Attacker overrides system prompt | "Ignore previous instructions" |
+| **Data Exfiltration** | AI leaks sensitive data in response | Model reveals database contents |
+| **Privilege Escalation** | AI performs actions beyond its scope | Model executes unauthorized API calls |
+| **Model Manipulation** | Attacker influences model behavior | Adversarial inputs cause wrong outputs |
+| **Supply Chain** | Vulnerable dependencies | Malicious npm package |
+
+### The Security Architecture Layers
+
+```
+┌─────────────────────────────────────────┐
+│           OUTPUT GUARDRAILS             │ ← What AI must NOT do
+├─────────────────────────────────────────┤
+│         AUDIT LOGGING                   │ ← Record everything
+├─────────────────────────────────────────┤
+│      AUTHORIZATION (RBAC)               │ ← Who can do what
+├─────────────────────────────────────────┤
+│      AUTHENTICATION (JWT + MFA)         │ ← Who are you
+├─────────────────────────────────────────┤
+│      INPUT VALIDATION                   │ ← What can come in
+├─────────────────────────────────────────┤
+│      NETWORK SECURITY                   │ ← WAF, rate limiting
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 💡 Example: Threat Model for AI Chatbot
+
+```markdown
+## Threat Model: AI Customer Support Chatbot
+
+### Assets
+- Customer database (PII, order history)
+- API keys (payment processor, email service)
+- Model integrity (prevent manipulation)
+
+### Threats & Controls
+
+1. **T1: Prompt Injection → Data Exfiltration**
+   - Threat: Attacker tricks AI into revealing customer data
+   - Control: Output guardrails + PII detection filter
+   - Severity: Critical
+
+2. **T2: API Key Exposure**
+   - Threat: AI includes API keys in response
+   - Control: Never expose keys to model context
+   - Severity: Critical
+
+3. **T3: Unauthorized Actions**
+   - Threat: AI executes API calls beyond scope
+   - Control: Allowlist of permitted actions + approval workflow
+   - Severity: High
+
+4. **T4: SQL Injection via AI**
+   - Threat: AI generates SQL with user input
+   - Control: Parameterized queries only, no dynamic SQL
+   - Severity: High
+```
+
+**Key insight:** Each threat has a specific control — vague security policies don't stop specific attacks.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Security as an afterthought**
+> "We'll add security before launch"
+> → Security architecture must be designed before code is written. Retrofitting security is expensive and incomplete.
+
+**Mistake 2: Overlooking AI-specific threats**
+> "We have standard web security covered"
+> → AI introduces new attack surfaces: prompt injection, data leakage through responses, model manipulation. Standard web security isn't enough.
+
+**Mistake 3: No output guardrails**
+> "The AI only does what we tell it"
+> → Without output guardrails, a compromised AI can leak data, execute unauthorized actions, or cause harm. Always define what AI must NOT do.
+
+**Mistake 4: Missing incident response plan**
+> "We'll figure it out when something happens"
+> → Incident response plans must exist BEFORE incidents. When a breach happens, you need clear steps, not panic.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-48-security-arch" />
+
+---
+
+## 🏋️ Quest: Security Architecture Design
+
+ออกแบบ security architecture สำหรับ AI chatbot ที่เข้าถึง database และ execute API calls — AI มักจะ proposal architecture ที่ลืม threat modeling หรือ output guardrails!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-48-security-arch
    cd quest-48-security-arch
@@ -28,9 +159,16 @@ Design security architecture for AI apps
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. เขียน `security-arch.md` ที่ครอบคลุม:
+   - Threat model (อย่างน้อย 4 threats ที่เฉพาะเจาะจง)
+   - Authentication และ authorization controls
+   - Input validation และ sanitization layer
+   - Output guardrails (AI ห้ามทำอะไร)
+   - Audit logging requirements
+   - Incident response plan outline
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +199,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- เริ่มจาก threat modeling — ระบุ assets, threats, และ controls ก่อนเขียน architecture
+- อย่าลืม output guardrails — model ที่เข้าถึง database ได้อาจ leak ข้อมูลถ้าไม่มี guardrails
+- คิดถึง AI-specific threats: prompt injection, data exfiltration, privilege escalation
+- ถ้าติดขัด ลองนึกว่าถ้าคุณเป็น attacker จะ exploit AI chatbot ยังไง

@@ -1,66 +1,197 @@
 ---
-title: "Code Review Simulator"
+title: "Quest 127 - Code Review Simulator"
 description: "Review diffs for bugs and issues"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Code Review Simulator
+# Quest 127: Code Review Simulator
 
 <Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Review diffs for bugs and issues
+<LearningObjectives items={[
+  "How to systematically review code diffs for bugs and security issues",
+  "Detecting hardcoded secrets, off-by-one errors, and missing null checks",
+  "Why async calls without error handling are dangerous",
+  "How AI code review tools work and their limitations"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Code Review
+
+Code review ไม่ใช่แค่การดู code — มันเป็น **systematic process** ของการค้นหา bugs, security issues, และ code smells ใน diff ก่อนที่จะ merge เข้า main branch
+
+Think of code review like a sparring partner checking your form — they look for openings (bugs), dangerous habits (security issues), and missed techniques (missing error handling) before you face a real opponent (production).
+
+---
+
+## ⚙️ How It Works
+
+### What to Look For in Diffs
+
+```
+🔴 ERROR (must fix):
+   - Hardcoded secrets (API keys, passwords, tokens)
+   - Off-by-one errors (<= arr.length instead of < arr.length)
+   - Missing null checks before property access
+
+🟡 WARNING (should fix):
+   - console.log left in code
+   - Async calls without try/catch or .catch()
+   - TODO/FIXME comments that need addressing
+
+🔵 INFO (nice to fix):
+   - TODO/FIXME without urgency
+   - Minor style suggestions
+```
+
+### Detection Patterns
+
+```javascript
+// Hardcoded secrets
+/["'](sk-|ak-|secret|password|api.?key|token)[\w-]*["']/i
+
+// Off-by-one
+/<=\s*\w+\.length/
+
+// Missing null check
+// If line accesses obj.prop without preceding if(obj) or null check
+```
+
+---
+
+## 💡 Example: Reviewing a Diff
+
+```javascript
+function reviewDiff(diff) {
+  const comments = [];
+  const lines = diff.split('\n');
+
+  lines.forEach((line, idx) => {
+    if (!line.startsWith('+') || line.startsWith('+++')) return;
+    const content = line.substring(1);
+
+    // 🔴 Hardcoded secrets
+    if (/["'](sk-|ak-|secret|password|api.?key|token)[\w-]*["']/i.test(content)) {
+      comments.push({
+        line: idx,
+        severity: 'error',
+        message: 'Hardcoded secret detected — use environment variables'
+      });
+    }
+
+    // 🔴 Off-by-one error
+    if (/<=\s*\w+\.length/.test(content)) {
+      comments.push({
+        line: idx,
+        severity: 'error',
+        message: 'Possible off-by-one error: using <= instead of < with .length'
+      });
+    }
+
+    // 🟡 Console.log left in
+    if (/console\.log/.test(content)) {
+      comments.push({
+        line: idx,
+        severity: 'warning',
+        message: 'console.log left in code — remove before merging'
+      });
+    }
+
+    // 🟡 Async without error handling
+    if (/await\s+\w+/.test(content)) {
+      const surrounding = lines.slice(Math.max(0, idx - 3), idx + 4).join('\n');
+      if (!/try|catch|\.catch/.test(surrounding)) {
+        comments.push({
+          line: idx,
+          severity: 'warning',
+          message: 'Async call without error handling'
+        });
+      }
+    }
+  });
+
+  const approved = !comments.some(c => c.severity === 'error');
+  return { comments, approved };
+}
+```
+
+**Key insight:** AI code review tools detect patterns well (regex-based), but they miss logical bugs that require understanding the business context. They're a first pass, not a replacement for human review.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ check สำหรับ hardcoded secrets**
+> AI review มองข้าม API keys ที่ hardcode
+> → Secrets ใน code = security vulnerability ร้ายแรง
+
+**Mistake 2: ไม่ detect off-by-one errors**
+> AI มอง `< arr.length` และ `<= arr.length` เหมือนกัน
+> → Off-by-one = bugs ที่เกิดขึ้นเฉพาะ edge cases
+
+**Mistake 3: ไม่ check null guards**
+> AI มอง `user.name` โดยไม่เช็คว่า `user` ถูก null check แล้วหรือยัง
+> → Null reference = runtime crash
+
+**Mistake 4: ให้ AI review แทน human ทั้งหมด**
+> AI detect ได้แค่ pattern-based issues, ไม่เข้าใจ business logic
+> → ยังต้อง human review สำหรับ architectural decisions
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-127-code-review-sim" />
+
+---
+
+## 🏋️ Quest: Code Review Simulator
+
+Now it's time to practice! Review code diffs for bugs and security issues.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-127-code-review-sim
    cd quest-127-code-review-sim
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `reviewDiff(diff)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ detection patterns สำหรับ secrets, off-by-one, null checks
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลอง review diff ด้วยมือก่อนเขียนโค้ด — ดูว่าคุณจับ issues ได้กี่อย่าง แล้วค่อยให้ code ทำตาม
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- detection patterns: secrets (regex), off-by-one (`<=` vs `<`), null checks (preceding if guard)
+- ตรวจสอบ severity levels: error, warning, info
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

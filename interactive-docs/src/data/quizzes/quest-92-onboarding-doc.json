@@ -1,0 +1,38 @@
+{
+  "questId": "quest-92-onboarding-doc",
+  "questions": [
+    {
+      "question": "Why should tech stack entries include descriptions (e.g., 'Node.js — runtime') instead of just names?",
+      "choices": [
+        "It looks more professional",
+        "Newcomers may not know what each tool is for — descriptions provide essential context",
+        "npm requires descriptions in documentation",
+        "It makes the document longer"
+      ],
+      "answer": 1,
+      "explanation": "A newcomer joining from a Python/Django background may not know that Node.js is a JavaScript runtime, or that PostgreSQL is the database. Descriptions provide the context needed to understand the project's architecture."
+    },
+    {
+      "question": "Why is a 'First Tasks' section important in onboarding documentation?",
+      "choices": [
+        "It fills space in the document",
+        "It reduces newcomer anxiety and provides a clear starting point for their first contribution",
+        "It's required by company policy",
+        "It helps managers track new hire progress"
+      ],
+      "answer": 1,
+      "explanation": "Newcomers are often overwhelmed by a new codebase. Giving them 3 specific, achievable starter tasks provides direction, builds confidence, and accelerates their path to making their first contribution."
+    },
+    {
+      "question": "What does 'Document for the Newcomer' mean?",
+      "choices": [
+        "Write the minimum documentation possible",
+        "Write as if the reader has never seen the codebase — don't assume knowledge of the tech stack or conventions",
+        "Only document the most complex parts",
+        "Write documentation in a language the team doesn't use"
+      ],
+      "answer": 1,
+      "explanation": "Every assumption you make ('everyone knows what a REST API is') becomes a wall for the newcomer. Write as if the reader joined from a completely different tech stack — explain acronyms, mention versions, and link to documentation."
+    }
+  ]
+}

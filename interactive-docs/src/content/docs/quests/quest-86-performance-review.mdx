@@ -5,22 +5,119 @@ description: "Identify performance anti-patterns in code"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Performance Review Analyzer
+# Quest 86: Performance Review Analyzer
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Identify performance anti-patterns in code
+<LearningObjectives items={[
+  "How to detect common performance anti-patterns programmatically",
+  "Why you should Measure Before Optimizing — not every slow-looking code is actually slow",
+  "How to identify N+1 queries, sync blocking, memory leaks, and unnecessary re-renders",
+  "The difference between module-level and function-level code context"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Performance Anti-Patterns
+
+Performance problems are some of the hardest bugs to diagnose in production. By the time you notice slowness, the code is in production, under load, and hard to reproduce. **Performance review analysis** catches these issues during code review — before they ever reach production.
+
+The key principle is **Measure Before Optimizing**. A performance analyzer doesn't auto-fix anything — it flags suspicious patterns and suggests measurement. Some anti-patterns are always bad (N+1 queries), while others are context-dependent (readFileSync at module level for config is fine; readFileSync inside a request handler is not).
+
+Think of performance anti-patterns as **landmines in the code** — most of the time you're fine walking, but when you hit one under load, the explosion is devastating and hard to trace back.
+
+---
+
+## ⚙️ How It Works
+
+### Common Performance Anti-Patterns
+
+| Pattern | Severity | Example |
+| --- | --- | --- |
+| N+1 queries | critical | Nested loops accessing DB inside outer loop |
+| Sync blocking | high | `readFileSync` inside async function |
+| Memory leak | high | `addEventListener` without `removeEventListener` |
+| Unnecessary re-render | high | `setState` inside a loop |
+| Large payload | medium | `JSON.parse(JSON.stringify(obj))` for deep clone |
+
+### Context-Dependent Detection
+
+```
+readFileSync at module level (config loading) → ✅ Acceptable
+readFileSync inside a request handler         → ❌ Anti-pattern
+addEventListener in component mount            → ✅ Normal
+addEventListener without matching cleanup      → ❌ Memory leak
+```
+
+The challenge: your detector needs to understand **where in the code** an anti-pattern appears, not just **whether it exists**.
+
+---
+
+## 💡 Example: Detecting N+1 Queries
+
+The N+1 query problem is the most common performance anti-pattern in web applications:
+
+```javascript
+// ❌ N+1 QUERY — fetches users, then queries DB for each user's orders
+async function getUserOrders(users) {
+  const results = [];
+  for (const user of users) {
+    const orders = await db.query(`SELECT * FROM orders WHERE user_id = ${user.id}`);
+    results.push({ user, orders });
+  }
+  return results;
+}
+
+// ✅ BETTER — single query with JOIN
+async function getUserOrders(users) {
+  const ids = users.map(u => u.id);
+  return db.query(`SELECT * FROM orders WHERE user_id IN (?)`, [ids]);
+}
+```
+
+A detector looks for: **nested loops where the inner loop contains a DB call, fetch, or async operation.**
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Flagging ALL readFileSync calls**
+> "readFileSync is always blocking!"
+> → `readFileSync` at module level (for config) is acceptable. It only becomes a problem when called inside request handlers or loops where it blocks the event loop.
+
+**Mistake 2: Not distinguishing module-level from function-level code**
+> "I see readFileSync, so it's a problem"
+> → Check whether the call is inside a function body or at the top level. Module-level sync operations run once at startup — that's usually fine.
+
+**Mistake 3: Treating all findings as "fix immediately"**
+> "Every performance issue is critical"
+> → `JSON.parse(JSON.stringify())` for deep clone is medium severity. N+1 queries are critical. Prioritize so teams tackle the real problems first.
+
+**Mistake 4: Missing the context around event listeners**
+> "Found addEventListener → memory leak"
+> → Check if there's a matching `removeEventListener`. An `addEventListener` with proper cleanup is normal, not a leak.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-86-performance-review" />
+
+---
+
+## 🏋️ Quest: Performance Review Analyzer
+
+Now it's time to practice! Build a performance anti-pattern detector.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-86-performance-review
    cd quest-86-performance-review
@@ -28,39 +125,36 @@ Identify performance anti-patterns in code
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement the `analyzePerformance(code)` function that detects:
+   - **n-plus-one**: nested loops with DB/fetch calls inside
+   - **sync-blocking**: `readFileSync`/`writeFileSync` inside async functions
+   - **memory-leak**: `addEventListener` without `removeEventListener`
+   - **large-payload**: `JSON.parse(JSON.stringify())` for deep clone
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Critical edge case:** `readFileSync` at module level (outside functions) for config loading is acceptable — don't flag it
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** This is a hard quest. Start by detecting the simplest patterns (large-payload), then work up to context-dependent ones (sync-blocking).
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- เริ่มจาก pattern ที่ง่ายที่สุดก่อน เช่น `JSON.parse(JSON.stringify())`
+- `readFileSync` ที่ module level ≠ `readFileSync` ใน function — ต้องตรวจสอบ context
+- ตรวจสอบ `addEventListener` ว่ามี `removeEventListener` คู่กันหรือไม่
+- ใช้ approach ทีละ pattern — อย่าพยายามทำทุกอย่างพร้อมกัน
+- ถ้าติดขัด ลองเขียน code ที่มี anti-pattern แล้ว test detector ของคุณ

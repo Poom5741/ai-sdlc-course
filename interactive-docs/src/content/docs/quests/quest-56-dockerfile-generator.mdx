@@ -5,62 +5,173 @@ description: "Generate optimized Dockerfiles"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 56: Dockerfile Generator
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Generate optimized Dockerfiles
+<LearningObjectives items={[
+  "How to generate optimized Dockerfiles with multi-stage builds",
+  "Why running as non-root user is critical for container security",
+  "How to include HEALTHCHECK instructions for production readiness",
+  "The importance of .dockerignore patterns to reduce image size"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Containerized Deployment
+
+Docker containers package your application with everything it needs to run — the runtime, dependencies, and configuration. A Dockerfile is the recipe for building that container. But a bad recipe creates a bloated, insecure image that's slow to deploy and easy to attack.
+
+The key engineering habit is: **optimize containers.** Small, secure images mean faster deploys and a smaller attack surface. Think of it like packing for a trip — you don't bring your entire wardrobe, just what you need. A multi-stage build is like having a separate packing room: you prepare everything there, then only bring the finished result to the suitcase.
+
+---
+
+## ⚙️ How It Works
+
+### Multi-Stage Build Pattern
+
+```
+Stage 1: Builder (install deps, compile, build)
+    ↓
+Stage 2: Production (copy only what's needed, run as non-root)
+```
+
+### Why Multi-Stage Matters
+
+```dockerfile
+# ❌ NAIVE: Single-stage, runs as root, bloated
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+# Problems: includes dev tools, runs as root, build artifacts in image
+
+# ✅ CORRECT: Multi-stage, non-root, optimized
+FROM node:18 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+
+FROM node:18-slim
+RUN useradd --create-home appuser
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+USER appuser
+EXPOSE 3000
+HEALTHCHECK --interval=30s CMD curl -f http://localhost:3000/health || exit 1
+CMD ["node", "dist/index.js"]
+```
+
+### The Key Security Principle: Non-Root User
+
+Running containers as root is the most common Docker security mistake. If an attacker escapes the container, they have root access to the host machine.
+
+---
+
+## 💡 Example: Generator Output
+
+Given a project description:
+
+```javascript
+const project = {
+  language: 'node',
+  framework: 'express',
+  port: 3000,
+  hasDB: true,
+  hasRedis: true
+};
+```
+
+The generator should produce a Dockerfile that:
+
+- Uses multi-stage build
+- Installs only production dependencies in the final stage
+- Creates and switches to a non-root user
+- Includes a HEALTHCHECK
+- Exposes the correct port
+- Mentions .dockerignore patterns as comments
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Running as root**
+> "It works fine as root"
+> → If an attacker escapes the container, they have root on the host. Always use `USER appuser`.
+
+**Mistake 2: Single-stage builds**
+> "Multi-stage is too complicated"
+> → Single-stage images include build tools, source code, and dev dependencies — bloating the image and increasing attack surface.
+
+**Mistake 3: Using `npm install` instead of `npm ci`**
+> "They do the same thing"
+> → `npm ci` installs from lockfile for reproducible builds. `npm install` can update dependencies unpredictably.
+
+**Mistake 4: Forgetting HEALTHCHECK**
+> "I'll add monitoring later"
+> → Without HEALTHCHECK, Docker can't know if your app is healthy. Orchestrators can't restart unhealthy containers.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-56-dockerfile-generator" />
+
+---
+
+## 🏋️ Quest: Dockerfile Generator
+
+Now it's time to practice! Build a Dockerfile generator that produces optimized, secure containers.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-56-dockerfile-generator
    cd quest-56-dockerfile-generator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `generateDockerfile(project)` that produces a Dockerfile with multi-stage build, non-root user, and HEALTHCHECK
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The generator MUST produce multi-stage builds and non-root user — naive AI generates a single-stage Dockerfile running as root.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Think about what a Dockerfile string looks like. Use template literals to build the output. The test checks for keywords like `AS builder`, `USER`, `HEALTHCHECK`, and `COPY --from=builder`.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Dockerfile ต้องมี multi-stage build (builder stage + production stage)
+- ต้องมี `USER appuser` หรือ `USER node` — ห้ามรันเป็น root
+- ต้องมี `HEALTHCHECK` instruction
+- ใช้ template literal สร้าง Dockerfile string
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

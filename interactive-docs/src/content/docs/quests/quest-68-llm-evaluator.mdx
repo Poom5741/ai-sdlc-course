@@ -1,66 +1,184 @@
 ---
 title: "Quest 68 - LLM Evaluator"
-description: "LLM-as-a-Judge implementation"
+description: "สร้าง LLM-as-a-Judge ที่มี calibrated scoring"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 68: LLM Evaluator
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-LLM-as-a-Judge implementation
+<LearningObjectives items={[
+  "สร้าง evaluator ที่ใช้ weighted scoring สำหรับ LLM output",
+  "เข้าใจ grade assignment — แปลง score เป็น letter grade",
+  "รู้จัก suspicious score detection — ตรวจ bias ในการให้คะแนน",
+  "ออกแบบ calibrated evaluation ที่ไม่ generous เกินไป"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: LLM-as-a-Judge
+
+LLM-as-a-Judge คือ technique ที่ใช้ **LLM ในการ evaluate output ของ LLM อีกตัวหนึ่ง** — เหมือนใช้นักเรียนคนหนึ่งตรวจงานของอีกคน
+
+ทำไมถึงมีประโยชน์? เพราะ **manual evaluation ใช้เวลานาน** แต่ LLM สามารถ evaluate ได้เร็วและ consistent — ถ้า calibrated อย่างถูกต้อง
+
+```javascript
+const evaluator = createEvaluator([
+  { name: 'accuracy', weight: 0.4 },
+  { name: 'clarity', weight: 0.3 },
+  { name: 'completeness', weight: 0.3 },
+]);
+
+const result = evaluator.evaluate('The capital of France is Paris.');
+// { score: 85, grade: 'B', suspicious: false }
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร LLM Evaluator
+
+```
+1. รับ criteria[] — แต่ละ criterion มี name, weight, scoring function
+         ↓
+2. Evaluate output ตามแต่ละ criterion → raw scores
+         ↓
+3. คำนวณ weighted score = sum(score × weight)
+         ↓
+4. แปลง score เป็น grade (A/B/C/D/F)
+         ↓
+5. ตรวจสอบ suspicious scoring — ให้คะแนนสูงเกินไป?
+```
+
+### Suspicious Score Detection
+
+LLM มักจะ **generous เกินไป** ในการให้คะแนน — ทุกอย่างได้ A หมด นี่คือ systematic bias ที่ต้อง detect:
+
+```javascript
+// ❌ Naive — ไม่ detect bias
+function evaluate(output) {
+  return { score: 95, grade: 'A' }; // ทุก output ได้ A
+}
+
+// ✅ Calibrated — detect suspicious patterns
+function evaluate(output) {
+  const score = calculateScore(output);
+  const suspicious = score > 90 && output.length < 50; // สั้นแต่ได้คะแนนสูง = น่าสงสัย
+  return { score, grade: getGrade(score), suspicious };
+}
+```
+
+---
+
+## 💡 Example: Evaluator แบบ step-by-step
+
+```javascript
+const evaluator = createEvaluator([
+  { name: 'accuracy', weight: 0.5 },
+  { name: 'relevance', weight: 0.3 },
+  { name: 'format', weight: 0.2 },
+]);
+
+// Evaluate a response
+const result = evaluator.evaluate('The sky is blue because of Rayleigh scattering.');
+console.log(result);
+// {
+//   score: 88,
+//   grade: 'B+',
+//   suspicious: false,
+//   breakdown: { accuracy: 92, relevance: 85, format: 90 }
+// }
+
+// Evaluate a suspicious response
+const sus = evaluator.evaluate('Yes.');
+console.log(sus);
+// {
+//   score: 30,
+//   grade: 'F',
+//   suspicious: true,  // สั้นมาก แต่ถ้าได้คะแนนสูง = น่าสงสัย
+//   breakdown: { accuracy: 20, relevance: 40, format: 30 }
+// }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ detect suspicious scoring**
+> "All outputs deserve high scores"
+> → LLM มัก generous — ต้อง detect เมื่อ score ไม่สมเหตุสมผล
+
+**Mistake 2: Weight ทุก criterion เท่ากัน**
+> "Accuracy and format are equally important"
+> → บาง criterion สำคัญกว่า — weight ควร reflect ความสำคัญ
+
+**Mistake 3: ไม่มี grade assignment**
+> "Just return the score"
+> → Grade ช่วยให้ humans เข้าใจได้เร็วกว่า raw score
+
+**Mistake 4: ใช้ scoring function เดียวกันสำหรับทุก criterion**
+> "All criteria use the same scoring logic"
+> → แต่ละ criterion ควรมี scoring function ที่เหมาะกับมัน
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-68-llm-evaluator" />
+
+---
+
+## 🏋️ Quest: LLM Evaluator
+
+สร้าง evaluator ที่มี weighted scoring, grade assignment, และ suspicious score detection
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-68-llm-evaluator
    cd quest-68-llm-evaluator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createEvaluator(criteria)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: output สั้นมากแต่ได้คะแนนสูง → suspicious
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง LLM ที่ให้คะแนน A ทุก output — evaluator ของคุณจะ detect อย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Weighted score = sum(score × weight) สำหรับทุก criterion
+- Grade: 90+ = A, 80-89 = B, 70-79 = C, 60-69 = D, `<60` = F
+- Suspicious: ถ้า score > 90 แต่ output สั้น (`<50 chars`) = น่าสงสัย
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

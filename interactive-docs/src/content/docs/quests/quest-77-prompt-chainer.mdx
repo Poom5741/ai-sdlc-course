@@ -1,66 +1,209 @@
 ---
 title: "Quest 77 - Prompt Chainer"
-description: "Multi-step prompt workflows"
+description: "สร้าง multi-step prompt workflows"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 77: Prompt Chainer
 
-<Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
-
-## เป้าหมาย
-
-Multi-step prompt workflows
+<Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจว่า prompt chaining ช่วยจัดการ complex tasks อย่างไร",
+  "สร้าง multi-step workflows ที่ส่งต่อ output ระหว่าง steps",
+  "จัดการกับ failure ที่ต้องหยุด chain ทั้งหมด",
+  "บันทึก history ของทุก step เพื่อ debug และ audit"
+]} />
+
+---
+
+## 📖 Concept: Prompt Chaining
+
+**Prompt Chaining** คือการเชื่อม prompt หลายตัวเข้าด้วยกัน — output ของ step แรกจะเป็น input ของ step ถัดไป เหมือน assembly line ในโรงงาน
+
+ลองนึกภาพเหมือนการทำอาหาร — คุณไม่สามารถทอดไข่ได้ถ้ายังไม่ล้างกระทะ ทุก step ต้องสำเร็จก่อน step ถัดไปจะเริ่มได้
+
+**ทำไมถึงสำคัญ:** งานที่ซับซ้อนเกินไปที่จะทำใน prompt เดียว — การแบ่งเป็นหลาย steps ช่วยให้:
+
+- แต่ละ step โฟกัสอย่างเดียว (Single Responsibility)
+- Debug ง่ายขึ้น (ถ้า step 3 fail รู้ทันทีว่าปัญหาอยู่ตรงไหน)
+- แต่ละ step สามารถ optimize แยกกัน
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ Prompt Chain
+
+```
+Step 1: Analyze code
+  Input: raw code
+  Output: { issues: [...], severity: [...] }
+    ↓
+Step 2: Prioritize issues
+  Input: { issues: [...] } (from step 1)
+  Output: { top3: [...], rationale: "..." }
+    ↓
+Step 3: Generate fixes
+  Input: { top3: [...] } (from step 2)
+  Output: { fixes: [...], tests: [...] }
+```
+
+### กฎของ Chain
+
+| กฎ | อธิบาย |
+| ---- | -------- |
+| Sequential execution | แต่ละ step รันทีละตัว ไม่ parallel |
+| Output passing | Output ของ step N → Input ของ step N+1 |
+| Failure stops chain | ถ้า step ไหน fail → หยุดทั้ง chain |
+| History recording | บันทึก input/output ของทุก step |
+
+---
+
+## 💡 Example: Prompt Chainer ใน Action
+
+```javascript
+function createChain(steps) {
+  const history = [];
+
+  async function run(initialInput) {
+    let currentInput = initialInput;
+
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      const startTime = Date.now();
+
+      try {
+        const output = await step.execute(currentInput);
+        const duration = Date.now() - startTime;
+
+        history.push({
+          step: i,
+          name: step.name,
+          input: currentInput,
+          output,
+          duration,
+          status: 'success'
+        });
+
+        currentInput = output;
+      } catch (error) {
+        history.push({
+          step: i,
+          name: step.name,
+          input: currentInput,
+          error: error.message,
+          status: 'failed'
+        });
+
+        // Failure stops the chain!
+        throw new Error(`Chain failed at step ${i} (${step.name}): ${error.message}`);
+      }
+    }
+
+    return { result: currentInput, history };
+  }
+
+  return { run, getHistory: () => history };
+}
+
+// ตัวอย่างการใช้งาน
+const chain = createChain([
+  {
+    name: 'analyze',
+    execute: (code) => ({ issues: ['SQL injection', 'No input validation'] })
+  },
+  {
+    name: 'prioritize',
+    execute: (data) => ({ top3: data.issues.slice(0, 3), priority: 'high' })
+  },
+  {
+    name: 'generate-fix',
+    execute: (data) => ({ fixes: data.top3.map(i => `Fix: ${i}`) })
+  }
+]);
+
+const result = await chain.run('const query = "SELECT * FROM users WHERE id=" + userId');
+console.log(result.result); // { fixes: ["Fix: SQL injection", "Fix: No input validation"] }
+console.log(result.history); // [{ step: 0, name: 'analyze', ... }, ...]
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ปล่อยให้ chain ต่อเมื่อ step ไหน fail**
+> คิดว่า "step 2 fail แต่ step 3 น่าจะทำได้"
+> → ทุก step ขึ้นอยู่กับ step ก่อนหน้า ถ้า fail ต้องหยุด
+
+**Mistake 2: ไม่บันทึก history**
+> ไม่เก็บ input/output ของแต่ละ step
+> → debug ไม่ได้เมื่อ chain fail ตรงไหน
+
+**Mistake 3: สร้าง chain ที่ยาวเกินไป**
+> ใส่ 20 steps ใน chain เดียว
+> → ซับซ้อนเกินไป ควร break down เป็น chains เล็กๆ
+
+**Mistake 4: ไม่ validate output ของแต่ละ step**
+> ไม่เช็คว่า output ตรงกับที่ step ถัดไป expects
+> → runtime error ที่ debug ยาก
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-77-prompt-chainer" />
+
+---
+
+## 🏋️ Quest: Prompt Chainer
+
+ถึงเวลาฝึกฝน! สร้าง prompt chain ที่มี sequential execution และ failure handling
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-77-prompt-chainer
    cd quest-77-prompt-chainer
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createChain(steps)` ที่:
+   - Sequential execution — รัน step ทีละตัว
+   - Output passing — output ของ step N → input ของ step N+1
+   - Failure stops chain — ถ้า step ไหน fail หยุดทั้ง chain
+   - History recording — บันทึก input/output ของทุก step
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก chain ที่มี 2 steps ก่อน — ถ้าทำงานได้แล้วค่อยเพิ่ม steps
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ `async/await` เพื่อรอให้แต่ละ step เสร็จก่อน step ถัดไป
+- เก็บ history ใน array — push ทุก step ไม่ว่าจะ success หรือ fail
+- ถ้า step fail ให้ `throw new Error()` ทันที — อย่า continue
+- ทดสอบด้วย chain ที่มี step ที่ fail — ต้องมั่นใจว่า chain หยุดจริง

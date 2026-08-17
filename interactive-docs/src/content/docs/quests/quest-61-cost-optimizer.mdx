@@ -5,62 +5,176 @@ description: "Token budget routing between models"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 61: Cost Optimizer
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Token budget routing between models
+<LearningObjectives items={[
+  "How to route LLM requests to the right model based on task complexity and budget",
+  "Why high-complexity tasks require quality models, not just cheap ones",
+  "How to calculate remaining daily budget and stay within limits",
+  "The balance between cost optimization and quality preservation"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Smart Model Routing
+
+Not every LLM task needs GPT-4. Summarizing a paragraph? GPT-3.5 is fine. Writing legal analysis? You need GPT-4. The cost optimizer routes requests to the cheapest model that meets quality requirements — like a dojo instructor assigning sparring partners appropriate to your skill level.
+
+The key engineering habit is: **optimize cost without sacrificing quality.** Route simple tasks to cheap models, complex tasks to powerful ones. This is how companies run AI at scale without going bankrupt.
+
+Think of it like ordering at a restaurant. You don't order the chef's special for a quick snack, and you don't order a kids' meal for a business dinner. Match the order to the occasion.
+
+---
+
+## ⚙️ How It Works
+
+### The Routing Decision Tree
+
+```
+Request arrives: { task, complexity, maxTokens }
+         ↓
+Check remaining budget: dailyLimit - spentToday
+         ↓
+Filter models by maxTokens capacity
+         ↓
+Apply complexity rules:
+  - High complexity → must use qualityScore >= 0.8
+  - Medium complexity → prefer qualityScore >= 0.6
+  - Low complexity → cheapest model that fits
+         ↓
+Pick cheapest model that meets requirements
+         ↓
+Calculate estimated cost: maxTokens / 1000 × costPer1kTokens
+         ↓
+Check if within budget
+         ↓
+Return: { model, estimatedCost, withinBudget, reason }
+```
+
+### Why Complexity Rules Matter
+
+```javascript
+// ❌ NAIVE: Always picks cheapest model
+// "Summarize this 10-page legal contract" → routed to gpt-3.5
+// Result: Garbage summary that misses critical clauses
+
+// ✅ CORRECT: Respects complexity requirements
+// "Summarize this 10-page legal contract" (complexity: high)
+// → Must use qualityScore >= 0.8 → routes to gpt-4
+// Result: Accurate, nuanced summary
+```
+
+### Budget Awareness
+
+```javascript
+const budget = { dailyLimit: 5.00, spentToday: 4.50 };
+const remaining = budget.dailyLimit - budget.spentToday;  // $0.50
+
+// Even if GPT-4 is the best model, if it costs $0.60 and you only have $0.50 left:
+// → Return cheapest model with withinBudget: false
+```
+
+---
+
+## 💡 Example: Complete Routing Logic
+
+```javascript
+function routeRequest(request, budget) {
+  const models = {
+    'gpt-3.5': { costPer1kTokens: 0.002, qualityScore: 0.6, maxContext: 4096 },
+    'gpt-4':   { costPer1kTokens: 0.03,  qualityScore: 0.9, maxContext: 8192 },
+    'gpt-4-turbo': { costPer1kTokens: 0.01, qualityScore: 0.85, maxContext: 128000 },
+  };
+  
+  const remaining = budget.dailyLimit - budget.spentToday;
+  const estimatedCost = request.maxTokens / 1000 * models[selectedModel].costPer1kTokens;
+  
+  return {
+    model: selectedModel,
+    estimatedCost,
+    withinBudget: estimatedCost <= remaining,
+    reason: `Selected ${selectedModel} for ${request.complexity} complexity task`
+  };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Always picking the cheapest model**
+> "GPT-3.5 is 15x cheaper, let's use it for everything"
+> → Complex tasks need quality models. A bad legal summary costs more than the GPT-4 call that would have gotten it right.
+
+**Mistake 2: Ignoring the budget entirely**
+> "Quality first, cost later"
+> → Without budget awareness, a single expensive call can blow your daily limit and block all subsequent calls.
+
+**Mistake 3: Not checking token capacity**
+> "This model is cheap and high-quality"
+> → If the request needs 10K tokens but the model only supports 4K, the call will fail.
+
+**Mistake 4: Returning a model without explaining why**
+> "Just pick one"
+> → The `reason` field helps debugging and auditing. Always explain your routing decision.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-61-cost-optimizer" />
+
+---
+
+## 🏋️ Quest: Cost Optimizer
+
+Now it's time to practice! Build a smart model router that balances cost, quality, and budget constraints.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-61-cost-optimizer
    cd quest-61-cost-optimizer
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `routeRequest(request, budget)` that picks the best model given complexity requirements and remaining budget
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The critical edge case is that naive AI always picks the cheapest model. You MUST respect complexity requirements — high complexity needs quality `>= 0.8`.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The models object is defined in `problem.js`. Use it to filter by quality score and max context. If no model fits the budget, return the cheapest one with `withinBudget: false`.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case ที่สำคัญที่สุด: อย่าเลือก model ถูกที่สุดเสมอ — high complexity ต้องใช้ quality `>= 0.8`
+- คำนวณ remaining budget: `budget.dailyLimit - budget.spentToday`
+- ถ้าไม่มี model ไหนเข้า budget ให้ return cheapest model พร้อม `withinBudget: false`
+- ต้องมี `reason` field อธิบายการเลือก
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -1,66 +1,223 @@
 ---
-title: "GitHub Copilot Workflow Analysis"
-description: "Analyze and optimize Copilot usage patterns"
+title: "Quest 115 - GitHub Copilot Workflow Analysis"
+description: "Analyze and optimize Copilot usage patterns — วิเคราะห์และเพิ่มประสิทธิภาพการใช้ AI tools"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# GitHub Copilot Workflow Analysis
+# Quest 115: GitHub Copilot Workflow Analysis
 
 <Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Analyze and optimize Copilot usage patterns
+<LearningObjectives items={[
+  "How to measure and analyze AI tool adoption across a development team",
+  "Why acceptance rate, not just usage, reveals true AI tool effectiveness",
+  "How to identify anti-patterns like over-reliance and prompt pollution",
+  "The engineering habit of OPTIMIZE YOUR TOOLS — measure, then improve"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Measuring AI Tool Effectiveness
+
+การใช้ AI coding tools เช่น GitHub Copilot ไม่ใช่แค่ "เปิดแล้วใช้" — ทีมที่ประสบความสำเร็จจะ **วัด, วิเคราะห์, และ optimize** การใช้งานอย่างต่อเนื่อง
+
+**Key Metrics ที่ต้องวัด:**
+
+```
+┌─────────────────────────────────────────┐
+│         Copilot Usage Dashboard         │
+│                                         │
+│  Acceptance Rate:    72%  ← สูง = ดี    │
+│  Lines Written/Day:  180  ← context     │
+│  Time Saved/Week:   8.5h ← ROI metric  │
+│  Tasks Completed:    34  ← productivity │
+│  Prompt Quality:     B+  ← room to grow│
+└─────────────────────────────────────────┘
+```
+
+**Acceptance Rate คือตัวชี้วัดที่สำคัญที่สุด** — ถ้า acceptance rate ต่ำ อาจหมายความว่า suggestions ไม่ตรงกับ coding style ของทีม หรือ prompts ไม่ดีพอ
+
+### ทำไมต้อง Analysis?
+
+- **Identify ว่า AI ช่วยได้จริงแค่ไหน** — ไม่ใช่แค่Copilot suggests, developer accepts
+- **Find ว่า team ไหนใช้ดี team ไหนต้อง improve** — best practices sharing
+- **Catch anti-patterns ก่อนกลายเป็นปัญหา** — over-reliance, copy-paste bugs
+- **Justify ROI** — ข้อมูลสำหรับ management ตัดสินใจ invest
+
+---
+
+## ⚙️ How It Works
+
+### Analysis Framework
+
+```
+1. COLLECT DATA
+   ├─ Acceptance rate per developer
+   ├─ Suggestion frequency
+   ├─ Code quality scores
+   └─ Time-to-completion metrics
+         ↓
+2. ANALYZE PATTERNS
+   ├─ Which file types get highest acceptance?
+   ├─ Which times of day are most productive?
+   ├─ Which developers benefit most?
+   └─ Where does Copilot struggle?
+         ↓
+3. OPTIMIZE
+   ├─ Improve prompt patterns
+   ├─ Share best practices
+   ├─ Set team guidelines
+   └─ Track improvements over time
+```
+
+### Required Analysis Sections
+
+| Section | Purpose |
+| --- | --- |
+| **Current Usage Patterns** | How the team uses Copilot today |
+| **Acceptance Rate Analysis** | What % of suggestions are actually accepted |
+| **Productivity Metrics** | Quantifiable impact: lines, time, tasks |
+| **Optimization Strategies** | How to make Copilot work better |
+| **Anti-Patterns to Avoid** | Common mistakes teams make |
+| **Team Guidelines** | Agreed-upon best practices |
+
+### Common Anti-Patterns
+
+```
+❌ Over-Reliance
+   "Copilot suggested it, ship it!"
+   → Developer stops thinking critically
+
+❌ Prompt Pollution
+   // TODO: fix this
+   // AI: fix this by changing x to y
+   → Comments become AI instructions, not documentation
+
+❌ Accepting Without Review
+   "Looks good enough"
+   → Security issues, performance problems slip through
+```
+
+---
+
+## 💡 Example: Analysis Document Structure
+
+```markdown
+# Copilot Usage Analysis
+
+## Current Usage Patterns
+- 85% of developers use Copilot daily
+- Most common: function completion (45%), test generation (30%)
+- Least common: refactoring suggestions (10%)
+
+## Acceptance Rate Analysis
+- Overall acceptance rate: 72%
+- Highest: Python boilerplate (89%)
+- Lowest: Complex algorithms (34%)
+- Recommendation: Improve prompts for algorithmic tasks
+
+## Productivity Metrics
+- Average time saved per developer: 1.2 hours/day
+- Total monthly time saved (team of 8): ~200 hours
+- Estimated cost savings: $15,000/month
+
+## Optimization Strategies
+1. Use descriptive function names to improve suggestions
+2. Write clear JSDoc comments before complex logic
+3. Accept and correct suggestions instead of writing from scratch
+
+## Anti-Patterns to Avoid
+- Never accept suggestions for security-critical code without review
+- Don't let Copilot generate entire files without human oversight
+- Avoid using vague variable names that reduce suggestion quality
+
+## Team Guidelines
+- Review all AI-generated code in pull requests
+- Prefer accepting + editing over writing from scratch
+- Use consistent naming conventions to improve suggestions
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Measuring only usage, not effectiveness**
+> "Everyone has Copilot enabled, that's enough"
+> → Usage ไม่เท่ากับ effectiveness ต้องวัด acceptance rate และ productivity
+
+**Mistake 2: Ignoring anti-patterns**
+> "As long as code ships fast, it's fine"
+> → Over-reliance สร้าง technical debt ที่มองไม่เห็น
+
+**Mistake 3: One-size-fits-all guidelines**
+> "Same rules for everyone"
+> → Junior devs ต้องการ different guidelines กับ senior devs
+
+**Mistake 4: No baseline measurement**
+> "Let's just start using it and see"
+> → ไม่มี baseline = ไม่รู้ว่าดีขึ้นจริงหรือเปล่า
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-115-copilot-analysis" />
+
+---
+
+## 🏋️ Quest: GitHub Copilot Workflow Analysis
+
+Now it's time to practice! Create a comprehensive Copilot usage analysis.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-115-copilot-analysis
    cd quest-115-copilot-analysis
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor — สังเกต required sections ที่ต้องเขียนใน `copilot-analysis.md`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. สร้างไฟล์ `copilot-analysis.md` ที่มี sections ครบถ้วน:
+   - Current Usage Patterns
+   - Acceptance Rate Analysis
+   - Productivity Metrics
+   - Optimization Strategies
+   - Anti-Patterns to Avoid
+   - Team Guidelines
 
-4. ตรวจสอบ solution ของคุณ:
+4. ใช้ AI ช่วย generate analysis — แต่ **verify ข้อมูล** ว่าสมเหตุสมผล
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เขียน analysis ที่มี data จริง (หรือ realistic numbers) ไม่ใช่ generic statements — specific metrics ดีกว่า vague claims
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- แต่ละ section ต้องมี content จริง ไม่ใช่ empty headings
+- Acceptance rate analysis ต้อง mention specific percentages
+- Anti-patterns section ต้องมีอย่างน้อย 2-3 patterns
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -5,22 +5,157 @@ description: "Multi-layer hallucination prevention"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 22: Hallucination Prevention System
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Multi-layer hallucination prevention
+<Badge text="hard" variant="danger" /> <Badge text="35 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "Understand hallucination as a fundamental LLM challenge requiring layered defense",
+  "Implement multiple prevention strategies: temperature, context injection, citation, confidence",
+  "Build a robust system that layers strategies instead of relying on one",
+  "Detect sparse context and warn users about potential hallucination risk"
+]} />
+
+---
+
+## 📖 Concept: Hallucination Prevention
+
+LLM มีนิสัย "แต่งเรื่อง" — เรียกว่า hallucination คือสร้างข้อมูลที่ดูสมเหตุสมผลแต่ไม่จริง การป้องกันไม่ใช่แค่ technique เดียว แต่ต้องใช้ **defense in depth** — หลายชั้นซ้อนกัน
+
+แต่ละชั้นมีจุดแข็งและจุดอ่อนต่างกัน:
+
+- **Temperature reduction:** ลดความ creative ของ model
+- **Context injection:** ให้ข้อมูลจริงเป็น foundation
+- **Citation requirement:** บังคับให้ model อ้างอิงแหล่งที่มา
+- **Confidence check:** เตือนเมื่อ context ไม่พอ
+
+เหมือน martial arts defense: ไม่ได้มีแค่ท่า block เดียว — คุณใช้ footwork + guard + head movement ซ้อนกัน
+
+---
+
+## ⚙️ How It Works
+
+### The Multi-Layer Prevention System
+
+```
+1. Receive prompt, context, and options
+         ↓
+2. Apply Layer 1: Temperature check
+   └── Warn if temperature > 0.7 (too creative)
+         ↓
+3. Apply Layer 2: Context injection
+   └── Enhance prompt with retrieved context
+         ↓
+4. Apply Layer 3: Citation requirement
+   └── Add citation instructions when enabled
+         ↓
+5. Apply Layer 4: Confidence check
+   └── Warn if context is sparse or empty
+         ↓
+6. Return { safe, warnings, enhancedPrompt }
+```
+
+### Warning Levels
+
+| Warning | Trigger | Action |
+| --- | --- | --- |
+| Temperature | > 0.7 | Suggest lowering to 0.3-0.5 |
+| Context sparse | < threshold chunks | Warn about hallucination risk |
+| No context | Empty context array | Strong warning, low confidence |
+| Citation needed | requireCitation = true | Add citation instructions |
+
+---
+
+## 💡 Example: Building the System
+
+**Step 1: Basic structure**
+
+```javascript
+function preventHallucination(prompt, context, options) {
+  const { temperature = 0.5, requireCitation = false, confidenceThreshold = 0.5 } = options;
+  const warnings = [];
+  
+  // Layer 1: Temperature check
+  if (temperature > 0.7) {
+    warnings.push('High temperature may increase hallucination risk. Consider lowering to 0.3-0.5.');
+  }
+  
+  // Layer 2: Context injection
+  let enhancedPrompt = prompt;
+  if (context.length > 0) {
+    enhancedPrompt = `Based on the following context:\n${context.join('\n---\n')}\n\nQuestion: ${prompt}`;
+  }
+  
+  // Layer 3: Citation requirement
+  if (requireCitation) {
+    enhancedPrompt += '\n\nPlease cite your sources for each claim.';
+  }
+  
+  // Layer 4: Confidence check
+  if (context.length === 0) {
+    warnings.push('No context provided. Response may contain hallucinated information.');
+  } else if (context.length < confidenceThreshold * 5) {
+    warnings.push('Limited context available. Confidence in response may be low.');
+  }
+  
+  const safe = warnings.length === 0;
+  return { safe, warnings, enhancedPrompt };
+}
+```
+
+**Step 2: Verify all layers work**
+
+```bash
+node test.js
+# Test: returns required structure
+# Test: warns on high temperature
+# Test: adds citation instructions
+# Test: warns on empty context
+# Test: considers context quantity
+# Test: applies multiple strategies
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Only implementing one strategy**
+> "Temperature reduction is enough"
+→ No single strategy catches everything. Layer multiple approaches.
+
+**Mistake 2: Not returning warnings**
+> Returning `{ safe, enhancedPrompt }` without warnings array
+→ Warnings help users understand WHY the system flagged something.
+
+**Mistake 3: Ignoring context quantity**
+> Treating 1 context chunk the same as 100
+→ Fewer chunks = lower confidence = more warnings.
+
+**Mistake 4: Making enhancedPrompt too long**
+> Injecting massive context into every prompt
+→ Keep context focused and relevant. Quality > quantity.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-22-hallucination-prevention" />
+
+---
+
+## 🏋️ Quest: Hallucination Prevention System
+
+Now it's time to build a multi-layer defense system!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-22-hallucination-prevention
    cd quest-22-hallucination-prevention
@@ -28,39 +163,30 @@ Multi-layer hallucination prevention
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `preventHallucination(prompt, context, options)` — ใช้ 4 prevention layers
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ:** ทดสอบทุก layer — temperature, context, citation, confidence
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Hallucination prevention คือ arms race — ยิ่ง model เก่งขึ้น ยิ่งต้องมี defense ซับซ้อนขึ้น
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ทดสอบทุก layer: temperature warning, context injection, citation instruction, confidence check
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

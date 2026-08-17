@@ -1,0 +1,38 @@
+{
+  "questId": "quest-30-prompt",
+  "questions": [
+    {
+      "question": "What is the core idea behind prompt refinement for code generation?",
+      "choices": [
+        "Making prompts as short as possible to save tokens",
+        "Transforming vague or incomplete instructions into precise, structured prompts that give the AI enough context to generate correct, working code",
+        "Using the same generic prompt for all coding tasks",
+        "Removing all constraints from the prompt to give the AI creative freedom"
+      ],
+      "answer": 1,
+      "explanation": "Prompt refinement converts ambiguous requests into structured instructions with clear inputs, outputs, constraints, and examples. The more precise the prompt, the closer the AI's output matches what you actually need."
+    },
+    {
+      "question": "Which of the following makes a prompt 'bad' for code generation?",
+      "choices": [
+        "Including input/output examples",
+        "Specifying the programming language and data types",
+        "Being vague about the desired behavior and edge cases",
+        "Providing error handling requirements"
+      ],
+      "answer": 2,
+      "explanation": "Vague prompts force the AI to guess at behavior, leading to incorrect implementations. Good prompts specify: what the function does, expected inputs/outputs, edge cases to handle, error behavior, and any constraints."
+    },
+    {
+      "question": "What is the key benefit of using structured prompts with explicit sections (input, output, constraints, examples)?",
+      "choices": [
+        "Structured prompts take up more space and are always better",
+        "Structure eliminates ambiguity by separating concerns, making it easy for the AI to address each aspect and for humans to verify completeness",
+        "Structured prompts are only needed for complex algorithms",
+        "AI models cannot parse structured text formats"
+      ],
+      "answer": 1,
+      "explanation": "Structured prompts with labeled sections force you to think through each aspect (behavior, constraints, edge cases, format) and give the AI a clear template to follow. This reduces ambiguity and makes output more predictable and correct."
+    }
+  ]
+}

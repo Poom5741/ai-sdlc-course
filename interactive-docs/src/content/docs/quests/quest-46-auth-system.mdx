@@ -5,22 +5,200 @@ description: "JWT + Argon2 authentication security"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 46: Auth System Hardener
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-JWT + Argon2 authentication security
+<LearningObjectives items={[
+  "Implement secure password hashing with Argon2-like algorithms",
+  "Build JWT-like token creation and verification with expiration checks",
+  "Apply defense-in-depth: combine hashing, token signing, and expiration",
+  "Recognize why naive authentication implementations fail in production"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Authentication — Defense in Depth
+
+Authentication คือ "ประตูหลัก" ของ application ทุกๆ อย่าง — ถ้าประตูนี้หลุด ทุกอย่างหลุดตาม หลักการสำคัญคือ **Defense in Depth**: อย่าพึ่งพา security layer เดียว แต่ให้ใช้หลายชั้นซ้อนกัน
+
+```
+ชั้นที่ 1: Password hashing (Argon2/bcrypt)
+    ↓
+ชั้นที่ 2: Token signing (HMAC-SHA256)
+    ↓
+ชั้นที่ 3: Token expiration
+    ↓
+ชั้นที่ 4: Rate limiting
+    ↓
+ชั้นที่ 5: Audit logging
+```
+
+ใน quest นี้ เราจะสร้าง 4 ฟังก์ชันหลัก:
+
+```javascript
+hashPassword(password) → { hash, salt }
+verifyPassword(password, hash, salt) → boolean
+createToken(userId, secret, expiresInMs) → string
+verifyToken(token, secret) → { userId, valid, reason? }
+```
+
+Think of it like a medieval castle: one wall can be breached, but three concentric walls with different defenses make it nearly impossible.
+
+---
+
+## ⚙️ How It Works
+
+### Password Hashing Flow
+
+```
+User registers: "MyP@ssw0rd"
+         ↓
+1. Generate random salt
+         ↓
+2. Hash password + salt using Argon2
+         ↓
+3. Store hash + salt in database (NEVER store plain password)
+         ↓
+User logs in: "MyP@ssw0rd"
+         ↓
+4. Retrieve stored hash + salt
+         ↓
+5. Hash input password with same salt
+         ↓
+6. Compare hashes — match? → ✅  /  no match? → ❌
+```
+
+### JWT Token Structure
+
+```
+Header.Payload.Signature
+
+eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiAiMTIzIiwidmVyc2lvbiI6IDEsImV4cCI6IDE3MDAwMDAwMDB9.signature
+```
+
+| Part | Contents |
+| --- | --- |
+| Header | Algorithm (HS256) |
+| Payload | userId, version, expiration timestamp |
+| Signature | HMAC-SHA256(header + payload, secret) |
+
+### Why Expiration Matters
+
+```javascript
+// ❌ Naive: no expiration check
+function verifyToken(token, secret) {
+  const payload = decode(token);
+  const sig = sign(payload, secret);
+  return { valid: token.endsWith('.' + sig), userId: payload.userId };
+  // Token lives FOREVER once issued!
+}
+
+// ✅ Secure: with expiration check
+function verifyToken(token, secret) {
+  const [header, payload, sig] = token.split('.');
+  const expectedSig = sign(header + '.' + payload, secret);
+  if (sig !== expectedSig) return { valid: false, reason: 'invalid signature' };
+  const data = JSON.parse(decode(payload));
+  if (data.exp < Date.now()) return { valid: false, reason: 'token expired' };
+  return { valid: true, userId: data.userId };
+}
+```
+
+---
+
+## 💡 Example: Full Auth Implementation
+
+```javascript
+// Password validation rules
+function validatePassword(password) {
+  if (password.length < 8) throw new Error('Password must be at least 8 characters');
+  if (!/[A-Z]/.test(password)) throw new Error('Password must contain uppercase');
+  if (!/[0-9]/.test(password)) throw new Error('Password must contain a digit');
+}
+
+// Hash with salt (simplified Argon2-like)
+function hashPassword(password) {
+  validatePassword(password);
+  const salt = generateSalt(32);
+  const hash = argon2Hash(password + salt);
+  return { hash, salt };
+}
+
+// Token creation with expiration
+function createToken(userId, secret, expiresInMs) {
+  const header = btoa(JSON.stringify({ alg: 'HS256', ver: 1 }));
+  const payload = btoa(JSON.stringify({
+    userId,
+    version: 1,
+    exp: Date.now() + expiresInMs,
+  }));
+  const signature = hmacSign(header + '.' + payload, secret);
+  return header + '.' + payload + '.' + signature;
+}
+
+// Token verification with ALL checks
+function verifyToken(token, secret) {
+  try {
+    const [header, payload, sig] = token.split('.');
+    if (!header || !payload || !sig) return { valid: false, reason: 'malformed' };
+
+    const expectedSig = hmacSign(header + '.' + payload, secret);
+    if (sig !== expectedSig) return { valid: false, reason: 'invalid signature' };
+
+    const data = JSON.parse(atob(payload));
+    if (data.exp < Date.now()) return { valid: false, reason: 'token expired' };
+
+    return { valid: true, userId: data.userId };
+  } catch {
+    return { valid: false, reason: 'invalid token' };
+  }
+}
+```
+
+**Key insight:** The `verifyToken` function must check BOTH signature validity AND expiration — missing either one creates a vulnerability.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Storing plain passwords**
+> "It's just a demo, I'll hash it later"
+> → NEVER store plain passwords, even in development. Build the hashing from day one.
+
+**Mistake 2: No expiration on tokens**
+> "The token is signed, so it's secure"
+> → A signed token without expiration is a permanent key. If it leaks, the attacker has access forever.
+
+**Mistake 3: Using weak secrets**
+> `secret = 'my-secret-key'`
+> → Token signing secrets must be long, random strings. A weak secret can be brute-forced.
+
+**Mistake 4: Not validating password strength**
+> "I'll just check if the password is not empty"
+> → Weak passwords are the #1 attack vector. Enforce minimum length, complexity requirements, and reject common passwords.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-46-auth-system" />
+
+---
+
+## 🏋️ Quest: Auth System Hardener
+
+สร้างระบบ authentication ที่รวม password hashing + token signing + expiration — AI มักจะ proposal โค้ดที่ลืม expiration check หรือ password validation!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-46-auth-system
    cd quest-46-auth-system
@@ -28,9 +206,14 @@ JWT + Argon2 authentication security
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชันทั้ง 4:
+   - `hashPassword(password)` — ตรวจสอบความแข็งแรง + hash ด้วย salt
+   - `verifyPassword(password, hash, salt)` — เปรียบเทียบ hash
+   - `createToken(userId, secret, expiresInMs)` — สร้าง JWT-like token
+   - `verifyToken(token, secret)` — ตรวจสอบ signature + expiration
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +244,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- `verifyToken` ต้องเช็คทั้ง signature AND expiration — เช็คตัวใดตัวหนึ่งไม่พอ
+- `hashPassword` ต้อง reject passwords สั้นกว่า 8 ตัวอักษร และ passwords ที่ไม่มี uppercase/digit
+- ใช้ `Date.now()` สำหรับ expiration check — อย่าใช้ static timestamps
+- ถ้าติดขัด ลองนึกว่า attacker จะ exploit อะไรได้บ้างถ้าลืม check ตัวไหน

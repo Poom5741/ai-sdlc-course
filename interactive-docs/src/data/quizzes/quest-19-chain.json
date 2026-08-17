@@ -1,0 +1,38 @@
+{
+  "questId": "quest-19-chain",
+  "questions": [
+    {
+      "question": "What is Chain-of-Thought (CoT) prompting?",
+      "choices": [
+        "Asking the model to generate a chain of related topics for further research",
+        "Including step-by-step reasoning instructions in the prompt so the model shows its thinking process before arriving at an answer",
+        "Linking multiple API calls in a sequential chain",
+        "A method of connecting multiple LLM instances together"
+      ],
+      "answer": 1,
+      "explanation": "Chain-of-Thought prompting instructs the model to break down complex problems into intermediate reasoning steps before giving a final answer, which significantly improves accuracy on multi-step reasoning tasks."
+    },
+    {
+      "question": "Why does Chain-of-Thought prompting improve performance on mathematical and logical problems?",
+      "choices": [
+        "It uses more tokens, which always means better results",
+        "It decomposes complex reasoning into verifiable intermediate steps, allowing the model to track state and catch errors at each step",
+        "It activates hidden mathematical modules in the model",
+        "It forces the model to use a specific calculation library"
+      ],
+      "answer": 1,
+      "explanation": "By explicitly reasoning step-by-step, the model can decompose complex problems into manageable sub-problems, maintain working memory of intermediate results, and apply logical rules at each stage — similar to how humans solve multi-step problems."
+    },
+    {
+      "question": "What is 'few-shot CoT' prompting?",
+      "choices": [
+        "Using zero examples and hoping the model figures out the reasoning pattern",
+        "Providing a few examples that demonstrate the step-by-step reasoning process, then asking the model to solve a new problem using the same approach",
+        "Training a smaller model on chain-of-thought data",
+        "Running the chain-of-thought process only a few times"
+      ],
+      "answer": 1,
+      "explanation": "Few-shot CoT includes example inputs paired with their step-by-step reasoning outputs in the prompt. The model learns the reasoning pattern from these examples and applies it to new problems, combining few-shot learning with structured reasoning."
+    }
+  ]
+}

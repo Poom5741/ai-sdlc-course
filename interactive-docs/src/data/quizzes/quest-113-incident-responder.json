@@ -1,0 +1,38 @@
+{
+  "questId": "quest-113-incident-responder",
+  "questions": [
+    {
+      "question": "ทำไม severity 'low' incidents ยังต้อง triage?",
+      "choices": [
+        "Because all incidents need documentation",
+        "Low severity อาจเป็น symptom ของปัญหาใหญ่ที่ซ่อนอยู่",
+        "Triage is mandatory for compliance only",
+        "Low severity incidents are the most dangerous"
+      ],
+      "answer": 1,
+      "explanation": "A low-severity incident like 'slight delay' could be an early warning of a bigger issue like connection pool exhaustion. Skipping triage means you might miss the root cause."
+    },
+    {
+      "question": "incident response output ควรประกอบด้วยอะไรบ้าง?",
+      "choices": [
+        "triage, actions, estimatedImpact, communication, postmortem",
+        "error, stackTrace, fix",
+        "type, severity, timestamp",
+        "log, metric, alert"
+      ],
+      "answer": 0,
+      "explanation": "A complete incident response includes: triage (classification), actions (response steps), estimatedImpact (severity assessment), communication (stakeholder template), and postmortem (root cause analysis)."
+    },
+    {
+      "question": "Actions array ควรเรียงตามอะไร?",
+      "choices": [
+        "ตัวอักษร (alphabetical)",
+        "ลำดับความสำคัญ — diagnose ก่อน, fix ทีหลัง",
+        "ความยาวของ action string",
+        "สุ่มลำดับ"
+      ],
+      "answer": 1,
+      "explanation": "Actions must be ordered by priority — diagnose and assess first, then remediate. Skipping diagnosis to jump to fixes can worsen the incident."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-58-deploy-pipeline",
+  "questions": [
+    {
+      "question": "What is a 'gate' in a deployment pipeline?",
+      "choices": [
+        "A physical barrier that blocks developers from the server room",
+        "An automated check that must pass before code advances to the next stage",
+        "A security firewall between environments",
+        "A manual approval step required for every deploy"
+      ],
+      "answer": 1,
+      "explanation": "Gates are automated pass/fail criteria at each pipeline stage. If the build fails, code doesn't proceed to testing. If tests fail, code doesn't reach staging. Gates prevent broken code from reaching production."
+    },
+    {
+      "question": "Why is a rollback strategy essential before deploying to production?",
+      "choices": [
+        "It makes deployments faster",
+        "By the time something goes wrong, you need a plan NOW — not one you're writing during an outage",
+        "It's required by law in all countries",
+        "Rollback strategies only apply to database migrations"
+      ],
+      "answer": 1,
+      "explanation": "During a production outage, every minute counts. A pre-defined rollback strategy lets you revert instantly. Writing a rollback plan during an incident is like writing a fire escape plan during a fire."
+    },
+    {
+      "question": "What is environment progression in a deployment pipeline?",
+      "choices": [
+        "Deploying to all environments simultaneously",
+        "Code moves through dev → staging → production, each stage catching different issues",
+        "Using different programming languages in each environment",
+        "Rotating encryption keys across environments"
+      ],
+      "answer": 1,
+      "explanation": "Environment progression means code must prove itself in each environment before advancing. Dev catches logic bugs, staging catches environment-specific issues, and production monitoring catches runtime problems."
+    }
+  ]
+}

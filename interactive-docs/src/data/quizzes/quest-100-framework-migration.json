@@ -1,0 +1,38 @@
+{
+  "questId": "quest-100-framework-migration",
+  "questions": [
+    {
+      "question": "When migrating Express to Fastify, what should `res.status(200).send('ok')` become?",
+      "choices": [
+        "reply.send(200, 'ok')",
+        "reply.code(200).send('ok')",
+        "reply.status(200).send('ok')",
+        "reply.send('ok').code(200)"
+      ],
+      "answer": 1,
+      "explanation": "Express: res.status(N).send() → Fastify: reply.code(N).send(). Fastify ใช้ `code()` method แทน `status()` สำหรับ setting HTTP status codes"
+    },
+    {
+      "question": "What should Express handler parameters `(req, res)` be changed to in Fastify?",
+      "choices": [
+        "(request, response)",
+        "(request, reply)",
+        "(req, reply)",
+        "(input, output)"
+      ],
+      "answer": 1,
+      "explanation": "Fastify ใช้ `(request, reply)` แทน Express `(req, res)` — request object สำหรับ input, reply object สำหรับ sending responses"
+    },
+    {
+      "question": "Why should framework migration be done one route at a time?",
+      "choices": [
+        "Fastify can only handle one route at a time",
+        "Incremental migration reduces risk and makes debugging easier",
+        "Express routes can't be converted all at once",
+        "It's faster to migrate incrementally"
+      ],
+      "answer": 1,
+      "explanation": "Incrementally migrate ทีละ route — wrap existing routes แล้ว replace ทีละตัว. ถ้ามีปัญหาจะ isolate ได้ง่ายกว่า rewriting ทั้ง app พร้อมกัน"
+    }
+  ]
+}

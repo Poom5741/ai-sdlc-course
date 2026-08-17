@@ -1,0 +1,38 @@
+{
+  "questId": "quest-8-multi-step",
+  "questions": [
+    {
+      "question": "What is the primary purpose of a Tool Selection Matrix?",
+      "choices": [
+        "To list all available AI tools in alphabetical order",
+        "To compare tools using weighted criteria so you can choose the best fit for a specific task",
+        "To track how much each tool costs per month",
+        "To replace the need for testing tools before use"
+      ],
+      "answer": 1,
+      "explanation": "A Tool Selection Matrix provides a structured comparison using weighted criteria and a scoring system, helping you select the most appropriate tool for a given task based on your priorities."
+    },
+    {
+      "question": "Why should you assign weights to criteria in a Tool Selection Matrix rather than treating all criteria equally?",
+      "choices": [
+        "Weights make the matrix look more professional in presentations",
+        "Different criteria have different importance depending on your project's context and priorities",
+        "Weights are required by the AI tool API specification",
+        "Equal criteria always produce incorrect results"
+      ],
+      "answer": 1,
+      "explanation": "Not all criteria matter equally for every project. Weighting allows you to prioritize factors like accuracy, speed, cost, or ease-of-use based on what matters most for your specific use case."
+    },
+    {
+      "question": "What is a common mistake when building a Tool Selection Matrix?",
+      "choices": [
+        "Including too many criteria and making the comparison overly complex",
+        "Using only one tool in the comparison",
+        "Always choosing the highest-scoring tool without considering trade-offs",
+        "Both A and C are common mistakes"
+      ],
+      "answer": 3,
+      "explanation": "Overcomplicating the matrix with too many criteria makes it unwieldy, and blindly picking the top scorer ignores important trade-offs. A good matrix balances comprehensiveness with practicality."
+    }
+  ]
+}

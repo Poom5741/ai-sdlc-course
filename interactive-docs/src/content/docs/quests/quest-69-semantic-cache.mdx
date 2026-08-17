@@ -1,66 +1,178 @@
 ---
 title: "Quest 69 - Semantic Cache Builder"
-description: "Cache LLM responses by similarity"
+description: "สร้าง cache สำหรับ LLM responses ที่ใช้ similarity-based lookup"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 69: Semantic Cache Builder
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Cache LLM responses by similarity
+<LearningObjectives items={[
+  "สร้าง semantic cache ที่ lookup responses ด้วย similarity",
+  "เข้าใจ cosine similarity — วัดว่า queries ใกล้เคียงกันแค่ไหน",
+  "รู้จัก threshold-based caching — cache hit เมื่อ similarity สูงพอ",
+  "ออกแบบ cache ที่ประหยัด API calls โดยไม่เสีย accuracy"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Semantic Caching
+
+Semantic Cache ต่างจาก regular cache ตรงที่ **มันไม่ได้ lookup ด้วย exact match** แต่ใช้ **similarity** — ถ้า query ใหม่ "ใกล้เคียง" กับ query ที่เคยมี ก็ใช้ cached response ได้เลย
+
+ลองนึกภาพว่าคุณถาม LLM ว่า "What is machine learning?" — แล้ว cached มี response สำหรับ "Explain machine learning" ทั้งสอง query ใกล้เคียงกันมาก Semantic cache จะ detect ว่าเป็น query เดียวกันและ return cached response
+
+```javascript
+const cache = createSemanticCache(0.85); // threshold: 85% similarity
+
+// Cache a response
+cache.set('What is AI?', 'AI is artificial intelligence...');
+
+// Lookup — แม้ query จะต่างกันเล็กน้อย
+cache.get('Explain artificial intelligence');
+// → Cache hit! (similarity > 0.85)
+```
+
+---
+
+## ⚙️ How It Works
+
+### วงจร Semantic Cache
+
+```
+1. get(query) — รับ query ใหม่
+         ↓
+2. คำนวณ similarity กับ cached queries ทั้งหมด
+         ↓
+3. ถ้า similarity > threshold → cache hit! return cached response
+         ↓
+4. ถ้า similarity < threshold → cache miss, ต้อง call LLM
+         ↓
+5. set(query, response) — เก็บ response ใหม่ลง cache
+```
+
+### Cosine Similarity
+
+Cosine similarity วัด **มุมระหว่าง vectors** — ยิ่งมุมเล็ก ยิ่งคล้ายกัน:
+
+```javascript
+// Simplified similarity
+function cosineSimilarity(a, b) {
+  // คำนวณ dot product / (magnitude of a × magnitude of b)
+  // Return value: 0 (ไม่คล้ายเลย) ถึง 1 (เหมือนกันactly)
+}
+
+// ตัวอย่าง
+cosineSimilarity('What is AI?', 'Explain artificial intelligence');
+// → 0.87 (คล้ายกันมาก)
+
+cosineSimilarity('What is AI?', 'How to cook pasta?');
+// → 0.12 (ไม่คล้ายกันเลย)
+```
+
+---
+
+## 💡 Example: Semantic Cache ใน action
+
+```javascript
+const cache = createSemanticCache(0.85);
+
+// First query — cache miss
+let result = cache.get('What is machine learning?');
+// → null (cache miss) — ต้อง call LLM
+
+// Store response
+cache.set('What is machine learning?', 'ML is a subset of AI...');
+
+// Similar query — cache hit!
+result = cache.get('Explain machine learning');
+// → 'ML is a subset of AI...' (similarity > 0.85)
+
+// Check stats
+cache.stats();
+// { hits: 1, misses: 1, hitRate: 0.5, size: 1 }
+```
+
+**สังเกต:** แม้ query จะต่างกันเล็กน้อย ("What is" vs "Explain") แต่ cache ยัง detect ว่าเป็นคำถามเดียวกัน
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ exact match แทน similarity**
+> "Cache lookup by exact query string"
+> → Semantic cache ต้องใช้ similarity — ไม่ใช่ exact match
+
+**Mistake 2: Threshold ต่ำเกินไป**
+> "ตั้ง threshold = 0.5 เพื่อ cache hit บ่อยๆ"
+> → Threshold ต่ำ = cache hit แต่ได้ response ผิด — เสีย accuracy
+
+**Mistake 3: ไม่ track cache stats**
+> "Just cache and return"
+> → Stats ช่วย debug — hit rate ต่ำ = threshold อาจต้องปรับ
+
+**Mistake 4: Cache ไม่มี TTL (time-to-live)**
+> "Cache ตลอดกาล"
+> → LLM responses อาจเก่า — cache ควรมี TTL หรือ max size
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-69-semantic-cache" />
+
+---
+
+## 🏋️ Quest: Semantic Cache Builder
+
+สร้าง semantic cache ที่ lookup responses ด้วย similarity-based matching
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-69-semantic-cache
    cd quest-69-semantic-cache
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createSemanticCache(threshold)` ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. **สำคัญ!** ทดสอบ edge case: query ที่คล้ายกันมาก vs คล้ายกันน้อย
+
+6. แก้ไขจน tests ทุกตัวผ่าน
+
+7. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง query ที่ต่างกันแค่คำเดียว — cache ของคุณจะ detect ว่าเป็นคำถามเดียวกันไหม?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ cosine similarity หรือ simple word overlap ก็ได้
+- Threshold คือ similarity ขั้นต่ำที่จะถือว่าเป็น cache hit
+- Stats ควรถูกต้อง: hits, misses, hitRate, size
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง

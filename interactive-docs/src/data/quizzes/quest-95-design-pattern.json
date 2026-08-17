@@ -1,0 +1,38 @@
+{
+  "questId": "quest-95-design-pattern",
+  "questions": [
+    {
+      "question": "A `const config = { debug: true }` is an example of which pattern?",
+      "choices": [
+        "Singleton",
+        "Factory",
+        "None — it's just a plain global variable",
+        "Observer"
+      ],
+      "answer": 2,
+      "explanation": "Plain global variables ไม่ใช่ singleton — singleton ต้องมี lazy initialization (getInstance()) และ static instance. `const config` เป็นแค่ config object ธรรมดา"
+    },
+    {
+      "question": "Which code pattern matches the Observer pattern?",
+      "choices": [
+        "Multiple if/else on the same variable",
+        "A create() function returning different types",
+        "on() registers listeners, emit() fires events",
+        "getInstance() with lazy initialization"
+      ],
+      "answer": 2,
+      "explanation": "Observer pattern มี 2 องค์ประกอบ: on() สำหรับ register listeners และ emit() สำหรับ fire events — เหมือน pub/sub system"
+    },
+    {
+      "question": "Why does pattern detection include a confidence score?",
+      "choices": [
+        "To show how complex the pattern is",
+        "To indicate whether the detection is a strong match or just a weak signal",
+        "To measure code quality",
+        "To count how many patterns exist"
+      ],
+      "answer": 1,
+      "explanation": "Confidence score (0-100) ช่วยให้คุณตัดสินใจ — สูง (80+) = pattern จริง, ต่ำ (<50) = อาจไม่ใช่ pattern จริง ต้อง investigate เพิ่ม"
+    }
+  ]
+}

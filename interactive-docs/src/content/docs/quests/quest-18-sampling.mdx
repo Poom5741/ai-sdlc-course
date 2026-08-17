@@ -5,22 +5,160 @@ description: "Implement temperature, top-k, top-p"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 18: Sampling Strategy Explorer
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Implement temperature, top-k, top-p
+<Badge text="easy" variant="success" /> <Badge text="20 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "Understand how temperature, top-k, and top-p control LLM output randomness",
+  "Implement greedy, temperature, top-k, and top-p sampling strategies",
+  "Apply temperature to logits BEFORE softmax for correct behavior",
+  "Choose the right sampling strategy for different use cases"
+]} />
+
+---
+
+## 📖 Concept: Sampling Strategies
+
+เมื่อ LLM คำนวณ logits เสร็จแล้ว มันต้อง "ตัดสินใจ" ว่าจะเลือก token ไหน — และนี่คือจุดที่ sampling strategies เข้ามา
+
+**Greedy:** เลือก token ที่มี score สูงสุดเสมอ — ทำนายได้แน่นอนแต่น่าเบื่อ
+**Temperature:** ควบคุมความสุ่ม — ต่ำ = แน่นอน, สูง = สร้างสรรค์
+**Top-k:** เฉพาะ k tokens ที่ดีที่สุดเท่านั้นที่มีสิทธิ์ถูกเลือก
+**Top-p (Nucleus):** เลือกจาก tokens ที่รวม probability ได้ p% — dynamic k
+
+คิดเหมือน martial arts: Greedy คือท่ามาตรฐานที่ทำซ้ำตลอด, Temperature คือความกล้าที่จะลอง technique ใหม่, Top-k/Top-p คือกรอบที่ป้องกันไม่ให้เลือกท่าที่ไม่สมเหตุสมผล
+
+---
+
+## ⚙️ How It Works
+
+### Sampling Strategy Workflow
+
+```
+1. Receive logits from model
+         ↓
+2. Apply strategy-specific transformation
+   ├── Greedy: pick argmax
+   ├── Temperature: divide logits by T, then softmax
+   ├── Top-k: keep only top k, then sample
+   └── Top-p: keep tokens until cumulative prob = p, then sample
+         ↓
+3. Apply softmax to get probabilities
+         ↓
+4. Sample from distribution (or pick argmax for greedy)
+         ↓
+5. Return token index
+```
+
+### Critical: Temperature on Logits, NOT Probabilities
+
+```
+WRONG:  softmax(logits) → divide by temperature
+RIGHT:  divide logits by temperature → softmax
+```
+
+Temperature < 1 sharpens the distribution (more confident).
+Temperature > 1 flattens the distribution (more random).
+
+---
+
+## 💡 Example: Implementing Each Strategy
+
+**Greedy — always pick the best**
+
+```javascript
+function greedySample(logits) {
+  return logits.indexOf(Math.max(...logits));
+}
+```
+
+**Temperature — scale logits before softmax**
+
+```javascript
+function temperatureSample(logits, temperature) {
+  const scaled = logits.map(l => l / temperature);
+  const probs = softmax(scaled);
+  return weightedSample(probs);
+}
+```
+
+**Top-k — only consider the k best tokens**
+
+```javascript
+function topKSample(logits, k) {
+  const indexed = logits.map((l, i) => ({ logit: l, index: i }));
+  indexed.sort((a, b) => b.logit - a.logit);
+  const topK = indexed.slice(0, k);
+  const probs = softmax(topK.map(t => t.logit));
+  const selected = weightedSample(probs);
+  return topK[selected].index;
+}
+```
+
+**Top-p — nucleus sampling**
+
+```javascript
+function topPSample(logits, p) {
+  const probs = softmax(logits);
+  const indexed = probs.map((prob, i) => ({ prob, index: i }));
+  indexed.sort((a, b) => b.prob - a.prob);
+  
+  let cumulative = 0;
+  const nucleus = [];
+  for (const item of indexed) {
+    nucleus.push(item);
+    cumulative += item.prob;
+    if (cumulative >= p) break;
+  }
+  
+  const nucleusProbs = nucleus.map(n => n.prob);
+  const selected = weightedSample(nucleusProbs);
+  return nucleus[selected].index;
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Applying temperature after softmax**
+> `softmax(logits)` then dividing probabilities by temperature
+→ Temperature must be applied to raw logits BEFORE softmax. Doing it after gives a flatter distribution (opposite of intended).
+
+**Mistake 2: Not handling temperature = 0**
+> `logits.map(l => l / 0)` gives Infinity
+→ When temperature is 0, return greedy (argmax) directly.
+
+**Mistake 3: Top-k with k > logits.length**
+> Trying to take top-10 from 5 tokens
+→ Clamp k to the number of available tokens.
+
+**Mistake 4: Top-p with p = 0**
+> No tokens pass the threshold → empty nucleus
+→ Ensure at least one token is always included.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-18-sampling-strategy" />
+
+---
+
+## 🏋️ Quest: Sampling Strategy Explorer
+
+Now it's time to implement sampling strategies!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-18-sampling-strategy
    cd quest-18-sampling-strategy
@@ -28,39 +166,30 @@ Implement temperature, top-k, top-p
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `sampleNext(logits, strategy)` — รองรับ greedy, temperature, top-k, top-p
 
-4. ตรวจสอบ solution ของคุณ:
+4. **สำคัญ:** ใช้ softmax เสมอ — อย่าลืม apply temperature ก่อน softmax
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Sampling strategies คือ🎛️ volume ของ AI creativity — เข้าใจแล้วจะรู้ว่าเมื่อไหร่ควรเปิด-ปิด
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ edge cases: temperature=0 (greedy), k > logits.length, p = 0
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

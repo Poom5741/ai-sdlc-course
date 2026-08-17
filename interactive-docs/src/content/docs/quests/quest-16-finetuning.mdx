@@ -5,22 +5,141 @@ description: "Design SFT to RLHF to DPO pipeline"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 16: Fine-Tuning Pipeline Design
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design SFT to RLHF to DPO pipeline
+<LearningObjectives items={[
+  "Understand the three stages of LLM fine-tuning: SFT → RLHF → DPO",
+  "Design data requirements and evaluation metrics for each stage",
+  "Recognize when to use RLHF vs. DPO for alignment",
+  "Create a complete fine-tuning pipeline design document"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Fine-Tuning Pipeline
+
+การ train LLM ไม่ใช่แค่ feed ข้อมูลเข้าไปแล้วหวังผล — มันเป็น pipeline ที่มี three distinct stages แต่ละ stage มีเป้าหมายและ data requirements ต่างกัน
+
+**SFT (Supervised Fine-Tuning):** สอน model ให้ทำ task เฉพาะ จากนั้น **RLHF (Reinforcement Learning from Human Feedback):** ปรับ model ให้ align กับความต้องการของมนุษย์ สุดท้าย **DPO (Direct Preference Optimization):** ปรับละเอียดโดยไม่ต้องมี reward model
+
+คิดเหมือน martial arts training: SFT คือท่าพื้นฐาน, RLHF คือ sparring กับคู่ซ้อม, DPO คือปรับ technique ให้สมบูรณ์แบบ
+
+---
+
+## ⚙️ How It Works
+
+### The Fine-Tuning Pipeline
+
+```
+Stage 1: SFT (Supervised Fine-Tuning)
+├── Data: Instruction-response pairs
+├── Goal: Teach model task-specific behavior
+└── Output: Fine-tuned model
+
+Stage 2: RLHF (Reinforcement Learning from Human Feedback)
+├── Data: Human preference rankings
+├── Goal: Align model with human values
+└── Output: Reward model + aligned model
+
+Stage 3: DPO (Direct Preference Optimization)
+├── Data: Chosen vs rejected responses
+├── Goal: Fine-tune without reward model
+└── Output: Final aligned model
+```
+
+### Data Requirements per Stage
+
+| Stage | Data Type | Volume | Example |
+| --- | --- | --- | --- |
+| SFT | Instruction → Response | 10K-100K pairs | "Summarize this" → summary |
+| RLHF | Prompt → Response A > Response B | 50K-200K rankings | Human rankings |
+| DPO | Prompt → Chosen + Rejected | 10K-50K pairs | Best vs worst responses |
+
+### Evaluation Metrics
+
+| Stage | Metrics | What It Measures |
+| --- | --- | --- |
+| SFT | Accuracy, ROUGE, BLEU | Task performance |
+| RLHF | Win rate, reward score | Human preference alignment |
+| DPO | DPO loss, preference accuracy | Direct preference optimization |
+
+---
+
+## 💡 Example: Designing the Pipeline
+
+**Step 1: Define SFT stage**
+
+```markdown
+## SFT Stage
+- **Data format:** {"instruction": "...", "response": "..."}
+- **Volume:** 50,000 instruction-response pairs
+- **Training:** Standard supervised learning, 3 epochs
+- **Evaluation:** Task accuracy on held-out set
+```
+
+**Step 2: Define RLHF stage**
+
+```markdown
+## RLHF Stage
+- **Data format:** {"prompt": "...", "response_a": "...", "response_b": "...", "ranking": [0, 1]}
+- **Volume:** 100,000 human preference rankings
+- **Training:** PPO with reward model
+- **Evaluation:** Win rate against SFT baseline
+```
+
+**Step 3: Define DPO stage**
+
+```markdown
+## DPO Stage
+- **Data format:** {"prompt": "...", "chosen": "...", "rejected": "..."}
+- **Volume:** 25,000 chosen-rejected pairs
+- **Training:** DPO loss (no reward model needed)
+- **Evaluation:** Preference accuracy + safety metrics
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Skipping SFT**
+> "I'll go straight to RLHF"
+→ SFT provides the foundation. Without it, RLHF has nothing to align.
+
+**Mistake 2: Using wrong data format per stage**
+> "I'll use the same data format for all stages"
+→ Each stage needs specific data format. SFT needs instruction-response, RLHF needs rankings, DPO needs chosen-rejected pairs.
+
+**Mistake 3: No evaluation plan**
+> "I'll just train and hope it works"
+→ Define metrics for each stage. Without evaluation, you can't measure improvement.
+
+**Mistake 4: Overlooking data quality**
+> "More data is always better"
+→ Quality > quantity. 10K high-quality pairs beat 1M noisy ones.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-16-finetuning-pipeline" />
+
+---
+
+## 🏋️ Quest: Fine-Tuning Pipeline Design
+
+Now it's time to design a complete fine-tuning pipeline!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-16-finetuning-pipeline
    cd quest-16-finetuning-pipeline
@@ -28,39 +147,31 @@ Design SFT to RLHF to DPO pipeline
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. สร้างไฟล์ `finetuning-design.md` ที่ครอบคลุม SFT, RLHF, DPO stages
 
-4. ตรวจสอบ solution ของคุณ:
+4. ระบุ data requirements และ evaluation metrics สำหรับแต่ละ stage
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Fine-tuning คือ investment — ออกแบบ pipeline ให้ดีก่อน train จะประหยัดเวลาและ compute ได้มหาศาล
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ออกแบบ pipeline ครบทั้ง 3 stages: SFT → RLHF → DPO
+- ระบุ data format, volume, และ metrics สำหรับแต่ละ stage
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

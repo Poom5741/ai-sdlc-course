@@ -1,0 +1,38 @@
+{
+  "questId": "quest-21-semantic-search",
+  "questions": [
+    {
+      "question": "What does cosine similarity measure?",
+      "choices": [
+        "The Euclidean distance between two vectors",
+        "The angle between two vectors (direction similarity)",
+        "The magnitude difference between two vectors",
+        "The number of shared elements"
+      ],
+      "answer": 1,
+      "explanation": "Cosine similarity measures the cosine of the angle between vectors, capturing direction similarity regardless of magnitude."
+    },
+    {
+      "question": "Why is normalization critical for cosine similarity?",
+      "choices": [
+        "It makes computation faster",
+        "Without it, vectors of different magnitudes give different similarity scores even if pointing in the same direction",
+        "It converts negative values to positive",
+        "It's required by the JavaScript Math library"
+      ],
+      "answer": 1,
+      "explanation": "Normalization ensures that [1,0] and [100,0] (same direction, different magnitude) produce the same similarity score, which is correct behavior."
+    },
+    {
+      "question": "What should cosineSimilarity return when one vector is all zeros?",
+      "choices": [
+        "1.0 (identical)",
+        "-1.0 (opposite)",
+        "NaN",
+        "0 (undefined similarity)"
+      ],
+      "answer": 3,
+      "explanation": "A zero vector has no direction, so similarity is undefined. Returning 0 is the safe default to avoid NaN in downstream calculations."
+    }
+  ]
+}

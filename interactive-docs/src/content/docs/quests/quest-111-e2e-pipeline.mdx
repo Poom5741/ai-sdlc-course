@@ -1,66 +1,220 @@
 ---
-title: "End-to-End AI Dev Pipeline"
-description: "Orchestrate AI tools across the full SDLC"
+title: "Quest 111 - End-to-End AI Dev Pipeline"
+description: "Orchestrate AI tools across the full SDLC — จาก plan ถึง deploy"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# End-to-End AI Dev Pipeline
+# Quest 111: End-to-End AI Dev Pipeline
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Orchestrate AI tools across the full SDLC
+<LearningObjectives items={[
+  "How to orchestrate AI tools across every SDLC phase (plan → code → test → review → deploy)",
+  "Why sequential execution order matters — test MUST come after code",
+  "How to track AI-enhanced stages vs manual stages in a pipeline",
+  "How to generate pipeline reports showing AI usage statistics",
+  "The engineering habit of building composable, observable pipelines"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Across the Full SDLC
+
+ใน module ที่ผ่านมา เราได้เรียนรู้ AI tools สำหรับแต่ละ phase ของ software development — จาก prompt engineering ถึง code review, testing, security และ deployment. Quest นี้จะเชื่อมทุกอย่างเข้าด้วยกัน
+
+**End-to-End AI Pipeline** คือการนำ AI tools มาใช้แบบครบวงจรในทุก step ของ SDLC (Software Development Lifecycle) แทนที่จะใช้ AI เฉพาะจุด เราจะสร้าง pipeline ที่ AI ช่วยในทุก phase:
+
+```
+Plan → Code → Test → Review → Deploy
+  🤖      🤖     ❌     🤖      ❌
+```
+
+ในตัวอย่างข้างบน 🤖 หมายถึง AI-enhanced stage และ ❌ หมายถึง manual stage สิ่งสำคัญคือ pipeline ต้อง **execute sequentially** — code ต้องเสร็จก่อน test, test ต้องเสร็จก่อน review
+
+**ทำไม sequential ถึงสำคัญ?** เพราะในโลกจริง คุณไม่สามารถ test code ที่ยังไม่เขียน หรือ review ระบบที่ยังไม่ได้ test Pipeline ที่ดีต้องเคารพ dependency chain นี้
+
+---
+
+## ⚙️ How It Works
+
+### Pipeline Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│              createPipeline(stages)          │
+│                                             │
+│  stages: [                                  │
+│    { name: 'plan',   type: 'plan',    🤖 }, │
+│    { name: 'code',   type: 'code',    🤖 }, │
+│    { name: 'test',   type: 'test',    ❌ }, │
+│    { name: 'review', type: 'review',  🤖 }, │
+│    { name: 'deploy', type: 'deploy',  ❌ }, │
+│  ]                                          │
+│                                             │
+│  execute() → results[]   (run all stages)   │
+│  report()  → string      (summary stats)    │
+└─────────────────────────────────────────────┘
+```
+
+### Key Components
+
+**1. Pipeline Creation**
+
+- รับ array of stages — แต่ละ stage มี `name`, `type`, และ `aiEnhanced` flag
+- เก็บ stages ไว้ใช้ระหว่าง execute
+
+**2. Sequential Execution**
+
+- วนลูปผ่านแต่ละ stage ตามลำดับ
+- บันทึกผลลัพธ์ของแต่ละ stage: `stage`, `type`, `status`, `aiUsed`, `duration`
+- **สำคัญ**: test stage ต้อง run หลัง code stage เสมอ
+
+**3. Reporting**
+
+- นับจำนวน stages ทั้งหมด vs stages ที่ใช้ AI
+- Return string summary เช่น `"Pipeline complete: 5 stages, 3 AI-enhanced."`
+
+### Execution Flow Diagram
+
+```
+execute() called
+    │
+    ▼
+for each stage:
+    ├─ Record start time
+    ├─ Execute stage (simulate)
+    ├─ Record: { stage, type, status, aiUsed, duration }
+    └─ Move to next stage
+    │
+    ▼
+lastResults = results
+return results
+```
+
+---
+
+## 💡 Example: Pipeline in Action
+
+**Creating a pipeline:**
+
+```javascript
+const stages = [
+  { name: 'plan',   type: 'plan',   aiEnhanced: true },
+  { name: 'code',   type: 'code',   aiEnhanced: true },
+  { name: 'test',   type: 'test',   aiEnhanced: false },
+  { name: 'review', type: 'review', aiEnhanced: true },
+  { name: 'deploy', type: 'deploy', aiEnhanced: false },
+];
+
+const pipeline = createPipeline(stages);
+```
+
+**Executing and reading results:**
+
+```javascript
+const results = pipeline.execute();
+// [
+//   { stage: 'plan',   type: 'plan',   status: 'completed', aiUsed: true,  duration: 0 },
+//   { stage: 'code',   type: 'code',   status: 'completed', aiUsed: true,  duration: 0 },
+//   { stage: 'test',   type: 'test',   status: 'completed', aiUsed: false, duration: 0 },
+//   { stage: 'review', type: 'review', status: 'completed', aiUsed: true,  duration: 0 },
+//   { stage: 'deploy', type: 'deploy', status: 'completed', aiUsed: false, duration: 0 },
+// ]
+```
+
+**Generating a report:**
+
+```javascript
+const report = pipeline.report();
+// "Pipeline complete: 5 stages, 3 AI-enhanced."
+```
+
+**Edge case — empty pipeline:**
+
+```javascript
+const emptyPipeline = createPipeline([]);
+emptyPipeline.execute();  // → []
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Running stages in parallel instead of sequential**
+> "Test and code can run at the same time, right?"
+> → ใน SDLC, test ต้องรอ code เสร็จ Pipeline ต้อง run ตามลำดับเสมอ
+
+**Mistake 2: Not tracking which stages use AI**
+> "Just run all stages, doesn't matter which ones use AI"
+> → Pipeline report ต้องระบุได้ว่า AI-enhanced กี่ stage เพื่อ transparency
+
+**Mistake 3: Ignoring empty pipeline edge case**
+> "An empty pipeline won't happen in production"
+> → Code ที่ดี handle empty input gracefully — return empty array ไม่ใช่ error
+
+**Mistake 4: Not recording execution metadata**
+> "Just return the stage names"
+> → แต่ละ result ต้องมี `type`, `status`, `aiUsed`, `duration` เพื่อ observability
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-111-e2e-pipeline" />
+
+---
+
+## 🏋️ Quest: End-to-End AI Dev Pipeline
+
+Now it's time to practice! Build an AI-powered SDLC pipeline.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-111-e2e-pipeline
    cd quest-111-e2e-pipeline
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณ — สังเกตว่า `createPipeline()` มีอยู่แล้วแต่ยังไม่สมบูรณ์
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ทำความเข้าใจ contract: `createPipeline(stages)` ต้อง return object ที่มี `execute()`, `stages`, และ `report()`
 
-4. ตรวจสอบ solution ของคุณ:
+4. Implement `execute()` — วนลูปผ่าน stages ตามลำดับ, บันทึกผลลัพธ์แต่ละ stage พร้อม metadata
+
+5. Implement `report()` — สร้าง summary string ที่นับ total stages และ AI-enhanced stages
+
+6. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+7. **สำคัญ**: อ่าน test output อย่างละเอียด — สังเกตว่า test ตรวจว่า stages run sequentially
+
+8. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า test ตรวจว่า "test runs after code (sequential)" ล้มเหลว — ตรวจสอบว่าคุณวนลูป stages ตามลำดับที่รับเข้ามา ไม่ใช่ sort หรือ run parallel
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- `createPipeline()` ต้อง return `{ execute, stages, report }` — ไม่ใช่ return array
+- ผลลัพธ์ของ `execute()` ต้องมี `stage`, `type`, `status`, `aiUsed`, `duration`
+- ตรวจสอบ edge case: empty pipeline ต้อง return empty array
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

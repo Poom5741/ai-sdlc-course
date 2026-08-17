@@ -1,26 +1,151 @@
 ---
-title: "Worker Environment Config"
-description: "Validate bindings and secrets"
+title: "Quest 132 - Worker Environment Config"
+description: "Validate bindings และสร้าง .dev.vars"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Worker Environment Config
+# Quest 132: Worker Environment Config
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Validate bindings and secrets
+<LearningObjectives items={[
+  "เข้าใจ Cloudflare Worker bindings (KV, D1, R2)",
+  "รู้วิธี validate wrangler.toml bindings ด้วย regex",
+  "เข้าใจความสำคัญของ .dev.vars สำหรับ secrets",
+  "ตรวจจับ secrets ที่หลุดเข้าไปใน wrangler.toml"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Bindings & Environment Configuration
+
+Cloudflare Workers ใช้ **bindings** เพื่อเชื่อมต่อกับ resources ต่างๆ — KV namespaces, D1 databases, R2 buckets bindings ถูก config ใน `wrangler.toml` แต่ **secrets** (API keys, database URLs) ต้องอยู่ใน `.dev.vars` เท่านั้น
+
+Think ของ `wrangler.toml` เหมือน "บัญชีรายชื่อ" — มันบอกว่า Worker ของคุณมี connections กี่ตัวและแต่ละตัวชื่ออะไร แต่ `.dev.vars` คือ "safe" ที่เก็บ password ของ connections เหล่านั้น
+
+ถ้าคุณ put secrets ใน `wrangler.toml` โดยตรง — มันจะถูก commit เข้า git ซึ่งเป็น **security risk** อย่างมาก
+
+---
+
+## ⚙️ How It Works
+
+### Validation Flow
+
+```
+1. รับ tomlContent (string) และ envVars (object)
+         ↓
+2. ตรวจจับ secrets ใน tomlContent (security warning)
+         ↓
+3. Validate KV bindings (ต้องมี id และ preview_id)
+         ↓
+4. Validate D1 bindings (ต้องมี database_id)
+         ↓
+5. Validate R2 bindings (ต้องมี bucket_name)
+         ↓
+6. สร้าง .dev.vars content จาก envVars
+         ↓
+7. Return { valid, errors, devVars, warnings }
+```
+
+### Binding Validation Rules
+
+| Binding Type | Required Fields | Example |
+| --- | --- | --- |
+| KV | `id`, `preview_id` | `[kv_namespaces]` section |
+| D1 | `database_id` | `[[d1_databases]]` section |
+| R2 | `bucket_name` | `[[r2_buckets]]` section |
+
+### Secret Detection
+
+```javascript
+// Regex ที่ตรวจจับ secrets
+const secretPatterns = /(?:API_KEY|SECRET|PASSWORD|TOKEN|DATABASE_URL)\s*=\s*["'][^"']+["']/i;
+```
+
+ถ้าเจอ match → return warning: "Secrets detected in wrangler.toml — move them to .dev.vars"
+
+---
+
+## 💡 Example: Validating Config
+
+**ขั้นตอนที่ 1: ตรวจ secrets ใน toml**
+
+```javascript
+const secretPatterns = /(?:API_KEY|SECRET|PASSWORD|TOKEN|DATABASE_URL)\s*=\s*["'][^"']+["']/i;
+if (secretPatterns.test(tomlContent)) {
+  warnings.push('Secrets detected in wrangler.toml — move them to .dev.vars for security');
+}
+```
+
+**ขั้นตอนที่ 2: Validate KV bindings**
+
+```javascript
+const kvBindingRegex = /\[kv_namespaces\][\s\S]*?(?=\n\[|\n#|$)/gi;
+const kvMatches = tomlContent.match(kvBindingRegex) || [];
+for (const kv of kvMatches) {
+  if (!/id\s*=\s*["'][\w-]+["']/.test(kv)) {
+    errors.push('KV namespace missing "id" field');
+  }
+  if (!/preview_id\s*=\s*["'][\w-]+["']/.test(kv)) {
+    errors.push('KV namespace missing "preview_id" field');
+  }
+}
+```
+
+**ขั้นตอนที่ 3: สร้าง .dev.vars content**
+
+```javascript
+const devVars = Object.entries(envVars)
+  .map(([key, value]) => `${key}=${value}`)
+  .join('\n');
+
+// Result:
+// API_KEY=sk-12345
+// DATABASE_URL=postgres://localhost/mydb
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ detect secrets ใน toml**
+> "tomlContent แค่ string ไม่ต้องเช็ค"
+> → Secrets ใน toml = security leak เสมอ ต้อง warn เสมอ
+
+**Mistake 2: ใช้ regex ที่ไม่ handle multiline sections**
+> KV/D1/R2 bindings อาจ span หลาย lines
+> → ใช้ `[\s\S]*?` pattern เพื่อ match multiline sections
+
+**Mistake 3: ไม่ validate preview_id สำหรับ KV**
+> KV ต้องมีทั้ง `id` และ `preview_id`
+> → Preview environment ใช้ `preview_id` — ถ้าไม่มี preview จะ fail
+
+**Mistake 4: ไม่ generate .dev.vars จาก envVars**
+> validate อย่างเดียวไม่พอ — ต้อง return `.dev.vars` content ด้วย
+> → Developer ต้องการไฟล์ `.dev.vars` พร้อมใช้
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-132-worker-env-config" />
+
+---
+
+## 🏋️ Quest: Worker Environment Config
+
+ถึงเวลา validate bindings และสร้าง environment config แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-132-worker-env-config
    cd quest-132-worker-env-config
@@ -28,39 +153,37 @@ Validate bindings and secrets
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `validateBindings(tomlContent, envVars)` ที่:
+   - ตรวจจับ secrets ใน tomlContent (return warnings)
+   - Validate KV, D1, R2 bindings
+   - สร้าง `.dev.vars` content จาก envVars
+   - Return `{ valid, errors, devVars, warnings }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง security flow — secrets ต้องอยู่ใน `.dev.vars` เท่านั้น, ไม่ใช่ `wrangler.toml`
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ใช้ regex patterns สำหรับ detect secrets (API_KEY, SECRET, PASSWORD, TOKEN, DATABASE_URL)
+- KV bindings ต้องมีทั้ง `id` และ `preview_id`
+- D1 bindings ต้องมี `database_id`
+- R2 bindings ต้องมี `bucket_name`

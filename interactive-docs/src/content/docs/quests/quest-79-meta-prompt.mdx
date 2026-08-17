@@ -1,66 +1,228 @@
 ---
 title: "Quest 79 - Meta-Prompt Generator"
-description: "Prompts that write prompts"
+description: "สร้าง prompts ที่เขียน prompts"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 79: Meta-Prompt Generator
 
-<Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
-
-## เป้าหมาย
-
-Prompts that write prompts
+<Badge text="hard" variant="danger" /> <Badge text="30-35 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจว่า meta-prompts ช่วย automate prompt creation ได้อย่างไร",
+  "สร้าง prompt generator ที่มี generate, validate, และ improve methods",
+  "รู้จัก validate prompt ว่ามีองค์ประกอบครบหรือไม่",
+  "เข้าใจว่า prompts ที่ดีต้องมี role, constraints, และ output format"
+]} />
+
+---
+
+## 📖 Concept: Meta-Prompts
+
+**Meta-prompt** คือ prompt ที่สร้าง prompt อื่น — เหมือน template สำหรับสร้าง templates
+
+ลองนึกภาพเหมือนโรงงานผลิตแม่พิมพ์ — แทนที่จะหล่อชิ้นส่วนทีละชิ้น คุณสร้างแม่พิมพ์หนึ่งตัวแล้วหล่อได้หลายร้อยชิ้น
+
+**ทำไมถึงสำคัญ:** ถ้าคุณต้องสร้าง prompt ใหม่ทุกวันสำหรับ task คล้ายๆ กัน — meta-prompt จะช่วย generate prompt ที่มีคุณภาพสูงให้โดยอัตโนมัติ
+
+```
+Manual:    เขียน prompt ใหม่ทุกครั้ง → เสียเวลา, คุณภาพไม่ consistent
+Meta:      ใช้ template generate prompt → เร็ว, คุณภาพ consistent
+```
+
+### โครงสร้างของ Meta-Prompt Template
+
+```javascript
+const template = {
+  role: "security auditor",
+  constraints: ["ไม่แก้โค้ด", "ต้อง rate ด้วย CVSS"],
+  outputFormat: "bullet points with severity",
+  examples: ["CRITICAL: SQL injection in line 42"]
+};
+```
+
+---
+
+## ⚙️ How It Works
+
+### วิธีการทำงานของ Generator
+
+```
+Template { role, constraints, outputFormat, examples }
+    ↓
+generator.generate(taskDescription, context)
+    ↓
+Returns: "You are a {role}...\n\nTask: {taskDescription}\n\nConstraints:\n{constraints}..."
+    ↓
+generator.validate(prompt)
+    ↓
+Returns: { valid: true/false, issues: [...] }
+    ↓
+generator.improve(prompt, feedback)
+    ↓
+Returns: improved prompt string
+```
+
+### ทำไมต้องมี Validate
+
+Meta-prompt สร้าง prompt ให้ — แต่ prompt ที่สร้างออกมาอาจไม่ครบองค์ประกอบ Validate จะเช็คว่า:
+
+- มี role ไหม
+- มี constraints ไหม
+- มี output format ไหม
+- มี task description ไหม
+
+---
+
+## 💡 Example: Meta-Prompt Generator ใน Action
+
+```javascript
+function createMetaPrompt(template) {
+  return {
+    generate(taskDescription, context = '') {
+      let prompt = `You are a ${template.role}.\n\n`;
+
+      if (context) {
+        prompt += `Context: ${context}\n\n`;
+      }
+
+      prompt += `Task: ${taskDescription}\n\n`;
+
+      if (template.constraints.length > 0) {
+        prompt += `Constraints:\n`;
+        template.constraints.forEach(c => {
+          prompt += `- ${c}\n`;
+        });
+        prompt += '\n';
+      }
+
+      prompt += `Output Format: ${template.outputFormat}\n`;
+
+      if (template.examples.length > 0) {
+        prompt += `\nExamples:\n`;
+        template.examples.forEach(e => {
+          prompt += `- ${e}\n`;
+        });
+      }
+
+      return prompt;
+    },
+
+    validate(prompt) {
+      const issues = [];
+
+      if (!prompt.includes('You are a')) {
+        issues.push('Missing role definition');
+      }
+      if (!prompt.includes('Constraints:')) {
+        issues.push('Missing constraints section');
+      }
+      if (!prompt.includes('Output Format:')) {
+        issues.push('Missing output format');
+      }
+      if (!prompt.includes('Task:')) {
+        issues.push('Missing task description');
+      }
+
+      return { valid: issues.length === 0, issues };
+    },
+
+    improve(prompt, feedback) {
+      return prompt + `\n\nAdditional Instructions: ${feedback}`;
+    }
+  };
+}
+
+// ตัวอย่างการใช้งาน
+const meta = createMetaPrompt({
+  role: 'security auditor specialized in OWASP Top 10',
+  constraints: ['Do NOT rewrite code', 'Rate by CVSS score'],
+  outputFormat: 'bullet points with severity levels',
+  examples: ['CRITICAL: SQL injection in query builder']
+});
+
+const prompt = meta.generate('Review this API endpoint', 'Express.js REST API');
+console.log(prompt);
+
+const validation = meta.validate(prompt);
+console.log(validation); // { valid: true, issues: [] }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate prompt ที่ generate ออกมา**
+> สร้าง prompt แล้วใช้เลยโดยไม่เช็คว่าครบองค์ประกอบ
+> → ได้ prompt ที่ไม่มี role หรือ constraints
+
+**Mistake 2: template ไม่มี constraints**
+> ปล่อยให้ prompt ไม่มีข้อจำกัด
+> → AI จะทำอะไรก็ได้ ไม่โฟกัสที่ task
+
+**Mistake 3: ไม่รองรับ context parameter**
+> ไม่ส่ง context เข้าไปใน prompt
+> → AI ไม่รู้ background ของ task
+
+**Mistake 4: improve ไม่ได้ improve จริงๆ**
+> improve() แค่ return prompt เดิม
+> → ไม่มีค่าจริง ต้องเพิ่ม feedback เข้าไป
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-79-meta-prompt" />
+
+---
+
+## 🏋️ Quest: Meta-Prompt Generator
+
+ถึงเวลาฝึกฝน! สร้าง meta-prompt generator ที่มี generate, validate, improve
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-79-meta-prompt
    cd quest-79-meta-prompt
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI assistant
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createMetaPrompt(template)` ที่ return object ที่มี:
+   - `generate(taskDescription, context)` — สร้าง prompt จาก template
+   - `validate(prompt)` — เช็คว่า prompt ครบองค์ประกอบ
+   - `improve(prompt, feedback)` — เพิ่ม feedback เข้าไปใน prompt
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เริ่มจาก generate() ก่อน — ถ้าสร้าง prompt ได้แล้วค่อยเพิ่ม validate() และ improve()
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- generate() ต้องประกอบ prompt จาก template fields: role, constraints, outputFormat, examples
+- validate() ต้องเช็คว่า prompt มี "You are a", "Constraints:", "Output Format:", "Task:"
+- improve() ต้องเพิ่ม feedback ต่อท้าย prompt — อย่า return prompt เดิม
+- ทดสอบด้วย template ที่ขาด fields ต่างๆ — validate ต้องจับได้ทุก case

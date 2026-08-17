@@ -1,26 +1,164 @@
 ---
-title: "KV Store Manager"
-description: "Namespaced KV CRUD operations"
+title: "Quest 133 - KV Store Manager"
+description: "สร้าง namespaced KV keys พร้อม TTL"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# KV Store Manager
+# Quest 133: KV Store Manager
 
 <Badge text="easy" variant="success" /> <Badge text="15 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Namespaced KV CRUD operations
+<LearningObjectives items={[
+  "เข้าใจ key namespace pattern สำหรับ Cloudflare KV",
+  "รู้จัก TTL (Time-To-Live) และการตั้งค่า expiration สำหรับ KV entries",
+  "สร้าง key format ที่มี structure ชัดเจน (namespace:entity:id)",
+  "รู้วิธี validate inputs ก่อนสร้าง KV key"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Namespaced KV Keys
+
+Cloudflare KV เป็น distributed key-value store ที่เร็วมาก — แต่ถ้าคุณใช้ key ที่ไม่มี structure เช่น `"data123"` หรือ `"user"` คุณจะปวดหัวเวลาต้อง manage ข้อมูลจำนวนมาก
+
+**Namespace pattern** คือวิธีจัดระเบียบ keys ให้มี structure ชัดเจน เช่น `user:profile:123` หรือ `product:items:456` pattern นี้ทำให้:
+
+- ค้นหา keys ได้ง่าย
+- จัดกลุ่มข้อมูลตาม entity type
+- หลีกเลี่ยง key collision
+
+Think ของมันเหมือน "ระบบไฟล์" — namespace เหมือนโฟลเดอร์, entity เหมือน subfolder, และ id เหมือนชื่อไฟล์
+
+---
+
+## ⚙️ How It Works
+
+### Key Generation Flow
+
+```
+1. รับ namespace, entity, id, action
+         ↓
+2. Validate inputs (ทุกตัวต้องไม่ empty)
+         ↓
+3. ตรวจสอบ action ใน ACTION_TTL map
+         ↓
+4. สร้าง key: "namespace:entity:id"
+         ↓
+5. Return { key, ttl }
+```
+
+### Key Format
+
+```
+namespace:entity:id
+     ↓       ↓     ↓
+   "user"  "profile" "123"
+   → user:profile:123
+```
+
+### TTL (Time-To-Live) by Action
+
+| Action | TTL | ความหมาย |
+| --- | --- | --- |
+| `read` | 0 | ไม่มี expiration (ใช้ค่า default ของ KV namespace) |
+| `write` | 3600 | หมดอายุใน 1 ชั่วโมง |
+| `delete` | 0 | ไม่มี expiration |
+
+---
+
+## 💡 Example: Building KV Keys
+
+**ขั้นตอนที่ 1: กำหนด ACTION_TTL map**
+
+```javascript
+const ACTION_TTL = {
+  read: 0,
+  write: 3600,
+  delete: 0,
+};
+```
+
+**ขั้นตอนที่ 2: Validate inputs**
+
+```javascript
+if (!namespace || namespace.trim() === '') {
+  return { key: '', error: 'namespace is required' };
+}
+if (!entity || entity.trim() === '') {
+  return { key: '', error: 'entity is required' };
+}
+if (!id || id.trim() === '') {
+  return { key: '', error: 'id is required' };
+}
+if (!ACTION_TTL.hasOwnProperty(action)) {
+  return { key: '', error: `invalid action: ${action}` };
+}
+```
+
+**ขั้นตอนที่ 3: สร้าง key**
+
+```javascript
+const key = `${namespace}:${entity}:${id}`;
+const ttl = ACTION_TTL[action];
+
+return { key, ttl };
+```
+
+**ตัวอย่างผลลัพธ์:**
+
+```javascript
+buildKVKey('user', 'profile', '123', 'write');
+// → { key: 'user:profile:123', ttl: 3600 }
+
+buildKVKey('product', 'items', '456', 'read');
+// → { key: 'product:items:456', ttl: 0 }
+
+buildKVKey('', 'profile', '123', 'read');
+// → { key: '', error: 'namespace is required' }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate inputs ก่อนสร้าง key**
+> "inputs จะต้องมีค่าอยู่แล้ว"
+> → Caller อาจส่ง empty string — validate เสมอก่อนสร้าง key
+
+**Mistake 2: ไม่ check action ใน ACTION_TTL map**
+> ใช้ action ที่ไม่มีใน map เช่น `"update"`
+> → ต้อง check `hasOwnProperty` ก่อนใช้ action
+
+**Mistake 3: ลืม strip whitespace จาก inputs**
+> `"  user  "` กลายเป็น key ที่มี space
+> → ใช้ `.trim()` กับ inputs เสมอ
+
+**Mistake 4: ใช้ separator ที่ไม่ consistent**
+> ใช้ `/` ในที่หนึ่งและ `:` ในอีกที่หนึ่ง
+> → เลือก separator ตัวเดียว (เช่น `:`) แล้วใช้ตลอด
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-133-kv-manager" />
+
+---
+
+## 🏋️ Quest: KV Store Manager
+
+ถึงเวลาสร้าง namespaced KV keys แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-133-kv-manager
    cd quest-133-kv-manager
@@ -28,39 +166,37 @@ Namespaced KV CRUD operations
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `buildKVKey(namespace, entity, id, action)` ที่:
+   - Validate inputs ทั้ง 4 ตัว
+   - สร้าง key format `namespace:entity:id`
+   - Return TTL ตาม action type
+   - Return error สำหรับ invalid inputs
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง filesystem analogy — namespace เหมือนโฟลเดอร์, entity เหมือน subfolder, id เหมือนชื่อไฟล์
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Key format คือ `namespace:entity:id` คั่นด้วย colon
+- ACTION_TTL map: read=0, write=3600, delete=0
+- ใช้ `.trim()` กับ inputs เสมอก่อน validate
+- ตรวจสอบ `hasOwnProperty` สำหรับ action

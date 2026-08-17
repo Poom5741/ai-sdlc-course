@@ -5,22 +5,176 @@ description: "Create CI/CD configurations"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 41: CI Pipeline Builder
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Create CI/CD configurations
+<Badge text="hard" variant="danger" /> <Badge text="25 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "เข้าใจ concepts ของ CI/CD pipelines",
+  "ใช้ AI ช่วยสร้าง CI configurations ที่ถูกต้อง",
+  "ออกแบบ pipeline stages ที่เหมาะสมกับ project",
+  "เรียนรู้ best practices ของ CI/CD"
+]} />
+
+---
+
+## 📖 Concept: CI/CD Pipeline
+
+CI (Continuous Integration) คือ practice ที่ developers merge code changes เข้า main branch บ่อยๆ — แต่ละ merge จะถูก test โดยอัตโนมัติ
+
+CD (Continuous Delivery/Deployment) คือการ automate ขั้นตอนหลัง tests ผ่าน — build, package, deploy
+
+CI/CD pipeline เหมือน conveyor belt ใน factory — code changes เข้ามา → ผ่าน tests → build → deploy โดยไม่ต้องทำ manual
+
+AI ช่วยสร้าง CI configurations ได้ดี因为它รู้ best practices จาก projects นับล้าน — แต่คุณต้อง verify ว่า config ตรงกับ needs ของ project
+
+---
+
+## ⚙️ How It Works
+
+### โครงสร้างของ CI/CD Pipeline
+
+```
+Code Push
+    ↓
+┌─────────────┐
+│   Lint &     │  ← ตรวจสอบ code quality
+│   Format     │
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│    Unit     │  ← ทดสอบ individual functions
+│    Tests    │
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│ Integration │  ← ทดสอบ modules ทำงานร่วมกัน
+│   Tests     │
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│    Build    │  ← สร้าง production bundle
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│   Deploy    │  ← deploy ไป production
+└─────────────┘
+```
+
+### CI Configuration Example (GitHub Actions)
+
+```yaml
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npm run lint
+      
+      - name: Test
+        run: npm test
+      
+      - name: Build
+        run: npm run build
+```
+
+---
+
+## 💡 Example: สร้าง Pipeline Config
+
+```javascript
+function generatePipelineConfig(projectType) {
+  const configs = {
+    node: {
+      name: 'Node.js CI',
+      steps: [
+        { name: 'Checkout', uses: 'actions/checkout@v4' },
+        { name: 'Setup Node', uses: 'actions/setup-node@v4', with: { 'node-version': '20' } },
+        { name: 'Install', run: 'npm ci' },
+        { name: 'Lint', run: 'npm run lint' },
+        { name: 'Test', run: 'npm test' },
+        { name: 'Build', run: 'npm run build' }
+      ]
+    },
+    python: {
+      name: 'Python CI',
+      steps: [
+        { name: 'Checkout', uses: 'actions/checkout@v4' },
+        { name: 'Setup Python', uses: 'actions/setup-python@v5', with: { 'python-version': '3.11' } },
+        { name: 'Install', run: 'pip install -r requirements.txt' },
+        { name: 'Lint', run: 'ruff check .' },
+        { name: 'Test', run: 'pytest' }
+      ]
+    }
+  };
+  
+  return configs[projectType] || configs.node;
+}
+
+// ใช้งาน
+const pipeline = generatePipelineConfig('node');
+console.log(JSON.stringify(pipeline, null, 2));
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ cache dependencies**
+> "npm install ทุกครั้งก็ได้"
+> → Caching ลด build time ได้มาก — ใช้ actions/cache หรือ built-in caching
+
+**Mistake 2: ไม่มี failing step ที่ชัดเจน**
+> "run ทุกอย่างใน step เดียว"
+> → Split steps ให้ชัด — จะได้รู้ว่า step ไหน fail
+
+**Mistake 3: ไม่ test ทุก environments**
+> "test แค่ Node 20"
+> → ทดสอบหลาย versions — บางครั้ง code ทำงานใน version หนึ่งแต่ไม่อีก version
+
+**Mistake 4: deploy โดยไม่มี approval**
+> "auto deploy ทุก push"
+> → Production deployments ควรมี approval gate — ป้องกัน accidental deploy
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-41-ci" />
+
+---
+
+## 🏋️ Quest: CI Pipeline Builder
+
+พร้อมแล้วสร้าง pipeline! ใช้ AI ช่วยสร้าง CI/CD configurations
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-41-ci-pipeline-builder
    cd quest-41-ci-pipeline-builder
@@ -28,39 +182,28 @@ Create CI/CD configurations
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ create CI/CD configuration
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกว่าถ้าคุณจะ setup CI สำหรับ project จริง — คุณจะ test อะไรบ้าง?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ดู project type ใน problem.js สำหรับ pipeline structure ที่ต้องใช้
+- คิดถึง stages ที่จำเป็น — lint, test, build, deploy
+- อย่าลืม caching และ error handling

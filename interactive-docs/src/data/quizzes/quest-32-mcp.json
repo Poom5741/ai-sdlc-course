@@ -1,0 +1,38 @@
+{
+  "questId": "quest-32-mcp",
+  "questions": [
+    {
+      "question": "What is MCP (Model Context Protocol)?",
+      "choices": [
+        "A new programming language for AI models",
+        "A standardized protocol that enables AI models to discover, connect to, and use external tools and data sources through a common interface",
+        "A database management system for storing embeddings",
+        "A method for compressing model weights"
+      ],
+      "answer": 1,
+      "explanation": "MCP provides a universal standard for AI-tool communication. Instead of building custom integrations for each tool, MCP defines a common protocol so any compatible AI model can connect to any compatible tool — like USB for AI."
+    },
+    {
+      "question": "What does an MCP tool definition typically include?",
+      "choices": [
+        "Only the tool's name and a description",
+        "A name, description, input schema (parameters), and the function to execute when the tool is called",
+        "The complete source code of the tool",
+        "Only the HTTP endpoint URL"
+      ],
+      "answer": 1,
+      "explanation": "An MCP tool definition provides: a name for identification, a natural language description so the AI understands when to use it, a JSON schema defining input parameters, and the execution handler that performs the actual work."
+    },
+    {
+      "question": "Why is MCP important for the AI ecosystem?",
+      "choices": [
+        "It makes AI models run faster",
+        "It creates a standard that prevents vendor lock-in and allows any AI model to use any tool, fostering interoperability and reducing duplicated integration work",
+        "It replaces the need for APIs entirely",
+        "It only works with one specific AI provider"
+      ],
+      "answer": 1,
+      "explanation": "MCP standardizes tool integration, so tool developers build once and it works with any MCP-compatible AI, while AI developers support MCP once and gain access to all compatible tools. This eliminates the N×M integration problem."
+    }
+  ]
+}

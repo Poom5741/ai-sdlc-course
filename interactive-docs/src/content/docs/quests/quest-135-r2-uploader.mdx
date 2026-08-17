@@ -1,26 +1,155 @@
 ---
-title: "R2 Object Uploader"
-description: "Presigned URLs and multipart upload"
+title: "Quest 135 - R2 Object Uploader"
+description: "Presigned URLs และ multipart upload strategy"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# R2 Object Uploader
+# Quest 135: R2 Object Uploader
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Presigned URLs and multipart upload
+<LearningObjectives items={[
+  "เข้าใจ Cloudflare R2 object storage และ use cases",
+  "รู้จัก presigned URLs สำหรับ secure file uploads",
+  "เข้าใจ multipart upload strategy สำหรับไฟล์ขนาดใหญ่",
+  "ตั้งค่า threshold สำหรับ single vs multipart upload"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: R2 Object Storage & Upload Strategies
+
+Cloudflare R2 เป็น S3-compatible object storage ที่ไม่มี egress fees — เหมาะสำหรับเก็บไฟล์, images, videos และ static assets ขนาดใหญ่
+
+**Presigned URLs** คือ temporary URLs ที่ให้ permission upload/download ไฟล์ได้โดยไม่ต้อง expose credentials Think ของมันเหมือน "บัตรเข้าชมชั่วคราว" — ใช้ได้แค่ช่วงเวลาหนึ่งแล้วหมดอายุ
+
+**Multipart upload** คือการแบ่งไฟล์ขนาดใหญ่เป็น chunks เล็กๆ แล้ว upload ทีละส่วน — เร็วกว่าและ reliable กว่า upload ทีเดียวสำหรับไฟล์ใหญ่
+
+---
+
+## ⚙️ How It Works
+
+### Upload Planning Flow
+
+```
+1. รับ fileName, fileSize, contentType
+         ↓
+2. Validate inputs
+         ↓
+3. ตรวจสอบ fileSize กับ MULTIPART_THRESHOLD (5MB)
+         ↓
+4. ถ้า ≤ 5MB → single upload (สร้าง presigned URL)
+         ↓
+5. ถ้า > 5MB → multipart upload (คำนวณจำนวน parts)
+         ↓
+6. Return { strategy, presignedUrl/parts }
+```
+
+### Upload Strategy Decision
+
+| File Size | Strategy | Details |
+| --- | --- | --- |
+| ≤ 5MB | Single | สร้าง presigned URL สำหรับ upload เดียว |
+| > 5MB | Multipart | แบ่งเป็น chunks 10MB ต่อ part |
+
+### Threshold Constants
+
+```javascript
+const MULTIPART_THRESHOLD = 5 * 1024 * 1024;  // 5MB
+const CHUNK_SIZE = 10 * 1024 * 1024;           // 10MB
+```
+
+---
+
+## 💡 Example: Planning Uploads
+
+**ขั้นตอนที่ 1: Validate inputs**
+
+```javascript
+if (!fileName || fileName.trim() === '') {
+  errors.push('fileName is required');
+}
+if (typeof fileSize !== 'number' || fileSize <= 0) {
+  errors.push('fileSize must be a positive number');
+}
+if (!contentType || contentType.trim() === '') {
+  errors.push('contentType is required');
+}
+```
+
+**ขั้นตอนที่ 2: Single upload (small file)**
+
+```javascript
+// ไฟล์ 3MB → single upload
+if (fileSize <= MULTIPART_THRESHOLD) {
+  const presignedUrl = `https://r2.example.com/${fileName}?upload=${contentType}`;
+  return { strategy: 'single', presignedUrl };
+}
+```
+
+**ขั้นตอนที่ 3: Multipart upload (large file)**
+
+```javascript
+// ไฟล์ 25MB → multipart (3 parts)
+const parts = Math.ceil(fileSize / CHUNK_SIZE);
+return { strategy: 'multipart', parts };
+```
+
+**ตัวอย่างผลลัพธ์:**
+
+```javascript
+planUpload('photo.jpg', 3 * 1024 * 1024, 'image/jpeg');
+// → { strategy: 'single', presignedUrl: 'https://r2.example.com/photo.jpg?upload=image/jpeg' }
+
+planUpload('video.mp4', 25 * 1024 * 1024, 'video/mp4');
+// → { strategy: 'multipart', parts: 3 }
+
+planUpload('', 1024, 'text/plain');
+// → { strategy: 'single', errors: ['fileName is required'] }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate fileSize type**
+> fileSize อาจเป็น string `"1024"` แทน number `1024`
+> → ตรวจสอบ `typeof fileSize === 'number'` เสมอ
+
+**Mistake 2: ใช้ threshold ผิดหน่วย**
+> ใช้ bytes แทน MB หรือสลับ MB กับ KB
+> → `5 * 1024 * 1024` = 5MB, `10 * 1024 * 1024` = 10MB
+
+**Mistake 3: ไม่ ceil จำนวน parts**
+> `25MB / 10MB = 2.5` ต้องเป็น 3 parts ไม่ใช่ 2
+> → ใช้ `Math.ceil()` เสมอสำหรับคำนวณจำนวน parts
+
+**Mistake 4: ลืม return error สำหรับ invalid inputs**
+> ปล่อยผ่าน fileName ว่าง string
+> → Validate ทุก input ก่อน return result
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-135-r2-uploader" />
+
+---
+
+## 🏋️ Quest: R2 Object Uploader
+
+ถึงเวลาสร้าง upload strategy planner แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-135-r2-uploader
    cd quest-135-r2-uploader
@@ -28,39 +157,38 @@ Presigned URLs and multipart upload
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `planUpload(fileName, fileSize, contentType)` ที่:
+   - Validate inputs (fileName, fileSize, contentType)
+   - ตัดสินใจ single vs multipart ตาม file size
+   - สร้าง presigned URL สำหรับ single upload
+   - คำนวณจำนวน parts สำหรับ multipart upload
+   - Return `{ strategy, presignedUrl/parts, errors }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง "ส่งพัสดุ" — ถ้ากล่องเล็กส่งทีเดียว, ถ้ากล่องใหญ่ต้องแยกเป็นหลายกล่อง
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- MULTIPART_THRESHOLD = 5MB (5 *1024* 1024 bytes)
+- CHUNK_SIZE = 10MB (10 *1024* 1024 bytes)
+- ใช้ `Math.ceil()` สำหรับคำนวณจำนวน parts
+- ตรวจสอบ `typeof fileSize === 'number'` ก่อนคำนวณ

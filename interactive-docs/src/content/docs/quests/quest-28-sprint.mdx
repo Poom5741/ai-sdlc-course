@@ -1,66 +1,217 @@
 ---
 title: "Quest 28 - Sprint Planner"
-description: "Break features into sprint tasks"
+description: "Break features into sprint-sized tasks"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 28: Sprint Planner
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Break features into sprint tasks
+<Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-28-sprint-planner
-   cd quest-28-sprint-planner
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Breaking large features into small, estimable sprint tasks",
+  "Estimating task complexity and comparing against team capacity",
+  "Understanding when features don't fit in a sprint and need splitting",
+  "The engineering habit: Decompose Work — large features must be broken into small tasks"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: Sprint Planning — แบ่งศึกให้เล็กพอที่จะชนะได้
+
+Sprint Planning คือการ **แบ่ง features ขนาดใหญ่ให้เป็น tasks ขนาดเล็ก** ที่สามารถทำเสร็จได้ใน 1 sprint (ปกติ 1-2 สัปดาห์) — เหมือนนักรบที่แบ่งศึกออกเป็นกลยุทธ์ย่อยๆ แทนที่จะเข้าปะทะตรงๆ
+
+ทำไมต้อง decompose? เพราะ **feature ขนาดใหญ่ที่ไม่ได้แบ่ง = ไม่มีวันเสร็จ** — ทีมจะรู้สึกว่าไม่มีความคืบหน้าและท้อไปในที่สุด
+
+Sprint Planner ต้องคิดถึง 2 สิ่งพร้อมกัน:
+
+| Concept | คำถามที่ตอบ |
+| --- | --- |
+| **Tasks** | feature นี้แบ่งเป็นกี่ sub-tasks? แต่ละตัวใช้เวลากี่ชั่วโมง? |
+| **Capacity** | ทีมมี capacity กี่ชั่วโมงต่อ sprint? แล้ว fit ไหม? |
+
+---
+
+## ⚙️ How It Works
+
+### Sprint Planning Workflow
+
+```
+1. รับ feature list พร้อม priority และ complexity
+         ↓
+2. แบ่งแต่ละ feature เป็น sub-tasks
+         ↓
+3. ประมาณการเวลา (estimate) แต่ละ task
+         ↓
+4. บวกรวม (totalEstimate) เทียบกับ teamCapacity
+         ↓
+5. ตัดสินใจว่า fitsInSprint หรือไม่
+```
+
+### Estimation Rules
+
+**Rule 1: ทุก task ต้องมี estimate > 0**
+
+```javascript
+// ❌ Bad: task ไม่มี estimate
+{ name: 'Build login', estimate: 0 }
+
+// ✅ Good: task มี estimate ชัดเจน
+{ name: 'Build login form UI', estimate: 4 }
+```
+
+**Rule 2: totalEstimate ต้องเท่ากับผลรวมของ tasks**
+
+```javascript
+// ❌ Bad: totalEstimate ไม่ตรง
+tasks = [{ estimate: 4 }, { estimate: 6 }]; // total = 10
+totalEstimate = 8; // ผิด!
+
+// ✅ Good: totalEstimate ตรง
+tasks = [{ estimate: 4 }, { estimate: 6 }]; // total = 10
+totalEstimate = 10; // ถูก!
+```
+
+**Rule 3: fitsInSprint ต้องเทียบกับ capacity จริง**
+
+```javascript
+// ❌ Bad: totalEstimate = 40 ชั่วโมง แต่ capacity = 20
+fitsInSprint = true; // ผิด!
+
+// ✅ Good: totalEstimate = 40 ชั่วโมง, capacity = 20
+fitsInSprint = false; // ถูก!
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: รับ features**
+
+```javascript
+const features = [
+  { name: 'User Auth', priority: 'high', complexity: 'medium' },
+  { name: 'Dashboard', priority: 'medium', complexity: 'high' }
+];
+const teamCapacity = 20; // 20 ชั่วโมงต่อ sprint
+```
+
+**Step 2: แบ่งเป็น sub-tasks พร้อม estimate**
+
+```javascript
+function planSprint(features, teamCapacity) {
+  const tasks = [];
+
+  for (const feature of features) {
+    // แบ่ง feature เป็น sub-tasks ตาม complexity
+    if (feature.complexity === 'medium') {
+      tasks.push(
+        { name: `${feature.name} - Design`, estimate: 4, priority: feature.priority },
+        { name: `${feature.name} - Implement`, estimate: 8, priority: feature.priority },
+        { name: `${feature.name} - Test`, estimate: 4, priority: feature.priority }
+      );
+    } else if (feature.complexity === 'high') {
+      tasks.push(
+        { name: `${feature.name} - Research`, estimate: 4, priority: feature.priority },
+        { name: `${feature.name} - Design`, estimate: 6, priority: feature.priority },
+        { name: `${feature.name} - Implement`, estimate: 12, priority: feature.priority },
+        { name: `${feature.name} - Test`, estimate: 6, priority: feature.priority }
+      );
+    }
+  }
+
+  const totalEstimate = tasks.reduce((sum, t) => sum + t.estimate, 0);
+  const fitsInSprint = totalEstimate <= teamCapacity;
+
+  return { tasks, totalEstimate, fitsInSprint };
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: ตรวจสอบ** — totalEstimate (40) > teamCapacity (20) → `fitsInSprint` ต้องเป็น `false`
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: คืน totalEstimate ไม่ตรงกับผลรวม tasks**
+> "ประมาณไว้ 20 ชั่วโมง แต่รวม tasks ได้ 40"
+> → Test จะ fail เพราะ `totalEstimate === tasks.reduce(...)`
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: ไม่คิดถึง team capacity**
+> "ทำได้ทุกอย่าง ไม่ต้องดู capacity"
+> → ถ้า totalEstimate > teamCapacity → `fitsInSprint` ต้องเป็น `false`
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: task ไม่มี estimate**
+> "เดี๋ยวค่อยประมาณทีหลัง"
+> → ทุก task ต้องมี estimate > 0 — ไม่งั้นคำนวณ total ไม่ได้
+
+**Mistake 4: แบ่ง task ใหญ่เกินไป**
+> "Feature 1: Build entire auth system — 20 ชั่วโมง"
+> → Task ขนาดใหญ่ควรแบ่งเป็น sub-tasks เล็กๆ เช่น Design, Implement, Test
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-28-sprint-planner" />
+
+---
+
+## 🏋️ Quest: Sprint Planner
+
+ตอนนี้ถึงเวลาฝึกฝน! แบ่ง features เป็น sprint tasks พร้อมประมาณการเวลา
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-28-sprint-planner
+   cd quest-28-sprint-planner
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `planSprint(features, teamCapacity)` ที่แบ่ง features เป็น tasks พร้อม estimate
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด — ตรวจสอบว่า totalEstimate ตรงกับผลรวม
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Feature ที่ไม่ fit ใน sprint = ต้องแบ่งต่อ ไม่ใช่บีบเข้าไป — การบีบ lead ไปสู่ quality issues
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- **สำคัญ:** `totalEstimate` ต้องเท่ากับ `tasks.reduce((s, t) => s + t.estimate, 0)` เป๊ะๆ
+- ทุก task ต้องมี `estimate > 0`
+- ตรวจสอบ `fitsInSprint` เทียบกับ `teamCapacity` จริง
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

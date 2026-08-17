@@ -1,0 +1,38 @@
+{
+  "questId": "quest-25-adr",
+  "questions": [
+    {
+      "question": "What are the four essential sections of an Architecture Decision Record (ADR)?",
+      "choices": [
+        "Problem, Solution, Deadline, Budget",
+        "Title, Context, Decision, Consequences",
+        "Introduction, Methods, Results, Conclusion",
+        "Owner, Priority, Status, Assignee"
+      ],
+      "answer": 1,
+      "explanation": "An ADR captures: Title (what is being decided), Context (the current situation and forces), Decision (what was chosen and why), and Consequences (both positive and negative outcomes of the decision)."
+    },
+    {
+      "question": "Why is the 'Consequences' section the most important part of an ADR?",
+      "choices": [
+        "It's the longest section so it looks more thorough",
+        "It captures both positive and negative trade-offs, helping future teams understand what was sacrificed and why, preventing repeated debates",
+        "It's the only section that project managers read",
+        "Consequences are optional and rarely useful"
+      ],
+      "answer": 1,
+      "explanation": "The consequences section is where the real value lies — it documents trade-offs explicitly. When future team members question a decision, the ADR explains not just what was chosen but what was given up, preventing the same debates from recurring."
+    },
+    {
+      "question": "When should you write an ADR?",
+      "choices": [
+        "Only when the CTO requests one",
+        "Whenever a significant technical decision is made that will affect the team or project long-term",
+        "After the project is completely finished",
+        "Only for decisions that turn out to be wrong"
+      ],
+      "answer": 1,
+      "explanation": "ADRs should be written for significant, lasting technical decisions — database choice, architecture pattern, framework selection. The goal is to capture the reasoning while it's fresh, so future team members don't have to guess or re-debate."
+    }
+  ]
+}

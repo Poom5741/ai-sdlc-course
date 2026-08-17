@@ -5,22 +5,185 @@ description: "Sanitize and validate user input"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 45: Input Validator
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Sanitize and validate user input
+<LearningObjectives items={[
+  "Understand why input validation is the first line of defense against attacks",
+  "Build a validation system that checks types, lengths, formats, and patterns",
+  "Learn to sanitize input by removing dangerous characters and content",
+  "Recognize the difference between validation (reject bad input) and sanitization (clean bad input)"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Input Validation — Trust Nothing
+
+กฎทองของ security: **อย่า trust ข้อมูลจาก user เด็ดขาด** ทุก input ที่เข้ามาในระบบต้องถูก validate ก่อนเสมอ ไม่ว่าจะมาจาก API, form, URL parameter, หรือ header
+
+Input validation มี 2 แบบหลัก:
+
+1. **Validation** — ตรวจสอบว่า input ตรงกับ expected format ถ้าไม่ก็ reject
+2. **Sanitization** — ทำความสะอาด input โดยลบ/escape อักขระอันตราย
+
+```javascript
+// ❌ ไม่ validate อะไรเลย
+app.post('/user', (req, res) => {
+  const name = req.body.name; // อาจเป็น "<script>alert('xss')</script>"
+  db.query(`INSERT INTO users (name) VALUES ('${name}')`);
+});
+
+// ✅ Validate + Sanitize
+app.post('/user', (req, res) => {
+  const name = req.body.name;
+  if (!name || typeof name !== 'string') {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+  const cleanName = name.trim().slice(0, 100).replace(/[<>"'&]/g, '');
+  db.query('INSERT INTO users (name) VALUES (?)', [cleanName]);
+});
+```
+
+Think of input validation as a bouncer at a club: they check every person at the door, verify they're on the list, and won't let anyone suspicious in — no matter how nice they look.
+
+---
+
+## ⚙️ How It Works
+
+### The Validation Pipeline
+
+```
+1. Raw user input arrives
+         ↓
+2. Type check: Is it the expected type? (string, number, etc.)
+         ↓
+3. Length check: Is it within acceptable bounds?
+         ↓
+4. Format check: Does it match the expected pattern? (email, URL, etc.)
+         ↓
+5. Sanitization: Remove/escape dangerous characters
+         ↓
+6. Safe to use in business logic
+```
+
+### Validation Rules by Type
+
+| Input Type | Check | Example |
+| --- | --- | --- |
+| String | Length, allowed chars, no HTML | `name`: 1-100 chars, no `<>` |
+| Email | Regex pattern match | `user@example.com` |
+| Number | Min/max range, integer check | `age`: 0-150, integer |
+| URL | Valid format, allowed protocols | `https://...` only |
+| Password | Min length, complexity | 8+ chars, uppercase + digit |
+
+### Sanitization Techniques
+
+```javascript
+// HTML entity encoding (prevent XSS)
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+// SQL parameterization (prevent SQLi) — already handled by query builder
+// Path traversal prevention
+function sanitizePath(path) {
+  return path.replace(/\.\./g, '').replace(/[^a-zA-Z0-9/_-]/g, '');
+}
+```
+
+---
+
+## 💡 Example: Building a Complete Validator
+
+```javascript
+function validateUserInput(input) {
+  const errors = [];
+
+  // Type check
+  if (typeof input.name !== 'string') {
+    errors.push({ field: 'name', error: 'Must be a string' });
+  } else {
+    // Length check
+    if (input.name.length < 1 || input.name.length > 100) {
+      errors.push({ field: 'name', error: 'Must be 1-100 characters' });
+    }
+    // Pattern check — no HTML tags
+    if (/<[^>]*>/.test(input.name)) {
+      errors.push({ field: 'name', error: 'HTML tags not allowed' });
+    }
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(input.email)) {
+    errors.push({ field: 'email', error: 'Invalid email format' });
+  }
+
+  // Age range check
+  if (typeof input.age !== 'number' || input.age < 0 || input.age > 150) {
+    errors.push({ field: 'age', error: 'Must be a number between 0 and 150' });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    sanitized: errors.length === 0 ? {
+      name: input.name.trim().slice(0, 100),
+      email: input.email.toLowerCase().trim(),
+      age: Math.floor(input.age),
+    } : null,
+  };
+}
+```
+
+**Key insight:** A good validator returns structured error messages so the frontend can display helpful feedback, not just "invalid input."
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Client-side validation only**
+> "I validate in the browser, so the server is safe"
+> → Client-side validation is for UX, not security. Attackers bypass it easily. Always validate on the server.
+
+**Mistake 2: Whitelisting vs. blacklisting**
+> "I'll remove `<script>` tags to prevent XSS"
+> → Blacklisting is a losing game — attackers find ways around every blocklist. Whitelist what's allowed instead.
+
+**Mistake 3: Trusting "typeof" checks**
+> `typeof input === 'string'` is not enough — a string can still contain SQL injection, XSS, or path traversal. Type check is step 1, not the whole story.
+
+**Mistake 4: Over-sanitization**
+> "I'll strip all special characters"
+> → Removing all special characters breaks legitimate input like email addresses, phone numbers, and names with accents. Sanitize proportionally.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-45-input-validator" />
+
+---
+
+## 🏋️ Quest: Input Validator
+
+สร้าง system ที่ validate และ sanitize user input หลาย type — AI มักจะ proposal validation ที่หลุด edge cases เช่น empty strings, Unicode, หรือ nested objects!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-45-input-validator
    cd quest-45-input-validator
@@ -28,9 +191,15 @@ Sanitize and validate user input
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement validation functions สำหรับ:
+   - String validation (length, allowed characters)
+   - Email format validation
+   - Number range validation
+   - Sanitization (escape HTML, trim, normalize)
+   - Return structured error objects
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +230,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- แยก validation (reject bad data) ออกจาก sanitization (clean data) อย่าผสมกัน
+- ใช้ whitelist approach แทน blacklist — กำหนดว่าอะไร allowed แทนที่จะลบสิ่งที่ไม่อนุญาต
+- อย่าลืม edge cases: empty strings, null, undefined, deeply nested objects
+- ถ้าติดขัด ลองนึกว่า input ที่ผ่านเข้ามาในระบบจริงจะมีหน้าตาแบบไหน

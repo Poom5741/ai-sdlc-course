@@ -1,0 +1,38 @@
+{
+  "questId": "quest-134-d1-migrator",
+  "questions": [
+    {
+      "question": "ทำไมต้อง backup data ก่อน DROP COLUMN?",
+      "choices": [
+        "เพื่อ speed up กระบวนการ",
+        "ข้อมูลจะหายตลอดกาลถ้าไม่ backup ก่อน DROP",
+        "Cloudflare บังคับให้ทำ",
+        "เพื่อ validation"
+      ],
+      "answer": 1,
+      "explanation": "DROP COLUMN จะลบข้อมูลใน column นั้นตลอดกาล — ต้อง backup ไป table อื่นก่อนเสมอ (CREATE TABLE backup AS SELECT * FROM table)"
+    },
+    {
+      "question": "DOWN script สำหรับ DROP TABLE ควรเขียนอย่างไร?",
+      "choices": [
+        "CREATE TABLE (สร้างใหม่)",
+        "DROP TABLE (ลบอีกรอบ)",
+        "Warning ว่าไม่สามารถ recover ข้อมูลได้",
+        "ALTER TABLE (เปลี่ยน schema)"
+      ],
+      "answer": 2,
+      "explanation": "DROP TABLE เป็น destructive action ที่ไม่สามารถ undo ได้ — DOWN script ควร comment warning ว่า data loss occurred และแนะนำให้ใช้ backups"
+    },
+    {
+      "question": "SQL ใดที่ถูกต้องสำหรับ DROP TABLE?",
+      "choices": [
+        "DROP TABLE users;",
+        "DROP TABLE IF EXISTS users;",
+        "DELETE TABLE users;",
+        "REMOVE TABLE users;"
+      ],
+      "answer": 1,
+      "explanation": "`DROP TABLE IF EXISTS` จะไม่ error ถ้า table ไม่มีอยู่ — ต่างจาก `DROP TABLE` ตรงๆ ที่จะ throw error"
+    }
+  ]
+}

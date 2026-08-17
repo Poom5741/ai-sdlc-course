@@ -1,0 +1,38 @@
+{
+  "questId": "quest-112-workflow-orchestrator",
+  "questions": [
+    {
+      "question": "Fail-fast pattern หมายถึงอะไร?",
+      "choices": [
+        "Execute all tools ให้เร็วที่สุดเท่าที่จะทำได้",
+        "หยุด workflow ทันทีเมื่อ tool ใด tool หนึ่ง error",
+        "Run tools หลายตัวพร้อมกัน",
+        "Skip tools ที่ slow"
+      ],
+      "answer": 1,
+      "explanation": "Fail-fast means stopping the workflow immediately when any tool throws an error. Continuing with a broken intermediate result could cause cascading failures in downstream tools."
+    },
+    {
+      "question": "ทำไม steps array จึงสำคัญใน workflow output?",
+      "choices": [
+        "สำหรับ display สวยงามเท่านั้น",
+        "เป็น audit trail ที่แสดงว่าแต่ละ tool ทำอะไรกับ input",
+        "ช่วยให้ workflow เร็วขึ้น",
+        "บันทึก error messages เท่านั้น"
+      ],
+      "answer": 1,
+      "explanation": "Steps serve as an audit trail — recording each tool's input and output. This is essential for debugging, compliance, and understanding data transformations in the pipeline."
+    },
+    {
+      "question": "orchestrateWorkflow([], 'hello') ควร return อะไร?",
+      "choices": [
+        "{ result: null, steps: [] }",
+        "Error: no tools provided",
+        "{ result: 'hello', steps: [] }",
+        "undefined"
+      ],
+      "answer": 2,
+      "explanation": "With no tools to process the input, the function should return the original input unchanged with an empty steps array."
+    }
+  ]
+}

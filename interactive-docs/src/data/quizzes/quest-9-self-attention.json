@@ -1,0 +1,38 @@
+{
+  "questId": "quest-9-self-attention",
+  "questions": [
+    {
+      "question": "Why must attention scores be divided by sqrt(d_k)?",
+      "choices": [
+        "To make the math easier",
+        "To prevent gradient explosion and ensure stable training",
+        "To reduce memory usage",
+        "To make the output larger"
+      ],
+      "answer": 1,
+      "explanation": "Without scaling, large dot products cause softmax to saturate (output near 0 or 1), leading to vanishing gradients. Scaling by sqrt(d_k) keeps scores in a reasonable range."
+    },
+    {
+      "question": "What does the 'Q' in QKV stand for?",
+      "choices": [
+        "Quality",
+        "Query — what am I looking for?",
+        "Quantity",
+        "Queue"
+      ],
+      "answer": 1,
+      "explanation": "Q stands for Query — it represents what each token is 'looking for'. K (Key) represents what each token 'offers', and V (Value) is the actual information passed forward."
+    },
+    {
+      "question": "What does softmax do in the attention mechanism?",
+      "choices": [
+        "Multiplies the matrices together",
+        "Converts raw scores into probabilities that sum to 1",
+        "Scales the input by sqrt(d_k)",
+        "Applies a linear transformation"
+      ],
+      "answer": 1,
+      "explanation": "Softmax converts raw attention scores into a probability distribution where all weights sum to 1. This determines how much each token 'attends to' every other token."
+    }
+  ]
+}

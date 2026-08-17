@@ -1,66 +1,209 @@
 ---
 title: "Quest 32 - MCP Client Builder"
-description: "Implement Model Context Protocol client"
+description: "Build an MCP client"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 32: MCP Client Builder
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Implement Model Context Protocol client
+<Badge text="medium" variant="caution" /> <Badge text="30 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-32-mcp-client
-   cd quest-32-mcp-client
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Understanding the Model Context Protocol (MCP) and why standardized interfaces matter",
+  "Building a client that can register, list, and execute tools",
+  "Implementing tool registration and execution patterns",
+  "The engineering habit: Standardize Interfaces — MCP provides a standard way for AI to interact with external tools"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: MCP — ภาษากลางสำหรับ AI และ Tools
+
+MCP (Model Context Protocol) คือ **มาตรฐานสำหรับให้ AI models เชื่อมต่อกับ external tools และ data** — เหมือน USB ที่ทำให้อุปกรณ์ต่างๆ เชื่อมต่อกันได้โดยไม่ต้องทำ custom cable ทุกครั้ง
+
+ทำไมต้องใช้ MCP? เพราะ **ถ้าไม่มีมาตรฐาน ทุก tool ต้องเขียน interface ใหม่ทุกครั้ง** — MCP ทำให้ AI สามารถเชื่อมต่อกับ tool ใดก็ได้ที่รองรับ protocol เดียวกัน
+
+MCP Client มี 3 functions หลัก:
+
+| Function | หน้าที่ |
+| --- | --- |
+| **registerTool** | เพิ่ม tool ใหม่เข้า client |
+| **getTools** | ดู tools ที่มีอยู่ทั้งหมด |
+| **executeTool** | รัน tool ที่ต้องการ |
+
+---
+
+## ⚙️ How It Works
+
+### MCP Client Workflow
+
+```
+1. สร้าง client พร้อม initial tools
+         ↓
+2. registerTool — เพิ่ม tool ใหม่
+         ↓
+3. getTools — ดู tools ที่มี
+         ↓
+4. executeTool — รัน tool โดยส่ง name
+         ↓
+5. ตรวจสอบว่าทุก function ทำงานถูกต้อง
+```
+
+### Tool Structure
+
+แต่ละ tool ต้องมี:
+
+```javascript
+{
+  name: 'tool-name',        // ชื่อ tool (ใช้สำหรับ execute)
+  handler: () => 'result'   // function ที่ทำงานเมื่อ execute
+}
+```
+
+### Client API
+
+```javascript
+const client = createMCPClient([]);
+
+// เพิ่ม tool
+client.registerTool({ name: 'greet', handler: (name) => `Hello, ${name}!` });
+
+// ดู tools
+client.getTools(); // [{ name: 'greet', handler: ... }]
+
+// รัน tool
+client.executeTool('greet', 'World'); // "Hello, World!"
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: สร้าง client**
+
+```javascript
+function createMCPClient(tools = []) {
+  // เก็บ tools ใน internal array
+  const registeredTools = [...tools];
+
+  return {
+    registerTool(tool) {
+      registeredTools.push(tool);
+    },
+
+    getTools() {
+      return registeredTools;
+    },
+
+    executeTool(name, ...args) {
+      const tool = registeredTools.find(t => t.name === name);
+      if (!tool) return null;
+      return tool.handler(...args);
+    }
+  };
+}
+```
+
+**Step 2: ใช้งาน**
+
+```javascript
+const client = createMCPClient([]);
+
+// เพิ่ม tools
+client.registerTool({ name: 'add', handler: (a, b) => a + b });
+client.registerTool({ name: 'multiply', handler: (a, b) => a * b });
+
+// ดู tools ที่มี
+console.log(client.getTools().length); // 2
+
+// รัน tool
+console.log(client.executeTool('add', 2, 3)); // 5
+console.log(client.executeTool('multiply', 2, 3)); // 6
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: registerTool ไม่เพิ่ม tool จริง**
+> "เขียน function แต่ไม่ push เข้า array"
+> → getTools() จะ return array ว่างเสมอ — test จะ fail
+
+**Mistake 2: executeTool ไม่ return handler result**
+> "หา tool เจอแล้ว แต่ไม่ return `handler(...args)`"
+> → executeTool จะ return `undefined` — test จะ fail
+
+**Mistake 3: ไม่ handle tool ที่ไม่มีอยู่**
+> "executeTool ชื่อ tool ที่ไม่มี → error"
+> → ต้อง return null เมื่อไม่เจอ tool — ไม่ใช่ throw error
+
+**Mistake 4: คืน object ที่ไม่มี functions ครบ**
+> `return { registerTool: () => {} }`
+> → ต้อง return object ที่มี registerTool, getTools, executeTool ครบถ้วน
 
 ---
 
-## ส่งคำตอบ
+## 📝 Knowledge Check
 
-When tests pass, submit your solution:
+<Quiz questId="quest-32-mcp-client" />
 
-```bash
-npx bluebeltdojo submit
-```
+---
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+## 🏋️ Quest: MCP Client Builder
+
+ตอนนี้ถึงเวลาฝึกฝน! สร้าง MCP client ที่สามารถ register, list, และ execute tools
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-32-mcp-client
+   cd quest-32-mcp-client
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `createMCPClient(tools)` ที่สร้าง client พร้อม registerTool, getTools, executeTool
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** MCP คือภาษากลางสำหรับ AI และ tools — ถ้า interface ตรง ก็เชื่อมต่อกันได้ทันที
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ต้อง return object ที่มี `registerTool`, `getTools`, `executeTool` ครบถ้วน
+- registerTool ต้อง push เข้า internal array
+- executeTool ต้อง return handler result (ไม่ใช่ undefined)
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-130-function-router",
+  "questions": [
+    {
+      "question": "HTTP OPTIONS request ใน context ของ CORS เรียกว่าอะไร?",
+      "choices": [
+        "Health check",
+        "Preflight request",
+        "Options request",
+        "Capability check"
+      ],
+      "answer": 1,
+      "explanation": "OPTIONS request ที่ browser ส่งก่อน CORS request เรียกว่า 'preflight request' — มันตรวจสอบว่า server อนุญาต cross-origin request หรือไม่"
+    },
+    {
+      "question": "Status code ที่ถูกต้องสำหรับ OPTIONS preflight response คือข้อใด?",
+      "choices": [
+        "200 OK",
+        "201 Created",
+        "204 No Content",
+        "304 Not Modified"
+      ],
+      "answer": 2,
+      "explanation": "OPTIONS preflight response ควร return 204 (No Content) เพราะ browser 期待 response ที่ไม่มี body — แค่ต้องการดู headers เท่านั้น"
+    },
+    {
+      "question": "CORS headers ที่จำเป็นต้องมีอย่างน้อยกี่ fields?",
+      "choices": [
+        "1 — Access-Control-Allow-Origin เท่านั้น",
+        "2 — Allow-Origin และ Allow-Methods",
+        "3 — Allow-Origin, Allow-Methods, และ Allow-Headers",
+        "4 — ทั้ง Origin, Methods, Headers และ Expose-Headers"
+      ],
+      "answer": 2,
+      "explanation": "Browser ต้องการทั้ง 3 fields: Allow-Origin (ใครเข้าได้), Allow-Methods (method ไหนได้), และ Allow-Headers (header ไหนส่งได้) ถึงจะ allow request"
+    }
+  ]
+}

@@ -5,22 +5,147 @@ description: "Write AI code review policies"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 50: AI Code Review Policy Writer
 
 <Badge text="medium" variant="caution" /> <Badge text="25-30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Write AI code review policies
+<LearningObjectives items={[
+  "Write a structured policy document for AI-assisted code review",
+  "Define review criteria, escalation paths, and human override processes",
+  "Understand why policy must come before tooling — automate rules only after humans agree",
+  "Recognize what AI review can and cannot replace in the review process"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Policy Before Tooling — The Contract
+
+หลายทีมเริ่มใช้ AI code review tools โดยไม่มี policy ที่ชัดเจน — ผลลัพธ์คือ chaos: AI บล็อก PRs ที่ไม่ควรบล็อก, ปล่อยผ่านโค้ดที่ควรตรวจสอบ, ไม่มีใครรู้ว่าใครรับผิดชอบอะไร
+
+**AI Code Review Policy** คือ "สัญญา" ระหว่างทีม — กำหนดว่า AI ควรตรวจสอบอะไร, ตัดสินใจยังไง, และเมื่อไหร่ที่ humans ต้องเข้ามา override
+
+Think of it like a restaurant's food safety policy: before you install inspection cameras, you need to write down what "safe" means, who checks what, and what happens when something goes wrong.
+
+---
+
+## ⚙️ How It Works
+
+### Policy Structure
+
+```
+1. SCOPE — อะไรบ้างที่ต้อง AI review?
+   → All PRs? Only production code? Security-sensitive changes?
+         ↓
+2. CRITERIA — AI ตรวจอะไรบ้าง?
+   → Security patterns, code quality, test coverage, documentation
+         ↓
+3. ESCALATION — เมื่อ AI flag ปัญหา ใครจัดการ?
+   → Auto-block? Warning? Notify specific reviewers?
+         ↓
+4. HUMAN OVERRIDE — humans ยกเลิก AI decision ได้ยังไง?
+   → Required approvals, justification required, audit trail
+         ↓
+5. METRICS — วัดผลยังไงว่า policy ได้ผล?
+   → False positive rate, time-to-merge, security incident rate
+```
+
+### What AI Review CAN Do
+
+| Capability | Example |
+| --- | --- |
+| Pattern detection | Find hardcoded secrets, SQL injection patterns |
+| Consistency checks | Enforce naming conventions, code style |
+| Vulnerability scanning | Detect known vulnerable patterns |
+| Test coverage analysis | Flag untested code paths |
+| Documentation checks | Require JSDoc for public functions |
+
+### What AI Review CANNOT Do
+
+| Limitation | Why Humans Are Needed |
+| --- | --- |
+| Business logic correctness | AI doesn't understand your domain |
+| Architecture decisions | Trade-offs require human judgment |
+| Team dynamics | Who reviews whom, knowledge sharing |
+| Edge case reasoning | Novel scenarios need human intuition |
+| Ethical considerations | Bias, fairness, accessibility |
+
+---
+
+## 💡 Example: Writing a Review Policy
+
+```markdown
+# AI Code Review Policy
+
+## Scope
+All pull requests to `main` and `release/*` branches require AI review.
+PRs to feature branches are reviewed optionally.
+
+## Review Criteria (AI Checks)
+1. **Security**: No hardcoded secrets, no SQL injection patterns, no XSS vectors
+2. **Code Quality**: Functions under 50 lines, no deeply nested conditionals
+3. **Test Coverage**: New functions must have corresponding test cases
+4. **Documentation**: Public API functions require JSDoc
+5. **Dependencies**: No new dependencies without security audit
+
+## Escalation Path
+- **Block**: Security vulnerabilities (critical/high) → required fix before merge
+- **Warning**: Code quality issues → reviewer decides
+- **Info**: Documentation suggestions → optional
+
+## Human Override
+- Any AI block can be overridden with written justification
+- Override requires approval from senior developer
+- All overrides are logged in audit trail
+
+## Metrics
+- Track false positive rate (target: < 10%)
+- Track time-to-merge impact (target: < 5% increase)
+- Monthly review of policy effectiveness
+```
+
+**Key insight:** The policy explicitly states what AI does NOT replace — human judgment on business logic, architecture, and team dynamics.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: No escalation path**
+> "AI flags issues, developers fix them"
+> → Without escalation paths, developers don't know if an AI flag is a hard block or a suggestion. Define clear severity levels.
+
+**Mistake 2: AI replaces all human review**
+> "If AI approves it, we ship it"
+> → AI review is a tool, not a replacement. Humans must still review for business logic, architecture, and team concerns.
+
+**Mistake 3: No metrics tracking**
+> "We'll know if it's working by feel"
+> → Without metrics (false positive rate, time-to-merge), you can't improve the policy. Measure what matters.
+
+**Mistake 4: One-size-fits-all policy**
+> "Same rules for all PRs"
+> → Different PR types need different review levels. A typo fix doesn't need the same scrutiny as a payment flow change.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-50-ai-review-policy" />
+
+---
+
+## 🏋️ Quest: AI Code Review Policy Writer
+
+เขียน AI code review policy ที่ครอบคลุม scope, criteria, escalation, และ human override — AI มักจะ proposal policy ที่ลืม human override process หรือ metrics!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-50-ai-review-policy
    cd quest-50-ai-review-policy
@@ -28,9 +153,16 @@ Write AI code review policies
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. เขียน `ai-review-policy.md` ที่ครอบคลุม:
+   - Scope: อะไรบ้างที่ต้อง AI review
+   - Review criteria (อย่างน้อย 5 specific checks)
+   - Human override process
+   - Escalation path สำหรับ flagged issues
+   - Metrics สำหรับวัด policy effectiveness
+   - สิ่งที่ AI review ไม่สามารถแทนที่ human judgment ได้
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
@@ -61,6 +193,7 @@ npx bluebeltdojo submit
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Policy ต้องบอกชัดว่า AI ทำอะไรได้และไม่ได้ — อย่าให้ AI ตัดสินใจแทน humans เรื่อง business logic
+- กำหนด escalation path ที่ชัดเจน: block, warning, info
+- อย่าลืม human override process — developers ต้องยกเลิก AI decision ได้เมื่อมีเหตุผล
+- ถ้าติดขัด ลองนึกว่าถ้าไม่มี policy ทีมจะใช้ AI review ยังไง — นั่นคือสิ่งที่ policy ควรแก้

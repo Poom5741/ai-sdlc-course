@@ -1,66 +1,182 @@
 ---
-title: "Commit Message Writer"
+title: "Quest 121 - Commit Message Writer"
 description: "Conventional commits (feat:, fix:, chore:)"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Commit Message Writer
+# Quest 121: Commit Message Writer
 
 <Badge text="medium" variant="caution" /> <Badge text="20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Conventional commits (feat:, fix:, chore:)
+<LearningObjectives items={[
+  "The Conventional Commits format: type(scope): description",
+  "Why imperative mood matters ('add' not 'added')",
+  "How commit message validation catches bad patterns",
+  "How AI often defaults to past tense and why that's wrong"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Conventional Commits
+
+Commit messages ไม่ใช่แค่บันทึกว่าคุณทำอะไร — มันเป็น **contract** ระหว่างทีมและเครื่องมือ automation รูปแบบ **Conventional Commits** ให้โครงสร้างที่ชัดเจน:
+
+```
+type(scope): description
+
+[optional body]
+```
+
+Type ที่ใช้บ่อย: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `ci`
+
+Think of commit messages like technique names in martial arts — "Roundhouse Kick (right leg)" tells you the type, scope, and action all at once. "I kicked" tells you almost nothing.
+
+---
+
+## ⚙️ How It Works
+
+### Validation Rules
+
+| Rule | Example |
+| --- | --- |
+| Type must be valid | `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `perf`, `ci`, `build` |
+| Description ≤ 72 chars | ยาวเกินไปจะถูกตัดใน GitHub UI |
+| Description lowercase | `feat: add login` ✅ `feat: Add login` ❌ |
+| No trailing period | `feat: add login` ✅ `feat: add login.` ❌ |
+| Imperative mood | `feat: add login` ✅ `feat: added login` ❌ |
+
+### The Imperative Mood Problem
+
+```javascript
+// ❌ Past tense (AI default)
+"feat: added login page"
+"fix: fixed the bug"
+"refactor: updated the API"
+
+// ✅ Imperative mood
+"feat: add login page"
+"fix: resolve buffer overflow"
+"refactor: update the API"
+```
+
+AI coding tools มักจะเขียน commit messages เป็น past tense เพราะมัน "听起来 natural" แต่ Conventional Commits กำหนดให้ใช้ imperative mood เพราะ commit message ควรอ่านว่า "ถ้าใช้ commit นี้ จะ..." — "add login page" = "this commit will add a login page"
+
+---
+
+## 💡 Example: Formatting Conventional Commits
+
+```javascript
+const VALID_TYPES = ['feat', 'fix', 'chore', 'docs', 'style', 'refactor', 'test', 'perf', 'ci', 'build'];
+const PAST_TENSE = /^(added|updated|fixed|changed|removed|deleted|modified|implemented|created|made)/i;
+
+function formatConventionalCommit(type, scope, description, body) {
+  const errors = [];
+
+  // Validate type
+  if (!VALID_TYPES.includes(type)) {
+    errors.push(`invalid type "${type}" — must be one of: ${VALID_TYPES.join(', ')}`);
+  }
+
+  // Validate description
+  if (!description || description.trim() === '') {
+    errors.push('description must not be empty');
+  } else {
+    if (description.length > 72) {
+      errors.push(`description must be 72 chars or less (got ${description.length})`);
+    }
+    if (description[0] !== description[0].toLowerCase()) {
+      errors.push('description must start with lowercase');
+    }
+    if (description.endsWith('.')) {
+      errors.push('description must not end with a period');
+    }
+    if (PAST_TENSE.test(description)) {
+      errors.push('description must use imperative mood, not past tense');
+    }
+  }
+
+  const subject = scope ? `${type}(${scope}): ${description}` : `${type}: ${description}`;
+
+  return { subject, body: body || '', isValid: errors.length === 0, errors };
+}
+```
+
+**Key insight:** AI มักจะ suggestion "added" หรือ "updated" — คุณต้องจับ edge case นี้และแก้เป็น imperative mood เสมอ
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ใช้ past tense**
+> AI เขียน "feat: added login page" ซึ่งดู natural แต่ผิด format
+> → ใช้ "feat: add login page" เสมอ (imperative mood)
+
+**Mistake 2: Description ยาวเกิน 72 ตัวอักษร**
+> AI เขียน description ยืดยาวเพื่ออธิบายทุกอย่าง
+> → .keep it short; รายละเอียดใส่ body แทน
+
+**Mistake 3: ใช้ type ที่ไม่อยู่ในรายการ**
+> AI ใช้ type เช่น "updated" หรือ "change" ซึ่งไม่ valid
+> → ใช้เฉพาะ type ที่กำหนด: feat, fix, chore, docs, style, refactor, test, perf, ci, build
+
+**Mistake 4: Description ขึ้นตัวใหญ่หรือลงท้ายด้วยจุด**
+> "Feat: Add login." → ทั้ง uppercase และ trailing period ผิด rules
+> → ขึ้นต้น lowercase, ไม่มีจุดท้าย
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-121-commit-message" />
+
+---
+
+## 🏋️ Quest: Commit Message Writer
+
+Now it's time to practice! Write properly formatted conventional commits.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-121-commit-message
    cd quest-121-commit-message
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `formatConventionalCommit(type, scope, description, body)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge case เกี่ยวกับ past tense และ length
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI suggestion ขึ้นต้นด้วย "added", "fixed", "updated" ให้แก้ทันที — มันต้องเป็น imperative mood
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: past tense detection (AI มักจะเขียน "added" แทน "add")
+- ตรวจสอบว่า description ไม่เกิน 72 ตัวอักษร
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

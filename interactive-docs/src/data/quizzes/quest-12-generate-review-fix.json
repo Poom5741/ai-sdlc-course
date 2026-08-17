@@ -1,0 +1,38 @@
+{
+  "questId": "quest-12-generate-review-fix",
+  "questions": [
+    {
+      "question": "What is the generate-review-fix agent loop pattern?",
+      "choices": [
+        "A workflow where AI generates code, another AI reviews it, and a human fixes issues manually",
+        "An autonomous cycle where an agent generates output, evaluates its own quality, and iteratively fixes issues until criteria are met",
+        "A deployment pipeline that generates builds, reviews logs, and fixes server errors",
+        "A testing strategy where tests are generated, reviewed by QA, and then code is fixed"
+      ],
+      "answer": 1,
+      "explanation": "The generate-review-fix loop is an autonomous agent pattern: the agent generates output, critically reviews it against requirements or test results, and iteratively fixes problems — creating a self-improving cycle."
+    },
+    {
+      "question": "Why is the review step essential in the generate-review-fix loop rather than just generating and fixing?",
+      "choices": [
+        "The review step adds unnecessary complexity to the system",
+        "Review provides an objective evaluation that identifies issues the generation step might miss, preventing the agent from reinforcing its own errors",
+        "Review is only needed for code, not for other types of output",
+        "The review step is a legal requirement for all AI systems"
+      ],
+      "answer": 1,
+      "explanation": "Without review, an agent may generate flawed output and attempt to fix it without understanding what's wrong. Review provides critical evaluation — using tests, validators, or a separate reasoning pass — to identify specific failures."
+    },
+    {
+      "question": "What is the key risk of running the generate-review-fix loop without proper termination criteria?",
+      "choices": [
+        "The loop will always converge on the perfect solution",
+        "The agent may loop indefinitely, wasting compute resources, or oscillate between solutions without converging",
+        "The model will run out of memory after exactly 10 iterations",
+        "There is no risk — the loop always improves quality with each iteration"
+      ],
+      "answer": 1,
+      "explanation": "Without defined stopping conditions (max iterations, test pass threshold, or confidence score), the loop can run forever, oscillate between states, or waste resources on diminishing returns."
+    }
+  ]
+}

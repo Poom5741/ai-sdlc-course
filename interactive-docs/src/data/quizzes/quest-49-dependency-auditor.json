@@ -1,0 +1,38 @@
+{
+  "questId": "quest-49-dependency-auditor",
+  "questions": [
+    {
+      "question": "ทำไม devDependencies ก็เป็น security risk ด้วย?",
+      "choices": [
+        "ไม่ใช่ risk เพราะไม่ได้ deploy",
+        "เพราะ run ตอน build/test — ถ้าถูก compromise จะ inject backdoor เข้า production code",
+        "เพราะ devDependencies มี size เล็กกว่า",
+        "ไม่ต้อง check เพราะ npm จัดการให้"
+      ],
+      "answer": 1,
+      "explanation": "devDependencies run ตอน build/test — ถ้าถูก compromise (เช่น event-stream incident 2018) จะ inject backdoor เข้า production code ได้"
+    },
+    {
+      "question": "Semver range `^1.2.3` หมายถึงอะไร?",
+      "choices": [
+        "เฉพาะ version 1.2.3 เท่านั้น",
+        ">=1.2.3 แต่ <2.0.0",
+        ">=1.2.3 (ทุก major version)",
+        "<=1.2.3"
+      ],
+      "answer": 1,
+      "explanation": "`^1.2.3` หมายถึง >=1.2.3 แต่ <2.0.0 — minor version ขึ้นได้ แต่ major version ต้องคงที่"
+    },
+    {
+      "question": "Audit results ควร sort ข้อมูลอย่างไร?",
+      "choices": [
+        "Sort ตาม alphabetical order",
+        "Sort ตาม severity (critical > high > medium > low)",
+        "Sort ตาม package name",
+        "ไม่ต้อง sort"
+      ],
+      "answer": 1,
+      "explanation": "Sorting by severity ช่วยให้ developer รู้ว่าควรแก้อะไรก่อน — critical vulnerabilities ต้อง fix ทันที"
+    }
+  ]
+}

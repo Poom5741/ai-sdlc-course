@@ -5,62 +5,199 @@ description: "Tracing and metrics for LLM calls"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 60: LLM Observability System
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Tracing and metrics for LLM calls
+<LearningObjectives items={[
+  "How to build tracing and metrics for LLM API calls",
+  "Why tracking dollar cost matters more than just counting tokens",
+  "How to break down metrics by model for cost attribution",
+  "How to identify slow queries that exceed latency thresholds"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: LLM Observability
+
+LLM calls are expensive, unpredictable, and non-deterministic. Unlike a regular API call that costs $0.001 and takes 50ms, an LLM call might cost $0.15 and take 3 seconds — or $2.00 and take 30 seconds. Without observability, you have no idea how much you're spending or which calls are slow.
+
+The key engineering habit is: **trace every LLM call.** Record the model, tokens, latency, cost, and success/failure for every invocation. This data is your financial and operational lifeline.
+
+Think of LLM observability like a dojo tracking training sessions. If you only count "number of sessions," you miss that some sessions cost 10x more in instructor time. You need to track *cost per session*, not just *count of sessions*.
+
+---
+
+## ⚙️ How It Works
+
+### The Tracing Pipeline
+
+```
+LLM Call Happens
+    ↓
+trace({ model, prompt, response, tokens, latency })
+    ↓
+Calculate cost:
+  inputCost = tokens.input / 1000 × inputPrice
+  outputCost = tokens.output / 1000 × outputPrice
+  totalCost = inputCost + outputCost
+    ↓
+Store trace with unique ID
+    ↓
+Aggregate: totalCalls, totalTokens, totalCost, avgLatency, byModel
+```
+
+### Cost Model (GPT-4 Pricing Example)
+
+```javascript
+const PRICING = {
+  'gpt-4': { input: 0.003, output: 0.006 },   // per 1K tokens
+  'gpt-3.5': { input: 0.001, output: 0.002 },
+};
+
+// For a call with 100 input tokens, 500 output tokens on gpt-4:
+const cost = (100 / 1000 * 0.003) + (500 / 1000 * 0.006);
+// = 0.0003 + 0.003 = $0.0033
+```
+
+### The Critical Edge Case: Cost, Not Just Tokens
+
+```javascript
+// ❌ NAIVE: Tracks tokens only
+const metrics = { totalCalls: 10, totalTokens: 5000 };
+// Missing: How much did we SPEND? Which model was used?
+
+// ✅ CORRECT: Tracks cost breakdown
+const metrics = {
+  totalCalls: 10,
+  totalTokens: 5000,
+  totalCost: 0.045,       // Actual dollar amount
+  avgLatency: 1200,        // ms
+  byModel: {
+    'gpt-4': { calls: 3, tokens: 2000, cost: 0.03 },
+    'gpt-3.5': { calls: 7, tokens: 3000, cost: 0.015 },
+  }
+};
+```
+
+---
+
+## 💡 Example: Complete Tracing System
+
+```javascript
+function createTracer() {
+  const traces = [];
+  const PRICING = {
+    'gpt-4': { input: 0.003, output: 0.006 },
+    'gpt-3.5': { input: 0.001, output: 0.002 },
+  };
+
+  function trace({ model, prompt, response, tokens, latency }) {
+    const id = `trace-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const pricing = PRICING[model] || { input: 0.003, output: 0.006 };
+    const cost = (tokens.input / 1000 * pricing.input) + 
+                 (tokens.output / 1000 * pricing.output);
+    
+    traces.push({ id, model, prompt, response, tokens, latency, cost });
+    return id;
+  }
+
+  function getMetrics() {
+    const totalCost = traces.reduce((sum, t) => sum + t.cost, 0);
+    const totalTokens = traces.reduce((sum, t) => sum + t.tokens.input + t.tokens.output, 0);
+    const avgLatency = traces.reduce((sum, t) => sum + t.latency, 0) / traces.length;
+    
+    const byModel = {};
+    for (const t of traces) {
+      if (!byModel[t.model]) byModel[t.model] = { calls: 0, tokens: 0, cost: 0 };
+      byModel[t.model].calls++;
+      byModel[t.model].tokens += t.tokens.input + t.tokens.output;
+      byModel[t.model].cost += t.cost;
+    }
+    
+    return { totalCalls: traces.length, totalTokens, totalCost, avgLatency, byModel };
+  }
+
+  return { trace, getTrace: (id) => traces.find(t => t.id === id), getMetrics, 
+           getSlowQueries: (ms) => traces.filter(t => t.latency > ms) };
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Tracking tokens but not cost**
+> "We made 1,000 calls with 500K tokens"
+> → Tokens don't pay the bill. Dollars do. GPT-4 output tokens cost 6x more than input tokens — token count alone is misleading.
+
+**Mistake 2: Not breaking down by model**
+> "Total cost is $45 this month"
+> → Which model is driving the cost? Without per-model breakdown, you can't optimize.
+
+**Mistake 3: Ignoring latency**
+> "The call completed, that's all that matters"
+> → Slow LLM calls block user interactions. Track latency and flag calls exceeding thresholds.
+
+**Mistake 4: Not generating unique trace IDs**
+> "I'll use the timestamp as the ID"
+> → Multiple calls can happen in the same millisecond. Use random IDs or UUIDs for uniqueness.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-60-llm-observability" />
+
+---
+
+## 🏋️ Quest: LLM Observability System
+
+Now it's time to practice! Build a tracing and metrics system for LLM calls.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-60-llm-observability
    cd quest-60-llm-observability
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `createTracer()` that returns an object with `trace`, `getTrace`, `getMetrics`, and `getSlowQueries`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The critical edge case is COST calculation — naive AI tracks token count but doesn't compute dollar cost. Use the GPT-4 pricing model.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** GPT-4 pricing: input $0.003/1K tokens, output $0.006/1K tokens. Cost formula: `(tokens.input / 1000 * 0.003) + (tokens.output / 1000 * 0.006)`. The test verifies the cost is approximately correct.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case ที่สำคัญที่สุด: ต้องคำนวณ **dollar cost** ไม่ใช่แค่ token count
+- GPT-4 pricing: input $0.003/1K tokens, output $0.006/1K tokens
+- `createTracer()` ต้อง return object ที่มี methods: `trace`, `getTrace`, `getMetrics`, `getSlowQueries`
+- ต้อง generate unique trace ID สำหรับทุก call
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

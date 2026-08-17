@@ -1,0 +1,38 @@
+{
+  "questId": "quest-82-prompt-porter",
+  "questions": [
+    {
+      "question": "ถ้า fromModel === toModel ควรทำอย่างไร?",
+      "choices": [
+        "Apply adaptations เหมือนเดิม",
+        "Passthrough — return prompt เดิมโดยไม่เปลี่ยน",
+        "Throw Error",
+        "Return warning ว่า same model"
+      ],
+      "answer": 1,
+      "explanation": "Same model = passthrough — ไม่ต้องเปลี่ยน prompt เพราะ prompt ที่เขียนสำหรับ model นั้นอยู่แล้ว"
+    },
+    {
+      "question": "Claude adaptations ควรเพิ่มอะไร?",
+      "choices": [
+        "\"Be thorough and detailed\"",
+        "\"Be concise and direct. Use structured format.\"",
+        "\"Output as structured JSON\"",
+        "\"Provide examples\""
+      ],
+      "answer": 1,
+      "explanation": "Claude มีจุดแข็งในการ following instructions — adaptation ควรเพิ่ม conciseness และ structured format เพื่อป้องกัน output ยาวเกินไป"
+    },
+    {
+      "question": "ถ้าส่ง model ที่ไม่รู้จัก (เช่น \"llama-3\") เข้าไป ควรทำอย่างไร?",
+      "choices": [
+        "Apply Claude adaptations เป็น default",
+        "Return warning ว่าไม่รู้จัก model — ไม่ apply adaptations",
+        "Throw Error หยุดการทำงาน",
+        "Return prompt เดิมโดยไม่ทำอะไร"
+      ],
+      "answer": 1,
+      "explanation": "Unknown model = return warning — ผู้ใช้ต้องรู้ว่า prompt ไม่ได้ถูกปรับเพราะ model ไม่อยู่ใน knownModels list"
+    }
+  ]
+}

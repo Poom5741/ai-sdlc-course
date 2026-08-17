@@ -1,26 +1,157 @@
 ---
-title: "Pages Deployment"
-description: "wrangler.toml for Cloudflare Pages"
+title: "Quest 129 - Pages Deployment"
+description: "สร้าง wrangler.toml สำหรับ Cloudflare Pages deployment"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Pages Deployment
+# Quest 129: Pages Deployment
 
 <Badge text="easy" variant="success" /> <Badge text="15 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-wrangler.toml for Cloudflare Pages
+<LearningObjectives items={[
+  "เข้าใจโครงสร้างของ wrangler.toml สำหรับ Cloudflare Pages",
+  "รู้จัก validation ของ project name และ output directory",
+  "สร้าง deployment config ที่ถูกต้องจาก parameters ที่กำหนด",
+  "เข้าใจความสำคัญของ compatibility_date"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Cloudflare Pages & wrangler.toml
+
+Cloudflare Pages เป็น hosting platform ที่ deploy static sites และ JAMstack applications ได้ง่ายมาก สิ่งที่ขาดไม่ได้คือ `wrangler.toml` — configuration file ที่บอก Cloudflare ว่า project ของคุณต้อง build อย่างไรและ deploy ไปที่ไหน
+
+Think ของ `wrangler.toml` เหมือน "แผนที่deployment" — มันบอก Cloudflare ว่า project ชื่ออะไร, ต้อง run build command อะไร, และ output ไฟล์ build อยู่ตรงไหน ถ้า config ผิดแม้แต่จุดเดียว deployment ก็จะล้มเหลว
+
+ใน quest นี้คุณจะเขียนฟังก์ชันที่ **generates wrangler.toml content** จาก project parameters — skill ที่จำเป็นมากเมื่อคุณต้อง setup project ใหม่บน Cloudflare ด้วย AI assistance
+
+---
+
+## ⚙️ How It Works
+
+### The Wrangler Config Generation Flow
+
+```
+1. รับ projectName, buildCmd, outputDir
+         ↓
+2. Validate inputs (required fields)
+         ↓
+3. สร้าง TOML string ด้วย template
+         ↓
+4. Return { toml, isValid, errors }
+```
+
+### TOML Structure สำหรับ Pages
+
+```toml
+[project]
+name = "my-awesome-site"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+build_command = "npm run build"
+```
+
+| Field | ความหมาย | ตัวอย่าง |
+| --- | --- | --- |
+| `name` | ชื่อ project (unique) | `"my-site"` |
+| `compatibility_date` | เวอร์ชัน compatibility | `"2024-01-01"` |
+| `pages_build_output_dir` | โฟลเดอร์ output ของ build | `"./dist"` |
+| `build_command` | คำสั่ง build | `"npm run build"` |
+
+### Input Validation
+
+ก่อน generate config ต้อง validate ก่อน:
+
+- **projectName** — ต้องไม่ empty string
+- **outputDir** — ต้องไม่ empty string
+- ถ้า validation ล้มเหลว → return `{ isValid: false, errors: [...] }`
+
+---
+
+## 💡 Example: สร้าง Wrangler Config
+
+**ขั้นตอนที่ 1: รับ parameters**
+
+```javascript
+const projectName = "blog-site";
+const buildCmd = "npm run build";
+const outputDir = "./dist";
+```
+
+**ขั้นตอนที่ 2: Validate inputs**
+
+```javascript
+if (!projectName || projectName.trim() === '') {
+  errors.push('project name is required');
+}
+if (!outputDir || outputDir.trim() === '') {
+  errors.push('output directory is required');
+}
+```
+
+**ขั้นตอนที่ 3: Generate TOML**
+
+```javascript
+const toml = `[project]
+name = "${projectName}"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "${outputDir}"
+build_command = "${buildCmd}"
+`;
+```
+
+**ขั้นตอนที่ 4: Return result**
+
+```javascript
+return {
+  toml,
+  isValid: errors.length === 0,
+  errors,
+};
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ validate inputs**
+> " projectName เป็น string อยู่แล้ว ไม่ต้องเช็ค "
+> → ต้องเช็ค empty string เสมอ เพราะ caller อาจส่ง `""` มา
+
+**Mistake 2: ใส่ build command ใน outputDir**
+> เข้าใจผิดว่า `build_command` คือ output directory
+> → `build_command` คือคำสั่ง build, `pages_build_output_dir` คือโฟลเดอร์ output
+
+**Mistake 3: ไม่ return error array**
+> return `{ isValid: false }` โดยไม่มี errors
+> → Caller ไม่รู้ว่า validation ล้มเหลวเพราะอะไร — เสมอ return `errors: [...]`
+
+**Mistake 4: TOML format ผิด**
+> ใส่ semicolon หรือ comma ใน TOML
+> → TOML ไม่ใช้ `;` สำหรับ comment (ใช้ `#`) และไม่ต้องใส่ comma ท้าย line
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-129-pages-deploy" />
+
+---
+
+## 🏋️ Quest: Pages Deployment
+
+ถึงเวลาลงมือสร้าง wrangler.toml config แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-129-pages-deploy
    cd quest-129-pages-deploy
@@ -28,39 +159,36 @@ wrangler.toml for Cloudflare Pages
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `generateWranglerConfig(projectName, buildCmd, outputDir)` ที่:
+   - Validate projectName และ outputDir
+   - Generate TOML string ที่ถูกต้อง
+   - Return `{ toml, isValid, errors }`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าติดขัด ลองนึกถึง TOML format — ไม่มี semicolons, ไม่มี commas, ใช้ `#` สำหรับ comment
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า projectName และ outputDir ไม่ใช่ empty string ก่อน
+- ใช้ template literal สร้าง TOML string
+- อย่าลืม `compatibility_date` — Cloudflare ต้องการ field นี้เสมอ
+- ถ้าติดขัด ลองนึกถึง TOML format ที่ถูกต้อง

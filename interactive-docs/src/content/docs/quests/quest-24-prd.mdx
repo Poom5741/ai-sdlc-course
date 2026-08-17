@@ -5,62 +5,208 @@ description: "Write product requirements document"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 24: PRD Writer
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Write product requirements document
+<LearningObjectives items={[
+  "Understanding what a PRD (Product Requirements Document) is and why it matters",
+  "Writing a PRD that covers problem, solution, success metrics, and timeline",
+  "Using AI to draft structured documents while maintaining quality control",
+  "The engineering habit: Document Before You Build"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: PRD — เอกสารที่ทำให้ทีมเดินไปในทิศทางเดียวกัน
 
-<Steps>
+PRD (Product Requirements Document) คือเอกสารที่ **สรุปว่าเราจะสร้างอะไร, ทำไมถึงต้องสร้าง, และวัดความสำเร็จอย่างไร** ก่อนที่จะเริ่มเขียน code แม้แต่บรรทัดเดียว
 
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-24-prd-writer
-   cd quest-24-prd-writer
-   ```
+ทำไมต้องเขียน PRD ก่อน? เพราะ **ถ้าไม่มีเข็มทิศ จะเดินหลงทางแน่นอน** — ทีมจะเริ่มถกเถียงกันว่า "ต้องทำอะไร?" แทนที่จะเริ่มลงมือทำ
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+PRD ไม่ใช่ novel ยาวๆ — มันเป็นเอกสารที่ **สั้น ชัดเจน และทดสอบได้** ประกอบด้วย 4 ส่วนหลัก:
 
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+| ส่วน | คำถามที่ตอบ |
+| --- | --- |
+| **Problem** | ปัญหาที่กำลังแก้คืออะไร? |
+| **Solution** | จะแก้ปัญหานี้อย่างไร? |
+| **Success Metrics** | รู้ได้อย่างไรว่าสำเร็จ? |
+| **Timeline** | แผนการและ milestones คืออะไร? |
 
 ---
 
-## การตรวจสอบ
+## ⚙️ How It Works
+
+### PRD Writing Workflow
+
+```
+1. นิยามปัญหา (Problem Statement)
+         ↓
+2. ออกแบบ solution overview
+         ↓
+3. กำหนด success metrics (KPIs)
+         ↓
+4. วางแผน timeline
+         ↓
+5. ใช้ AI ช่วย draft → ตรวจสอบคุณภาพ
+         ↓
+6. บันทึกเป็น prd.md
+```
+
+### The 4 Essential Sections
+
+**Problem Statement** — อธิบายปัญหาที่ชัดเจนและวัดได้
+
+```markdown
+## Problem
+Users abandon checkout because the form requires 7 steps.
+Cart abandonment rate is 68%, costing $50K/month in lost revenue.
+```
+
+**Solution Overview** — สรุปแนวทางแก้ปัญหา
+
+```markdown
+## Solution
+Reduce checkout to 3 steps with auto-fill from saved profiles.
+Add guest checkout option for first-time buyers.
+```
+
+**Success Metrics** — KPIs ที่วัดได้จริง
+
+```markdown
+## Success Metrics
+- Reduce cart abandonment from 68% to under 40%
+- Increase conversion rate from 32% to 50%+
+- Maintain average checkout time under 90 seconds
+```
+
+**Timeline** — แผนการและ milestones
+
+```markdown
+## Timeline
+- Week 1-2: Design & user research
+- Week 3-4: Frontend implementation
+- Week 5: Backend integration & testing
+- Week 6: Launch & monitoring
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: เริ่มจาก raw ideas**
+
+```markdown
+Problem: Our app is slow, users are unhappy.
+Solution: Make it faster.
+```
+
+**Step 2: ใช้ AI ช่วย flesh out ให้ชัดเจน**
+
+```markdown
+## Problem
+Mobile app load time exceeds 4 seconds on 3G networks,
+causing 45% of users to abandon the app before seeing content.
+This impacts user retention and ad revenue by ~$20K/month.
+
+## Solution
+Implement progressive loading, image compression, and
+lazy loading for non-critical content. Target <1.5s
+initial load on 3G.
+
+## Success Metrics
+- Reduce initial load time from 4s to <1.5s on 3G
+- Decrease bounce rate from 45% to under 20%
+- Increase average session duration by 30%
+
+## Timeline
+- Sprint 1: Audit and identify bottlenecks
+- Sprint 2: Implement image compression and lazy loading
+- Sprint 3: Progressive loading and caching
+- Sprint 4: Testing and optimization
+```
+
+**Step 3: บันทึกเป็น `prd.md`** แล้วรัน test
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: เขียน PRD ที่คลุมเครือเกินไป**
+> "Make the app better and faster"
+> → PRD ต้องมี numbers ที่วัดได้ เช่น "reduce load time from 4s to `<1.5s`"
+
+**Mistake 2: ไม่มี success metrics**
+> "ถ้าใช้งานได้ก็โอเคแล้ว"
+> → ไม่มี metrics = ไม่รู้ว่าสำเร็จจริงหรือแค่รู้สึกว่าสำเร็จ
+
+**Mistake 3: ข้าม timeline**
+> "เดี๋ยวค่อยว่ากันเรื่องเวลา"
+> → ไม่มี timeline = ไม่มี accountability = project ไม่มีวันเสร็จ
+
+**Mistake 4: ให้ AI เขียน PRD ทั้งหมดโดยไม่ตรวจสอบ**
+> "AI เขียนให้แล้ว น่าจะดี"
+> → AI อาจเขียน PRD ที่ดูดีแต่ไม่ตรงกับปัญหาจริง — ต้องตรวจสอบว่าทุก section ตรงกับความเป็นจริง
 
 ---
 
-## ส่งคำตอบ
+## 📝 Knowledge Check
 
-When tests pass, submit your solution:
+<Quiz questId="quest-24-prd-writer" />
 
-```bash
-npx bluebeltdojo submit
-```
+---
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+## 🏋️ Quest: PRD Writer
+
+ตอนนี้ถึงเวลาฝึกฝน! เขียน PRD สำหรับ project โดยใช้ AI ช่วย
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-24-prd-writer
+   cd quest-24-prd-writer
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — เขียน `prd.md` ที่ครอบคลุม problem, solution, success metrics, timeline
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด — ตรวจสอบว่าทุก section มีอยู่จริง
+
+5. แก้ไข section ที่ขาดหาย
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** PRD ที่ดีคือ PRD ที่ **ทุกคนในทีมอ่านแล้วเข้าใจตรงกัน** — ถ้าคนอื่นอ่านแล้วยังงง แปลว่ายังไม่ชัดพอ
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- PRD ต้องมี 4 ส่วนหลัก: Problem, Solution, Success Metrics, Timeline
+- ใช้ numbers ที่วัดได้ใน success metrics เช่น "reduce from X% to Y%"
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

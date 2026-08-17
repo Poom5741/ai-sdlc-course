@@ -1,0 +1,38 @@
+{
+  "questId": "quest-129-pages-deploy",
+  "questions": [
+    {
+      "question": "wrangler.toml สำหรับ Cloudflare Pages ต้องมี field ใดบ้างที่จำเป็น?",
+      "choices": [
+        "name, build_command, port",
+        "name, pages_build_output_dir, compatibility_date",
+        "project_name, dist_folder, version",
+        "app_name, build_dir, env"
+      ],
+      "answer": 1,
+      "explanation": "wrangler.toml สำหรับ Pages ต้องมี `name` (ชื่อ project), `pages_build_output_dir` (โฟลเดอร์ output), และ `compatibility_date` (เวอร์ชัน compatibility) เป็นอย่างน้อย"
+    },
+    {
+      "question": "ถ้า `generateWranglerConfig('', 'npm run build', './dist')` ถูกเรียก ผลลัพธ์จะเป็นอย่างไร?",
+      "choices": [
+        "Return toml string ที่มี name เป็น empty",
+        "Return isValid: false พร้อม error 'project name is required'",
+        "Return isValid: true แต่ toml ว่าง",
+        "Throw error"
+      ],
+      "answer": 1,
+      "explanation": "ฟังก์ชันต้อง validate projectName ก่อน — ถ้า empty string จะ return `{ isValid: false, errors: ['project name is required'] }`"
+    },
+    {
+      "question": "TOML format ใช้ symbol ใดสำหรับ comment?",
+      "choices": [
+        "; (semicolon)",
+        "// (double slash)",
+        "# (hash)",
+        "/* ... */ (block comment)"
+      ],
+      "answer": 2,
+      "explanation": "TOML ใช้ `#` สำหรับ comment, ไม่ใช้ `;` (เหมือน INI) หรือ `//` (เหมือน JavaScript)"
+    }
+  ]
+}

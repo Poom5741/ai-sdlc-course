@@ -5,62 +5,167 @@ description: "Build a transformer block"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 12: Transformer From Scratch
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Build a transformer block
+<Badge text="hard" variant="danger" /> <Badge text="45 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "How a complete transformer block works (self-attention + feed-forward)",
+  "Why residual connections are critical for deep networks",
+  "How layer normalization stabilizes training",
+  "The engineering habit: BUILD TO UNDERSTAND"
+]} />
+
+---
+
+## 📖 Concept: Transformer Block
+
+Transformer block เป็น building block ของ LLMs ทุกตัว — มันประกอบด้วย:
+
+1. **Layer Normalization** — ปรับ scale ของ activations
+2. **Self-Attention** — ให้ tokens "talk" กัน
+3. **Residual Connection** — เพิ่ม input กลับเข้าไป (แก้ vanishing gradient)
+4. **Feed-Forward Network** — แปลง features
+5. **Layer Normalization** (อีกรอบ)
+
+Think of it like this: Self-attention คือการ "อ่าน" ข้อความ, Feed-forward คือการ "คิด", Residual connection คือการ "จำ" ข้อมูลเดิม
+
+---
+
+## ⚙️ How It Works
+
+### Architecture
+
+```
+Input
+  |
+Layer Norm -> Self-Attention -> + Input (Residual)
+  |
+Layer Norm -> Feed-Forward -> + Previous Output (Residual)
+  |
+Output
+```
+
+### Code Implementation
+
+```javascript
+function transformerBlock(input, weights) {
+  const { Wq, Wk, Wv, Wo, W1, W2 } = weights;
+  const { ln1_gamma, ln1_beta, ln2_gamma, ln2_beta } = weights;
+  
+  // Step 1: Layer Norm + Self-Attention
+  const normalized1 = layerNorm(input, ln1_gamma, ln1_beta);
+  const attention = selfAttention(normalized1, Wq, Wk, Wv);
+  const afterAttention = linear(attention, Wo);
+  
+  // Step 2: Residual Connection
+  const residual1 = add(input, afterAttention);
+  
+  // Step 3: Layer Norm + Feed-Forward
+  const normalized2 = layerNorm(residual1, ln2_gamma, ln2_beta);
+  const ff1 = linear(normalized2, W1);
+  const activated = relu(ff1);
+  const ff2 = linear(activated, W2);
+  
+  // Step 4: Residual Connection
+  const residual2 = add(residual1, ff2);
+  
+  return residual2;
+}
+```
+
+---
+
+## 💡 Example: Why Residual Connections Matter
+
+```javascript
+// ไม่มี residual connection
+// Layer 1 output -> Layer 2 output -> ... -> Layer N output
+// ปัญหา: gradients หาย (vanishing) เมื่อมีหลาย layers
+
+// มี residual connection
+// Layer 1 output + input -> Layer 2 output + previous -> ...
+// แก้ปัญหา: gradients ไหลผ่าน residual path ได้
+
+// ตัวอย่าง
+const input = [1, 2, 3, 4];
+const layer1Output = [0.1, 0.2, 0.3, 0.4];
+const withoutResidual = layer1Output;  // [0.1, 0.2, 0.3, 0.4]
+const withResidual = [1.1, 2.2, 3.3, 4.4];  // input + layer1Output
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ลืม residual connection**
+> ทำ self-attention + feed-forward โดยไม่เพิ่ม input กลับ
+> -> Gradients จะ vanish ทำให้ training ไม่ work
+
+**Mistake 2: คำนวณ layer norm ผิด**
+> ใช้ wrong formula สำหรับ normalization
+> -> ต้อง: `(x - mean) / sqrt(variance + epsilon) * gamma + beta`
+
+**Mistake 3: ไม่ handle dimensions**
+> ไม่ check ว่า matrix dimensions ตรงกัน
+> -> ต้อง verify: (seq_len x d_model) x (d_model x d_model)
+
+**Mistake 4: ไม่ test กับ small inputs**
+> ไม่ test กับ seq_len = 1, d_model = 1
+> -> ต้อง test edge cases
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-12-transformer-scratch" />
+
+---
+
+## 🏋️ Quest: Transformer From Scratch
+
+เขียน function ที่ implement transformer block ครบถ้วน
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-12-transformer-scratch
    cd quest-12-transformer-scratch
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. ให้ AI ช่วย implement `transformerBlock(input, weights)` step by step:
+   - Layer Norm
+   - Self-Attention
+   - Residual Connection
+   - Feed-Forward
+   - Residual Connection
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
+5. ทดสอบ: residual connections, layer norm, dimensions
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้า AI ลืม residual connections ให้บอกว่า "Add input back after each sub-layer!"
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี architecture ระบุไว้
+- ต้อง implement: layerNorm, selfAttention, linear, relu, add
+- ตรวจสอบ residual connections — ต้องเพิ่ม input กลับหลังแต่ละ sub-layer
+- ถ้าติดขัด ลอง search "transformer block implementation from scratch"

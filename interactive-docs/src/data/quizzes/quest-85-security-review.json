@@ -1,0 +1,38 @@
+{
+  "questId": "quest-85-security-review",
+  "questions": [
+    {
+      "question": "Why should `const { password } = req.body` NOT be flagged as a hardcoded secret?",
+      "choices": [
+        "It uses destructuring syntax",
+        "It's reading a password from a request, not hardcoding a literal string value",
+        "The variable name doesn't contain 'secret'",
+        "It's inside a function"
+      ],
+      "answer": 1,
+      "explanation": "A hardcoded secret assigns a literal string value to a variable (e.g., `password = \"admin123\"`). Destructuring from req.body is reading user input, which is a completely different and normal pattern."
+    },
+    {
+      "question": "Which of these is the MOST critical security issue a scanner should detect?",
+      "choices": [
+        "A comment with http:// in it",
+        "eval() used with user input",
+        "A function with 5 parameters",
+        "A line longer than 120 characters"
+      ],
+      "answer": 1,
+      "explanation": "eval() with user input is a critical vulnerability — it allows arbitrary code execution. The other options are either stylistic issues or not security threats at all."
+    },
+    {
+      "question": "What is 'context-aware scanning' in the context of security review?",
+      "choices": [
+        "Scanning the entire codebase without filtering",
+        "Understanding whether code is dangerous based on HOW it's used, not just WHAT pattern it matches",
+        "Only scanning files that contain the word 'security'",
+        "Running scans only during business hours"
+      ],
+      "answer": 1,
+      "explanation": "Context-aware scanning means understanding the difference between `password = \"admin123\"` (dangerous) and `const { password } = req.body` (normal). It checks the surrounding code to determine if a pattern is actually a threat."
+    }
+  ]
+}

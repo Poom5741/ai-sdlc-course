@@ -1,66 +1,191 @@
 ---
-title: "PR Description Generator"
+title: "Quest 125 - PR Description Generator"
 description: "Structured PR descriptions"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# PR Description Generator
+# Quest 125: PR Description Generator
 
 <Badge text="medium" variant="caution" /> <Badge text="20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Structured PR descriptions
+<LearningObjectives items={[
+  "How to structure a PR description with type, changes, and testing instructions",
+  "When and how to flag breaking changes",
+  "Why 'How to Test' sections are essential for code review",
+  "How PR descriptions accelerate the review process"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Pull Request Descriptions
+
+Pull Request (PR) ไม่ใช่แค่ diff — มันเป็น **สื่อสาร** ระหว่างคนเขียน code และคน review PR description ที่ดีช่วยให้ reviewer เข้าใจว่า:
+
+1. เปลี่ยนอะไร (Changes)
+2. ทำไมเปลี่ยน (Type/Reason)
+3. ทดสอบอย่างไร (How to Test)
+4. มี breaking change ไหม (Breaking Changes)
+
+Think of a PR description like a technique demonstration card — it tells the judge what form you're performing, what moves are included, and how to score it.
+
+---
+
+## ⚙️ How It Works
+
+### PR Description Structure
+
+```markdown
+## [Feature] Add user authentication
+
+### Changes
+- Added login endpoint with JWT support
+- Added password hashing with bcrypt
+- Added auth middleware for protected routes
+
+### How to Test
+1. Pull this branch
+2. Run `npm install` and `npm test`
+3. Verify the changes work as expected
+4. Test edge cases mentioned in the changes above
+```
+
+### Type Badges
+
+| Type | Badge |
+| --- | --- |
+| feat | [Feature] |
+| fix | [Fix] |
+| refactor | [Refactor] |
+| docs | [Docs] |
+| test | [Test] |
+| chore | [Chore] |
+
+### Breaking Changes
+
+```markdown
+⚠️ **BREAKING CHANGE**: This PR introduces breaking changes
+that may require migration.
+```
+
+---
+
+## 💡 Example: Generating PR Descriptions
+
+```javascript
+const TYPE_BADGES = {
+  feat: '[Feature]',
+  fix: '[Fix]',
+  refactor: '[Refactor]',
+  docs: '[Docs]',
+  test: '[Test]',
+  chore: '[Chore]',
+};
+
+function generatePRDescription(type, title, changes, breaking) {
+  const badge = TYPE_BADGES[type] || `[${type}]`;
+  const changesList = changes.map(c => `- ${c}`).join('\n');
+
+  const breakingNotice = breaking
+    ? '\n\n⚠️ **BREAKING CHANGE**: This PR introduces breaking changes that may require migration.\n'
+    : '';
+
+  const description = `## ${badge} ${title}
+
+### Changes
+${changesList}
+${breakingNotice}
+### How to Test
+
+1. Pull this branch
+2. Run \`npm install\` and \`npm test\`
+3. Verify the changes work as expected
+4. Test edge cases mentioned in the changes above
+`;
+
+  return {
+    description,
+    hasHowToTest: /how to test/i.test(description),
+    hasBreakingNotice: breaking,
+  };
+}
+```
+
+**Key insight:** AI มักจะ generate PR description ที่ไม่มี "How to Test" section — คุณต้อง ensure ว่ามีเสมอเพราะ reviewer ต้องการรู้ว่าจะ verify ได้อย่างไร
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่มี "How to Test" section**
+> AI เขียน changes แต่ลืมบอกวิธีทดสอบ
+> → Reviewer ไม่รู้จะ verify อย่างไร = review ช้า
+
+**Mistake 2: ไม่ flag breaking changes**
+> AI ไม่เช็คว่า changes มี breaking change หรือไม่
+> → Breaking change ที่ไม่ถูก flag = production อาจพัง
+
+**Mistake 3: ใช้ type badge ผิด**
+> AI ใช้ "[Updated]" แทน "[Refactor]" หรือ "[Changed]" แทน "[Fix]"
+> → ใช้เฉพาะ badge ที่ match TYPE_BADGES
+
+**Mistake 4: Changes list ไม่ specific**
+> AI เขียน "Made some improvements" แทน bullet points ที่ชัดเจน
+> → แต่ละ change ต้อง specific และ actionable
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-125-pr-description" />
+
+---
+
+## 🏋️ Quest: PR Description Generator
+
+Now it's time to practice! Generate structured PR descriptions.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-125-pr-description
    cd quest-125-pr-description
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `generatePRDescription(type, title, changes, breaking)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge cases เกี่ยวกับ breaking changes และ How to Test
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองเป็น reviewer — ถ้าคุณได้รับ PR ที่ไม่มี "How to Test" คุณจะรู้สึกอย่างไร?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: PR description ต้องมี "How to Test" section เสมอ
+- ตรวจสอบว่า breaking changes ถูก flag ด้วย ⚠️ notice
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

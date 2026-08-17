@@ -1,0 +1,38 @@
+{
+  "questId": "quest-24-prd-writer",
+  "questions": [
+    {
+      "question": "PRD ควรมีส่วนประกอบหลักอะไรบ้าง?",
+      "choices": [
+        "Code, tests, deployment scripts",
+        "Problem, Solution, Success Metrics, Timeline",
+        "UI mockups, API specs, database schema",
+        "User stories, sprint tasks, burndown chart"
+      ],
+      "answer": 1,
+      "explanation": "PRD ที่ดีต้องมี 4 ส่วนหลัก: Problem (ปัญหาที่แก้), Solution (แนวทางแก้), Success Metrics (วัดความสำเร็จ), Timeline (แผนการ) — ทำให้ทุกคนเข้าใจตรงกัน"
+    },
+    {
+      "question": "Success Metrics ที่ดีควรมีลักษณะใด?",
+      "choices": [
+        "กว้างๆ เช่น 'ทำให้ดีขึ้น' หรือ 'เร็วขึ้น'",
+        "เฉพาะเจาะจงและวัดได้ เช่น 'reduce load time from 4s to <1.5s'",
+        "เทียบกับคู่แข่งเท่านั้น",
+        "ไม่จำเป็นต้องมี numbers"
+      ],
+      "answer": 1,
+      "explanation": "Success metrics ต้องมี numbers ที่วัดได้จริง — เช่น 'reduce X from 68% to under 40%' ทำให้วัดได้ว่าสำเร็จจริงหรือแค่รู้สึกว่าสำเร็จ"
+    },
+    {
+      "question": "เพราะอะไรเราถึงต้องเขียน PRD ก่อนเริ่มเขียน code?",
+      "choices": [
+        "เพราะ PM บังคับให้เขียน",
+        "เพราะเข็มทิศนำทางก่อนออกเดินทาง — ทำให้ทีมเข้าใจตรงกันว่าสร้างอะไรและทำไม",
+        "เพราะเป็น formal requirement ที่ต้องทำตามขั้นตอน",
+        "เพราะ documentation สำคัญกว่า working code"
+      ],
+      "answer": 1,
+      "explanation": "PRD เปรียบเสมือนเข็มทิศ — ถ้าไม่มี ทีมจะเดินหลงทางและถกเถียงกันว่า 'ต้องทำอะไร?' แทนที่จะเริ่มลงมือทำ"
+    }
+  ]
+}

@@ -5,62 +5,181 @@ description: "Create a multi-file project with AI"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 2: Multi-File Project
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Create a multi-file project with AI
+<LearningObjectives items={[
+  "How to decompose a project into multiple files before generating code",
+  "Why defining the public interface first leads to better AI output",
+  "How to wire separate modules together with require/exports",
+  "The engineering habit: DECOMPOSE BEFORE GENERATING"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Multi-File Generation
+
+เมื่อโปรเจกต์เล็ก ไฟล์เดียวอาจเพียงพอ แต่เมื่อโปรเจกต์ใหญ่ขึ้น การพยายามให้ AI สร้างทุกอย่างในไฟล์เดียวจะทำให้ผลลัพธ์ยุ่งเหยิงและยากต่อการดูแล
+
+หลักการสำคัญคือ **分解ก่อน生成** — กำหนด interface สาธารณะก่อน แล้วค่อยให้ AI เติมเนื้อหาแต่ละไฟล์ แทนที่จะขอ "some utils" แล้วยอมรับผลลัพธ์ที่กลับมา
+
+Think of it like this: ถ้าคุณบอกช่างไม้ให้ "สร้างบ้าน" โดยไม่มีแบบแปลน ผลลัพธ์จะแย่มาก แต่ถ้าคุณบอกว่า "ห้องนี้ขนาด 3x4 เมตร มีหน้าต่าง 2 บาน" — ช่างจะสร้างได้ดีกว่ามาก
+
+---
+
+## ⚙️ How It Works
+
+### The Decomposition Workflow
+
+```
+1. Define the public interface (what exports, what types)
+         ↓
+2. Break into logical modules (math, validators, index)
+         ↓
+3. Ask AI to generate each file against the interface
+         ↓
+4. Wire together with require()/module.exports
+         ↓
+5. Run tests and verify the contract
+```
+
+### Interface-First Approach
+
+แทนที่จะให้ AI สร้างทุกอย่างพร้อมกัน ให้กำหนด interface ก่อน:
+
+```javascript
+// Step 1: Define the interface FIRST
+// add(a, b)      → number
+// subtract(a, b) → number
+// multiply(a, b) → number
+// divide(a, b)   → number (divide(x, 0) returns Infinity)
+// calculate(op, a, b) → number (throws on unknown op)
+```
+
+จากนั้นแบ่งเป็นไฟล์:
+
+```javascript
+// math.js — core operations
+function add(a, b) { return a + b; }
+function subtract(a, b) { return a - b; }
+function multiply(a, b) { return a * b; }
+function divide(a, b) { return b === 0 ? Infinity : a / b; }
+module.exports = { add, subtract, multiply, divide };
+
+// validators.js — input validation
+function isNumber(val) { return typeof val === 'number' && !isNaN(val); }
+module.exports = { isNumber };
+
+// index.js — re-export + dispatcher
+const { add, subtract, multiply, divide } = require('./math');
+function calculate(op, a, b) {
+  switch (op) {
+    case 'add': return add(a, b);
+    case 'subtract': return subtract(a, b);
+    case 'multiply': return multiply(a, b);
+    case 'divide': return divide(a, b);
+    default: throw new Error(`Unknown operation: ${op}`);
+  }
+}
+module.exports = { add, subtract, multiply, divide, calculate };
+```
+
+---
+
+## 💡 Example: Decomposition in Practice
+
+**ผิดวิธี — ให้ AI สร้างทุกอย่างในไฟล์เดียว:**
+
+```javascript
+// ❌ "AI, write me a math library"
+// Result: messy, hard to test, hard to maintain
+```
+
+**ถูกวิธี — กำหนด interface แล้ว分解:**
+
+```javascript
+// ✅ Step 1: Write the interface as comments
+// Step 2: Ask AI to implement each file
+// Step 3: Wire with require/exports
+// Step 4: Test the contract
+
+// ผลลัพธ์: แต่ละไฟล์มีหน้าที่ชัดเจน ทดสอบง่าย ดูแลง่าย
+```
+
+**Edge case ที่ต้องระวัง:** `divide(x, 0)` ต้อง return `Infinity` ไม่ใช่ throw error — นี่คือ edge case ที่ AI มักจะพลาดถ้าไม่ระบุชัดเจน
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่define interface ก่อน**
+> "ขอให้ AI สร้าง util library"
+> → ผลลัพธ์จะสุ่มและไม่ consistent กำหนด interface ก่อนเสมอ
+
+**Mistake 2: ยอมรับ stub ที่ return ค่าเดิม**
+> `add(a, b) { return 0; }` — stub ที่ไม่ได้ทำอะไร
+> → ต้อง implement จริง ไม่ใช่แค่ stub
+
+**Mistake 3: ไม่เชื่อมไฟล์เข้าด้วยกัน**
+> สร้างไฟล์แยกแต่ไม่ wire ด้วย require/exports
+> → index.js ต้อง re-export ทุกอย่าง
+
+**Mistake 4: ไม่ทดสอบ edge cases**
+> ทดสอบแค่ happy path
+> → ทดสอบ divide by zero, unknown op, non-number inputs
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-2-prompts" />
+
+---
+
+## 🏋️ Quest: Multi-File Project
+
+สร้าง multi-file math library ด้วยความช่วยเหลือของ AI
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-02-multi-file
    cd quest-02-multi-file
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. **กำหนด interface ก่อน** — อ่าน instructions ใน `problem.js` ให้เข้าใจ contract
 
-4. ตรวจสอบ solution ของคุณ:
+4. แบ่งงานเป็นไฟล์: math.js, validators.js, index.js
+
+5. ให้ AI สร้างแต่ละไฟล์ตาม interface ที่กำหนด
+
+6. ตรวจสอบ solution:
+
    ```bash
    node test.js
    ```
 
+7. ตรวจสอบ edge cases: divide by zero, unknown operation
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ถ้าติดขัด ลองเขียน interface เป็น comment แล้วให้ AI สร้าง implementation ตามนั้น — อย่าขอ "some utils" โดยไม่มี spec
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อ่าน instructions ใน `problem.js` อย่างละเอียด — มี interface ระบุไว้ชัดเจน
+- แบ่งเป็น 3 ไฟล์: math.js (operations), validators.js (checks), index.js (re-export)
+- ทดสอบ divide by zero — ต้อง return Infinity
+- ถ้าติดขัด ลองเขียน comments อธิบาย interface แล้วให้ AI ช่วย implement

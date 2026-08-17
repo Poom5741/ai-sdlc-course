@@ -5,22 +5,115 @@ description: "Migrate JavaScript to TypeScript with proper types"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Type Migration Assistant
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+<LearningObjectives items={[
+  "How to add TypeScript type annotations to existing JavaScript functions",
+  "Why specific types (number, string) are better than `any` for type safety",
+  "How to infer parameter types from usage patterns and return values",
+  "When to convert `var` to `let`/`const` as part of modernization"
+]} />
 
-Migrate JavaScript to TypeScript with proper types
+## 📖 Concept: JavaScript → TypeScript Migration
 
----
+TypeScript migration คือการเพิ่ม type safety ให้ JavaScript ที่มีอยู่ — เหมือนการใส่เกราะให้นักสู้ที่เคยสู้ด้วยมือเปล่า แต่ **การ migrate ต้องทำอย่างถูกต้อง** — ถ้าใส่ type `any` ทุกที่ก็ไม่ต่างจาก JavaScript
 
-## วิธีทำ
+หลักการสำคัญ: **inferring types from actual usage** — ถ้า function รับ parameter แล้ว return `n * 2` แสดงว่า parameter นั้นต้องเป็น number, ไม่ใช่ any. AI tools ช่วย generate type annotations ได้ แต่มักจะ **default to `any`** ซึ่งไม่ได้ช่วยอะไร
+
+Think of it like upgrading from a simple belt to a colored belt in martial arts — you're adding structure and formality, but the core techniques must still work. The belt upgrade doesn't change how you fight; it makes your skill level explicit.
+
+## ⚙️ How It Works
+
+### The Type Migration Workflow
+
+1. **Analyze function signatures** — look at parameter usage and return values
+2. **Infer specific types** — `n * 2` → n is `number`, `"Hello " + name` → name is `string`
+3. **Add type annotations** — update function signature with types
+4. **Convert var → let/const** — modernize variable declarations
+5. **Verify** — ensure the typed code still works
+
+### Type Inference from Usage
+
+```javascript
+// From usage: a + b → both are numbers
+function add(a, b) { return a + b; }
+// → function add(a: number, b: number): number
+
+// From usage: "Hello " + name → name is string
+function greet(name) { return "Hello " + name; }
+// → function greet(name: string): string
+
+// From usage: return 42 → return type is number
+function getCount() { return 42; }
+// → function getCount(): number
+```
+
+### var → let/const
+
+```javascript
+// ❌ Before: var (function-scoped, hoisted)
+var x = 1;
+
+// ✅ After: const (block-scoped, immutable)
+const x = 1;
+
+// Use let when reassignment is needed
+let counter = 0;
+counter += 1;
+```
+
+## 💡 Example: Walkthrough
+
+```javascript
+// Input
+const code = `function double(n) { return n * 2; }`;
+
+// Analysis:
+// - Parameter "n" is multiplied by 2 → n is number
+// - Return value is number * number → return type is number
+// - No var declarations to convert
+
+// Output
+const typed = `function double(n: number): number { return n * 2; }`;
+```
+
+Key insight: the solution uses **specific types** (`number`, `string`) instead of `any`. Using `any` defeats the purpose of TypeScript.
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Defaulting to `any`**
+> "ไม่รู้ type → ใส่ `any` ไปก่อน"
+> → `any` ปิด type checking ทั้งหมด — ใช้ `number`, `string`, `boolean` จากการ infer usage
+
+**Mistake 2: Not converting var to let/const**
+> "Focus on types อย่างเดียว"
+> → var → let/const เป็นส่วนหนึ่งของ modernization — ทำพร้อมกัน
+
+**Mistake 3: Losing function body during transformation**
+> "เปลี่ยน signature แล้วลืม copy body"
+> → ตรวจสอบว่า function body ยังเหมือนเดิมหลังจากเพิ่ม types
+
+**Mistake 4: Breaking on empty input**
+> "ไม่ได้ handle code ว่าง"
+> → Empty input → return empty string
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-96-type-migration" />
+
+## 🏋️ Quest: Type Migration Assistant
+
+Now it's time to practice! Migrate JavaScript to TypeScript with proper types.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-96-type-migration
    cd quest-96-type-migration
@@ -31,36 +124,18 @@ Migrate JavaScript to TypeScript with proper types
 3. Implement solution ตาม instructions ใน `problem.js`
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
-
----
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+> 💡 **Tip:** ทดสอบ edge case — ตรวจสอบว่าใช้ specific types (number, string) ไม่ใช่ `any`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
+- `addTypeAnnotations(code)` รับ JavaScript code string และ return TypeScript code string
+- ตรวจสอบ parameter usage เพื่อ infer types: `n * 2` → number, `"Hello " + name` → string
+- แปลง `var` เป็น `let`/`const` ด้วย
 - ถ้าติดขัด ดู `_solution/solution.js`

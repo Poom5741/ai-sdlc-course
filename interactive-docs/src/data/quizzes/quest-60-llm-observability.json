@@ -1,0 +1,38 @@
+{
+  "questId": "quest-60-llm-observability",
+  "questions": [
+    {
+      "question": "Why is tracking dollar cost more important than tracking token count for LLM observability?",
+      "choices": [
+        "Tokens are harder to count than dollars",
+        "GPT-4 output tokens cost 6x more than input tokens — token count alone is misleading",
+        "Dollar amounts are easier to display in dashboards",
+        "Token counts are always zero due to API limitations"
+      ],
+      "answer": 1,
+      "explanation": "Different models and token types have vastly different costs. GPT-4 output tokens ($0.006/1K) cost 6x more than input tokens ($0.003/1K). A call with 1000 output tokens costs 6x more than one with 1000 input tokens — token count alone doesn't tell you this."
+    },
+    {
+      "question": "What information should each LLM trace record?",
+      "choices": [
+        "Just the response text",
+        "Model used, prompt, response, token counts (input/output), latency, and computed cost",
+        "Only the timestamp and model name",
+        "Just the total cost rounded to the nearest dollar"
+      ],
+      "answer": 1,
+      "explanation": "A complete trace records everything needed for debugging and cost analysis: which model was used, what was sent and received, how many tokens of each type, how long it took, and the computed dollar cost."
+    },
+    {
+      "question": "Why is per-model cost breakdown essential in LLM observability?",
+      "choices": [
+        "It makes the dashboard look more professional",
+        "Without it, you can't tell which model is driving costs or optimize accordingly",
+        "Each model requires a separate API key",
+        "Per-model tracking is required by OpenAI's terms of service"
+      ],
+      "answer": 1,
+      "explanation": "If your total LLM cost is $45/month, you don't know where to optimize without per-model breakdown. Maybe GPT-4 is responsible for $40 of that — then you can route simpler tasks to GPT-3.5 to save."
+    }
+  ]
+}

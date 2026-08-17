@@ -1,26 +1,167 @@
 ---
-title: "Pages Function Router"
-description: "Route requests with CORS"
+title: "Quest 130 - Pages Function Router"
+description: "Route requests ด้วย CORS support"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Pages Function Router
+# Quest 130: Pages Function Router
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Route requests with CORS
+<LearningObjectives items={[
+  "เข้าใจ HTTP method routing (GET, POST, PUT, DELETE, OPTIONS)",
+  "รู้จัก CORS (Cross-Origin Resource Sharing) และ preflight requests",
+  "สร้าง function router ที่ map methods กับ handlers",
+  "จัดการ error responses สำหรับ unsupported methods"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Request Routing & CORS
+
+ทุก HTTP request ที่เข้ามาใน Cloudflare Worker หรือ Pages Function ต้องถูก **route** ไปหา handler ที่ถูกต้อง นี่คือ "dispatch" pattern — เหมือน receptionist ที่ส่ง phone call ไปหาแผนกที่ถูกต้อง
+
+**CORS** (Cross-Origin Resource Sharing) คือกลไกที่ browser ใช้ control ว่า website หนึ่งสามารถ access resources จาก origin อื่นได้หรือไม่ ถ้าคุณสร้าง API ที่ frontend ต้องเรียกจาก domain ต่างกัน คุณ **ต้อง** ตั้งค่า CORS headers ไม่งั้น browser จะ block request
+
+Think ของมันเหมือน "บัตรผ่าน" — CORS headers คือบัตรที่บอก browser ว่า "允许 request จาก domain นี้ได้"
+
+---
+
+## ⚙️ How It Works
+
+### Routing Flow
+
+```
+1. ได้รับ request (method, path)
+         ↓
+2. ตรวจสอบ method ใน handlers map
+         ↓
+3. ถ้า method ไม่ supported → return 400 error
+         ↓
+4. ถ้า CORS enabled → สร้าง CORS headers
+         ↓
+5. Return { handler, corsHeaders, status }
+```
+
+### HTTP Methods & Handlers
+
+| Method | Handler | ใช้ทำอะไร |
+| --- | --- | --- |
+| `GET` | `list` | ดึงข้อมูล |
+| `POST` | `create` | สร้างข้อมูลใหม่ |
+| `PUT` | `update` | อัพเดทข้อมูล |
+| `DELETE` | `delete` | ลบข้อมูล |
+| `OPTIONS` | `preflight` | CORS preflight check |
+
+### CORS Headers
+
+```javascript
+{
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+```
+
+- `Allow-Origin: *` — อนุญาตทุก origin (production ควรระบุ domain ที่เจาะจง)
+- `Allow-Methods` — HTTP methods ที่อนุญาต
+- `Allow-Headers` — Headers ที่ client สามารถส่งได้
+
+---
+
+## 💡 Example: Routing Request
+
+**ขั้นตอนที่ 1: กำหนด handlers map**
+
+```javascript
+const handlers = {
+  GET: 'list',
+  POST: 'create',
+  PUT: 'update',
+  DELETE: 'delete',
+  OPTIONS: 'preflight',
+};
+```
+
+**ขั้นตอนที่ 2: Route request**
+
+```javascript
+function routeRequest(method, path, corsEnabled) {
+  // Check if method is supported
+  if (!handlers[method]) {
+    return {
+      handler: '',
+      corsHeaders: null,
+      status: 400,
+      error: `Unsupported method: ${method}`
+    };
+  }
+
+  // Generate CORS headers if enabled
+  const corsHeaders = corsEnabled ? {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  } : null;
+
+  // OPTIONS returns 204 (No Content) for preflight
+  const status = method === 'OPTIONS' ? 204 : 200;
+
+  return { handler: handlers[method], corsHeaders, status };
+}
+```
+
+**ขั้นตอนที่ 3: ทดสอบ edge cases**
+
+```javascript
+routeRequest('PATCH', '/api/users', true);
+// → { handler: '', status: 400, error: 'Unsupported method: PATCH' }
+
+routeRequest('OPTIONS', '/api/users', false);
+// → { handler: 'preflight', corsHeaders: null, status: 204 }
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: ไม่ handle OPTIONS preflight**
+> "OPTIONS ไม่ต้องทำอะไร special"
+> → OPTIONS ต้อง return status 204 ไม่ใช่ 200 — browser 期待 preflight response ที่ไม่มี body
+
+**Mistake 2: CORS headers ไม่ complete**
+> ใส่แค่ `Access-Control-Allow-Origin` แต่ลืม methods/headers
+> → Browser ต้องการทั้ง 3 fields ถึงจะ allow request
+
+**Mistake 3: ไม่ return error สำหรับ unsupported method**
+> ปล่อยผ่าน method ที่ไม่รู้จัก
+> → ต้อง return 400 error เพื่อให้ client รู้ว่า method ไม่ supported
+
+**Mistake 4: Hardcode CORS origin เป็น `*` ใน production**
+> `*` ใช้ได้ตอน dev แต่ production ควรระบุ domain ที่เจาะจงเพื่อ security
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-130-function-router" />
+
+---
+
+## 🏋️ Quest: Function Router
+
+ถึงเวลาสร้าง request router ที่จัดการ CORS ได้แล้ว!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-130-function-router
    cd quest-130-function-router
@@ -28,39 +169,37 @@ Route requests with CORS
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement ฟังก์ชัน `routeRequest(method, path, corsEnabled)` ที่:
+   - Map HTTP methods กับ handler names
+   - สร้าง CORS headers เมื่อ `corsEnabled` เป็น true
+   - Return error สำหรับ unsupported methods
+   - Return status 204 สำหรับ OPTIONS requests
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน test output อย่างละเอียด — ดูว่า test ไหน fail และทำไม
+
+6. แก้ไขจนกว่า tests ทั้งหมดจะผ่าน
+
+7. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง browser preflight flow — OPTIONS request ถูกส่งก่อน request จริงเสมอ
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- HTTP methods ที่ต้อง handle: GET, POST, PUT, DELETE, OPTIONS
+- OPTIONS request ต้อง return status 204 ไม่ใช่ 200
+- CORS headers ต้องมีทั้ง Allow-Origin, Allow-Methods, และ Allow-Headers
+- ถ้า method ไม่ supported ต้อง return error object ที่มี error message

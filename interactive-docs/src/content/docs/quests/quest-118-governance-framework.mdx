@@ -1,66 +1,229 @@
 ---
-title: "Team AI Governance Framework"
-description: "Design governance for a team using AI tools"
+title: "Quest 118 - Team AI Governance Framework"
+description: "Design governance for a team using AI tools — สร้างกรอบการกำกับดูแล AI"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Team AI Governance Framework
+# Quest 118: Team AI Governance Framework
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Design governance for a team using AI tools
+<LearningObjectives items={[
+  "How to design governance frameworks that enable (not block) AI adoption",
+  "Why code review standards for AI-generated code are non-negotiable",
+  "How to handle security, privacy, and IP concerns with AI tools",
+  "The engineering habit of GOVERNANCE ENABLES — good rules make teams faster by removing ambiguity"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: AI Governance Done Right
+
+"Governance" ฟังดูน่าเบื่อ — แต่สำหรับ AI tools มัน **สำคัญมาก** เพราะ AI สร้าง unique risks:
+
+```
+⚠️ AI-Specific Risks:
+├─ Code leaking to external APIs (privacy)
+├─ AI-generated code with security vulnerabilities
+├─ IP ownership questions (who owns AI code?)
+├─ Over-reliance reducing developer skills
+└─ Inconsistent code quality across team
+```
+
+**Core Principle: GOVERNANCE ENABLES, NOT BLOCKS**
+
+ governance ที่ดีไม่ใช่การห้ามใช้ AI — แต่คือการ **สร้าง guidelines ที่ชัดเจน** เพื่อให้ทุกคนใช้ AI ได้อย่างมั่นใจ:
+
+```
+❌ Bad Governance:  "ห้ามใช้ AI tools"
+✅ Good Governance: "ใช้ AI ได้ แต่ต้อง review code, ห้ามส่ง secrets, log ทุก usage"
+```
+
+### Governance Framework Components
+
+```
+┌──────────────────────────────────────────────┐
+│       AI Governance Framework                 │
+│                                              │
+│  📋 Purpose & Scope    → Why rules exist      │
+│  🛠️ Approved Tools     → Which tools allowed  │
+│  📏 Usage Guidelines   → How to use properly  │
+│  👁️ Code Review        → AI code requirements │
+│  🔒 Security & Privacy → What's off-limits    │
+│  ⚖️ IP & Attribution   → Who owns what        │
+│  📊 Monitoring         → Compliance tracking  │
+│  🚨 Incident Response  → When AI causes issues│
+└──────────────────────────────────────────────┘
+```
+
+---
+
+## ⚙️ How It Works
+
+### Framework Sections
+
+**1. Purpose and Scope**
+
+- ทำไม governance ถึงมี
+- ใช้กับใคร (ทั้ง team? ทั้ง organization?)
+- AI tools ที่ covered
+
+**2. Approved AI Tools**
+
+- Whitelist ของ tools ที่ใช้ได้
+- แต่ละ tool มี allowed/forbidden use cases
+- Process สำหรับขอ approve tool ใหม่
+
+**3. Usage Guidelines**
+
+- ✅ ใช้ AI สำหรับ: boilerplate, test generation, documentation
+- ❌ ห้ามใช้ AI สำหรับ: secrets, PII, proprietary algorithms
+
+**4. Code Review Standards**
+
+- AI-generated code ต้องผ่าน human review เสมอ
+- Reviewer ต้อง verify: security, performance, logic
+- ต้อง标记ว่า code ไหนเป็น AI-generated
+
+**5. Security and Privacy Rules**
+
+- 🔴 ห้ามส่ง: API keys, passwords, PII
+- 🟡 ระวัง: proprietary code, internal APIs
+- 🟢 ปลอดภัย: open-source patterns, standard algorithms
+
+**6. IP and Attribution**
+
+- AI-generated code ownership policy
+- How to attribute AI assistance
+- License implications
+
+**7. Monitoring and Compliance**
+
+- Log AI tool usage
+- Periodic audits
+- Non-compliance consequences
+
+**8. Incident Response for AI Issues**
+
+- What to do when AI generates buggy code
+- How to handle AI-related security incidents
+- Escalation process
+
+---
+
+## 💡 Example: Usage Guidelines
+
+```markdown
+## Usage Guidelines
+
+### ✅ Encouraged Use Cases
+- Boilerplate code generation (configs, templates)
+- Test case generation and edge case identification
+- Documentation and code comments
+- Code refactoring suggestions
+- Learning new languages/frameworks
+
+### ⚠️ Use With Caution
+- Complex algorithm implementation (always verify logic)
+- Database queries (check for injection vulnerabilities)
+- API integrations (verify authentication handling)
+
+### 🚫 Prohibited
+- Never paste API keys, secrets, or credentials into AI tools
+- Never share PII or customer data with AI
+- Never use AI to generate code that circumvents security controls
+- Never accept AI suggestions for security-critical code without senior review
+
+### 📝 Attribution
+When submitting PRs with significant AI assistance:
+- Add `AI-assisted` label to the PR
+- Note which parts were AI-generated in the description
+- Reviewer must verify all AI-generated sections
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Governance that blocks everything**
+> "Let's restrict AI to only documentation generation"
+> → ทีมจะ finding workarounds — governance ต้อง enable, ไม่ใช่ block
+
+**Mistake 2: No incident response for AI issues**
+> "If AI generates a bug, just fix it normally"
+> → AI bugs ต้อง special treatment — ต้อง track pattern ว่า AI ผิดพลาดยังไง
+
+**Mistake 3: Ignoring IP questions**
+> "We'll figure out ownership later"
+> → ตอนนี้ AI-generated code IP status ไม่ชัดเจน — ต้องมี policy ตั้งแต่แรก
+
+**Mistake 4: No monitoring or compliance tracking**
+> "Trust developers to follow the rules"
+> → Trust but verify — ต้องมี audit mechanism
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-118-governance-framework" />
+
+---
+
+## 🏋️ Quest: Team AI Governance Framework
+
+Now it's time to practice! Design a comprehensive governance framework.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-118-governance-framework
    cd quest-118-governance-framework
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor — สังเกต required sections ที่ต้องเขียนใน `governance-framework.md`
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. สร้างไฟล์ `governance-framework.md` ที่มี sections ครบถ้วน:
+   - Purpose and Scope
+   - Approved AI Tools
+   - Usage Guidelines
+   - Code Review Standards
+   - Security and Privacy Rules
+   - IP and Attribution
+   - Monitoring and Compliance
+   - Incident Response for AI Issues
 
-4. ตรวจสอบ solution ของคุณ:
+4. ใช้ AI ช่วยสร้าง framework — แต่ **customize ให้เหมาะกับ scenario** ที่ problem.js กำหนด
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** เขียน governance ที่developers อยากใช้ — ถ้า rules ฟังดูน่าเบื่อเกินไป ทีมจะ ignore
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Security section ต้องระบุชัดว่าห้ามส่งอะไร (API keys, PII, secrets)
+- Code Review section ต้อง mention AI-generated code labeling
+- Incident Response section ต้องมี escalation process
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

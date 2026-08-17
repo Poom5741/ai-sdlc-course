@@ -1,0 +1,38 @@
+{
+  "questId": "quest-26-tech",
+  "questions": [
+    {
+      "question": "What are the four key evaluation dimensions for recommending a tech stack?",
+      "choices": [
+        "Price, Popularity, Age, and Logo color",
+        "Team capability, Project requirements, Ecosystem maturity, and Operational cost",
+        "Speed, Memory, CPU, and Disk",
+        "Frontend, Backend, Database, and DevOps"
+      ],
+      "answer": 1,
+      "explanation": "Good tech stack recommendations evaluate: can the team actually use it (capability), does it fit the project needs (requirements), is the ecosystem stable and supported (maturity), and what's the total cost of ownership (operations)."
+    },
+    {
+      "question": "Why should team capability be the first consideration when recommending a tech stack?",
+      "choices": [
+        "Because it's the easiest dimension to evaluate",
+        "Because even the best technology fails if the team lacks the skills to use it effectively, leading to slower delivery and more bugs",
+        "Because it determines the project budget",
+        "Team capability doesn't matter when using AI coding assistants"
+      ],
+      "answer": 1,
+      "explanation": "A technically superior stack that the team can't use effectively will underperform a simpler stack the team knows well. Learning curves have real costs — missed deadlines, architectural mistakes, and production incidents."
+    },
+    {
+      "question": "What is the danger of recommending a tech stack based solely on benchmark performance?",
+      "choices": [
+        "Benchmarks are always wrong",
+        "Benchmarks measure synthetic conditions that may not reflect real-world performance, ignoring factors like developer productivity, ecosystem support, and operational complexity",
+        "Benchmark results cannot be reproduced",
+        "High performance is never important"
+      ],
+      "answer": 1,
+      "explanation": "Benchmarks test isolated micro-benchmarks under ideal conditions. Real-world performance depends on many factors benchmarks don't cover: developer velocity, library availability, debugging tools, deployment complexity, and community support."
+    }
+  ]
+}

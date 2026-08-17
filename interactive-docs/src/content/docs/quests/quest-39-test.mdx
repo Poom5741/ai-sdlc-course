@@ -5,22 +5,153 @@ description: "Analyze test coverage gaps"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 39: Test Suite Analyzer
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Analyze test coverage gaps
+<LearningObjectives items={[
+  "วิเคราะห์ test suite ที่มีอยู่เพื่อหา coverage gaps",
+  "ใช้ AI ช่วยระบุ functions ที่ยังไม่มี tests",
+  "จัด prioritization ว่า test ไหนควรเขียนก่อน",
+  "เข้าใจว่า coverage percentage ไม่ใช่ everything"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Test Coverage Analysis
+
+Test coverage คือ measure ว่า codebase ของคุณถูก test ครอบคลุมแค่ไหน — แต่ **coverage percentage ไม่ใช่ทุกอย่าง**
+
+โค้ดที่มี coverage 100% อาจยังมี bugs ได้ ถ้า tests ไม่ได้ test ถูก scenario — และโค้ดที่มี coverage 60% อาจปลอดภัยกว่า ถ้า critical paths ถูก test ดี
+
+AI ช่วยวิเคราะห์ test suite ของคุณ — ไม่ใช่แค่ดู % coverage แต่ดู **quality** ของ tests ด้วย
+
+---
+
+## ⚙️ How It Works
+
+### กระบวนการ Test Analysis
+
+```
+1. SCAN — สแกน test files และ source files
+         ↓
+2. MAP — map ว่า test ไหน cover function ไหน
+         ↓
+3. GAP — หา functions ที่ไม่มี tests
+         ↓
+4. PRIORITY — จัดลำดับตาม risk
+         ↓
+5. RECOMMEND — แนะนำว่าควรเขียน test อะไรต่อ
+```
+
+### วิธีวิเคราะห์ Coverage
+
+```javascript
+function analyzeCoverage(sourceCode, testCode) {
+  // หา functions ทั้งหมดใน source
+  const sourceFunctions = extractFunctions(sourceCode);
+  
+  // หา functions ที่ถูกเรียกใน tests
+  const testedFunctions = extractTestedFunctions(testCode);
+  
+  // หา gaps
+  const gaps = sourceFunctions.filter(fn => 
+    !testedFunctions.includes(fn.name)
+  );
+  
+  return {
+    total: sourceFunctions.length,
+    covered: sourceFunctions.length - gaps.length,
+    coverage: ((sourceFunctions.length - gaps.length) / sourceFunctions.length * 100).toFixed(1),
+    gaps: gaps.map(fn => ({
+      name: fn.name,
+      risk: fn.complexity > 10 ? 'high' : fn.complexity > 5 ? 'medium' : 'low'
+    }))
+  };
+}
+```
+
+### Priority Matrix
+
+| Risk Level | Criteria | Action |
+| --- | --- | --- |
+| **High** | Complex logic + no tests | เขียน test ก่อน |
+| **Medium** | Simple logic + no tests | เขียน test เร็วๆ |
+| **Low** | Edge functions + no tests | เขียนเมื่อมีเวลา |
+| **Covered** | มี tests แล้ว | ตรวจสอบ quality |
+
+---
+
+## 💡 Example: วิเคราะห์ Test Suite
+
+```javascript
+// Source functions
+const functions = [
+  { name: 'validateEmail', complexity: 3, critical: true },
+  { name: 'calculateTotal', complexity: 8, critical: true },
+  { name: 'formatDate', complexity: 2, critical: false },
+  { name: 'processPayment', complexity: 12, critical: true },
+  { name: 'logError', complexity: 1, critical: false }
+];
+
+// Tests ที่มีอยู่
+const tests = ['validateEmail', 'formatDate'];
+
+// Analysis result
+const analysis = {
+  total: 5,
+  covered: 2,
+  coverage: '40.0%',
+  gaps: [
+    { name: 'calculateTotal', risk: 'high', reason: 'complexity 8 + no tests' },
+    { name: 'processPayment', risk: 'high', reason: 'complexity 12 + critical' },
+    { name: 'logError', risk: 'low', reason: 'simple + not critical' }
+  ],
+  recommendation: 'Focus on processPayment first — highest complexity and critical'
+};
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: พอใจกับ coverage % สูงๆ**
+> "Coverage 90% แล้ว ไม่ต้องเขียน test เพิ่ม"
+> → 10% ที่เหลืออาจเป็น critical functions — ดูว่า functions ไหนไม่ได้ test
+
+**Mistake 2: นับ trivial tests**
+> "มี 100 tests แล้ว"
+> → Quality > quantity — test ที่ไม่ assert อะไรเลยไม่มีค่า
+
+**Mistake 3: ไม่ prioritize ตาม risk**
+> "เขียน test ทุก functions เท่าๆ กัน"
+> → Critical + complex functions ควร test ก่อน — risk-based testing
+
+**Mistake 4: ไม่ review test quality**
+> "tests ผ่านทุกตัว ดีแล้ว"
+> → ตรวจสอบว่า tests จริงๆ ตรวจสอบ behavior หรือแค่ assert true
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-39-test" />
+
+---
+
+## 🏋️ Quest: Test Suite Analyzer
+
+พร้อมแล้ววิเคราะห์ test suite! หา gaps และจัด prioritization
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-39-test-suite-analyzer
    cd quest-39-test-suite-analyzer
@@ -28,39 +159,28 @@ Analyze test coverage gaps
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `solve()` ที่ analyze test coverage gaps
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึง project สุดท้ายที่มี bug production — test ไหนน่าจะจับได้ถ้ามี?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- อย่าดูแค่ coverage % — ดูว่า functions ไหน critical แต่ไม่มี tests
+- Risk-based prioritization: complexity × criticality
+- ทดสอบกับ codebase จริงๆ ว่า analysis ตรงกับที่คาดไว้ไหม

@@ -1,66 +1,195 @@
 ---
-title: "Interactive Rebase Simulator"
+title: "Quest 123 - Interactive Rebase Simulator"
 description: "Reorder, squash, edit commits"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Interactive Rebase Simulator
+# Quest 123: Interactive Rebase Simulator
 
 <Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Reorder, squash, edit commits
+<LearningObjectives items={[
+  "How interactive rebase works: pick, squash, edit, reorder",
+  "Why squashing combines commit messages",
+  "The effect of reordering commits on history",
+  "When interactive rebase is useful vs dangerous"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Interactive Rebase
+
+Interactive rebase (`git rebase -i`) เป็นอาวุธที่ทรงพลังที่สุดอย่างหนึ่งของ Git — มันให้คุณ **แก้ไขประวัติ commit** ได้ก่อนที่จะ push ขึ้น remote คุณสามารถ: pick (keep), squash (combine), edit (modify), reorder (move) commits
+
+Think of it like editing a martial arts form before the final demonstration — you can rearrange moves, combine techniques, or refine individual strikes before anyone sees the performance.
+
+---
+
+## ⚙️ How It Works
+
+### Four Operations
+
+```
+1. PICK — keep commit as-is
+   A → B → C  becomes  A → B → C
+
+2. SQUASH — combine into previous commit
+   A → B → C  (squash C into B)
+   becomes  A → B+C  (merged message)
+
+3. EDIT — mark commit for modification
+   A → B → C  (edit B)
+   becomes  A → [edited] B → C
+
+4. REORDER — move commit to new position
+   A → B → C  (move C before B)
+   becomes  A → C → B
+```
+
+### How Squash Merges Messages
+
+```javascript
+// Before squashing:
+// Commit A: "feat: add user model"
+// Commit B: "fix: handle null user"
+
+// After squash B into A:
+// "feat: add user model + fix: handle null user"
+```
+
+---
+
+## 💡 Example: Simulating Interactive Rebase
+
+```javascript
+function simulateRebase(commits, operations) {
+  let result = commits.map(c => ({ ...c }));  // deep copy
+  const dropped = [];
+
+  for (const op of operations) {
+    const targetIdx = result.findIndex(c => c.hash === op.targetHash);
+    if (targetIdx === -1) {
+      dropped.push(op.targetHash);
+      continue;
+    }
+
+    switch (op.action) {
+      case 'pick':
+        // Keep as-is
+        break;
+
+      case 'squash': {
+        if (targetIdx === 0) break;  // can't squash first commit
+        const prev = result[targetIdx - 1];
+        const target = result[targetIdx];
+        prev.message = `${prev.message} + ${target.message}`;
+        result.splice(targetIdx, 1);
+        break;
+      }
+
+      case 'edit': {
+        result[targetIdx].message = `[edited] ${result[targetIdx].message}`;
+        break;
+      }
+
+      case 'reorder': {
+        const target = result[targetIdx];
+        const beforeIdx = result.findIndex(c => c.hash === op.beforeHash);
+        if (beforeIdx === -1 || beforeIdx === targetIdx) break;
+        result.splice(targetIdx, 1);
+        const newIdx = result.findIndex(c => c.hash === op.beforeHash);
+        result.splice(newIdx, 0, target);
+        break;
+      }
+    }
+  }
+
+  return {
+    result,
+    dropped,
+    message: dropped.length === 0
+      ? 'rebase complete'
+      : `rebase complete with ${dropped.length} dropped`,
+  };
+}
+```
+
+**Key insight:** Squash ทำงานโดย combine message ของ target เข้ากับ commit ก่อนหน้า — ถ้า target อยู่ที่ index 0 จะ squash ไม่ได้เพราะไม่มี commit ก่อนหน้า
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Squash commit ตัวแรก**
+> AI ไม่เช็คว่า target index === 0 ก่อน squash
+> → Squash ตัวแรก = ไม่มี commit ให้ combine เข้าด้วย
+
+**Mistake 2: Reorder โดยไม่ deep copy**
+> AI แก้ commits array โดยตรง (mutate) ทำให้ข้อมูลต้นทางเสีย
+> → ต้อง `.map(c => ({ ...c }))` เสมอ
+
+**Mistake 3: ไม่ handle target ที่ไม่มีอยู่**
+> AI ไม่เช็คว่า targetHash มีอยู่จริงใน commits array
+> → ถ้า hash ไม่เจอ → crash หรือ behavior ผิด
+
+**Mistake 4: Reorder แล้วไม่ adjust index**
+> หลัง splice ตำแหน่งเปลี่ยน แต่ AI ใช้ index เดิม
+> → ต้อง re-find index หลัง splice
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-123-rebase-simulator" />
+
+---
+
+## 🏋️ Quest: Interactive Rebase Simulator
+
+Now it's time to practice! Simulate interactive rebase operations.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-123-rebase-simulator
    cd quest-123-rebase-simulator
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `simulateRebase(commits, operations)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge cases เกี่ยวกับ squash ตัวแรกและ reorder index
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองวาด commit chain ด้วยมือก่อนเขียนโค้ด — แล้ว simulate แต่ละ operation ด้วยมือก่อน implement
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: squash ไม่ได้ถ้า target อยู่ index 0
+- ต้อง deep copy commits ก่อนแก้ไข — ห้าม mutate ต้นฉบับ
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

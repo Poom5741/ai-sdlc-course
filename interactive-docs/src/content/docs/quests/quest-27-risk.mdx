@@ -5,62 +5,194 @@ description: "Identify project risks"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 27: Risk Identifier
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Identify project risks
+<Badge text="medium" variant="caution" /> <Badge text="20 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
-
-<Steps>
-
-1. Download ไฟล์เริ่มต้นของ quest:
-   ```bash
-   npx bluebeltdojo download quest-27-risk-identifier
-   cd quest-27-risk-identifier
-   ```
-
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
-
-3. Implement solution ตาม instructions ใน `problem.js`
-
-4. ตรวจสอบ solution ของคุณ:
-   ```bash
-   node test.js
-   ```
-
-</Steps>
+<LearningObjectives items={[
+  "Understanding how to identify technical and project risks early",
+  "Classifying risks by severity (low, medium, high)",
+  "Writing mitigation strategies for each identified risk",
+  "The engineering habit: Anticipate Failures — identify risks early to mitigate them"
+]} />
 
 ---
 
-## การตรวจสอบ
+## 📖 Concept: Risk Identification — มองเห็นปัญหาก่อนที่มันจะเกิด
+
+Risk Identification คือการ **มองหาสิ่งที่อาจผิดพลาด** ก่อนที่จะเริ่มเขียน code — เหมือนนักดาบที่มองเห็นจุดอ่อนของคู่ต่อสู้ก่อนจะฟัน
+
+ทำไมต้องidentify risks? เพราะ **ปัญหาที่พบตอน design แก้ได้ใน 5 นาที แต่ปัญหาที่พบตอน production แก้ได้ใน 5 วัน** — ยิ่งเรารู้เร็ว ยิ่งแก้ถูก
+
+Risk แต่ละตัวมี 3 องค์ประกอบ:
+
+| Field | คำอธิบาย |
+| --- | --- |
+| **risk** | ปัญหาที่อาจเกิดขึ้นคืออะไร? |
+| **severity** | รุนแรงแค่ไหน? (low / medium / high) |
+| **mitigation** | จะป้องกันหรือแก้ไขอย่างไร? |
+
+---
+
+## ⚙️ How It Works
+
+### Risk Identification Workflow
+
+```
+1. อ่าน project description
+         ↓
+2. วิเคราะห์สิ่งที่อาจผิดพลาด
+         ↓
+3. จัดประเภท severity
+         ↓
+4. เขียน mitigation strategy
+         ↓
+5. ตรวจสอบว่าครบทุก field
+```
+
+### Risk Categories
+
+**Technical Risks** — ปัญหาทางเทคนิค
+
+```javascript
+// API ที่ใช้อาจล่มหรือเปลี่ยน API contract
+// Database อาจไม่ scale พอสำหรับ traffic ที่คาดไว้
+// Security vulnerabilities ใน third-party libraries
+```
+
+**Project Risks** — ปัญหาด้านการจัดการ
+
+```javascript
+// ทีมไม่มีประสบการณ์กับ technology ที่เลือก
+// Timeline ที่กดดันเกินไป
+// Dependency บน third-party ที่อาจหายไป
+```
+
+**Business Risks** — ปัญหาด้านธุรกิจ
+
+```javascript
+// Regulation changes อาจส่งผลต่อ feature
+// Competitor อาจเปิดตัวฟีเจอร์เดียวกัน
+// Market demand อาจเปลี่ยน
+```
+
+---
+
+## 💡 Example: The Right Way
+
+**Step 1: ดู project description**
+
+> "Build a payment system with third-party API integration"
+
+**Step 2: ใช้ AI ช่วย identify risks**
+
+```javascript
+function identifyRisks(description) {
+  const risks = [
+    {
+      risk: 'Third-party payment API may change contract or go down',
+      severity: 'high',
+      mitigation: 'Implement API versioning and fallback payment provider'
+    },
+    {
+      risk: 'PCI compliance requirements may be complex',
+      severity: 'high',
+      mitigation: 'Use established payment processor (Stripe) to reduce PCI scope'
+    },
+    {
+      risk: 'Transaction volume may exceed API rate limits',
+      severity: 'medium',
+      mitigation: 'Implement request queuing and rate limit monitoring'
+    }
+  ];
+
+  return risks;
+}
+```
+
+**Step 3: Run tests**
 
 ```bash
 node test.js
 ```
 
-When all tests pass, you will see the completion message.
+**Step 4: ตรวจสอบว่า identified risks ตรงกับ project** — test จะ fail ถ้าไม่identify API dependency risk
 
 ---
 
-## ส่งคำตอบ
+## ⚠️ Common Mistakes
 
-When tests pass, submit your solution:
+**Mistake 1: ไม่เขียน mitigation**
+> "รู้ว่ามี risk แต่ไม่รู้จะแก้ยังไง"
+> → Mitigation คือส่วนที่ทำให้ risk identification มีค่า — ถ้าไม่มี mitigation ก็แค่ list ปัญหา
 
-```bash
-npx bluebeltdojo submit
-```
+**Mistake 2: Identify risks ที่ไม่เกี่ยวข้อง**
+> "AI เขียน risk 20 ข้อ แต่ไม่เกี่ยวกับ project เลย"
+> → Risks ต้องตรงกับ project description — test จะ fail ถ้าไม่identify API dependency risk
 
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+**Mistake 3: ไม่จัด severity**
+> "ทุก risk เป็น high"
+> → Severity ต้องต่างกันตาม impact — API dependency เป็น high, minor UI issue เป็น low
+
+**Mistake 4: คืน array ว่าง**
+> "ยังไม่รู้ว่า risk อะไรบ้าง"
+> → คืน array ว่าง = ไม่ได้ identify อะไรเลย — test จะ fail ทันที
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-27-risk-identifier" />
+
+---
+
+## 🏋️ Quest: Risk Identifier
+
+ตอนนี้ถึงเวลาฝึกฝน! ระบุ project risks และเขียน mitigation strategy
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-27-risk-identifier
+   cd quest-27-risk-identifier
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool (Copilot, Claude Code, Cursor ฯลฯ)
+
+3. ดู instructions ใน `problem.js` — implement `identifyRisks(description)` ที่ระบุ risks พร้อม severity และ mitigation
+
+4. **สำคัญ:** Run `node test.js` และอ่าน failure messages ให้ละเอียด
+
+5. แก้ไข edge cases ที่ AI พลาด
+
+6. ตรวจสอบว่า test ผ่านทั้งหมด:
+
+   ```bash
+   node test.js
+   ```
+
+7. เมื่อ test ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Risk ที่ดีที่สุดคือ risk ที่เราพบก่อนที่มันจะเกิด — ยิ่งเร็ว ยิ่งแก้ถูก
+
+---
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบว่า return array มี risks อย่างน้อย 2 ตัว แต่ละตัวมี `risk`, `severity`, `mitigation`
+- Risks ต้องตรงกับ project description — เช่น ถ้ามี third-party API ต้องidentify API dependency risk
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

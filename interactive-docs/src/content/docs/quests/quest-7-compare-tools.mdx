@@ -5,62 +5,169 @@ description: "Analyze vibe coding vs engineering"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 7: Vibe Coding vs Vibe Engineering Analysis
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Analyze vibe coding vs engineering
+<LearningObjectives items={[
+  "The difference between vibe coding and vibe engineering",
+  "When vibe coding works and when it fails",
+  "How to create a decision framework for choosing the right approach",
+  "The engineering habit: INTENTIONAL ENGINEERING"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Vibe Coding vs Engineering
+
+**Vibe Coding** คือการเขียนโค้ดแบบ "ตามใจ" — ให้ AI สร้างโค้ดตามความรู้สึก โดยไม่มี structure ชัดเจน เหมือนการ improvise ดนตรี
+
+**Vibe Engineering** คือการเขียนโค้ดแบบมี structure — กำหนด interface, write tests, วางแผน decomposition ก่อนให้ AI ช่วย เหมือนการเรียบเรียงเพลงก่อนเล่น
+
+ปัญหาคือ **vibe coding ดูเหมือน work ได้ดีในตอนแรก** — โค้ดออกมาเร็ว ดูสวย แต่พอโปรเจกต์ใหญ่ขึ้น จะเริ่มมีปัญหา: โค้ดซ้ำซ้อน, ไม่ tested, แก้ไขยาก
+
+---
+
+## ⚙️ How It Works
+
+### When Vibe Coding Works
+
+```
+✅ Quick prototypes
+✅ Throwaway scripts
+✅ Learning exercises
+✅ One-off utilities
+```
+
+### When Vibe Engineering is Required
+
+```
+✅ Production code
+✅ Team collaboration
+✅ Long-term maintenance
+✅ Complex systems
+```
+
+### Decision Framework
+
+```javascript
+// คำถามตัดสินใจ
+const useVibeEngineering = (
+  isProduction ||        // ใช้ใน production?
+  willBeMaintained ||    // จะต้องดูแลต่อ?
+  hasMultipleDevs ||     // มีหลายคนทำงาน?
+  needsTests             // ต้องมี tests?
+);
+
+// ถ้า true → ใช้ vibe engineering
+// ถ้า false → vibe coding อาจพอ
+```
+
+---
+
+## 💡 Example: Side-by-Side Comparison
+
+**Vibe Coding:**
+
+```javascript
+// ❌ "AI, make me a user registry"
+// Result: ไฟล์เดียว 200 บรรทัด ไม่มี tests ไม่มี error handling
+
+const users = [];
+function addUser(name, email) {
+  users.push({ name, email });
+  return true;
+}
+// ไม่ check duplicate, ไม่ validate email, ไม่ handle errors
+```
+
+**Vibe Engineering:**
+
+```javascript
+// ✅ กำหนด interface ก่อน
+// add(name, email) → user object
+// find(email) → user | null
+// validateEmail(email) → boolean
+
+// แบ่งเป็นไฟล์
+// users.js — data management
+// validators.js — input validation
+// index.js — re-export
+
+// เขียน tests ก่อน
+// test.js — ทดสอบ edge cases
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: คิดว่า vibe coding ใช้ได้ทุกที่**
+> "โค้ดออกมาเร็ว ดีแล้ว"
+> → Production code ต้องมี tests, error handling, documentation
+
+**Mistake 2: ไม่เขียน tests เพราะ "AI สร้างโค้ดถูกแล้ว"**
+> AI สร้างโค้ดที่ดูถูกต้อง
+> → ต้อง verify ด้วย tests เสมอ
+
+**Mistake 3: ไม่คิดถึง long-term**
+> "ตอนนี้ work ก็พอ"
+> → โค้ดที่ไม่มี structure จะแก้ไขยากเมื่อโปรเจกต์ใหญ่ขึ้น
+
+**Mistake 4: ใช้ vibe engineering กับ prototype**
+> เขียน tests ละเอียดสำหรับ prototype ที่จะทิ้ง
+> → รู้จัก balance — ไม่ต้อง over-engineer
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-7-compare-tools" />
+
+---
+
+## 🏋️ Quest: Vibe Coding vs Engineering Analysis
+
+เขียน design document เปรียบเทียบ vibe coding vs engineering
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-07-vibe-coding-analysis
    cd quest-07-vibe-coding-analysis
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. คิดตัวอย่างที่ vibe coding ล้มเหลว (อย่างน้อย 2 ตัวอย่าง)
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. เขียน `vibe-analysis.md` ตาม structure ที่กำหนด:
+   - Definition of vibe coding
+   - Definition of vibe engineering
+   - Examples of when vibe coding fails
+   - Decision framework
+   - Risk assessment
 
-4. ตรวจสอบ solution ของคุณ:
+4. ตรวจสอบ:
+
    ```bash
    node test.js
    ```
 
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลองนึกถึงโปรเจกต์ที่คุณเคยเจอ — โค้ดที่ไม่มี tests แก้ไขยากแค่ไหน?
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- คิดตัวอย่างจริงที่ vibe coding ล้มเหลว (ไม่ใช่แค่ theory)
+- เขียน decision framework ที่ใช้ได้จริง
+- ถ้าติดขัด ลองนึกถึงโปรเจกต์ที่คุณเคย work ด้วย

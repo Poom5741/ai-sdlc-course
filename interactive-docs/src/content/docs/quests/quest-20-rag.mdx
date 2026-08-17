@@ -5,22 +5,166 @@ description: "Implement document chunking"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 20: RAG Chunking Strategist
 
 <Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Implement document chunking
+<LearningObjectives items={[
+  "Understand why document chunking is critical for RAG retrieval quality",
+  "Implement paragraph, sentence, and word-based chunking strategies",
+  "Apply overlap between chunks to preserve context across boundaries",
+  "Recognize the tradeoff between chunk size and retrieval precision"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Document Chunking
+
+RAG (Retrieval-Augmented Generation) ต้องการแบ่งเอกสารขนาดใหญ่เป็นชิ้นเล็ก ๆ (chunks) เพื่อค้นหาข้อมูลที่เกี่ยวข้อง แต่ **วิธีแบ่งส่งผลโดยตรงต่อคุณภาพการค้นหา**
+
+แบ่งเล็กเกินไป → 丢失 context สำคัญ แบ่งใหญ่เกินไป → relevance score จางลงเพราะมี noise เยอะ
+
+Chunking คือศิลปะแห่ง balance — เหมือน martial arts ที่ต้องหาจุดสมดุลระหว่าง speed และ power
+
+---
+
+## ⚙️ How It Works
+
+### Chunking Strategies
+
+```
+Strategy        | Boundary       | Best For
+────────────────|────────────────|─────────────────────
+paragraph       | \n\n           | Well-structured docs
+sentence        | . ? !          | Prose, articles
+words           | whitespace     | Technical docs, code
+```
+
+### The Chunking Workflow
+
+```
+1. Receive text and options
+         ↓
+2. Split by chosen boundary (paragraph/sentence/words)
+         ↓
+3. Merge small pieces up to maxChunkSize
+         ↓
+4. Apply overlap between adjacent chunks
+         ↓
+5. Return array of text chunks
+```
+
+### Why Overlap Matters
+
+Without overlap, the boundary between chunks loses context:
+
+```
+Chunk 1: "The cat sat on the"
+Chunk 2: "mat and looked outside"
+# "sat on the mat" is split across chunks!
+```
+
+With overlap:
+
+```
+Chunk 1: "The cat sat on the"
+Chunk 2: "on the mat and looked outside"
+# Context preserved!
+```
+
+---
+
+## 💡 Example: Implementing Chunking
+
+**Step 1: Split by paragraph**
+
+```javascript
+function chunkDocument(text, options) {
+  const { maxChunkSize = 500, overlap = 0, splitBy = 'paragraph' } = options;
+  
+  let pieces;
+  switch (splitBy) {
+    case 'paragraph': pieces = text.split(/\n\n+/); break;
+    case 'sentence':  pieces = text.split(/(?<=[.!?])\s+/); break;
+    case 'words':     pieces = text.split(/\s+/); break;
+  }
+  
+  return mergeAndOverlap(pieces, maxChunkSize, overlap);
+}
+```
+
+**Step 2: Merge small pieces**
+
+```javascript
+function mergeAndOverlap(pieces, maxSize, overlap) {
+  const chunks = [];
+  let current = '';
+  
+  for (const piece of pieces) {
+    if (current.length + piece.length > maxSize && current.length > 0) {
+      chunks.push(current.trim());
+      // Apply overlap from end of current chunk
+      current = overlap > 0 ? current.slice(-overlap) + ' ' + piece : piece;
+    } else {
+      current += (current ? ' ' : '') + piece;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+}
+```
+
+**Step 3: Verify**
+
+```bash
+node test.js
+# Test: splits into multiple chunks
+# Test: chunks respect max size
+# Test: overlap creates shared content
+# Test: word split respects boundaries
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Splitting mid-word**
+> "Hello world" → ["Hello", "wor", "ld"]
+→ Always split at natural boundaries (paragraphs, sentences, or words).
+
+**Mistake 2: No overlap**
+> Chunks have zero shared context at boundaries
+→ Add overlap (5-20% of chunk size) to preserve context.
+
+**Mistake 3: Chunks too large**
+> One chunk contains the entire document
+→ Set reasonable maxChunkSize (200-500 chars for most use cases).
+
+**Mistake 4: Ignoring edge cases**
+> Empty text, single-word text, text shorter than maxChunkSize
+→ Always handle gracefully — return at least one chunk.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-20-rag-chunking" />
+
+---
+
+## 🏋️ Quest: RAG Chunking Strategist
+
+Now it's time to build a document chunking system!
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-20-rag-chunking
    cd quest-20-rag-chunking
@@ -28,39 +172,30 @@ Implement document chunking
 
 2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `chunkDocument(text, options)` — รองรับ paragraph, sentence, word splitting
 
-4. ตรวจสอบ solution ของคุณ:
+4. ทดสอบ edge cases: empty text, overlap, max size, boundary respect
+
+5. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** Chunking strategy กำหนดคุณارة RAG ทั้งหมด — แบ่งดี retrieval ดี, แบ่งไม่ดี retrieval พัง
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ: chunks ต้อง respect boundaries, มี overlap, ไม่เกิน maxChunkSize
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

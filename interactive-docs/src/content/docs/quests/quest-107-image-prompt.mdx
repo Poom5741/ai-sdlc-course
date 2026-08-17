@@ -1,66 +1,173 @@
 ---
-title: "Image Prompt Engineer"
+title: "Quest 107 - Image Prompt Engineer"
 description: "Write effective prompts for image generation models"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# Image Prompt Engineer
+# Quest 107: Image Prompt Engineer
 
 <Badge text="easy" variant="success" /> <Badge text="15-20 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Write effective prompts for image generation models
+<LearningObjectives items={[
+  "How to structure prompts with subject, style, composition, lighting, and mood",
+  "Why vague prompts produce vague images and specific prompts produce specific results",
+  "How to improve prompts with before/after examples",
+  "Model-specific tips for DALL-E, Midjourney, and Stable Diffusion"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Precision in Image Prompts
+
+Image generation models like DALL-E, Midjourney, and Stable Diffusion are incredibly powerful — but they're not mind readers. The quality of the output directly depends on the quality of your prompt. A vague prompt like "a cat" produces a generic, forgettable image. A structured prompt like "a fluffy orange tabby cat sitting on a sunlit windowsill, soft focus, warm afternoon light, cozy atmosphere" produces a specific, compelling image.
+
+**Prompt engineering for images** is about giving the model enough structure to understand your vision. The best prompts follow a formula: **Subject → Style → Composition → Lighting → Mood**. This isn't just theory — it's a practical skill that separates effective AI artists from frustrated ones.
+
+Think of it like martial arts kata: the structure isn't a constraint, it's a foundation that lets you express creativity effectively.
+
+---
+
+## ⚙️ How It Works
+
+### The Prompt Structure Formula
+
+```
+1. Subject — What is the main focus?
+   "a warrior meditating under a cherry blossom tree"
+         ↓
+2. Style — What art style?
+   "digital painting, Studio Ghibli inspired"
+         ↓
+3. Composition — How is it framed?
+   "wide angle, low perspective, centered subject"
+         ↓
+4. Lighting — What's the light source?
+   "golden hour, soft backlighting, warm tones"
+         ↓
+5. Mood — What feeling does it evoke?
+   "peaceful, serene, contemplative"
+```
+
+### Before vs After
+
+| Bad Prompt | Good Prompt |
+| --- | --- |
+| "a mountain" | "snow-capped mountain peak at sunrise, aerial photography, dramatic clouds, epic scale, warm golden light" |
+| "a robot" | "friendly humanoid robot in a kitchen, soft pastel colors, Pixar style, warm lighting, cozy atmosphere" |
+| "food" | "artisan sourdough bread on rustic wooden board, overhead shot, natural daylight, food photography, warm tones" |
+
+---
+
+## 💡 Example: Building a Prompt Step by Step
+
+Let's build a prompt for a specific image:
+
+**Step 1: Start with the subject**
+
+```
+a samurai standing in a field of bamboo
+```
+
+**Step 2: Add style**
+
+```
+a samurai standing in a field of bamboo, ink wash painting style, Japanese sumi-e
+```
+
+**Step 3: Add composition**
+
+```
+a samurai standing in a field of bamboo, ink wash painting style, Japanese sumi-e, vertical composition, bamboo framing the figure
+```
+
+**Step 4: Add lighting and mood**
+
+```
+a samurai standing in a field of bamboo, ink wash painting style, Japanese sumi-e, vertical composition, bamboo framing the figure, misty morning light, peaceful and contemplative
+```
+
+Each layer adds specificity. The model now has enough information to produce a focused, intentional image.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Being too vague**
+> "Make me a cool image"
+> → The model has no idea what "cool" means to you. Be specific about subject, style, and mood.
+
+**Mistake 2: Contradictory styles**
+> "Photorealistic anime style watercolor"
+> → Pick one primary style and stick with it. Contradictory instructions confuse the model.
+
+**Mistake 3: Ignoring model differences**
+> "Same prompt for DALL-E, Midjourney, and SD"
+> → Each model has different strengths. DALL-E excels at literal interpretations, Midjourney at artistic styles, Stable Diffusion at customization.
+
+**Mistake 4: Overloading with keywords**
+> "cat, cute, fluffy, orange, tabby, sitting, window, sun, light, warm, cozy, home, indoor, paws, tail, whiskers"
+> → A wall of keywords dilutes focus. Structure your prompt with clear hierarchy.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-107-image-prompt" />
+
+---
+
+## 🏋️ Quest: Image Prompt Engineer
+
+Now it's time to practice! Write a guide for effective image generation prompts.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-107-image-prompt
    cd quest-107-image-prompt
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` to read the design requirements
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Create `image-prompt-guide.md` with all five required sections:
+   - Prompt Structure (subject, style, composition, lighting, mood)
+   - Style Keywords Library (organized by category)
+   - Common Mistakes (vague prompts, conflicting styles)
+   - Before/After Examples (bad prompt → improved prompt)
+   - Model-Specific Tips (DALL-E, Midjourney, Stable Diffusion)
 
-4. ตรวจสอบ solution ของคุณ:
+4. Run `node test.js` to validate your document structure
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** The best way to learn prompt engineering is to experiment. Try the before/after examples with an actual image model and see the difference structure makes.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
-- อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- นี่เป็น design quest — งานจริงอยู่ใน `image-prompt-guide.md`
+- โครงสร้าง prompt: Subject → Style → Composition → Lighting → Mood
+- รวม before/after examples ที่แสดงให้เห็นว่า prompt ที่ดีกว่าสร้างภาพที่ดีกว่า
+- ครอบคลุม model-specific tips สำหรับ DALL-E, Midjourney, Stable Diffusion
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

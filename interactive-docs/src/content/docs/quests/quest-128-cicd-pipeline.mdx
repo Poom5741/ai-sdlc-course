@@ -1,66 +1,200 @@
 ---
-title: "CI/CD Pipeline Configurator"
+title: "Quest 128 - CI/CD Pipeline Configurator"
 description: "GitHub Actions YAML generation"
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
-# CI/CD Pipeline Configurator
+# Quest 128: CI/CD Pipeline Configurator
 
 <Badge text="hard" variant="danger" /> <Badge text="30 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-GitHub Actions YAML generation
+<LearningObjectives items={[
+  "How GitHub Actions workflows are structured: triggers, jobs, steps",
+  "Why node version should be configurable, not hardcoded",
+  "How to structure a CI pipeline: install, lint, test, build",
+  "When and how to add deployment steps to a workflow"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: CI/CD Pipelines
+
+CI/CD (Continuous Integration / Continuous Deployment) คือระบบอัตโนมัติที่ **build, test, และ deploy** โค้ดของคุณทุกครั้งที่มี push หรือ PR GitHub Actions เป็น CI/CD ที่นิยมที่สุดใน GitHub ecosystem
+
+Think of CI/CD like an automated training assessment — every time you demonstrate a technique (push code), the system automatically checks your form (lint), tests your power (unit tests), and if everything passes, awards your new belt (deploy).
+
+---
+
+## ⚙️ How It Works
+
+### GitHub Actions Workflow Structure
+
+```yaml
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+```
+
+### Standard CI Pipeline Steps
+
+```
+1. Checkout    — clone the repository
+2. Setup Node  — install specified node version
+3. Install     — npm install dependencies
+4. Lint        — check code style
+5. Test        — run unit/integration tests
+6. Build       — compile production artifacts
+```
+
+### Why Configurable Node Version Matters
+
+```javascript
+// ❌ Hardcoded (AI default)
+node-version: '18'  // what if project uses 20?
+
+// ✅ Configurable
+node-version: '${config.nodeVersion}'  // from config
+```
+
+---
+
+## 💡 Example: Generating a Workflow
+
+```javascript
+function generateWorkflow(config) {
+  const errors = [];
+
+  if (!config.name) errors.push('workflow name is required');
+  if (!config.nodeVersion) errors.push('node version is required');
+  if (!config.steps || config.steps.length === 0) errors.push('at least one step is required');
+
+  if (errors.length > 0) {
+    return { yaml: '', isValid: false, errors };
+  }
+
+  const steps = [];
+  steps.push('      - uses: actions/checkout@v4');
+  steps.push('      - uses: actions/setup-node@v4');
+  steps.push(`        with:`);
+  steps.push(`          node-version: '${config.nodeVersion}'`);
+
+  if (config.steps.includes('install')) steps.push('      - run: npm install');
+  if (config.steps.includes('lint')) steps.push('      - run: npm run lint');
+  if (config.steps.includes('test')) steps.push('      - run: npm test');
+  if (config.steps.includes('build')) steps.push('      - run: npm run build');
+
+  const yaml = `name: ${config.name}
+
+on:
+  push:
+    branches: [${config.deploy?.branch || 'main'}]
+  pull_request:
+    branches: [${config.deploy?.branch || 'main'}]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+${steps.join('\n')}
+`;
+
+  return { yaml, isValid: true, errors: [] };
+}
+```
+
+**Key insight:** AI มักจะ hardcoded node version เป็น '18' หรือ '20' — คุณต้อง ensure ว่า version มาจาก config เพื่อให้ workflow ปรับตาม project ได้
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Hardcode node version**
+> AI เขียน `node-version: '18'` โดยไม่เช็คว่า config มีค่าอะไร
+→ ถ้า project ใช้ Node 20, workflow จะ fail
+
+**Mistake 2: ไม่ validate config ก่อน generate**
+> AI generate YAML โดยไม่เช็คว่า name, nodeVersion, steps มีค่า
+→ Invalid config = broken workflow
+
+**Mistake 3: ไม่มี checkout step**
+> AI ข้าม `actions/checkout@v4`
+→ Workflow ไม่มี code ให้ build/test
+
+**Mistake 4: Steps ไม่เรียงตามลำดับที่ถูกต้อง**
+> AI วาง test ก่อน install
+→ ทดสอบก่อนติดตั้ง dependencies = fail เสมอ
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-128-cicd-pipeline" />
+
+---
+
+## 🏋️ Quest: CI/CD Pipeline Configurator
+
+Now it's time to practice! Generate GitHub Actions workflows.
 
 <Steps>
 
 1. Download ไฟล์เริ่มต้นของ quest:
+
    ```bash
    npx bluebeltdojo download quest-128-cicd-pipeline
    cd quest-128-cicd-pipeline
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. เปิด `problem.js` ใน editor ของคุณพร้อม AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `generateWorkflow(config)` ตาม instructions
 
 4. ตรวจสอบ solution ของคุณ:
+
    ```bash
    node test.js
    ```
 
+5. อ่าน failing tests — เอาใจใส่ edge cases เกี่ยวกับ config validation และ node version
+
+6. เมื่อ tests ผ่านทั้งหมด ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** ลอง generate workflow สำหรับ project จริงของคุณ — คุณจะเห็นว่า configurable node version สำคัญแค่ไหน
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- edge case สำคัญ: node version ต้องมาจาก config ห้าม hardcoded
+- ตรวจสอบว่า checkout step อยู่ตำแหน่งแรกเสมอ
+- อย่าดู `_solution/solution.js` โดยตรง — พยายามก่อน

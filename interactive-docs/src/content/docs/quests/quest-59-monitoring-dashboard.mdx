@@ -5,62 +5,170 @@ description: "Build monitoring data aggregator with p95"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 59: Monitoring Dashboard Builder
 
 <Badge text="hard" variant="danger" /> <Badge text="30-45 minutes" variant="note" />
 
-## เป้าหมาย
+---
 
-Build monitoring data aggregator with p95
+<LearningObjectives items={[
+  "How to build a monitoring data aggregator with summary statistics (avg, min, max, p95)",
+  "Why p95 (95th percentile) matters more than average for latency monitoring",
+  "How to detect anomalies and trigger threshold-based alerts",
+  "How to analyze trends to predict issues before they become outages"
+]} />
 
 ---
 
-## วิธีทำ
+## 📖 Concept: Observability & Monitoring
+
+Monitoring is how you know what's happening inside your system. Without it, you're flying blind. A monitoring dashboard aggregates raw metrics into meaningful summaries: averages, percentiles, alerts, and trends.
+
+The key engineering habit is: **observe before optimize.** You can't fix what you can't see. A monitoring dashboard is your system's vital signs monitor — it tells you when things are healthy and when they're about to crash.
+
+Think of it like a dojo's training log. If you only track "average session length," you miss the fact that some sessions are 3x longer than others. You need percentiles to see the full picture.
+
+---
+
+## ⚙️ How It Works
+
+### Summary Statistics Pipeline
+
+```
+Raw Metrics: [{ name, value, timestamp, tags }]
+         ↓
+Group by metric name
+         ↓
+Calculate per-metric:
+  - avg: sum / count
+  - min: minimum value
+  - max: maximum value
+  - p95: 95th percentile value
+  - count: number of data points
+         ↓
+Summary: { [metricName]: { avg, min, max, p95, count } }
+```
+
+### Why P95 Matters More Than Average
+
+Consider these latency measurements (ms): `[100, 120, 110, 150, 3000]`
+
+| Metric | Value | What it tells you |
+| --- | --- | --- |
+| Average | 696ms | "Things are fine on average" |
+| P95 | 3000ms | "5% of requests take 3+ seconds!" |
+
+The average hides the outlier. P95 exposes it. For latency monitoring, P95 (or P99) is the metric that tells you about your worst用户体验.
+
+### How to Calculate P95
+
+```javascript
+function percentile(sorted, p) {
+  const index = Math.ceil(sorted.length * p) - 1;
+  return sorted[Math.max(0, index)];
+}
+
+const sorted = [100, 110, 120, 150, 3000].sort((a, b) => a - b);
+const p95 = percentile(sorted, 0.95);  // 3000
+```
+
+---
+
+## 💡 Example: Dashboard Output
+
+```javascript
+const metrics = [
+  { name: 'latency', value: 100, timestamp: 1000, tags: { env: 'prod' } },
+  { name: 'latency', value: 150, timestamp: 2000, tags: { env: 'prod' } },
+  { name: 'latency', value: 200, timestamp: 3000, tags: { env: 'prod' } },
+  { name: 'latency', value: 500, timestamp: 4000, tags: { env: 'prod' } },
+  { name: 'latency', value: 3000, timestamp: 5000, tags: { env: 'prod' } },
+];
+
+// Dashboard output:
+{
+  summary: {
+    latency: { avg: 790, min: 100, max: 3000, p95: 3000, count: 5 }
+  },
+  alerts: [
+    { metric: 'latency', type: 'threshold', value: 3000, threshold: 1000 }
+  ],
+  trends: { latency: 'increasing' }
+}
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Only calculating average**
+> "Average latency is 790ms — that's acceptable"
+> → Average hides outliers. A P95 of 3000ms means 5% of users see 3-second delays.
+
+**Mistake 2: Not sorting before calculating percentile**
+> "P95 is just the value at index 95%"
+> → Percentile calculation requires sorted data. Unsorted data gives wrong results.
+
+**Mistake 3: Missing anomaly detection**
+> "We have averages and percentiles"
+> → Without anomaly detection (sudden spikes, trend changes), you only discover issues when users complain.
+
+**Mistake 4: Ignoring timestamps for trends**
+> "All latency values are the same"
+> → Timestamps reveal trends. Increasing latency over time signals a degrading system.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-59-monitoring-dashboard" />
+
+---
+
+## 🏋️ Quest: Monitoring Dashboard Builder
+
+Now it's time to practice! Build a monitoring data aggregator with summary statistics, alerts, and trend analysis.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
+
    ```bash
    npx bluebeltdojo download quest-59-monitoring-dashboard
    cd quest-59-monitoring-dashboard
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Implement `buildDashboard(metrics)` that returns `{ summary, alerts, trends }`
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** The critical edge case is P95 calculation — naive AI only computes average. You must sort values and calculate the 95th percentile.
+
+5. Verify all tests pass:
+
    ```bash
    node test.js
    ```
 
+6. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** For P95, sort the values ascending, then pick the value at index `Math.ceil(length * 0.95) - 1`. Don't forget to handle edge cases like empty arrays.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- Edge case ที่สำคัญที่สุด: P95 calculation — ต้อง sort values ก่อนแล้วเลือกค่าที่ index `Math.ceil(length * 0.95) - 1`
+- อย่าคำนวณแค่ average — P95 สำคัญกว่าสำหรับ latency monitoring
+- ต้องมี alerts (threshold-based) และ trends (increasing/decreasing/stable)
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง
