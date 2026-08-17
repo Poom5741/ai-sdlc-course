@@ -1,56 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-File Project Structure — Quest 2</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
-  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
-  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
-  .container{display:flex;gap:2rem;width:100%;max-width:1100px;flex-wrap:wrap}
-  .tree-panel{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
-  .content-panel{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a;min-height:360px}
-  .panel-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:#4f2bdf}
-  .tree{font-family:'Fira Code',monospace;font-size:.9rem;line-height:1.8}
-  .tree-item{cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .15s}
-  .tree-item:hover{background:rgba(79,43,223,.2)}
-  .tree-item.active{background:rgba(79,43,223,.35);color:#fff}
-  .tree-icon{margin-right:6px;display:inline-block;width:18px;text-align:center}
-  .folder>.tree-icon{color:#f0c040}
-  .file>.tree-icon{color:#00c864}
-  .indent{display:inline-block}
-  .file-content{animation:fadeIn .3s}
-  .file-header{color:#00c864;font-family:'Fira Code',monospace;font-size:.85rem;margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid #2a2a4a}
-  pre{background:#0f1629;border-radius:8px;padding:1rem;font-size:.82rem;line-height:1.6;overflow-x:auto;font-family:'Fira Code',monospace}
-  .kw{color:#c678dd}
-  .str{color:#98c379}
-  .cm{color:#5c6370}
-  .fn{color:#61afef}
-  .num{color:#d19a66}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  .hint{color:#666;font-size:.8rem;margin-top:.5rem;font-style:italic}
-</style>
-</head>
-<body>
-<h1>📁 Multi-File Project Structure</h1>
-<p class="subtitle">Quest 2 · Click files to explore their contents</p>
-<div class="container">
-  <div class="tree-panel">
-    <div class="panel-title">Project Explorer</div>
-    <div class="tree" id="tree"></div>
-  </div>
-  <div class="content-panel">
-    <div class="panel-title">File Viewer</div>
-    <div id="viewer"><p class="hint">← Click a file in the tree to view its contents</p></div>
-  </div>
-</div>
-<script>
-const project = {
-  name: "my-app/", type: "folder", children: [
-    { name: "package.json", type: "file", lang: "json", content:
-`{
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-File Project Structure — Quest 2</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+        color: #fff;
+      }
+      .subtitle {
+        color: #9e9eb8;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      .container {
+        display: flex;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1100px;
+        flex-wrap: wrap;
+      }
+      .tree-panel {
+        flex: 1;
+        min-width: 320px;
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+      }
+      .content-panel {
+        flex: 1;
+        min-width: 320px;
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+        min-height: 360px;
+      }
+      .panel-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #4f2bdf;
+      }
+      .tree {
+        font-family: "Fira Code", monospace;
+        font-size: 0.9rem;
+        line-height: 1.8;
+      }
+      .tree-item {
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: background 0.15s;
+      }
+      .tree-item:hover {
+        background: rgba(79, 43, 223, 0.2);
+      }
+      .tree-item.active {
+        background: rgba(79, 43, 223, 0.35);
+        color: #fff;
+      }
+      .tree-icon {
+        margin-right: 6px;
+        display: inline-block;
+        width: 18px;
+        text-align: center;
+      }
+      .folder > .tree-icon {
+        color: #f0c040;
+      }
+      .file > .tree-icon {
+        color: #00c864;
+      }
+      .indent {
+        display: inline-block;
+      }
+      .file-content {
+        animation: fadeIn 0.3s;
+      }
+      .file-header {
+        color: #00c864;
+        font-family: "Fira Code", monospace;
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #2a2a4a;
+      }
+      pre {
+        background: #0f1629;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.82rem;
+        line-height: 1.6;
+        overflow-x: auto;
+        font-family: "Fira Code", monospace;
+      }
+      .kw {
+        color: #c678dd;
+      }
+      .str {
+        color: #98c379;
+      }
+      .cm {
+        color: #5c6370;
+      }
+      .fn {
+        color: #61afef;
+      }
+      .num {
+        color: #d19a66;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hint {
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📁 Multi-File Project Structure</h1>
+    <p class="subtitle">Quest 2 · Click files to explore their contents</p>
+    <div class="container">
+      <div class="tree-panel">
+        <div class="panel-title">Project Explorer</div>
+        <div class="tree" id="tree"></div>
+      </div>
+      <div class="content-panel">
+        <div class="panel-title">File Viewer</div>
+        <div id="viewer">
+          <p class="hint">← Click a file in the tree to view its contents</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      const project = {
+        name: "my-app/",
+        type: "folder",
+        children: [
+          {
+            name: "package.json",
+            type: "file",
+            lang: "json",
+            content: `{
   "name": "my-app",
   "version": "1.0.0",
   "scripts": {
@@ -61,9 +181,13 @@ const project = {
   "dependencies": {
     "react": "^18.2.0"
   }
-}` },
-    { name: "README.md", type: "file", lang: "md", content:
-`# My App
+}`,
+          },
+          {
+            name: "README.md",
+            type: "file",
+            lang: "md",
+            content: `# My App
 
 A modern React application built with Vite.
 
@@ -78,10 +202,17 @@ npm run dev
 
 - \`src/\` — Application source code
 - \`tests/\` — Test suite
-- \`public/\` — Static assets` },
-    { name: "src/", type: "folder", children: [
-      { name: "main.tsx", type: "file", lang: "ts", content:
-`<span class="kw">import</span> React <span class="kw">from</span> <span class="str">'react'</span>
+- \`public/\` — Static assets`,
+          },
+          {
+            name: "src/",
+            type: "folder",
+            children: [
+              {
+                name: "main.tsx",
+                type: "file",
+                lang: "ts",
+                content: `<span class="kw">import</span> React <span class="kw">from</span> <span class="str">'react'</span>
 <span class="kw">import</span> ReactDOM <span class="kw">from</span> <span class="str">'react-dom/client'</span>
 <span class="kw">import</span> { App } <span class="kw">from</span> <span class="str">'./App'</span>
 
@@ -89,9 +220,13 @@ ReactDOM.<span class="fn">createRoot</span>(
   document.<span class="fn">getElementById</span>(<span class="str">'root'</span>)!
 ).<span class="fn">render</span>(
   <span class="kw">&lt;</span>App /<span class="kw">&gt;</span>
-)` },
-      { name: "App.tsx", type: "file", lang: "ts", content:
-`<span class="kw">import</span> { Header } <span class="kw">from</span> <span class="str">'./components/Header'</span>
+)`,
+              },
+              {
+                name: "App.tsx",
+                type: "file",
+                lang: "ts",
+                content: `<span class="kw">import</span> { Header } <span class="kw">from</span> <span class="str">'./components/Header'</span>
 <span class="kw">import</span> { Dashboard } <span class="kw">from</span> <span class="str">'./components/Dashboard'</span>
 
 <span class="kw">export function</span> <span class="fn">App</span>() {
@@ -101,10 +236,17 @@ ReactDOM.<span class="fn">createRoot</span>(
       <span class="kw">&lt;</span>Dashboard /<span class="kw">&gt;</span>
     <span class="kw">&lt;/</span>div<span class="kw">&gt;</span>
   )
-}` },
-      { name: "components/", type: "folder", children: [
-        { name: "Header.tsx", type: "file", lang: "ts", content:
-`<span class="kw">interface</span> <span class="fn">HeaderProps</span> {
+}`,
+              },
+              {
+                name: "components/",
+                type: "folder",
+                children: [
+                  {
+                    name: "Header.tsx",
+                    type: "file",
+                    lang: "ts",
+                    content: `<span class="kw">interface</span> <span class="fn">HeaderProps</span> {
   title: <span class="str">string</span>
   subtitle?: <span class="str">string</span>
 }
@@ -116,9 +258,13 @@ ReactDOM.<span class="fn">createRoot</span>(
       {subtitle <span class="kw">&amp;&amp;</span> <span class="kw">&lt;</span>p<span class="kw">&gt;</span>{subtitle}<span class="kw">&lt;/</span>p<span class="kw">&gt;</span>}
     <span class="kw">&lt;/</span>header<span class="kw">&gt;</span>
   )
-}` },
-        { name: "Dashboard.tsx", type: "file", lang: "ts", content:
-`<span class="kw">import</span> { useMetrics } <span class="kw">from</span> <span class="str">'../hooks/useMetrics'</span>
+}`,
+                  },
+                  {
+                    name: "Dashboard.tsx",
+                    type: "file",
+                    lang: "ts",
+                    content: `<span class="kw">import</span> { useMetrics } <span class="kw">from</span> <span class="str">'../hooks/useMetrics'</span>
 <span class="kw">import</span> { MetricCard } <span class="kw">from</span> <span class="str">'./MetricCard'</span>
 
 <span class="kw">export function</span> <span class="fn">Dashboard</span>() {
@@ -131,11 +277,19 @@ ReactDOM.<span class="fn">createRoot</span>(
       )}
     <span class="kw">&lt;/</span>section<span class="kw">&gt;</span>
   )
-}` },
-      ]},
-      { name: "hooks/", type: "folder", children: [
-        { name: "useMetrics.ts", type: "file", lang: "ts", content:
-`<span class="kw">import</span> { useState, useEffect } <span class="kw">from</span> <span class="str">'react'</span>
+}`,
+                  },
+                ],
+              },
+              {
+                name: "hooks/",
+                type: "folder",
+                children: [
+                  {
+                    name: "useMetrics.ts",
+                    type: "file",
+                    lang: "ts",
+                    content: `<span class="kw">import</span> { useState, useEffect } <span class="kw">from</span> <span class="str">'react'</span>
 
 <span class="kw">interface</span> <span class="fn">Metric</span> {
   id: <span class="str">string</span>
@@ -153,12 +307,21 @@ ReactDOM.<span class="fn">createRoot</span>(
   }, [])
 
   <span class="kw">return</span> metrics
-}` },
-      ]},
-    ]},
-    { name: "tests/", type: "folder", children: [
-      { name: "App.test.tsx", type: "file", lang: "ts", content:
-`<span class="kw">import</span> { render, screen } <span class="kw">from</span> <span class="str">'@testing-library/react'</span>
+}`,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "tests/",
+            type: "folder",
+            children: [
+              {
+                name: "App.test.tsx",
+                type: "file",
+                lang: "ts",
+                content: `<span class="kw">import</span> { render, screen } <span class="kw">from</span> <span class="str">'@testing-library/react'</span>
 <span class="kw">import</span> { App } <span class="kw">from</span> <span class="str">'../src/App'</span>
 
 <span class="fn">describe</span>(<span class="str">'App'</span>, () <span class="kw">=&gt;</span> {
@@ -168,65 +331,71 @@ ReactDOM.<span class="fn">createRoot</span>(
       screen.<span class="fn">getByRole</span>(<span class="str">'heading'</span>)
     ).<span class="fn">toBeInTheDocument</span>()
   })
-})` },
-    ]},
-  ]
-};
+})`,
+              },
+            ],
+          },
+        ],
+      };
 
-function renderTree(node, container, depth = 0) {
-  const item = document.createElement('div');
-  item.className = `tree-item ${node.type}`;
-  item.style.paddingLeft = (depth * 20) + 'px';
-  const icon = node.type === 'folder' ? '📂' : '📄';
-  const iconSpan = document.createElement('span');
-  iconSpan.className = 'tree-icon';
-  iconSpan.textContent = icon;
-  item.appendChild(iconSpan);
-  item.appendChild(document.createTextNode(node.name));
-  container.appendChild(item);
+      function renderTree(node, container, depth = 0) {
+        const item = document.createElement("div");
+        item.className = `tree-item ${node.type}`;
+        item.style.paddingLeft = depth * 20 + "px";
+        const icon = node.type === "folder" ? "📂" : "📄";
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "tree-icon";
+        iconSpan.textContent = icon;
+        item.appendChild(iconSpan);
+        item.appendChild(document.createTextNode(node.name));
+        container.appendChild(item);
 
-  if (node.type === 'file') {
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.querySelectorAll('.tree-item.active').forEach(el => el.classList.remove('active'));
-      item.classList.add('active');
-      showContent(node);
-    });
-  } else {
-    const childContainer = document.createElement('div');
-    childContainer.style.display = 'none';
-    container.appendChild(childContainer);
-    let open = false;
-    item.addEventListener('click', () => {
-      open = !open;
-      childContainer.style.display = open ? 'block' : 'none';
-      item.querySelector('.tree-icon').textContent = open ? '📂' : '📁';
-    });
-    if (node.children) {
-      node.children.forEach(c => renderTree(c, childContainer, depth + 1));
-    }
-  }
-}
+        if (node.type === "file") {
+          item.addEventListener("click", (e) => {
+            e.stopPropagation();
+            document
+              .querySelectorAll(".tree-item.active")
+              .forEach((el) => el.classList.remove("active"));
+            item.classList.add("active");
+            showContent(node);
+          });
+        } else {
+          const childContainer = document.createElement("div");
+          childContainer.style.display = "none";
+          container.appendChild(childContainer);
+          let open = false;
+          item.addEventListener("click", () => {
+            open = !open;
+            childContainer.style.display = open ? "block" : "none";
+            item.querySelector(".tree-icon").textContent = open ? "📂" : "📁";
+          });
+          if (node.children) {
+            node.children.forEach((c) =>
+              renderTree(c, childContainer, depth + 1),
+            );
+          }
+        }
+      }
 
-function showContent(node) {
-  const viewer = document.getElementById('viewer');
-  const lines = node.content.split('\n').length;
-  viewer.textContent = '';
-  const wrapper = document.createElement('div');
-  wrapper.className = 'file-content';
-  const hdr = document.createElement('div');
-  hdr.className = 'file-header';
-  hdr.textContent = `📄 ${node.name} · ${lines} lines · ${node.lang}`;
-  const pre = document.createElement('pre');
-  pre.textContent = node.content;
-  wrapper.appendChild(hdr);
-  wrapper.appendChild(pre);
-  viewer.appendChild(wrapper);
-}
+      function showContent(node) {
+        const viewer = document.getElementById("viewer");
+        const lines = node.content.split("\n").length;
+        viewer.textContent = "";
+        const wrapper = document.createElement("div");
+        wrapper.className = "file-content";
+        const hdr = document.createElement("div");
+        hdr.className = "file-header";
+        hdr.textContent = `📄 ${node.name} · ${lines} lines · ${node.lang}`;
+        const pre = document.createElement("pre");
+        pre.textContent = node.content;
+        wrapper.appendChild(hdr);
+        wrapper.appendChild(pre);
+        viewer.appendChild(wrapper);
+      }
 
-renderTree(project, document.getElementById('tree'));
-// auto-open first level
-document.querySelector('.tree-item.folder').click();
-</script>
-</body>
+      renderTree(project, document.getElementById("tree"));
+      // auto-open first level
+      document.querySelector(".tree-item.folder").click();
+    </script>
+  </body>
 </html>

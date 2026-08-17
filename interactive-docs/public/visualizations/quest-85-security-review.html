@@ -1,221 +1,541 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Security Review Checklist — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
-.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
-.ctn{max-width:860px;margin:0 auto}
-/* Scan progress */
-.scan-bar{background:#16213e;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #333}
-.scan-bar h2{font-size:.9rem;color:#4f2bdf;margin-bottom:10px}
-.scan-track{height:8px;background:#0d1117;border-radius:99px;overflow:hidden}
-.scan-fill{height:100%;width:0;background:linear-gradient(90deg,#4f2bdf,#00c864);border-radius:99px;transition:width .3s linear}
-.scan-status{display:flex;justify-content:space-between;margin-top:8px;font-size:.75rem;color:#888}
-.scan-status .pct{color:#00c864;font-weight:700}
-/* Score ring */
-.score-ring{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px;flex-wrap:wrap}
-.ring-wrap{position:relative;width:140px;height:140px}
-.ring-wrap svg{transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:#333;stroke-width:10}
-.ring-fg{fill:none;stroke:#00c864;stroke-width:10;stroke-linecap:round;stroke-dasharray:377;stroke-dashoffset:377;transition:stroke-dashoffset 1.5s ease}
-.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-text .val{font-size:1.8rem;font-weight:700;color:#00c864}
-.ring-text .lbl{font-size:.7rem;color:#888}
-.breakdown{display:flex;flex-direction:column;gap:8px}
-.breakdown .row{display:flex;align-items:center;gap:10px;font-size:.8rem}
-.breakdown .row .bar-bg{width:120px;height:8px;background:#0d1117;border-radius:99px;overflow:hidden}
-.breakdown .row .bar-fg{height:100%;border-radius:99px;transition:width 1s ease}
-.breakdown .row .num{min-width:30px;text-align:right;font-weight:700}
-/* Checklist */
-.checklist{background:#16213e;border-radius:12px;padding:16px;border:1px solid #333;margin-bottom:20px}
-.checklist h2{font-size:.9rem;color:#4f2bdf;margin-bottom:12px}
-.cat{margin-bottom:14px}
-.cat-title{font-size:.8rem;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.chk{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:4px;cursor:pointer;transition:background .2s;user-select:none}
-.chk:hover{background:#4f2bdf15}
-.chk .box{width:20px;height:20px;border-radius:6px;border:2px solid #555;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;font-size:.7rem}
-.chk.done .box{border-color:#00c864;background:#00c86422;color:#00c864}
-.chk .txt{font-size:.82rem;line-height:1.4;flex:1}
-.chk .sev{font-size:.65rem;padding:1px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0}
-.sev.crit{background:#ff446633;color:#ff4466}
-.sev.high{background:#ffb34733;color:#ffb347}
-.sev.med{background:#4fc3f733;color:#4fc3f7}
-.sev.low{background:#8883;color:#aaa}
-.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
-.btn:hover{background:#6143e8}
-</style>
-</head>
-<body>
-<h1>🛡️ Security Review Checklist</h1>
-<p class="sub">Interactive checklist with severity scoring — scan or check items manually</p>
-<div class="ctn">
-<!-- Scan bar -->
-<div class="scan-bar">
-  <h2 id="scanTitle">⏳ Security Scan</h2>
-  <div class="scan-track"><div class="scan-fill" id="scanFill"></div></div>
-  <div class="scan-status"><span id="scanPhase">Ready</span><span class="pct" id="scanPct">0%</span></div>
-</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Security Review Checklist — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #4f2bdf;
+        margin-bottom: 6px;
+        font-size: 1.5rem;
+      }
+      .sub {
+        text-align: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .ctn {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      /* Scan progress */
+      .scan-bar {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #333;
+      }
+      .scan-bar h2 {
+        font-size: 0.9rem;
+        color: #4f2bdf;
+        margin-bottom: 10px;
+      }
+      .scan-track {
+        height: 8px;
+        background: #0d1117;
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .scan-fill {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #4f2bdf, #00c864);
+        border-radius: 99px;
+        transition: width 0.3s linear;
+      }
+      .scan-status {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.75rem;
+        color: #888;
+      }
+      .scan-status .pct {
+        color: #00c864;
+        font-weight: 700;
+      }
+      /* Score ring */
+      .score-ring {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .ring-wrap {
+        position: relative;
+        width: 140px;
+        height: 140px;
+      }
+      .ring-wrap svg {
+        transform: rotate(-90deg);
+      }
+      .ring-bg {
+        fill: none;
+        stroke: #333;
+        stroke-width: 10;
+      }
+      .ring-fg {
+        fill: none;
+        stroke: #00c864;
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-dasharray: 377;
+        stroke-dashoffset: 377;
+        transition: stroke-dashoffset 1.5s ease;
+      }
+      .ring-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .ring-text .val {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #00c864;
+      }
+      .ring-text .lbl {
+        font-size: 0.7rem;
+        color: #888;
+      }
+      .breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .breakdown .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.8rem;
+      }
+      .breakdown .row .bar-bg {
+        width: 120px;
+        height: 8px;
+        background: #0d1117;
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .breakdown .row .bar-fg {
+        height: 100%;
+        border-radius: 99px;
+        transition: width 1s ease;
+      }
+      .breakdown .row .num {
+        min-width: 30px;
+        text-align: right;
+        font-weight: 700;
+      }
+      /* Checklist */
+      .checklist {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+      .checklist h2 {
+        font-size: 0.9rem;
+        color: #4f2bdf;
+        margin-bottom: 12px;
+      }
+      .cat {
+        margin-bottom: 14px;
+      }
+      .cat-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+      }
+      .chk {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+        user-select: none;
+      }
+      .chk:hover {
+        background: #4f2bdf15;
+      }
+      .chk .box {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        border: 2px solid #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.3s;
+        font-size: 0.7rem;
+      }
+      .chk.done .box {
+        border-color: #00c864;
+        background: #00c86422;
+        color: #00c864;
+      }
+      .chk .txt {
+        font-size: 0.82rem;
+        line-height: 1.4;
+        flex: 1;
+      }
+      .chk .sev {
+        font-size: 0.65rem;
+        padding: 1px 8px;
+        border-radius: 99px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .sev.crit {
+        background: #ff446633;
+        color: #ff4466;
+      }
+      .sev.high {
+        background: #ffb34733;
+        color: #ffb347;
+      }
+      .sev.med {
+        background: #4fc3f733;
+        color: #4fc3f7;
+      }
+      .sev.low {
+        background: #8883;
+        color: #aaa;
+      }
+      .btn {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 28px;
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #6143e8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛡️ Security Review Checklist</h1>
+    <p class="sub">
+      Interactive checklist with severity scoring — scan or check items manually
+    </p>
+    <div class="ctn">
+      <!-- Scan bar -->
+      <div class="scan-bar">
+        <h2 id="scanTitle">⏳ Security Scan</h2>
+        <div class="scan-track">
+          <div class="scan-fill" id="scanFill"></div>
+        </div>
+        <div class="scan-status">
+          <span id="scanPhase">Ready</span
+          ><span class="pct" id="scanPct">0%</span>
+        </div>
+      </div>
 
-<!-- Score ring -->
-<div class="score-ring">
-  <div class="ring-wrap">
-    <svg viewBox="0 0 130 130" width="130" height="130">
-      <circle class="ring-bg" cx="65" cy="65" r="60"/>
-      <circle class="ring-fg" id="ringFg" cx="65" cy="65" r="60"/>
-    </svg>
-    <div class="ring-text"><span class="val" id="scoreVal">0</span><span class="lbl">/100 pts</span></div>
-  </div>
-  <div class="breakdown" id="breakdown"></div>
-</div>
+      <!-- Score ring -->
+      <div class="score-ring">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 130 130" width="130" height="130">
+            <circle class="ring-bg" cx="65" cy="65" r="60" />
+            <circle class="ring-fg" id="ringFg" cx="65" cy="65" r="60" />
+          </svg>
+          <div class="ring-text">
+            <span class="val" id="scoreVal">0</span
+            ><span class="lbl">/100 pts</span>
+          </div>
+        </div>
+        <div class="breakdown" id="breakdown"></div>
+      </div>
 
-<!-- Checklist -->
-<div class="checklist" id="checklist">
-  <h2>📋 Security Review Items</h2>
-</div>
+      <!-- Checklist -->
+      <div class="checklist" id="checklist">
+        <h2>📋 Security Review Items</h2>
+      </div>
 
-<button class="btn" onclick="runScan()">🔍 Auto-Scan (Demo)</button>
-<button class="btn" onclick="resetAll()" style="background:#333;margin-top:8px">↺ Reset</button>
-</div>
+      <button class="btn" onclick="runScan()">🔍 Auto-Scan (Demo)</button>
+      <button
+        class="btn"
+        onclick="resetAll()"
+        style="background: #333; margin-top: 8px"
+      >
+        ↺ Reset
+      </button>
+    </div>
 
-<script>
-const categories=[
-  {name:'Authentication',items:[
-    {t:'Password hashing uses bcrypt/argon2 (not MD5/SHA1)',sev:'crit',pts:15},
-    {t:'MFA enabled for admin accounts',sev:'high',pts:10},
-    {t:'Session tokens expire within 24 hours',sev:'high',pts:10},
-    {t:'Rate limiting on login endpoint',sev:'med',pts:5},
-  ]},
-  {name:'Data Protection',items:[
-    {t:'No secrets committed to source control',sev:'crit',pts:15},
-    {t:'PII encrypted at rest (AES-256)',sev:'crit',pts:12},
-    {t:'TLS 1.3 enforced for all connections',sev:'high',pts:8},
-    {t:'Sensitive data masked in logs',sev:'med',pts:5},
-  ]},
-  {name:'Input Validation',items:[
-    {t:'All user inputs sanitized (XSS prevention)',sev:'crit',pts:12},
-    {t:'Parameterized queries for all DB calls',sev:'crit',pts:14},
-    {t:'File upload size limits enforced',sev:'med',pts:4},
-    {t:'Content-Type validation on uploads',sev:'low',pts:2},
-  ]},
-  {name:'Access Control',items:[
-    {t:'Role-based access control (RBAC) implemented',sev:'high',pts:8},
-    {t:'CORS restricted to known origins',sev:'med',pts:5},
-    {t:'Admin routes behind auth middleware',sev:'high',pts:8},
-  ]},
-];
+    <script>
+      const categories = [
+        {
+          name: "Authentication",
+          items: [
+            {
+              t: "Password hashing uses bcrypt/argon2 (not MD5/SHA1)",
+              sev: "crit",
+              pts: 15,
+            },
+            { t: "MFA enabled for admin accounts", sev: "high", pts: 10 },
+            {
+              t: "Session tokens expire within 24 hours",
+              sev: "high",
+              pts: 10,
+            },
+            { t: "Rate limiting on login endpoint", sev: "med", pts: 5 },
+          ],
+        },
+        {
+          name: "Data Protection",
+          items: [
+            {
+              t: "No secrets committed to source control",
+              sev: "crit",
+              pts: 15,
+            },
+            { t: "PII encrypted at rest (AES-256)", sev: "crit", pts: 12 },
+            { t: "TLS 1.3 enforced for all connections", sev: "high", pts: 8 },
+            { t: "Sensitive data masked in logs", sev: "med", pts: 5 },
+          ],
+        },
+        {
+          name: "Input Validation",
+          items: [
+            {
+              t: "All user inputs sanitized (XSS prevention)",
+              sev: "crit",
+              pts: 12,
+            },
+            {
+              t: "Parameterized queries for all DB calls",
+              sev: "crit",
+              pts: 14,
+            },
+            { t: "File upload size limits enforced", sev: "med", pts: 4 },
+            { t: "Content-Type validation on uploads", sev: "low", pts: 2 },
+          ],
+        },
+        {
+          name: "Access Control",
+          items: [
+            {
+              t: "Role-based access control (RBAC) implemented",
+              sev: "high",
+              pts: 8,
+            },
+            { t: "CORS restricted to known origins", sev: "med", pts: 5 },
+            { t: "Admin routes behind auth middleware", sev: "high", pts: 8 },
+          ],
+        },
+      ];
 
-const $cl=document.getElementById('checklist');
-const $breakdown=document.getElementById('breakdown');
-let checked=new Array(categories.reduce((s,c)=>s+c.items.length,0)).fill(false);
-let idx=0;
+      const $cl = document.getElementById("checklist");
+      const $breakdown = document.getElementById("breakdown");
+      let checked = new Array(
+        categories.reduce((s, c) => s + c.items.length, 0),
+      ).fill(false);
+      let idx = 0;
 
-function renderChecklist(){
-  while($cl.firstChild)$cl.removeChild($cl.firstChild);
-  const h2=document.createElement('h2');h2.textContent='📋 Security Review Items';$cl.appendChild(h2);
-  let globalIdx=0;
-  categories.forEach(cat=>{
-    const catDiv=document.createElement('div');
-    catDiv.className='cat';
-    const catTitle=document.createElement('div');catTitle.className='cat-title';catTitle.textContent=cat.name;catDiv.appendChild(catTitle);
-    cat.items.forEach(item=>{
-      const row=document.createElement('div');
-      row.className='chk'+(checked[globalIdx]?' done':'');
-      row.dataset.gi=globalIdx;
-      const box=document.createElement('span');box.className='box';box.textContent=checked[globalIdx]?'✓':'';row.appendChild(box);
-      const txt=document.createElement('span');txt.className='txt';txt.textContent=item.t;row.appendChild(txt);
-      const sev=document.createElement('span');sev.className='sev '+item.sev;sev.textContent=item.sev.toUpperCase();row.appendChild(sev);
-      row.addEventListener('click',()=>toggleItem(globalIdx));
-      catDiv.appendChild(row);
-      globalIdx++;
-    });
-    $cl.appendChild(catDiv);
-  });
-}
+      function renderChecklist() {
+        while ($cl.firstChild) $cl.removeChild($cl.firstChild);
+        const h2 = document.createElement("h2");
+        h2.textContent = "📋 Security Review Items";
+        $cl.appendChild(h2);
+        let globalIdx = 0;
+        categories.forEach((cat) => {
+          const catDiv = document.createElement("div");
+          catDiv.className = "cat";
+          const catTitle = document.createElement("div");
+          catTitle.className = "cat-title";
+          catTitle.textContent = cat.name;
+          catDiv.appendChild(catTitle);
+          cat.items.forEach((item) => {
+            const row = document.createElement("div");
+            row.className = "chk" + (checked[globalIdx] ? " done" : "");
+            row.dataset.gi = globalIdx;
+            const box = document.createElement("span");
+            box.className = "box";
+            box.textContent = checked[globalIdx] ? "✓" : "";
+            row.appendChild(box);
+            const txt = document.createElement("span");
+            txt.className = "txt";
+            txt.textContent = item.t;
+            row.appendChild(txt);
+            const sev = document.createElement("span");
+            sev.className = "sev " + item.sev;
+            sev.textContent = item.sev.toUpperCase();
+            row.appendChild(sev);
+            row.addEventListener("click", () => toggleItem(globalIdx));
+            catDiv.appendChild(row);
+            globalIdx++;
+          });
+          $cl.appendChild(catDiv);
+        });
+      }
 
-function toggleItem(i){
-  checked[i]=!checked[i];
-  renderChecklist();
-  updateScore();
-}
+      function toggleItem(i) {
+        checked[i] = !checked[i];
+        renderChecklist();
+        updateScore();
+      }
 
-function updateScore(){
-  let total=0,max=0,bySev={crit:0,high:0,med:0,low:0,critM:0,highM:0,medM:0,lowM:0};
-  let gi=0;
-  categories.forEach(cat=>cat.items.forEach(item=>{
-    max+=item.pts;
-    bySev[item.sev+'M']+=item.pts;
-    if(checked[gi]){total+=item.pts;bySev[item.sev]+=item.pts;}
-    gi++;
-  }));
-  const pct=Math.round(total/max*100);
-  // Ring
-  const circ=2*Math.PI*60;
-  document.getElementById('ringFg').style.strokeDashoffset=circ-(circ*pct/100);
-  document.getElementById('scoreVal').textContent=pct;
-  const color=pct>=80?'#00c864':pct>=50?'#ffb347':'#ff4466';
-  document.getElementById('scoreVal').style.color=color;
-  document.getElementById('ringFg').style.stroke=color;
-  // Breakdown
-  const sevs=[{k:'crit',l:'Critical',c:'#ff4466'},{k:'high',l:'High',c:'#ffb347'},{k:'med',l:'Medium',c:'#4fc3f7'},{k:'low',l:'Low',c:'#aaa'}];
-  while($breakdown.firstChild)$breakdown.removeChild($breakdown.firstChild);
-  sevs.forEach(s=>{
-    const m=bySev[s.k+'M'];const v=bySev[s.k];
-    const p=m>0?Math.round(v/m*100):0;
-    const row=document.createElement('div');row.className='row';
-    const lbl=document.createElement('span');lbl.style.cssText='color:'+s.c+';min-width:55px';lbl.textContent=s.l;row.appendChild(lbl);
-    const barBg=document.createElement('div');barBg.className='bar-bg';
-    const barFg=document.createElement('div');barFg.className='bar-fg';barFg.style.cssText='width:'+p+'%;background:'+s.c;
-    barBg.appendChild(barFg);row.appendChild(barBg);
-    const num=document.createElement('span');num.className='num';num.style.color=s.c;num.textContent=p+'%';row.appendChild(num);
-    $breakdown.appendChild(row);
-  });
-}
+      function updateScore() {
+        let total = 0,
+          max = 0,
+          bySev = {
+            crit: 0,
+            high: 0,
+            med: 0,
+            low: 0,
+            critM: 0,
+            highM: 0,
+            medM: 0,
+            lowM: 0,
+          };
+        let gi = 0;
+        categories.forEach((cat) =>
+          cat.items.forEach((item) => {
+            max += item.pts;
+            bySev[item.sev + "M"] += item.pts;
+            if (checked[gi]) {
+              total += item.pts;
+              bySev[item.sev] += item.pts;
+            }
+            gi++;
+          }),
+        );
+        const pct = Math.round((total / max) * 100);
+        // Ring
+        const circ = 2 * Math.PI * 60;
+        document.getElementById("ringFg").style.strokeDashoffset =
+          circ - (circ * pct) / 100;
+        document.getElementById("scoreVal").textContent = pct;
+        const color = pct >= 80 ? "#00c864" : pct >= 50 ? "#ffb347" : "#ff4466";
+        document.getElementById("scoreVal").style.color = color;
+        document.getElementById("ringFg").style.stroke = color;
+        // Breakdown
+        const sevs = [
+          { k: "crit", l: "Critical", c: "#ff4466" },
+          { k: "high", l: "High", c: "#ffb347" },
+          { k: "med", l: "Medium", c: "#4fc3f7" },
+          { k: "low", l: "Low", c: "#aaa" },
+        ];
+        while ($breakdown.firstChild)
+          $breakdown.removeChild($breakdown.firstChild);
+        sevs.forEach((s) => {
+          const m = bySev[s.k + "M"];
+          const v = bySev[s.k];
+          const p = m > 0 ? Math.round((v / m) * 100) : 0;
+          const row = document.createElement("div");
+          row.className = "row";
+          const lbl = document.createElement("span");
+          lbl.style.cssText = "color:" + s.c + ";min-width:55px";
+          lbl.textContent = s.l;
+          row.appendChild(lbl);
+          const barBg = document.createElement("div");
+          barBg.className = "bar-bg";
+          const barFg = document.createElement("div");
+          barFg.className = "bar-fg";
+          barFg.style.cssText = "width:" + p + "%;background:" + s.c;
+          barBg.appendChild(barFg);
+          row.appendChild(barBg);
+          const num = document.createElement("span");
+          num.className = "num";
+          num.style.color = s.c;
+          num.textContent = p + "%";
+          row.appendChild(num);
+          $breakdown.appendChild(row);
+        });
+      }
 
-// Auto scan animation
-const phases=['Checking auth config…','Scanning for secrets…','Validating inputs…','Auditing access control…','Analyzing dependencies…','Review complete ✓'];
-let scanning=false;
-function runScan(){
-  if(scanning)return;scanning=true;
-  checked.fill(false);renderChecklist();updateScore();
-  const fill=document.getElementById('scanFill');
-  const pct=document.getElementById('scanPct');
-  const phase=document.getElementById('scanPhase');
-  const title=document.getElementById('scanTitle');
-  fill.style.width='0%';
-  let step=0;
-  const totalItems=checked.length;
-  const iv=setInterval(()=>{
-    step++;
-    const p=Math.min(100,Math.round(step/totalItems*100));
-    fill.style.width=p+'%';
-    pct.textContent=p+'%';
-    const pi=Math.min(phases.length-1,Math.floor(step/totalItems*phases.length));
-    phase.textContent=phases[pi];
-    if(step<=totalItems){
-      checked[step-1]=true;
-      renderChecklist();updateScore();
-    }
-    if(step>totalItems){
-      clearInterval(iv);scanning=false;
-      title.textContent='✅ Scan Complete';
-      title.style.color='#00c864';
-    }
-  },120);
-}
-function resetAll(){
-  scanning=false;
-  checked.fill(false);
-  renderChecklist();updateScore();
-  document.getElementById('scanFill').style.width='0%';
-  document.getElementById('scanPct').textContent='0%';
-  document.getElementById('scanPhase').textContent='Ready';
-  const t=document.getElementById('scanTitle');t.textContent='⏳ Security Scan';t.style.color='#4f2bdf';
-}
-renderChecklist();updateScore();
-</script>
-</body>
+      // Auto scan animation
+      const phases = [
+        "Checking auth config…",
+        "Scanning for secrets…",
+        "Validating inputs…",
+        "Auditing access control…",
+        "Analyzing dependencies…",
+        "Review complete ✓",
+      ];
+      let scanning = false;
+      function runScan() {
+        if (scanning) return;
+        scanning = true;
+        checked.fill(false);
+        renderChecklist();
+        updateScore();
+        const fill = document.getElementById("scanFill");
+        const pct = document.getElementById("scanPct");
+        const phase = document.getElementById("scanPhase");
+        const title = document.getElementById("scanTitle");
+        fill.style.width = "0%";
+        let step = 0;
+        const totalItems = checked.length;
+        const iv = setInterval(() => {
+          step++;
+          const p = Math.min(100, Math.round((step / totalItems) * 100));
+          fill.style.width = p + "%";
+          pct.textContent = p + "%";
+          const pi = Math.min(
+            phases.length - 1,
+            Math.floor((step / totalItems) * phases.length),
+          );
+          phase.textContent = phases[pi];
+          if (step <= totalItems) {
+            checked[step - 1] = true;
+            renderChecklist();
+            updateScore();
+          }
+          if (step > totalItems) {
+            clearInterval(iv);
+            scanning = false;
+            title.textContent = "✅ Scan Complete";
+            title.style.color = "#00c864";
+          }
+        }, 120);
+      }
+      function resetAll() {
+        scanning = false;
+        checked.fill(false);
+        renderChecklist();
+        updateScore();
+        document.getElementById("scanFill").style.width = "0%";
+        document.getElementById("scanPct").textContent = "0%";
+        document.getElementById("scanPhase").textContent = "Ready";
+        const t = document.getElementById("scanTitle");
+        t.textContent = "⏳ Security Scan";
+        t.style.color = "#4f2bdf";
+      }
+      renderChecklist();
+      updateScore();
+    </script>
+  </body>
 </html>

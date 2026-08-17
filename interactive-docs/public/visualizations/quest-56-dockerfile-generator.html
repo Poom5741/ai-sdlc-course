@@ -1,84 +1,362 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dockerfile Structure — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
-.dockerfile{width:100%;max-width:700px;background:#0d1117;border-radius:12px;overflow:hidden;border:1px solid #4f2bdf33}
-.file-header{padding:.6rem 1rem;background:#4f2bdf22;font-family:'Courier New',monospace;font-size:.8rem;color:#4f2bdf}
-.layers{padding:.5rem}
-.layer{display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;border-radius:8px;cursor:pointer;transition:all .3s;margin-bottom:.2rem}
-.layer:hover{background:#16213e}
-.layer.active{background:#16213e;border:1px solid #4f2bdf44}
-.layer .ln{color:#555;font-size:.7rem;width:20px;text-align:right;flex-shrink:0;font-family:'Courier New',monospace}
-.layer .kw{font-family:'Courier New',monospace;font-weight:700;font-size:.82rem;width:80px;flex-shrink:0}
-.kw.from{color:#ff6b6b}.kw.workdir{color:#e8a020}.kw.copy{color:#00c864}.kw.run{color:#4f2bdf}.kw.cmd{color:#ff6baa}.kw.expose{color:#00c864}
-.layer .rest{font-family:'Courier New',monospace;font-size:.8rem;color:#aaa}
-.layer .size{margin-left:auto;font-size:.7rem;color:#555;white-space:nowrap;flex-shrink:0}
-.detail{margin:1rem;max-height:0;overflow:hidden;transition:max-height .4s}
-.detail.open{max-height:200px}
-.detail-inner{background:#16213e;padding:.8rem;border-radius:8px;font-size:.8rem;line-height:1.5;color:#bbb;border-left:3px solid #4f2bdf}
-.size-bar{margin-top:1rem;width:100%;max-width:700px;background:#16213e;border-radius:8px;padding:1rem}
-.size-bar h3{font-size:.85rem;color:#888;margin-bottom:.8rem}
-.bar-track{height:24px;background:#0d1117;border-radius:12px;overflow:hidden;display:flex}
-.bar-seg{height:100%;transition:width .6s ease;position:relative}
-.bar-seg .bar-label{font-size:.6rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;color:#fff}
-.bar-legend{display:flex;gap:1rem;margin-top:.6rem;flex-wrap:wrap}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:.7rem;color:#888}
-.legend-dot{width:8px;height:8px;border-radius:50%}
-@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-.layer{animation:slideIn .3s ease backwards}
-.layer:nth-child(2){animation-delay:.05s}.layer:nth-child(3){animation-delay:.1s}
-.layer:nth-child(4){animation-delay:.15s}.layer:nth-child(5){animation-delay:.2s}
-.layer:nth-child(6){animation-delay:.25s}.layer:nth-child(7){animation-delay:.3s}
-</style>
-</head>
-<body>
-<h1>Dockerfile Structure</h1>
-<p class="sub">Click each layer to see its purpose and size impact</p>
-<div class="dockerfile"><div class="file-header">📄 Dockerfile</div><div class="layers" id="layers"></div></div>
-<div class="detail" id="detail"><div class="detail-inner" id="detailInner"></div></div>
-<div class="size-bar" id="sizeBar"><h3>Image Size Breakdown</h3><div class="bar-track" id="barTrack"></div><div class="bar-legend" id="barLegend"></div></div>
-<script>
-const layers=[
-  {kw:'FROM',rest:'node:20-alpine',size:'110 MB',desc:'Base image — lightweight Alpine Linux with Node.js 20. Smallest Node image available.',color:'#ff6b6b'},
-  {kw:'WORKDIR',rest:'/app',size:'0 KB',desc:'Sets working directory inside container. Creates it if missing. No disk impact.',color:'#e8a020'},
-  {kw:'COPY',rest:'package*.json ./',size:'50 KB',desc:'Copy package files first for layer caching — dependencies only rebuild when package.json changes.',color:'#00c864'},
-  {kw:'RUN',rest:'npm ci --production',size:'85 MB',desc:'Install production dependencies. Separated from code copy for better cache utilization.',color:'#4f2bdf'},
-  {kw:'COPY',rest:'. .',size:'2 MB',desc:'Copy application source code. Changing code only invalidates layers after this point.',color:'#00c864'},
-  {kw:'EXPOSE',rest:'3000',size:'0 KB',desc:'Documents which port the app listens on. Does NOT publish it — use -p at runtime.',color:'#00c864'},
-  {kw:'CMD',rest:'["node", "server.js"]',size:'0 KB',desc:'Default command when container runs. Can be overridden at docker run. Use exec form (JSON array).',color:'#ff6baa'}
-];
-const colors=['#ff6b6b','#e8a020','#00c864','#4f2bdf','#00c864','#00c864','#ff6baa'];
-const cont=document.getElementById('layers'),det=document.getElementById('detail'),detIn=document.getElementById('detailInner');
-const barTrack=document.getElementById('barTrack'),barLegend=document.getElementById('barLegend');
-let activeIdx=-1;
-layers.forEach((l,i)=>{
-  const el=document.createElement('div');el.className='layer';
-  const ln=document.createElement('span');ln.className='ln';ln.textContent=String(i+1);
-  const kw=document.createElement('span');kw.className='kw '+l.kw.toLowerCase();kw.textContent=l.kw;
-  const rest=document.createElement('span');rest.className='rest';rest.textContent=l.rest;
-  const sz=document.createElement('span');sz.className='size';sz.textContent=l.size;
-  el.appendChild(ln);el.appendChild(kw);el.appendChild(rest);el.appendChild(sz);
-  el.onclick=()=>{if(activeIdx===i){activeIdx=-1;det.classList.remove('open');cont.children[i].classList.remove('active')}else{if(activeIdx>=0)cont.children[activeIdx].classList.remove('active');activeIdx=i;det.classList.add('open');detIn.textContent=l.desc;cont.children[i].classList.add('active')}};
-  cont.appendChild(el);
-});
-const sizes=[110,0,0.05,85,2,0,0];const total=sizes.reduce((a,b)=>a+b,0);
-layers.forEach((l,i)=>{
-  if(!sizes[i])return;
-  const pct=(sizes[i]/total*100).toFixed(1);
-  const seg=document.createElement('div');seg.className='bar-seg';seg.style.width=pct+'%';seg.style.background=l.color;
-  if(parseFloat(pct)>5){const lb=document.createElement('span');lb.className='bar-label';lb.textContent=l.kw+' '+pct+'%';seg.appendChild(lb)}
-  barTrack.appendChild(seg);
-  const leg=document.createElement('div');leg.className='legend-item';
-  const dot=document.createElement('span');dot.className='legend-dot';dot.style.background=l.color;
-  const txt=document.createElement('span');txt.textContent=l.kw+' — '+l.size;
-  leg.appendChild(dot);leg.appendChild(txt);barLegend.appendChild(leg);
-});
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dockerfile Structure — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+      .dockerfile {
+        width: 100%;
+        max-width: 700px;
+        background: #0d1117;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #4f2bdf33;
+      }
+      .file-header {
+        padding: 0.6rem 1rem;
+        background: #4f2bdf22;
+        font-family: "Courier New", monospace;
+        font-size: 0.8rem;
+        color: #4f2bdf;
+      }
+      .layers {
+        padding: 0.5rem;
+      }
+      .layer {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 0.2rem;
+      }
+      .layer:hover {
+        background: #16213e;
+      }
+      .layer.active {
+        background: #16213e;
+        border: 1px solid #4f2bdf44;
+      }
+      .layer .ln {
+        color: #555;
+        font-size: 0.7rem;
+        width: 20px;
+        text-align: right;
+        flex-shrink: 0;
+        font-family: "Courier New", monospace;
+      }
+      .layer .kw {
+        font-family: "Courier New", monospace;
+        font-weight: 700;
+        font-size: 0.82rem;
+        width: 80px;
+        flex-shrink: 0;
+      }
+      .kw.from {
+        color: #ff6b6b;
+      }
+      .kw.workdir {
+        color: #e8a020;
+      }
+      .kw.copy {
+        color: #00c864;
+      }
+      .kw.run {
+        color: #4f2bdf;
+      }
+      .kw.cmd {
+        color: #ff6baa;
+      }
+      .kw.expose {
+        color: #00c864;
+      }
+      .layer .rest {
+        font-family: "Courier New", monospace;
+        font-size: 0.8rem;
+        color: #aaa;
+      }
+      .layer .size {
+        margin-left: auto;
+        font-size: 0.7rem;
+        color: #555;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .detail {
+        margin: 1rem;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s;
+      }
+      .detail.open {
+        max-height: 200px;
+      }
+      .detail-inner {
+        background: #16213e;
+        padding: 0.8rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: #bbb;
+        border-left: 3px solid #4f2bdf;
+      }
+      .size-bar {
+        margin-top: 1rem;
+        width: 100%;
+        max-width: 700px;
+        background: #16213e;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .size-bar h3 {
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 0.8rem;
+      }
+      .bar-track {
+        height: 24px;
+        background: #0d1117;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+      }
+      .bar-seg {
+        height: 100%;
+        transition: width 0.6s ease;
+        position: relative;
+      }
+      .bar-seg .bar-label {
+        font-size: 0.6rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        color: #fff;
+      }
+      .bar-legend {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+        color: #888;
+      }
+      .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .layer {
+        animation: slideIn 0.3s ease backwards;
+      }
+      .layer:nth-child(2) {
+        animation-delay: 0.05s;
+      }
+      .layer:nth-child(3) {
+        animation-delay: 0.1s;
+      }
+      .layer:nth-child(4) {
+        animation-delay: 0.15s;
+      }
+      .layer:nth-child(5) {
+        animation-delay: 0.2s;
+      }
+      .layer:nth-child(6) {
+        animation-delay: 0.25s;
+      }
+      .layer:nth-child(7) {
+        animation-delay: 0.3s;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dockerfile Structure</h1>
+    <p class="sub">Click each layer to see its purpose and size impact</p>
+    <div class="dockerfile">
+      <div class="file-header">📄 Dockerfile</div>
+      <div class="layers" id="layers"></div>
+    </div>
+    <div class="detail" id="detail">
+      <div class="detail-inner" id="detailInner"></div>
+    </div>
+    <div class="size-bar" id="sizeBar">
+      <h3>Image Size Breakdown</h3>
+      <div class="bar-track" id="barTrack"></div>
+      <div class="bar-legend" id="barLegend"></div>
+    </div>
+    <script>
+      const layers = [
+        {
+          kw: "FROM",
+          rest: "node:20-alpine",
+          size: "110 MB",
+          desc: "Base image — lightweight Alpine Linux with Node.js 20. Smallest Node image available.",
+          color: "#ff6b6b",
+        },
+        {
+          kw: "WORKDIR",
+          rest: "/app",
+          size: "0 KB",
+          desc: "Sets working directory inside container. Creates it if missing. No disk impact.",
+          color: "#e8a020",
+        },
+        {
+          kw: "COPY",
+          rest: "package*.json ./",
+          size: "50 KB",
+          desc: "Copy package files first for layer caching — dependencies only rebuild when package.json changes.",
+          color: "#00c864",
+        },
+        {
+          kw: "RUN",
+          rest: "npm ci --production",
+          size: "85 MB",
+          desc: "Install production dependencies. Separated from code copy for better cache utilization.",
+          color: "#4f2bdf",
+        },
+        {
+          kw: "COPY",
+          rest: ". .",
+          size: "2 MB",
+          desc: "Copy application source code. Changing code only invalidates layers after this point.",
+          color: "#00c864",
+        },
+        {
+          kw: "EXPOSE",
+          rest: "3000",
+          size: "0 KB",
+          desc: "Documents which port the app listens on. Does NOT publish it — use -p at runtime.",
+          color: "#00c864",
+        },
+        {
+          kw: "CMD",
+          rest: '["node", "server.js"]',
+          size: "0 KB",
+          desc: "Default command when container runs. Can be overridden at docker run. Use exec form (JSON array).",
+          color: "#ff6baa",
+        },
+      ];
+      const colors = [
+        "#ff6b6b",
+        "#e8a020",
+        "#00c864",
+        "#4f2bdf",
+        "#00c864",
+        "#00c864",
+        "#ff6baa",
+      ];
+      const cont = document.getElementById("layers"),
+        det = document.getElementById("detail"),
+        detIn = document.getElementById("detailInner");
+      const barTrack = document.getElementById("barTrack"),
+        barLegend = document.getElementById("barLegend");
+      let activeIdx = -1;
+      layers.forEach((l, i) => {
+        const el = document.createElement("div");
+        el.className = "layer";
+        const ln = document.createElement("span");
+        ln.className = "ln";
+        ln.textContent = String(i + 1);
+        const kw = document.createElement("span");
+        kw.className = "kw " + l.kw.toLowerCase();
+        kw.textContent = l.kw;
+        const rest = document.createElement("span");
+        rest.className = "rest";
+        rest.textContent = l.rest;
+        const sz = document.createElement("span");
+        sz.className = "size";
+        sz.textContent = l.size;
+        el.appendChild(ln);
+        el.appendChild(kw);
+        el.appendChild(rest);
+        el.appendChild(sz);
+        el.onclick = () => {
+          if (activeIdx === i) {
+            activeIdx = -1;
+            det.classList.remove("open");
+            cont.children[i].classList.remove("active");
+          } else {
+            if (activeIdx >= 0)
+              cont.children[activeIdx].classList.remove("active");
+            activeIdx = i;
+            det.classList.add("open");
+            detIn.textContent = l.desc;
+            cont.children[i].classList.add("active");
+          }
+        };
+        cont.appendChild(el);
+      });
+      const sizes = [110, 0, 0.05, 85, 2, 0, 0];
+      const total = sizes.reduce((a, b) => a + b, 0);
+      layers.forEach((l, i) => {
+        if (!sizes[i]) return;
+        const pct = ((sizes[i] / total) * 100).toFixed(1);
+        const seg = document.createElement("div");
+        seg.className = "bar-seg";
+        seg.style.width = pct + "%";
+        seg.style.background = l.color;
+        if (parseFloat(pct) > 5) {
+          const lb = document.createElement("span");
+          lb.className = "bar-label";
+          lb.textContent = l.kw + " " + pct + "%";
+          seg.appendChild(lb);
+        }
+        barTrack.appendChild(seg);
+        const leg = document.createElement("div");
+        leg.className = "legend-item";
+        const dot = document.createElement("span");
+        dot.className = "legend-dot";
+        dot.style.background = l.color;
+        const txt = document.createElement("span");
+        txt.textContent = l.kw + " — " + l.size;
+        leg.appendChild(dot);
+        leg.appendChild(txt);
+        barLegend.appendChild(leg);
+      });
+    </script>
+  </body>
 </html>

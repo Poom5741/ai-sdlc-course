@@ -1,258 +1,523 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Requirements Quality Scorer — Quest 29</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
-  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
-  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
-  .container{display:flex;gap:2rem;width:100%;max-width:1000px;flex-wrap:wrap}
-  .input-panel{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
-  .score-panel{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
-  .panel-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:#4f2bdf}
-  .req-input{width:100%;background:#0f1629;border:1px solid #2a2a4a;border-radius:8px;padding:.8rem;color:#e0e0e0;font-size:.9rem;font-family:inherit;min-height:120px;resize:vertical;line-height:1.5}
-  .req-input:focus{outline:none;border-color:#4f2bdf}
-  .score-btn{background:#4f2bdf;color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-size:.9rem;cursor:pointer;font-weight:600;margin-top:1rem;transition:background .2s}
-  .score-btn:hover{background:#6141e0}
-  .criteria-item{margin-bottom:1.2rem;background:#0f1629;border-radius:8px;padding:1rem}
-  .criteria-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
-  .criteria-name{font-weight:600;font-size:.95rem}
-  .criteria-score{font-family:'Fira Code',monospace;font-weight:700;font-size:1.1rem}
-  .criteria-desc{font-size:.8rem;color:#888;margin-bottom:.6rem}
-  .rating-bar{display:flex;gap:4px}
-  .rating-dot{width:28px;height:28px;border-radius:6px;border:2px solid #2a2a4a;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#555}
-  .rating-dot:hover{border-color:#4f2bdf;transform:scale(1.1)}
-  .rating-dot.filled{border-color:transparent}
-  .total-score{background:#0f1629;border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
-  .total-label{font-size:.8rem;color:#9e9eb8;text-transform:uppercase;letter-spacing:.05em}
-  .total-num{font-size:2.2rem;font-weight:700;font-family:'Fira Code',monospace;margin:.3rem 0}
-  .total-grade{font-size:1rem;font-weight:600}
-  .grade-a{color:#00c864}.grade-b{color:#61afef}.grade-c{color:#f0c040}.grade-d{color:#ff9f43}.grade-f{color:#ff4757}
-  .feedback{margin-top:1rem;font-size:.85rem;color:#aaa;line-height:1.5;background:#0f1629;border-radius:8px;padding:1rem}
-  .feedback strong{color:#e0e0e0}
-</style>
-</head>
-<body>
-<h1>📊 Requirements Quality Scorer</h1>
-<p class="subtitle">Quest 29 · Rate your requirements across 6 quality dimensions</p>
-<div class="container">
-  <div class="input-panel">
-    <div class="panel-title">📝 Enter Requirement</div>
-    <textarea class="req-input" id="reqInput" placeholder="e.g. The system shall allow users to reset their password via email within 60 seconds..."></textarea>
-    <button class="score-btn" id="scoreBtn">Analyze &amp; Score</button>
-    <div class="panel-title" style="margin-top:1.5rem">🎚️ Rate Each Dimension</div>
-    <div id="criteriaList"></div>
-  </div>
-  <div class="score-panel">
-    <div class="panel-title">📈 Quality Score</div>
-    <div class="total-score" id="totalScore">
-      <div class="total-label">Overall Score</div>
-      <div class="total-num" id="totalNum">—</div>
-      <div class="total-grade" id="totalGrade"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Requirements Quality Scorer — Quest 29</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+        color: #fff;
+      }
+      .subtitle {
+        color: #9e9eb8;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      .container {
+        display: flex;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1000px;
+        flex-wrap: wrap;
+      }
+      .input-panel {
+        flex: 1;
+        min-width: 320px;
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+      }
+      .score-panel {
+        flex: 1;
+        min-width: 320px;
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+      }
+      .panel-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #4f2bdf;
+      }
+      .req-input {
+        width: 100%;
+        background: #0f1629;
+        border: 1px solid #2a2a4a;
+        border-radius: 8px;
+        padding: 0.8rem;
+        color: #e0e0e0;
+        font-size: 0.9rem;
+        font-family: inherit;
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+      .req-input:focus {
+        outline: none;
+        border-color: #4f2bdf;
+      }
+      .score-btn {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 1rem;
+        transition: background 0.2s;
+      }
+      .score-btn:hover {
+        background: #6141e0;
+      }
+      .criteria-item {
+        margin-bottom: 1.2rem;
+        background: #0f1629;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .criteria-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      .criteria-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .criteria-score {
+        font-family: "Fira Code", monospace;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .criteria-desc {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 0.6rem;
+      }
+      .rating-bar {
+        display: flex;
+        gap: 4px;
+      }
+      .rating-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 2px solid #2a2a4a;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #555;
+      }
+      .rating-dot:hover {
+        border-color: #4f2bdf;
+        transform: scale(1.1);
+      }
+      .rating-dot.filled {
+        border-color: transparent;
+      }
+      .total-score {
+        background: #0f1629;
+        border-radius: 10px;
+        padding: 1.2rem;
+        text-align: center;
+        margin-top: 1rem;
+      }
+      .total-label {
+        font-size: 0.8rem;
+        color: #9e9eb8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .total-num {
+        font-size: 2.2rem;
+        font-weight: 700;
+        font-family: "Fira Code", monospace;
+        margin: 0.3rem 0;
+      }
+      .total-grade {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .grade-a {
+        color: #00c864;
+      }
+      .grade-b {
+        color: #61afef;
+      }
+      .grade-c {
+        color: #f0c040;
+      }
+      .grade-d {
+        color: #ff9f43;
+      }
+      .grade-f {
+        color: #ff4757;
+      }
+      .feedback {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #aaa;
+        line-height: 1.5;
+        background: #0f1629;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .feedback strong {
+        color: #e0e0e0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📊 Requirements Quality Scorer</h1>
+    <p class="subtitle">
+      Quest 29 · Rate your requirements across 6 quality dimensions
+    </p>
+    <div class="container">
+      <div class="input-panel">
+        <div class="panel-title">📝 Enter Requirement</div>
+        <textarea
+          class="req-input"
+          id="reqInput"
+          placeholder="e.g. The system shall allow users to reset their password via email within 60 seconds..."
+        ></textarea>
+        <button class="score-btn" id="scoreBtn">Analyze &amp; Score</button>
+        <div class="panel-title" style="margin-top: 1.5rem">
+          🎚️ Rate Each Dimension
+        </div>
+        <div id="criteriaList"></div>
+      </div>
+      <div class="score-panel">
+        <div class="panel-title">📈 Quality Score</div>
+        <div class="total-score" id="totalScore">
+          <div class="total-label">Overall Score</div>
+          <div class="total-num" id="totalNum">—</div>
+          <div class="total-grade" id="totalGrade"></div>
+        </div>
+        <svg
+          id="radarChart"
+          width="320"
+          height="320"
+          viewBox="0 0 320 320"
+          style="display: block; margin: 1rem auto"
+        ></svg>
+        <div class="feedback" id="feedback">
+          Enter a requirement and rate each dimension to see quality feedback.
+        </div>
+      </div>
     </div>
-    <svg id="radarChart" width="320" height="320" viewBox="0 0 320 320" style="display:block;margin:1rem auto"></svg>
-    <div class="feedback" id="feedback">Enter a requirement and rate each dimension to see quality feedback.</div>
-  </div>
-</div>
-<script>
-var dimensions = [
-  { name: 'Clarity', desc: 'Is the requirement unambiguous and clearly worded?', color: '#4f2bdf' },
-  { name: 'Testability', desc: 'Can you write a test to verify this requirement?', color: '#00c864' },
-  { name: 'Completeness', desc: 'Does it cover the full scope without gaps?', color: '#f0c040' },
-  { name: 'Consistency', desc: 'Does it align with other requirements?', color: '#e040fb' },
-  { name: 'Feasibility', desc: 'Is this technically and practically achievable?', color: '#61afef' },
-  { name: 'Specificity', desc: 'Are measurements, thresholds, and details concrete?', color: '#ff9f43' }
-];
-var ratings = {};
-dimensions.forEach(function(_, i) { ratings[i] = 0; });
+    <script>
+      var dimensions = [
+        {
+          name: "Clarity",
+          desc: "Is the requirement unambiguous and clearly worded?",
+          color: "#4f2bdf",
+        },
+        {
+          name: "Testability",
+          desc: "Can you write a test to verify this requirement?",
+          color: "#00c864",
+        },
+        {
+          name: "Completeness",
+          desc: "Does it cover the full scope without gaps?",
+          color: "#f0c040",
+        },
+        {
+          name: "Consistency",
+          desc: "Does it align with other requirements?",
+          color: "#e040fb",
+        },
+        {
+          name: "Feasibility",
+          desc: "Is this technically and practically achievable?",
+          color: "#61afef",
+        },
+        {
+          name: "Specificity",
+          desc: "Are measurements, thresholds, and details concrete?",
+          color: "#ff9f43",
+        },
+      ];
+      var ratings = {};
+      dimensions.forEach(function (_, i) {
+        ratings[i] = 0;
+      });
 
-function renderCriteria() {
-  var list = document.getElementById('criteriaList');
-  list.textContent = '';
-  dimensions.forEach(function(d, i) {
-    var item = document.createElement('div');
-    item.className = 'criteria-item';
+      function renderCriteria() {
+        var list = document.getElementById("criteriaList");
+        list.textContent = "";
+        dimensions.forEach(function (d, i) {
+          var item = document.createElement("div");
+          item.className = "criteria-item";
 
-    var header = document.createElement('div');
-    header.className = 'criteria-header';
-    var name = document.createElement('span');
-    name.className = 'criteria-name';
-    name.textContent = d.name;
-    var score = document.createElement('span');
-    score.className = 'criteria-score';
-    score.textContent = ratings[i] + '/5';
-    score.style.color = d.color;
-    header.appendChild(name);
-    header.appendChild(score);
+          var header = document.createElement("div");
+          header.className = "criteria-header";
+          var name = document.createElement("span");
+          name.className = "criteria-name";
+          name.textContent = d.name;
+          var score = document.createElement("span");
+          score.className = "criteria-score";
+          score.textContent = ratings[i] + "/5";
+          score.style.color = d.color;
+          header.appendChild(name);
+          header.appendChild(score);
 
-    var desc = document.createElement('div');
-    desc.className = 'criteria-desc';
-    desc.textContent = d.desc;
+          var desc = document.createElement("div");
+          desc.className = "criteria-desc";
+          desc.textContent = d.desc;
 
-    var bar = document.createElement('div');
-    bar.className = 'rating-bar';
-    for (var v = 1; v <= 5; v++) {
-      (function(idx, val) {
-        var dot = document.createElement('div');
-        dot.className = 'rating-dot' + (val <= ratings[idx] ? ' filled' : '');
-        dot.textContent = String(val);
-        if (val <= ratings[idx]) dot.style.background = d.color;
-        dot.addEventListener('click', function() { ratings[idx] = val; renderCriteria(); updateScores(); });
-        bar.appendChild(dot);
-      })(i, v);
-    }
+          var bar = document.createElement("div");
+          bar.className = "rating-bar";
+          for (var v = 1; v <= 5; v++) {
+            (function (idx, val) {
+              var dot = document.createElement("div");
+              dot.className =
+                "rating-dot" + (val <= ratings[idx] ? " filled" : "");
+              dot.textContent = String(val);
+              if (val <= ratings[idx]) dot.style.background = d.color;
+              dot.addEventListener("click", function () {
+                ratings[idx] = val;
+                renderCriteria();
+                updateScores();
+              });
+              bar.appendChild(dot);
+            })(i, v);
+          }
 
-    item.appendChild(header);
-    item.appendChild(desc);
-    item.appendChild(bar);
-    list.appendChild(item);
-  });
-}
+          item.appendChild(header);
+          item.appendChild(desc);
+          item.appendChild(bar);
+          list.appendChild(item);
+        });
+      }
 
-function updateScores() {
-  var vals = dimensions.map(function(_, i) { return ratings[i]; });
-  var sum = 0;
-  vals.forEach(function(v) { sum += v; });
-  var avg = sum / vals.length;
-  var totalEl = document.getElementById('totalNum');
-  var gradeEl = document.getElementById('totalGrade');
-  totalEl.textContent = avg.toFixed(1) + '/5.0';
+      function updateScores() {
+        var vals = dimensions.map(function (_, i) {
+          return ratings[i];
+        });
+        var sum = 0;
+        vals.forEach(function (v) {
+          sum += v;
+        });
+        var avg = sum / vals.length;
+        var totalEl = document.getElementById("totalNum");
+        var gradeEl = document.getElementById("totalGrade");
+        totalEl.textContent = avg.toFixed(1) + "/5.0";
 
-  var labels = [
-    [4, 'total-num grade-a', 'total-grade grade-a', '🟢 Excellent — Production Ready'],
-    [3, 'total-num grade-b', 'total-grade grade-b', '🔵 Good — Minor Refinements Needed'],
-    [2, 'total-num grade-c', 'total-grade grade-c', '🟡 Fair — Needs Significant Work'],
-    [1, 'total-num grade-d', 'total-grade grade-d', '🟠 Poor — Major Revision Required'],
-    [0, 'total-num grade-f', 'total-grade grade-f', '🔴 Incomplete — Rate dimensions to begin']
-  ];
-  for (var k = 0; k < labels.length; k++) {
-    if (avg >= labels[k][0]) {
-      totalEl.className = labels[k][1];
-      gradeEl.className = labels[k][2];
-      gradeEl.textContent = labels[k][3];
-      break;
-    }
-  }
-  if (avg === 0) { totalEl.textContent = '—'; }
-  drawRadar(vals);
-  generateFeedback(vals);
-}
+        var labels = [
+          [
+            4,
+            "total-num grade-a",
+            "total-grade grade-a",
+            "🟢 Excellent — Production Ready",
+          ],
+          [
+            3,
+            "total-num grade-b",
+            "total-grade grade-b",
+            "🔵 Good — Minor Refinements Needed",
+          ],
+          [
+            2,
+            "total-num grade-c",
+            "total-grade grade-c",
+            "🟡 Fair — Needs Significant Work",
+          ],
+          [
+            1,
+            "total-num grade-d",
+            "total-grade grade-d",
+            "🟠 Poor — Major Revision Required",
+          ],
+          [
+            0,
+            "total-num grade-f",
+            "total-grade grade-f",
+            "🔴 Incomplete — Rate dimensions to begin",
+          ],
+        ];
+        for (var k = 0; k < labels.length; k++) {
+          if (avg >= labels[k][0]) {
+            totalEl.className = labels[k][1];
+            gradeEl.className = labels[k][2];
+            gradeEl.textContent = labels[k][3];
+            break;
+          }
+        }
+        if (avg === 0) {
+          totalEl.textContent = "—";
+        }
+        drawRadar(vals);
+        generateFeedback(vals);
+      }
 
-function drawRadar(vals) {
-  var svg = document.getElementById('radarChart');
-  svg.textContent = '';
-  var cx = 160, cy = 160, r = 120, n = dimensions.length;
+      function drawRadar(vals) {
+        var svg = document.getElementById("radarChart");
+        svg.textContent = "";
+        var cx = 160,
+          cy = 160,
+          r = 120,
+          n = dimensions.length;
 
-  for (var ring = 1; ring <= 5; ring++) {
-    var rr = r * ring / 5;
-    var pts = [];
-    for (var i = 0; i < n; i++) {
-      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-      pts.push((cx + rr * Math.cos(angle)) + ',' + (cy + rr * Math.sin(angle)));
-    }
-    var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    poly.setAttribute('points', pts.join(' '));
-    poly.setAttribute('fill', 'none');
-    poly.setAttribute('stroke', '#2a2a4a');
-    svg.appendChild(poly);
-  }
+        for (var ring = 1; ring <= 5; ring++) {
+          var rr = (r * ring) / 5;
+          var pts = [];
+          for (var i = 0; i < n; i++) {
+            var angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+            pts.push(
+              cx + rr * Math.cos(angle) + "," + (cy + rr * Math.sin(angle)),
+            );
+          }
+          var poly = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          poly.setAttribute("points", pts.join(" "));
+          poly.setAttribute("fill", "none");
+          poly.setAttribute("stroke", "#2a2a4a");
+          svg.appendChild(poly);
+        }
 
-  for (var i2 = 0; i2 < n; i2++) {
-    var angle2 = (Math.PI * 2 * i2 / n) - Math.PI / 2;
-    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', cx); line.setAttribute('y1', cy);
-    line.setAttribute('x2', cx + r * Math.cos(angle2)); line.setAttribute('y2', cy + r * Math.sin(angle2));
-    line.setAttribute('stroke', '#2a2a4a');
-    svg.appendChild(line);
+        for (var i2 = 0; i2 < n; i2++) {
+          var angle2 = (Math.PI * 2 * i2) / n - Math.PI / 2;
+          var line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          line.setAttribute("x1", cx);
+          line.setAttribute("y1", cy);
+          line.setAttribute("x2", cx + r * Math.cos(angle2));
+          line.setAttribute("y2", cy + r * Math.sin(angle2));
+          line.setAttribute("stroke", "#2a2a4a");
+          svg.appendChild(line);
 
-    var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    txt.setAttribute('x', cx + (r + 18) * Math.cos(angle2));
-    txt.setAttribute('y', cy + (r + 18) * Math.sin(angle2));
-    txt.setAttribute('text-anchor', 'middle');
-    txt.setAttribute('dominant-baseline', 'middle');
-    txt.setAttribute('fill', '#9e9eb8');
-    txt.setAttribute('font-size', '10');
-    txt.textContent = dimensions[i2].name;
-    svg.appendChild(txt);
-  }
+          var txt = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          txt.setAttribute("x", cx + (r + 18) * Math.cos(angle2));
+          txt.setAttribute("y", cy + (r + 18) * Math.sin(angle2));
+          txt.setAttribute("text-anchor", "middle");
+          txt.setAttribute("dominant-baseline", "middle");
+          txt.setAttribute("fill", "#9e9eb8");
+          txt.setAttribute("font-size", "10");
+          txt.textContent = dimensions[i2].name;
+          svg.appendChild(txt);
+        }
 
-  var hasData = false;
-  vals.forEach(function(v) { if (v > 0) hasData = true; });
-  if (hasData) {
-    var dataPts = [];
-    for (var i3 = 0; i3 < n; i3++) {
-      var angle3 = (Math.PI * 2 * i3 / n) - Math.PI / 2;
-      var vr = r * vals[i3] / 5;
-      dataPts.push((cx + vr * Math.cos(angle3)) + ',' + (cy + vr * Math.sin(angle3)));
-    }
-    var dataPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    dataPoly.setAttribute('points', dataPts.join(' '));
-    dataPoly.setAttribute('fill', 'rgba(79,43,223,.2)');
-    dataPoly.setAttribute('stroke', '#4f2bdf');
-    dataPoly.setAttribute('stroke-width', '2');
-    svg.appendChild(dataPoly);
+        var hasData = false;
+        vals.forEach(function (v) {
+          if (v > 0) hasData = true;
+        });
+        if (hasData) {
+          var dataPts = [];
+          for (var i3 = 0; i3 < n; i3++) {
+            var angle3 = (Math.PI * 2 * i3) / n - Math.PI / 2;
+            var vr = (r * vals[i3]) / 5;
+            dataPts.push(
+              cx + vr * Math.cos(angle3) + "," + (cy + vr * Math.sin(angle3)),
+            );
+          }
+          var dataPoly = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          dataPoly.setAttribute("points", dataPts.join(" "));
+          dataPoly.setAttribute("fill", "rgba(79,43,223,.2)");
+          dataPoly.setAttribute("stroke", "#4f2bdf");
+          dataPoly.setAttribute("stroke-width", "2");
+          svg.appendChild(dataPoly);
 
-    for (var i4 = 0; i4 < n; i4++) {
-      var angle4 = (Math.PI * 2 * i4 / n) - Math.PI / 2;
-      var vr2 = r * vals[i4] / 5;
-      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', cx + vr2 * Math.cos(angle4));
-      circle.setAttribute('cy', cy + vr2 * Math.sin(angle4));
-      circle.setAttribute('r', '5');
-      circle.setAttribute('fill', dimensions[i4].color);
-      svg.appendChild(circle);
-    }
-  }
-}
+          for (var i4 = 0; i4 < n; i4++) {
+            var angle4 = (Math.PI * 2 * i4) / n - Math.PI / 2;
+            var vr2 = (r * vals[i4]) / 5;
+            var circle = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "circle",
+            );
+            circle.setAttribute("cx", cx + vr2 * Math.cos(angle4));
+            circle.setAttribute("cy", cy + vr2 * Math.sin(angle4));
+            circle.setAttribute("r", "5");
+            circle.setAttribute("fill", dimensions[i4].color);
+            svg.appendChild(circle);
+          }
+        }
+      }
 
-function generateFeedback(vals) {
-  var fb = document.getElementById('feedback');
-  fb.textContent = '';
-  var weakest = [];
-  var strongest = [];
-  vals.forEach(function(v, i) {
-    if (v > 0 && v <= 2) weakest.push(dimensions[i].name);
-    if (v >= 4) strongest.push(dimensions[i].name);
-  });
-  if (strongest.length) {
-    var s1 = document.createElement('strong');
-    s1.textContent = 'Strengths: ';
-    fb.appendChild(s1);
-    fb.appendChild(document.createTextNode(strongest.join(', ') + '. '));
-  }
-  if (weakest.length) {
-    var s2 = document.createElement('strong');
-    s2.textContent = 'Needs work: ';
-    fb.appendChild(s2);
-    fb.appendChild(document.createTextNode(weakest.join(', ') + '. '));
-  }
-  if (!strongest.length && !weakest.length) {
-    fb.textContent = 'Rate the dimensions to receive quality feedback.';
-  }
-}
+      function generateFeedback(vals) {
+        var fb = document.getElementById("feedback");
+        fb.textContent = "";
+        var weakest = [];
+        var strongest = [];
+        vals.forEach(function (v, i) {
+          if (v > 0 && v <= 2) weakest.push(dimensions[i].name);
+          if (v >= 4) strongest.push(dimensions[i].name);
+        });
+        if (strongest.length) {
+          var s1 = document.createElement("strong");
+          s1.textContent = "Strengths: ";
+          fb.appendChild(s1);
+          fb.appendChild(document.createTextNode(strongest.join(", ") + ". "));
+        }
+        if (weakest.length) {
+          var s2 = document.createElement("strong");
+          s2.textContent = "Needs work: ";
+          fb.appendChild(s2);
+          fb.appendChild(document.createTextNode(weakest.join(", ") + ". "));
+        }
+        if (!strongest.length && !weakest.length) {
+          fb.textContent = "Rate the dimensions to receive quality feedback.";
+        }
+      }
 
-document.getElementById('scoreBtn').addEventListener('click', function() {
-  var req = document.getElementById('reqInput').value.trim();
-  if (!req) return;
-  var words = req.split(/\s+/).length;
-  var hasNumbers = /\d/.test(req);
-  var hasShall = /shall|must|should|will/i.test(req);
-  var hasWhen = /when|if|given/i.test(req);
-  ratings[0] = req.indexOf('.') !== -1 ? 4 : 2;
-  ratings[1] = (hasNumbers || hasWhen) ? 4 : 2;
-  ratings[2] = words > 10 ? 4 : 2;
-  ratings[3] = 3;
-  ratings[4] = hasShall ? 4 : 3;
-  ratings[5] = hasNumbers ? 4 : 2;
-  renderCriteria();
-  updateScores();
-});
+      document
+        .getElementById("scoreBtn")
+        .addEventListener("click", function () {
+          var req = document.getElementById("reqInput").value.trim();
+          if (!req) return;
+          var words = req.split(/\s+/).length;
+          var hasNumbers = /\d/.test(req);
+          var hasShall = /shall|must|should|will/i.test(req);
+          var hasWhen = /when|if|given/i.test(req);
+          ratings[0] = req.indexOf(".") !== -1 ? 4 : 2;
+          ratings[1] = hasNumbers || hasWhen ? 4 : 2;
+          ratings[2] = words > 10 ? 4 : 2;
+          ratings[3] = 3;
+          ratings[4] = hasShall ? 4 : 3;
+          ratings[5] = hasNumbers ? 4 : 2;
+          renderCriteria();
+          updateScores();
+        });
 
-renderCriteria();
-updateScores();
-</script>
-</body>
+      renderCriteria();
+      updateScores();
+    </script>
+  </body>
 </html>

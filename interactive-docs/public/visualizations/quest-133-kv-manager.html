@@ -1,392 +1,832 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KV Store Operations — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
-.container{max-width:1200px;margin:0 auto}
-.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
-.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
-.panel:hover{border-color:#4f2bdf}
-.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KV Store Operations — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+      @media (max-width: 900px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.2rem;
+        transition: border-color 0.3s;
+      }
+      .panel:hover {
+        border-color: #4f2bdf;
+      }
+      .panel h2 {
+        color: #4f2bdf;
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+      }
 
-/* Namespace Tabs */
-.ns-tabs{display:flex;gap:.4rem;margin-bottom:1rem}
-.ns-tab{background:#0d1117;border:2px solid #333;border-radius:8px;padding:.35rem .8rem;font-size:.78rem;cursor:pointer;transition:all .2s}
-.ns-tab:hover{border-color:#4f2bdf}
-.ns-tab.active{border-color:#00c864;color:#00c864;background:#00c86410}
+      /* Namespace Tabs */
+      .ns-tabs {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+      }
+      .ns-tab {
+        background: #0d1117;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .ns-tab:hover {
+        border-color: #4f2bdf;
+      }
+      .ns-tab.active {
+        border-color: #00c864;
+        color: #00c864;
+        background: #00c86410;
+      }
 
-/* Operation Buttons */
-.ops{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
-.op-btn{border:2px solid #333;border-radius:8px;padding:.4rem .8rem;font-size:.78rem;cursor:pointer;transition:all .2s;background:#0d1117;font-weight:700;letter-spacing:.5px}
-.op-btn:hover{transform:translateY(-1px)}
-.op-btn.op-create{color:#00c864;border-color:#00c86444}
-.op-btn.op-create:hover,.op-btn.op-create.active{background:#00c86415;border-color:#00c864}
-.op-btn.op-read{color:#4f2bdf;border-color:#4f2bdf44}
-.op-btn.op-read:hover,.op-btn.op-read.active{background:#4f2bdf15;border-color:#4f2bdf}
-.op-btn.op-update{color:#e8a020;border-color:#e8a02044}
-.op-btn.op-update:hover,.op-btn.op-update.active{background:#e8a02015;border-color:#e8a020}
-.op-btn.op-delete{color:#ff4466;border-color:#ff446644}
-.op-btn.op-delete:hover,.op-btn.op-delete.active{background:#ff446615;border-color:#ff4466}
+      /* Operation Buttons */
+      .ops {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .op-btn {
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #0d1117;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .op-btn:hover {
+        transform: translateY(-1px);
+      }
+      .op-btn.op-create {
+        color: #00c864;
+        border-color: #00c86444;
+      }
+      .op-btn.op-create:hover,
+      .op-btn.op-create.active {
+        background: #00c86415;
+        border-color: #00c864;
+      }
+      .op-btn.op-read {
+        color: #4f2bdf;
+        border-color: #4f2bdf44;
+      }
+      .op-btn.op-read:hover,
+      .op-btn.op-read.active {
+        background: #4f2bdf15;
+        border-color: #4f2bdf;
+      }
+      .op-btn.op-update {
+        color: #e8a020;
+        border-color: #e8a02044;
+      }
+      .op-btn.op-update:hover,
+      .op-btn.op-update.active {
+        background: #e8a02015;
+        border-color: #e8a020;
+      }
+      .op-btn.op-delete {
+        color: #ff4466;
+        border-color: #ff446644;
+      }
+      .op-btn.op-delete:hover,
+      .op-btn.op-delete.active {
+        background: #ff446615;
+        border-color: #ff4466;
+      }
 
-/* Operation Form */
-.op-form{background:#0d1117;border-radius:8px;padding:.8rem;margin-bottom:1rem;display:none;transition:all .3s}
-.op-form.show{display:block}
-.form-row{display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap}
-.form-input{background:#1a1a2e;border:2px solid #333;border-radius:6px;padding:.4rem .6rem;color:#e0e0e0;font-size:.82rem;font-family:monospace;flex:1;min-width:100px;transition:border-color .2s}
-.form-input:focus{outline:none;border-color:#4f2bdf}
-.form-input::placeholder{color:#555}
-.form-btn{background:#4f2bdf;color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.78rem;transition:all .2s;white-space:nowrap}
-.form-btn:hover{background:#6143e8}
-.form-btn.btn-red{background:#ff4466}
-.form-btn.btn-red:hover{background:#ff6680}
+      /* Operation Form */
+      .op-form {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        display: none;
+        transition: all 0.3s;
+      }
+      .op-form.show {
+        display: block;
+      }
+      .form-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .form-input {
+        background: #1a1a2e;
+        border: 2px solid #333;
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        color: #e0e0e0;
+        font-size: 0.82rem;
+        font-family: monospace;
+        flex: 1;
+        min-width: 100px;
+        transition: border-color 0.2s;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #4f2bdf;
+      }
+      .form-input::placeholder {
+        color: #555;
+      }
+      .form-btn {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .form-btn:hover {
+        background: #6143e8;
+      }
+      .form-btn.btn-red {
+        background: #ff4466;
+      }
+      .form-btn.btn-red:hover {
+        background: #ff6680;
+      }
 
-/* KV Table */
-.kv-table{width:100%;border-collapse:collapse;font-size:.8rem}
-.kv-table th{color:#4f2bdf;text-align:left;padding:.5rem;border-bottom:2px solid #333;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px}
-.kv-table td{padding:.4rem .5rem;border-bottom:1px solid #ffffff08;color:#aaa;font-family:monospace;font-size:.78rem}
-.kv-table tr:hover td{background:#ffffff05;color:#e0e0e0}
-.kv-table tr.new-row td{animation:slideIn .4s ease}
-.kv-table tr.removing td{animation:fadeOut .4s ease forwards}
-@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
-.kv-key{color:#00c864;font-weight:700}
-.kv-val{color:#e0e0e0}
-.kv-ttl{color:#e8a020;font-size:.72rem}
-.kv-empty{text-align:center;padding:2rem;color:#555;font-size:.82rem}
+      /* KV Table */
+      .kv-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+      }
+      .kv-table th {
+        color: #4f2bdf;
+        text-align: left;
+        padding: 0.5rem;
+        border-bottom: 2px solid #333;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .kv-table td {
+        padding: 0.4rem 0.5rem;
+        border-bottom: 1px solid #ffffff08;
+        color: #aaa;
+        font-family: monospace;
+        font-size: 0.78rem;
+      }
+      .kv-table tr:hover td {
+        background: #ffffff05;
+        color: #e0e0e0;
+      }
+      .kv-table tr.new-row td {
+        animation: slideIn 0.4s ease;
+      }
+      .kv-table tr.removing td {
+        animation: fadeOut 0.4s ease forwards;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
+      .kv-key {
+        color: #00c864;
+        font-weight: 700;
+      }
+      .kv-val {
+        color: #e0e0e0;
+      }
+      .kv-ttl {
+        color: #e8a020;
+        font-size: 0.72rem;
+      }
+      .kv-empty {
+        text-align: center;
+        padding: 2rem;
+        color: #555;
+        font-size: 0.82rem;
+      }
 
-/* Data Flow SVG */
-.flow-svg{width:100%;height:80px;margin-bottom:1rem}
-.flow-packet{r:5;opacity:0}
-.flow-packet.animate{animation:flowPacket 1s ease-in-out forwards}
-@keyframes flowPacket{0%{opacity:1}50%{opacity:1}100%{opacity:0}}
+      /* Data Flow SVG */
+      .flow-svg {
+        width: 100%;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .flow-packet {
+        r: 5;
+        opacity: 0;
+      }
+      .flow-packet.animate {
+        animation: flowPacket 1s ease-in-out forwards;
+      }
+      @keyframes flowPacket {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
 
-/* Operation Log */
-.log-terminal{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.6rem;font-family:'SF Mono',monospace;font-size:.72rem;max-height:200px;overflow-y:auto;line-height:1.6}
-.log-line{white-space:pre-wrap}
-.log-put{color:#00c864}
-.log-get{color:#4f2bdf}
-.log-del{color:#ff4466}
-.log-time{color:#555}
-.log-dim{color:#555}
+      /* Operation Log */
+      .log-terminal {
+        background: #0d1117;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 0.6rem;
+        font-family: "SF Mono", monospace;
+        font-size: 0.72rem;
+        max-height: 200px;
+        overflow-y: auto;
+        line-height: 1.6;
+      }
+      .log-line {
+        white-space: pre-wrap;
+      }
+      .log-put {
+        color: #00c864;
+      }
+      .log-get {
+        color: #4f2bdf;
+      }
+      .log-del {
+        color: #ff4466;
+      }
+      .log-time {
+        color: #555;
+      }
+      .log-dim {
+        color: #555;
+      }
 
-.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
-button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
-button:hover{background:#6143e8}
-.btn-green{background:#00c864;color:#1a1a2e}
-.btn-green:hover{background:#00dd70}
-</style>
-</head>
-<body>
-<h1>KV Store Operations</h1>
-<p class="sub">Interactive key-value store — perform CRUD with animated data flow</p>
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6143e8;
+      }
+      .btn-green {
+        background: #00c864;
+        color: #1a1a2e;
+      }
+      .btn-green:hover {
+        background: #00dd70;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>KV Store Operations</h1>
+    <p class="sub">
+      Interactive key-value store — perform CRUD with animated data flow
+    </p>
 
-<div class="container">
-  <!-- Data Flow SVG -->
-  <svg class="flow-svg" id="flowSvg" viewBox="0 0 700 80">
-    <defs>
-      <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#4f2bdf"/><stop offset="100%" stop-color="#00c864"/>
-      </linearGradient>
-    </defs>
-    <rect x="30" y="20" width="90" height="40" rx="8" fill="#16213e" stroke="#4f2bdf" stroke-width="2"/>
-    <text x="75" y="44" text-anchor="middle" fill="#4f2bdf" font-size="11" font-family="system-ui,sans-serif">Client</text>
-    <line x1="125" y1="40" x2="280" y2="40" stroke="#333" stroke-width="2" stroke-dasharray="6 4"/>
-    <rect x="280" y="20" width="100" height="40" rx="8" fill="#16213e" stroke="#e8a020" stroke-width="2"/>
-    <text x="330" y="44" text-anchor="middle" fill="#e8a020" font-size="11" font-family="system-ui,sans-serif">Worker</text>
-    <line x1="385" y1="40" x2="540" y2="40" stroke="#333" stroke-width="2" stroke-dasharray="6 4"/>
-    <rect x="540" y="20" width="120" height="40" rx="8" fill="#16213e" stroke="#00c864" stroke-width="2"/>
-    <text x="600" y="44" text-anchor="middle" fill="#00c864" font-size="11" font-family="system-ui,sans-serif">KV Store</text>
-    <circle class="flow-packet" id="packet1" cx="125" cy="40" r="5" fill="#4f2bdf"/>
-    <circle class="flow-packet" id="packet2" cx="385" cy="40" r="5" fill="#e8a020"/>
-  </svg>
+    <div class="container">
+      <!-- Data Flow SVG -->
+      <svg class="flow-svg" id="flowSvg" viewBox="0 0 700 80">
+        <defs>
+          <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#4f2bdf" />
+            <stop offset="100%" stop-color="#00c864" />
+          </linearGradient>
+        </defs>
+        <rect
+          x="30"
+          y="20"
+          width="90"
+          height="40"
+          rx="8"
+          fill="#16213e"
+          stroke="#4f2bdf"
+          stroke-width="2"
+        />
+        <text
+          x="75"
+          y="44"
+          text-anchor="middle"
+          fill="#4f2bdf"
+          font-size="11"
+          font-family="system-ui,sans-serif"
+        >
+          Client
+        </text>
+        <line
+          x1="125"
+          y1="40"
+          x2="280"
+          y2="40"
+          stroke="#333"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+        />
+        <rect
+          x="280"
+          y="20"
+          width="100"
+          height="40"
+          rx="8"
+          fill="#16213e"
+          stroke="#e8a020"
+          stroke-width="2"
+        />
+        <text
+          x="330"
+          y="44"
+          text-anchor="middle"
+          fill="#e8a020"
+          font-size="11"
+          font-family="system-ui,sans-serif"
+        >
+          Worker
+        </text>
+        <line
+          x1="385"
+          y1="40"
+          x2="540"
+          y2="40"
+          stroke="#333"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+        />
+        <rect
+          x="540"
+          y="20"
+          width="120"
+          height="40"
+          rx="8"
+          fill="#16213e"
+          stroke="#00c864"
+          stroke-width="2"
+        />
+        <text
+          x="600"
+          y="44"
+          text-anchor="middle"
+          fill="#00c864"
+          font-size="11"
+          font-family="system-ui,sans-serif"
+        >
+          KV Store
+        </text>
+        <circle
+          class="flow-packet"
+          id="packet1"
+          cx="125"
+          cy="40"
+          r="5"
+          fill="#4f2bdf"
+        />
+        <circle
+          class="flow-packet"
+          id="packet2"
+          cx="385"
+          cy="40"
+          r="5"
+          fill="#e8a020"
+        />
+      </svg>
 
-  <div class="main-grid">
-    <!-- Left: Operations + Table -->
-    <div>
-      <div class="panel">
-        <h2>🗄️ KV Store</h2>
-        <div class="ns-tabs" id="nsTabs"></div>
-        <div class="ops" id="opsRow">
-          <div class="op-btn op-create" onclick="setOp('create')">CREATE</div>
-          <div class="op-btn op-read" onclick="setOp('read')">READ</div>
-          <div class="op-btn op-update" onclick="setOp('update')">UPDATE</div>
-          <div class="op-btn op-delete" onclick="setOp('delete')">DELETE</div>
+      <div class="main-grid">
+        <!-- Left: Operations + Table -->
+        <div>
+          <div class="panel">
+            <h2>🗄️ KV Store</h2>
+            <div class="ns-tabs" id="nsTabs"></div>
+            <div class="ops" id="opsRow">
+              <div class="op-btn op-create" onclick="setOp('create')">
+                CREATE
+              </div>
+              <div class="op-btn op-read" onclick="setOp('read')">READ</div>
+              <div class="op-btn op-update" onclick="setOp('update')">
+                UPDATE
+              </div>
+              <div class="op-btn op-delete" onclick="setOp('delete')">
+                DELETE
+              </div>
+            </div>
+
+            <div class="op-form" id="createForm">
+              <div class="form-row">
+                <input class="form-input" id="createKey" placeholder="key" />
+                <input
+                  class="form-input"
+                  id="createValue"
+                  placeholder="value"
+                />
+              </div>
+              <div class="form-row">
+                <input
+                  class="form-input"
+                  id="createTtl"
+                  placeholder="TTL (seconds, optional)"
+                />
+                <button class="form-btn" onclick="doCreate()">PUT</button>
+              </div>
+            </div>
+            <div class="op-form" id="readForm">
+              <div class="form-row">
+                <input class="form-input" id="readKey" placeholder="key" />
+                <button class="form-btn" onclick="doRead()">GET</button>
+              </div>
+              <div
+                id="readResult"
+                style="
+                  margin-top: 0.5rem;
+                  font-family: monospace;
+                  font-size: 0.82rem;
+                  color: #4f2bdf;
+                  min-height: 1.5em;
+                "
+              ></div>
+            </div>
+            <div class="op-form" id="updateForm">
+              <div class="form-row">
+                <input class="form-input" id="updateKey" placeholder="key" />
+                <input
+                  class="form-input"
+                  id="updateValue"
+                  placeholder="new value"
+                />
+              </div>
+              <div class="form-row">
+                <button class="form-btn" onclick="doUpdate()">UPDATE</button>
+              </div>
+            </div>
+            <div class="op-form" id="deleteForm">
+              <div class="form-row">
+                <input class="form-input" id="deleteKey" placeholder="key" />
+                <button class="form-btn btn-red" onclick="doDelete()">
+                  DELETE
+                </button>
+              </div>
+            </div>
+
+            <table class="kv-table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Value</th>
+                  <th>TTL</th>
+                  <th>Modified</th>
+                </tr>
+              </thead>
+              <tbody id="kvBody"></tbody>
+            </table>
+            <div class="kv-empty" id="kvEmpty">
+              No entries — CREATE one or seed demo data
+            </div>
+          </div>
         </div>
 
-        <div class="op-form" id="createForm">
-          <div class="form-row">
-            <input class="form-input" id="createKey" placeholder="key">
-            <input class="form-input" id="createValue" placeholder="value">
-          </div>
-          <div class="form-row">
-            <input class="form-input" id="createTtl" placeholder="TTL (seconds, optional)">
-            <button class="form-btn" onclick="doCreate()">PUT</button>
+        <!-- Right: Log -->
+        <div>
+          <div class="panel">
+            <h2>📋 Operation Log</h2>
+            <div class="log-terminal" id="logTerminal"></div>
           </div>
         </div>
-        <div class="op-form" id="readForm">
-          <div class="form-row">
-            <input class="form-input" id="readKey" placeholder="key">
-            <button class="form-btn" onclick="doRead()">GET</button>
-          </div>
-          <div id="readResult" style="margin-top:.5rem;font-family:monospace;font-size:.82rem;color:#4f2bdf;min-height:1.5em"></div>
-        </div>
-        <div class="op-form" id="updateForm">
-          <div class="form-row">
-            <input class="form-input" id="updateKey" placeholder="key">
-            <input class="form-input" id="updateValue" placeholder="new value">
-          </div>
-          <div class="form-row">
-            <button class="form-btn" onclick="doUpdate()">UPDATE</button>
-          </div>
-        </div>
-        <div class="op-form" id="deleteForm">
-          <div class="form-row">
-            <input class="form-input" id="deleteKey" placeholder="key">
-            <button class="form-btn btn-red" onclick="doDelete()">DELETE</button>
-          </div>
-        </div>
+      </div>
 
-        <table class="kv-table">
-          <thead><tr><th>Key</th><th>Value</th><th>TTL</th><th>Modified</th></tr></thead>
-          <tbody id="kvBody"></tbody>
-        </table>
-        <div class="kv-empty" id="kvEmpty">No entries — CREATE one or seed demo data</div>
+      <div class="controls">
+        <button class="btn-green" onclick="seedDemo()">
+          🌱 Seed Demo Data
+        </button>
+        <button onclick="clearStore()">🗑️ Clear Store</button>
       </div>
     </div>
 
-    <!-- Right: Log -->
-    <div>
-      <div class="panel">
-        <h2>📋 Operation Log</h2>
-        <div class="log-terminal" id="logTerminal"></div>
-      </div>
-    </div>
-  </div>
+    <script>
+      const namespaces = ["sessions", "cache", "config"];
+      let currentNs = 0;
+      const stores = {};
+      namespaces.forEach((ns) => (stores[ns] = {}));
+      let activeOp = "create";
 
-  <div class="controls">
-    <button class="btn-green" onclick="seedDemo()">🌱 Seed Demo Data</button>
-    <button onclick="clearStore()">🗑️ Clear Store</button>
-  </div>
-</div>
+      // Render namespace tabs
+      const nsContainer = document.getElementById("nsTabs");
+      namespaces.forEach((ns, i) => {
+        const tab = document.createElement("div");
+        tab.className = "ns-tab" + (i === 0 ? " active" : "");
+        tab.textContent = ns;
+        tab.onclick = () => {
+          currentNs = i;
+          document
+            .querySelectorAll(".ns-tab")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          renderTable();
+        };
+        nsContainer.appendChild(tab);
+      });
 
-<script>
-const namespaces = ['sessions', 'cache', 'config'];
-let currentNs = 0;
-const stores = {};
-namespaces.forEach(ns => stores[ns] = {});
-let activeOp = 'create';
+      function setOp(op) {
+        activeOp = op;
+        document
+          .querySelectorAll(".op-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.querySelector(".op-btn.op-" + op).classList.add("active");
+        ["createForm", "readForm", "updateForm", "deleteForm"].forEach((id) => {
+          document.getElementById(id).classList.remove("show");
+        });
+        document.getElementById(op + "Form").classList.add("show");
+      }
 
-// Render namespace tabs
-const nsContainer = document.getElementById('nsTabs');
-namespaces.forEach((ns, i) => {
-  const tab = document.createElement('div');
-  tab.className = 'ns-tab' + (i === 0 ? ' active' : '');
-  tab.textContent = ns;
-  tab.onclick = () => {
-    currentNs = i;
-    document.querySelectorAll('.ns-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    renderTable();
-  };
-  nsContainer.appendChild(tab);
-});
+      function timestamp() {
+        const d = new Date();
+        return d.toTimeString().slice(0, 8);
+      }
 
-function setOp(op) {
-  activeOp = op;
-  document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.op-btn.op-' + op).classList.add('active');
-  ['createForm','readForm','updateForm','deleteForm'].forEach(id => {
-    document.getElementById(id).classList.remove('show');
-  });
-  document.getElementById(op + 'Form').classList.add('show');
-}
+      function addLog(text, cls) {
+        const log = document.getElementById("logTerminal");
+        const line = document.createElement("div");
+        line.className = "log-line";
+        const ts = document.createElement("span");
+        ts.className = "log-time";
+        ts.textContent = "[" + timestamp() + "] ";
+        const msg = document.createElement("span");
+        msg.className = cls || "";
+        msg.textContent = text;
+        line.appendChild(ts);
+        line.appendChild(msg);
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+      }
 
-function timestamp() {
-  const d = new Date();
-  return d.toTimeString().slice(0, 8);
-}
+      async function animatePacket() {
+        const p1 = document.getElementById("packet1");
+        const p2 = document.getElementById("packet2");
+        p1.style.transition = "none";
+        p2.style.transition = "none";
+        p1.setAttribute("cx", "125");
+        p2.setAttribute("cx", "385");
+        p1.setAttribute("opacity", "1");
+        p2.setAttribute("opacity", "1");
+        p1.style.transition = "cx 0.3s ease";
+        p1.setAttribute("cx", "280");
+        await sleep(300);
+        p2.style.transition = "cx 0.3s ease";
+        p2.setAttribute("cx", "540");
+        await sleep(300);
+        p1.setAttribute("opacity", "0");
+        await sleep(200);
+        p2.setAttribute("opacity", "0");
+      }
 
-function addLog(text, cls) {
-  const log = document.getElementById('logTerminal');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  const ts = document.createElement('span');
-  ts.className = 'log-time';
-  ts.textContent = '[' + timestamp() + '] ';
-  const msg = document.createElement('span');
-  msg.className = cls || '';
-  msg.textContent = text;
-  line.appendChild(ts);
-  line.appendChild(msg);
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
-}
+      function renderTable() {
+        const body = document.getElementById("kvBody");
+        const empty = document.getElementById("kvEmpty");
+        const ns = namespaces[currentNs];
+        const data = stores[ns];
+        const keys = Object.keys(data);
+        while (body.firstChild) body.removeChild(body.firstChild);
+        empty.style.display = keys.length ? "none" : "block";
 
-async function animatePacket() {
-  const p1 = document.getElementById('packet1');
-  const p2 = document.getElementById('packet2');
-  p1.style.transition = 'none';
-  p2.style.transition = 'none';
-  p1.setAttribute('cx', '125');
-  p2.setAttribute('cx', '385');
-  p1.setAttribute('opacity', '1');
-  p2.setAttribute('opacity', '1');
-  p1.style.transition = 'cx 0.3s ease';
-  p1.setAttribute('cx', '280');
-  await sleep(300);
-  p2.style.transition = 'cx 0.3s ease';
-  p2.setAttribute('cx', '540');
-  await sleep(300);
-  p1.setAttribute('opacity', '0');
-  await sleep(200);
-  p2.setAttribute('opacity', '0');
-}
+        keys.forEach((k) => {
+          const row = document.createElement("tr");
+          const kTd = document.createElement("td");
+          kTd.className = "kv-key";
+          kTd.textContent = k;
+          const vTd = document.createElement("td");
+          vTd.className = "kv-val";
+          vTd.textContent = data[k].value;
+          const tTd = document.createElement("td");
+          tTd.className = "kv-ttl";
+          tTd.textContent = data[k].ttl ? data[k].ttl + "s" : "—";
+          const mTd = document.createElement("td");
+          mTd.className = "log-dim";
+          mTd.textContent = data[k].modified;
+          row.appendChild(kTd);
+          row.appendChild(vTd);
+          row.appendChild(tTd);
+          row.appendChild(mTd);
+          body.appendChild(row);
+        });
+      }
 
-function renderTable() {
-  const body = document.getElementById('kvBody');
-  const empty = document.getElementById('kvEmpty');
-  const ns = namespaces[currentNs];
-  const data = stores[ns];
-  const keys = Object.keys(data);
-  while (body.firstChild) body.removeChild(body.firstChild);
-  empty.style.display = keys.length ? 'none' : 'block';
+      async function doCreate() {
+        const key = document.getElementById("createKey").value.trim();
+        const value = document.getElementById("createValue").value.trim();
+        const ttl = document.getElementById("createTtl").value.trim();
+        if (!key || !value) return;
+        await animatePacket();
+        const ns = namespaces[currentNs];
+        stores[ns][key] = {
+          value,
+          ttl: ttl ? parseInt(ttl) : null,
+          modified: timestamp(),
+        };
+        addLog(
+          "PUT " +
+            ns +
+            "/" +
+            key +
+            ' = "' +
+            value +
+            '"' +
+            (ttl ? " TTL=" + ttl + "s" : ""),
+          "log-put",
+        );
+        renderTable();
+        // Highlight new row
+        const rows = document.querySelectorAll("#kvBody tr");
+        if (rows.length) {
+          rows[rows.length - 1].classList.add("new-row");
+        }
+      }
 
-  keys.forEach(k => {
-    const row = document.createElement('tr');
-    const kTd = document.createElement('td');
-    kTd.className = 'kv-key';
-    kTd.textContent = k;
-    const vTd = document.createElement('td');
-    vTd.className = 'kv-val';
-    vTd.textContent = data[k].value;
-    const tTd = document.createElement('td');
-    tTd.className = 'kv-ttl';
-    tTd.textContent = data[k].ttl ? data[k].ttl + 's' : '—';
-    const mTd = document.createElement('td');
-    mTd.className = 'log-dim';
-    mTd.textContent = data[k].modified;
-    row.appendChild(kTd);
-    row.appendChild(vTd);
-    row.appendChild(tTd);
-    row.appendChild(mTd);
-    body.appendChild(row);
-  });
-}
+      async function doRead() {
+        const key = document.getElementById("readKey").value.trim();
+        if (!key) return;
+        await animatePacket();
+        const ns = namespaces[currentNs];
+        const entry = stores[ns][key];
+        const result = document.getElementById("readResult");
+        while (result.firstChild) result.removeChild(result.firstChild);
+        if (entry) {
+          addLog(
+            "GET " + ns + "/" + key + ' → "' + entry.value + '"',
+            "log-get",
+          );
+          result.textContent = entry.value;
+          result.style.color = "#00c864";
+        } else {
+          addLog("GET " + ns + "/" + key + " → null", "log-dim");
+          result.textContent = "null (not found)";
+          result.style.color = "#ff4466";
+        }
+      }
 
-async function doCreate() {
-  const key = document.getElementById('createKey').value.trim();
-  const value = document.getElementById('createValue').value.trim();
-  const ttl = document.getElementById('createTtl').value.trim();
-  if (!key || !value) return;
-  await animatePacket();
-  const ns = namespaces[currentNs];
-  stores[ns][key] = { value, ttl: ttl ? parseInt(ttl) : null, modified: timestamp() };
-  addLog('PUT ' + ns + '/' + key + ' = "' + value + '"' + (ttl ? ' TTL=' + ttl + 's' : ''), 'log-put');
-  renderTable();
-  // Highlight new row
-  const rows = document.querySelectorAll('#kvBody tr');
-  if (rows.length) { rows[rows.length - 1].classList.add('new-row'); }
-}
+      async function doUpdate() {
+        const key = document.getElementById("updateKey").value.trim();
+        const value = document.getElementById("updateValue").value.trim();
+        if (!key || !value) return;
+        await animatePacket();
+        const ns = namespaces[currentNs];
+        if (stores[ns][key]) {
+          stores[ns][key].value = value;
+          stores[ns][key].modified = timestamp();
+          addLog(
+            "PUT " + ns + "/" + key + ' = "' + value + '" (updated)',
+            "log-put",
+          );
+        } else {
+          stores[ns][key] = { value, ttl: null, modified: timestamp() };
+          addLog(
+            "PUT " + ns + "/" + key + ' = "' + value + '" (created)',
+            "log-put",
+          );
+        }
+        renderTable();
+      }
 
-async function doRead() {
-  const key = document.getElementById('readKey').value.trim();
-  if (!key) return;
-  await animatePacket();
-  const ns = namespaces[currentNs];
-  const entry = stores[ns][key];
-  const result = document.getElementById('readResult');
-  while (result.firstChild) result.removeChild(result.firstChild);
-  if (entry) {
-    addLog('GET ' + ns + '/' + key + ' → "' + entry.value + '"', 'log-get');
-    result.textContent = entry.value;
-    result.style.color = '#00c864';
-  } else {
-    addLog('GET ' + ns + '/' + key + ' → null', 'log-dim');
-    result.textContent = 'null (not found)';
-    result.style.color = '#ff4466';
-  }
-}
+      async function doDelete() {
+        const key = document.getElementById("deleteKey").value.trim();
+        if (!key) return;
+        await animatePacket();
+        const ns = namespaces[currentNs];
+        if (stores[ns][key]) {
+          // Fade out row
+          const rows = document.querySelectorAll("#kvBody tr");
+          rows.forEach((r) => {
+            if (
+              r.querySelector(".kv-key") &&
+              r.querySelector(".kv-key").textContent === key
+            )
+              r.classList.add("removing");
+          });
+          await sleep(400);
+          delete stores[ns][key];
+          addLog("DEL " + ns + "/" + key, "log-del");
+        } else {
+          addLog("DEL " + ns + "/" + key + " (not found)", "log-dim");
+        }
+        renderTable();
+      }
 
-async function doUpdate() {
-  const key = document.getElementById('updateKey').value.trim();
-  const value = document.getElementById('updateValue').value.trim();
-  if (!key || !value) return;
-  await animatePacket();
-  const ns = namespaces[currentNs];
-  if (stores[ns][key]) {
-    stores[ns][key].value = value;
-    stores[ns][key].modified = timestamp();
-    addLog('PUT ' + ns + '/' + key + ' = "' + value + '" (updated)', 'log-put');
-  } else {
-    stores[ns][key] = { value, ttl: null, modified: timestamp() };
-    addLog('PUT ' + ns + '/' + key + ' = "' + value + '" (created)', 'log-put');
-  }
-  renderTable();
-}
+      const demoData = {
+        sessions: {
+          sess_abc123: { value: '{"user":"alice","role":"admin"}', ttl: 3600 },
+          sess_def456: { value: '{"user":"bob","role":"user"}', ttl: 3600 },
+          sess_ghi789: { value: '{"user":"charlie","role":"user"}', ttl: 1800 },
+        },
+        cache: {
+          home_page: { value: '{"html":"...","gzipped":true}', ttl: 300 },
+          api_users: { value: '[{"id":1},{"id":2}]', ttl: 60 },
+          static_assets: { value: '{"etag":"v2.1.0"}', ttl: 86400 },
+        },
+        config: {
+          feature_flags: { value: '{"darkMode":true,"beta":false}', ttl: null },
+          rate_limits: { value: '{"api":100,"auth":10}', ttl: null },
+          secrets_hash: { value: "sha256:a1b2c3...", ttl: null },
+        },
+      };
 
-async function doDelete() {
-  const key = document.getElementById('deleteKey').value.trim();
-  if (!key) return;
-  await animatePacket();
-  const ns = namespaces[currentNs];
-  if (stores[ns][key]) {
-    // Fade out row
-    const rows = document.querySelectorAll('#kvBody tr');
-    rows.forEach(r => { if (r.querySelector('.kv-key') && r.querySelector('.kv-key').textContent === key) r.classList.add('removing'); });
-    await sleep(400);
-    delete stores[ns][key];
-    addLog('DEL ' + ns + '/' + key, 'log-del');
-  } else {
-    addLog('DEL ' + ns + '/' + key + ' (not found)', 'log-dim');
-  }
-  renderTable();
-}
+      async function seedDemo() {
+        for (const ns of namespaces) {
+          for (const [key, data] of Object.entries(demoData[ns])) {
+            stores[ns][key] = {
+              value: data.value,
+              ttl: data.ttl,
+              modified: timestamp(),
+            };
+            addLog("SEED " + ns + "/" + key, "log-put");
+            await sleep(100);
+          }
+        }
+        renderTable();
+      }
 
-const demoData = {
-  sessions: {
-    'sess_abc123': {value:'{"user":"alice","role":"admin"}', ttl:3600},
-    'sess_def456': {value:'{"user":"bob","role":"user"}', ttl:3600},
-    'sess_ghi789': {value:'{"user":"charlie","role":"user"}', ttl:1800}
-  },
-  cache: {
-    'home_page': {value:'{"html":"...","gzipped":true}', ttl:300},
-    'api_users': {value:'[{"id":1},{"id":2}]', ttl:60},
-    'static_assets': {value:'{"etag":"v2.1.0"}', ttl:86400}
-  },
-  config: {
-    'feature_flags': {value:'{"darkMode":true,"beta":false}', ttl:null},
-    'rate_limits': {value:'{"api":100,"auth":10}', ttl:null},
-    'secrets_hash': {value:'sha256:a1b2c3...', ttl:null}
-  }
-};
+      function clearStore() {
+        namespaces.forEach((ns) => (stores[ns] = {}));
+        renderTable();
+        addLog("CLEARED all namespaces", "log-del");
+      }
 
-async function seedDemo() {
-  for (const ns of namespaces) {
-    for (const [key, data] of Object.entries(demoData[ns])) {
-      stores[ns][key] = { value: data.value, ttl: data.ttl, modified: timestamp() };
-      addLog('SEED ' + ns + '/' + key, 'log-put');
-      await sleep(100);
-    }
-  }
-  renderTable();
-}
+      function sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms));
+      }
 
-function clearStore() {
-  namespaces.forEach(ns => stores[ns] = {});
-  renderTable();
-  addLog('CLEARED all namespaces', 'log-del');
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-setOp('create');
-renderTable();
-</script>
-</body>
+      setOp("create");
+      renderTable();
+    </script>
+  </body>
 </html>

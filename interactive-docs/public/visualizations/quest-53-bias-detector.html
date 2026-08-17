@@ -1,360 +1,666 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bias Detection Metrics — Quest 53</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
-  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
-  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
-  .dashboard{width:100%;max-width:1000px}
-  .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;margin-bottom:1.5rem}
-  .metric-card{background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a;position:relative;overflow:hidden}
-  .metric-card .card-title{font-size:.85rem;color:#9e9eb8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.8rem}
-  .metric-card .card-value{font-size:2rem;font-weight:700;font-family:'Fira Code',monospace;margin-bottom:.3rem}
-  .metric-card .card-bar{height:8px;background:#0f1629;border-radius:4px;overflow:hidden;margin:.6rem 0}
-  .metric-card .card-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
-  .metric-card .card-desc{font-size:.78rem;color:#777;line-height:1.4}
-  .chart-section{background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a;margin-bottom:1.5rem}
-  .chart-title{font-size:1.1rem;font-weight:600;color:#4f2bdf;margin-bottom:1rem}
-  .controls{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem}
-  .ctrl-btn{padding:.4rem .8rem;border-radius:6px;font-size:.8rem;cursor:pointer;border:1px solid #2a2a4a;background:#0f1629;color:#e0e0e0;transition:all .2s}
-  .ctrl-btn:hover{border-color:#4f2bdf}
-  .ctrl-btn.active{background:#4f2bdf;border-color:#4f2bdf;color:#fff}
-  svg{width:100%;overflow:visible}
-  .bar-label{font-size:11px;fill:#9e9eb8}
-  .bar-value{font-size:12px;fill:#e0e0e0;font-weight:600;font-family:'Fira Code',monospace}
-  @keyframes growBar{from{width:0}to{width:var(--w)}}
-  @keyframes fadeSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  .metric-card{animation:fadeSlideUp .5s backwards}
-  .metric-card:nth-child(2){animation-delay:.1s}
-  .metric-card:nth-child(3){animation-delay:.2s}
-  .metric-card:nth-child(4){animation-delay:.3s}
-  .timeline{background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
-  .timeline-title{font-size:1.1rem;font-weight:600;color:#4f2bdf;margin-bottom:1rem}
-  .tl-row{display:flex;align-items:center;gap:1rem;margin-bottom:.8rem}
-  .tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-  .tl-label{font-size:.85rem;min-width:140px;color:#ccc}
-  .tl-bar{flex:1;height:20px;background:#0f1629;border-radius:4px;overflow:hidden;position:relative}
-  .tl-fill{height:100%;border-radius:4px;transition:width 1.2s ease}
-  .tl-pct{position:absolute;right:8px;top:2px;font-size:.75rem;font-family:'Fira Code',monospace;color:#fff}
-</style>
-</head>
-<body>
-<h1>⚖️ Bias Detection Metrics</h1>
-<p class="subtitle">Quest 53 · Monitor and visualize bias across your ML pipeline</p>
-<div class="dashboard">
-  <div class="metric-grid" id="metricGrid"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bias Detection Metrics — Quest 53</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+        color: #fff;
+      }
+      .subtitle {
+        color: #9e9eb8;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      .dashboard {
+        width: 100%;
+        max-width: 1000px;
+      }
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
+      }
+      .metric-card {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+        position: relative;
+        overflow: hidden;
+      }
+      .metric-card .card-title {
+        font-size: 0.85rem;
+        color: #9e9eb8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.8rem;
+      }
+      .metric-card .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: "Fira Code", monospace;
+        margin-bottom: 0.3rem;
+      }
+      .metric-card .card-bar {
+        height: 8px;
+        background: #0f1629;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0.6rem 0;
+      }
+      .metric-card .card-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease;
+      }
+      .metric-card .card-desc {
+        font-size: 0.78rem;
+        color: #777;
+        line-height: 1.4;
+      }
+      .chart-section {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+        margin-bottom: 1.5rem;
+      }
+      .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #4f2bdf;
+        margin-bottom: 1rem;
+      }
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+      .ctrl-btn {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: 1px solid #2a2a4a;
+        background: #0f1629;
+        color: #e0e0e0;
+        transition: all 0.2s;
+      }
+      .ctrl-btn:hover {
+        border-color: #4f2bdf;
+      }
+      .ctrl-btn.active {
+        background: #4f2bdf;
+        border-color: #4f2bdf;
+        color: #fff;
+      }
+      svg {
+        width: 100%;
+        overflow: visible;
+      }
+      .bar-label {
+        font-size: 11px;
+        fill: #9e9eb8;
+      }
+      .bar-value {
+        font-size: 12px;
+        fill: #e0e0e0;
+        font-weight: 600;
+        font-family: "Fira Code", monospace;
+      }
+      @keyframes growBar {
+        from {
+          width: 0;
+        }
+        to {
+          width: var(--w);
+        }
+      }
+      @keyframes fadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .metric-card {
+        animation: fadeSlideUp 0.5s backwards;
+      }
+      .metric-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .metric-card:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .metric-card:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .timeline {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #2a2a4a;
+      }
+      .timeline-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #4f2bdf;
+        margin-bottom: 1rem;
+      }
+      .tl-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.8rem;
+      }
+      .tl-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .tl-label {
+        font-size: 0.85rem;
+        min-width: 140px;
+        color: #ccc;
+      }
+      .tl-bar {
+        flex: 1;
+        height: 20px;
+        background: #0f1629;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+      }
+      .tl-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1.2s ease;
+      }
+      .tl-pct {
+        position: absolute;
+        right: 8px;
+        top: 2px;
+        font-size: 0.75rem;
+        font-family: "Fira Code", monospace;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>⚖️ Bias Detection Metrics</h1>
+    <p class="subtitle">
+      Quest 53 · Monitor and visualize bias across your ML pipeline
+    </p>
+    <div class="dashboard">
+      <div class="metric-grid" id="metricGrid"></div>
 
-  <div class="chart-section">
-    <div class="chart-title">📊 Bias Distribution by Category</div>
-    <div class="controls" id="chartControls"></div>
-    <svg id="barChart" viewBox="0 0 800 300"></svg>
-  </div>
+      <div class="chart-section">
+        <div class="chart-title">📊 Bias Distribution by Category</div>
+        <div class="controls" id="chartControls"></div>
+        <svg id="barChart" viewBox="0 0 800 300"></svg>
+      </div>
 
-  <div class="chart-section">
-    <div class="chart-title">📈 Fairness Across Demographics</div>
-    <svg id="radarChart" viewBox="0 0 400 400" style="max-width:400px;display:block;margin:0 auto"></svg>
-  </div>
+      <div class="chart-section">
+        <div class="chart-title">📈 Fairness Across Demographics</div>
+        <svg
+          id="radarChart"
+          viewBox="0 0 400 400"
+          style="max-width: 400px; display: block; margin: 0 auto"
+        ></svg>
+      </div>
 
-  <div class="timeline">
-    <div class="timeline-title">📋 Bias Mitigation Timeline</div>
-    <div id="timeline"></div>
-  </div>
-</div>
-<script>
-var biasTypes = [
-  { name: 'Selection Bias', value: 72, color: '#ff4757', desc: 'Training data does not represent the target population.' },
-  { name: 'Measurement Bias', value: 45, color: '#ff9f43', desc: 'Inconsistent or inaccurate data collection methods.' },
-  { name: 'Label Bias', value: 38, color: '#f0c040', desc: 'Human-labeled ground truth reflects annotator prejudice.' },
-  { name: 'Algorithmic Bias', value: 56, color: '#4f2bdf', desc: 'Model amplifies existing patterns of inequality.' },
-  { name: 'Deployment Bias', value: 29, color: '#00c864', desc: 'Model used in context different from training assumptions.' },
-  { name: 'Confirmation Bias', value: 33, color: '#e040fb', desc: 'Evaluation metrics reinforce pre-existing beliefs.' }
-];
+      <div class="timeline">
+        <div class="timeline-title">📋 Bias Mitigation Timeline</div>
+        <div id="timeline"></div>
+      </div>
+    </div>
+    <script>
+      var biasTypes = [
+        {
+          name: "Selection Bias",
+          value: 72,
+          color: "#ff4757",
+          desc: "Training data does not represent the target population.",
+        },
+        {
+          name: "Measurement Bias",
+          value: 45,
+          color: "#ff9f43",
+          desc: "Inconsistent or inaccurate data collection methods.",
+        },
+        {
+          name: "Label Bias",
+          value: 38,
+          color: "#f0c040",
+          desc: "Human-labeled ground truth reflects annotator prejudice.",
+        },
+        {
+          name: "Algorithmic Bias",
+          value: 56,
+          color: "#4f2bdf",
+          desc: "Model amplifies existing patterns of inequality.",
+        },
+        {
+          name: "Deployment Bias",
+          value: 29,
+          color: "#00c864",
+          desc: "Model used in context different from training assumptions.",
+        },
+        {
+          name: "Confirmation Bias",
+          value: 33,
+          color: "#e040fb",
+          desc: "Evaluation metrics reinforce pre-existing beliefs.",
+        },
+      ];
 
-var demographics = [
-  { name: 'Age Group', scores: [88, 92, 85, 78, 90] },
-  { name: 'Gender', scores: [95, 91, 89, 93, 94] },
-  { name: 'Ethnicity', scores: [82, 79, 86, 74, 81] },
-  { name: 'Income Level', scores: [91, 88, 76, 83, 90] },
-  { name: 'Geography', scores: [87, 84, 90, 82, 86] }
-];
+      var demographics = [
+        { name: "Age Group", scores: [88, 92, 85, 78, 90] },
+        { name: "Gender", scores: [95, 91, 89, 93, 94] },
+        { name: "Ethnicity", scores: [82, 79, 86, 74, 81] },
+        { name: "Income Level", scores: [91, 88, 76, 83, 90] },
+        { name: "Geography", scores: [87, 84, 90, 82, 86] },
+      ];
 
-var mitigationSteps = [
-  { label: 'Audit Started', pct: 100, color: '#4f2bdf', done: true },
-  { label: 'Data Collection Review', pct: 100, color: '#61afef', done: true },
-  { label: 'Bias Identification', pct: 100, color: '#f0c040', done: true },
-  { label: 'Mitigation Strategy', pct: 65, color: '#ff9f43', done: false },
-  { label: 'Model Retraining', pct: 20, color: '#ff4757', done: false },
-  { label: 'Validation & Reporting', pct: 0, color: '#e040fb', done: false }
-];
+      var mitigationSteps = [
+        { label: "Audit Started", pct: 100, color: "#4f2bdf", done: true },
+        {
+          label: "Data Collection Review",
+          pct: 100,
+          color: "#61afef",
+          done: true,
+        },
+        {
+          label: "Bias Identification",
+          pct: 100,
+          color: "#f0c040",
+          done: true,
+        },
+        {
+          label: "Mitigation Strategy",
+          pct: 65,
+          color: "#ff9f43",
+          done: false,
+        },
+        { label: "Model Retraining", pct: 20, color: "#ff4757", done: false },
+        {
+          label: "Validation & Reporting",
+          pct: 0,
+          color: "#e040fb",
+          done: false,
+        },
+      ];
 
-// Summary cards
-function renderMetrics() {
-  var grid = document.getElementById('metricGrid');
-  grid.textContent = '';
-  var avg = biasTypes.reduce(function(a, b) { return a + b.value; }, 0) / biasTypes.length;
-  var high = biasTypes.filter(function(b) { return b.value > 60; }).length;
+      // Summary cards
+      function renderMetrics() {
+        var grid = document.getElementById("metricGrid");
+        grid.textContent = "";
+        var avg =
+          biasTypes.reduce(function (a, b) {
+            return a + b.value;
+          }, 0) / biasTypes.length;
+        var high = biasTypes.filter(function (b) {
+          return b.value > 60;
+        }).length;
 
-  var cards = [
-    { title: 'Average Bias Score', value: avg.toFixed(1) + '%', bar: avg, color: avg > 50 ? '#ff4757' : '#00c864', desc: 'Weighted average across all detected bias types.' },
-    { title: 'High Risk Categories', value: String(high), bar: (high / biasTypes.length) * 100, color: '#ff4757', desc: 'Categories exceeding 60% bias threshold.' },
-    { title: 'Mitigation Progress', value: '48%', bar: 48, color: '#4f2bdf', desc: 'Overall completion of bias mitigation steps.' },
-    { title: 'Model Fairness Index', value: '0.87', bar: 87, color: '#00c864', desc: 'Demographic parity score (1.0 = perfectly fair).' }
-  ];
+        var cards = [
+          {
+            title: "Average Bias Score",
+            value: avg.toFixed(1) + "%",
+            bar: avg,
+            color: avg > 50 ? "#ff4757" : "#00c864",
+            desc: "Weighted average across all detected bias types.",
+          },
+          {
+            title: "High Risk Categories",
+            value: String(high),
+            bar: (high / biasTypes.length) * 100,
+            color: "#ff4757",
+            desc: "Categories exceeding 60% bias threshold.",
+          },
+          {
+            title: "Mitigation Progress",
+            value: "48%",
+            bar: 48,
+            color: "#4f2bdf",
+            desc: "Overall completion of bias mitigation steps.",
+          },
+          {
+            title: "Model Fairness Index",
+            value: "0.87",
+            bar: 87,
+            color: "#00c864",
+            desc: "Demographic parity score (1.0 = perfectly fair).",
+          },
+        ];
 
-  cards.forEach(function(c, i) {
-    var card = document.createElement('div');
-    card.className = 'metric-card';
-    card.style.animationDelay = (i * 0.1) + 's';
+        cards.forEach(function (c, i) {
+          var card = document.createElement("div");
+          card.className = "metric-card";
+          card.style.animationDelay = i * 0.1 + "s";
 
-    var title = document.createElement('div');
-    title.className = 'card-title';
-    title.textContent = c.title;
+          var title = document.createElement("div");
+          title.className = "card-title";
+          title.textContent = c.title;
 
-    var value = document.createElement('div');
-    value.className = 'card-value';
-    value.textContent = c.value;
-    value.style.color = c.color;
+          var value = document.createElement("div");
+          value.className = "card-value";
+          value.textContent = c.value;
+          value.style.color = c.color;
 
-    var bar = document.createElement('div');
-    bar.className = 'card-bar';
-    var fill = document.createElement('div');
-    fill.className = 'card-bar-fill';
-    fill.style.width = c.bar + '%';
-    fill.style.background = c.color;
-    fill.style.setProperty('--w', c.bar + '%');
-    fill.style.animation = 'growBar 1s ' + (i * 0.15) + 's ease forwards';
-    fill.style.width = '0';
-    bar.appendChild(fill);
+          var bar = document.createElement("div");
+          bar.className = "card-bar";
+          var fill = document.createElement("div");
+          fill.className = "card-bar-fill";
+          fill.style.width = c.bar + "%";
+          fill.style.background = c.color;
+          fill.style.setProperty("--w", c.bar + "%");
+          fill.style.animation = "growBar 1s " + i * 0.15 + "s ease forwards";
+          fill.style.width = "0";
+          bar.appendChild(fill);
 
-    var desc = document.createElement('div');
-    desc.className = 'card-desc';
-    desc.textContent = c.desc;
+          var desc = document.createElement("div");
+          desc.className = "card-desc";
+          desc.textContent = c.desc;
 
-    card.appendChild(title);
-    card.appendChild(value);
-    card.appendChild(bar);
-    card.appendChild(desc);
-    grid.appendChild(card);
-  });
-}
+          card.appendChild(title);
+          card.appendChild(value);
+          card.appendChild(bar);
+          card.appendChild(desc);
+          grid.appendChild(card);
+        });
+      }
 
-// Bar chart
-var chartMode = 'all';
-function renderChartControls() {
-  var controls = document.getElementById('chartControls');
-  controls.textContent = '';
-  var modes = ['All', 'High Risk', 'Low Risk'];
-  modes.forEach(function(m, i) {
-    var btn = document.createElement('button');
-    btn.className = 'ctrl-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = m;
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#chartControls .ctrl-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      chartMode = m.toLowerCase().replace(' ', '');
-      if (chartMode === 'all') chartMode = 'all';
+      // Bar chart
+      var chartMode = "all";
+      function renderChartControls() {
+        var controls = document.getElementById("chartControls");
+        controls.textContent = "";
+        var modes = ["All", "High Risk", "Low Risk"];
+        modes.forEach(function (m, i) {
+          var btn = document.createElement("button");
+          btn.className = "ctrl-btn" + (i === 0 ? " active" : "");
+          btn.textContent = m;
+          btn.addEventListener("click", function () {
+            document
+              .querySelectorAll("#chartControls .ctrl-btn")
+              .forEach(function (b) {
+                b.classList.remove("active");
+              });
+            btn.classList.add("active");
+            chartMode = m.toLowerCase().replace(" ", "");
+            if (chartMode === "all") chartMode = "all";
+            renderBarChart();
+          });
+          controls.appendChild(btn);
+        });
+      }
+
+      function renderBarChart() {
+        var svg = document.getElementById("barChart");
+        svg.textContent = "";
+        var filtered = biasTypes.filter(function (b) {
+          if (chartMode === "highrisk") return b.value > 60;
+          if (chartMode === "lowrisk") return b.value <= 60;
+          return true;
+        });
+
+        var barH = 36;
+        var gap = 12;
+        var maxW = 550;
+        var startX = 160;
+        var startY = 10;
+
+        filtered.forEach(function (b, i) {
+          var y = startY + i * (barH + gap);
+
+          var label = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          label.setAttribute("x", startX - 10);
+          label.setAttribute("y", y + barH / 2 + 4);
+          label.setAttribute("text-anchor", "end");
+          label.setAttribute("class", "bar-label");
+          label.textContent = b.name;
+          svg.appendChild(label);
+
+          var bgRect = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "rect",
+          );
+          bgRect.setAttribute("x", startX);
+          bgRect.setAttribute("y", y);
+          bgRect.setAttribute("width", maxW);
+          bgRect.setAttribute("height", barH);
+          bgRect.setAttribute("rx", 6);
+          bgRect.setAttribute("fill", "#0f1629");
+          svg.appendChild(bgRect);
+
+          var rect = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "rect",
+          );
+          rect.setAttribute("x", startX);
+          rect.setAttribute("y", y);
+          rect.setAttribute("width", 0);
+          rect.setAttribute("height", barH);
+          rect.setAttribute("rx", 6);
+          rect.setAttribute("fill", b.color);
+          rect.setAttribute("opacity", ".7");
+          var targetW = (b.value / 100) * maxW;
+          rect.style.transition = "width 1s " + i * 0.1 + "s ease";
+          svg.appendChild(rect);
+          requestAnimationFrame(function () {
+            rect.setAttribute("width", targetW);
+          });
+
+          var val = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          val.setAttribute("x", startX + targetW + 8);
+          val.setAttribute("y", y + barH / 2 + 4);
+          val.setAttribute("class", "bar-value");
+          val.setAttribute("fill", b.color);
+          val.textContent = b.value + "%";
+          svg.appendChild(val);
+        });
+      }
+
+      // Radar chart
+      function renderRadar() {
+        var svg = document.getElementById("radarChart");
+        svg.textContent = "";
+        var cx = 200,
+          cy = 200,
+          r = 140,
+          n = demographics.length;
+        var maxScore = 100;
+
+        // rings
+        for (var ring = 1; ring <= 4; ring++) {
+          var rr = (r * ring) / 4;
+          var pts = [];
+          for (var i = 0; i < n; i++) {
+            var angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+            pts.push(
+              cx + rr * Math.cos(angle) + "," + (cy + rr * Math.sin(angle)),
+            );
+          }
+          var poly = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "polygon",
+          );
+          poly.setAttribute("points", pts.join(" "));
+          poly.setAttribute("fill", "none");
+          poly.setAttribute("stroke", "#2a2a4a");
+          svg.appendChild(poly);
+
+          var ringLabel = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          ringLabel.setAttribute("x", cx + 4);
+          ringLabel.setAttribute("y", cy - rr + 4);
+          ringLabel.setAttribute("fill", "#555");
+          ringLabel.setAttribute("font-size", "9");
+          ringLabel.textContent = ring * 25 + "%";
+          svg.appendChild(ringLabel);
+        }
+
+        // axes + labels
+        for (var i2 = 0; i2 < n; i2++) {
+          var angle2 = (Math.PI * 2 * i2) / n - Math.PI / 2;
+          var line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          line.setAttribute("x1", cx);
+          line.setAttribute("y1", cy);
+          line.setAttribute("x2", cx + r * Math.cos(angle2));
+          line.setAttribute("y2", cy + r * Math.sin(angle2));
+          line.setAttribute("stroke", "#2a2a4a");
+          svg.appendChild(line);
+
+          var txt = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          txt.setAttribute("x", cx + (r + 24) * Math.cos(angle2));
+          txt.setAttribute("y", cy + (r + 24) * Math.sin(angle2));
+          txt.setAttribute("text-anchor", "middle");
+          txt.setAttribute("dominant-baseline", "middle");
+          txt.setAttribute("fill", "#9e9eb8");
+          txt.setAttribute("font-size", "11");
+          txt.textContent = demographics[i2].name;
+          svg.appendChild(txt);
+        }
+
+        // average scores per demographic
+        var avgScores = demographics.map(function (d) {
+          return (
+            d.scores.reduce(function (a, b) {
+              return a + b;
+            }, 0) / d.scores.length
+          );
+        });
+
+        var dataPts = [];
+        for (var i3 = 0; i3 < n; i3++) {
+          var angle3 = (Math.PI * 2 * i3) / n - Math.PI / 2;
+          var vr = (r * avgScores[i3]) / maxScore;
+          dataPts.push(
+            cx + vr * Math.cos(angle3) + "," + (cy + vr * Math.sin(angle3)),
+          );
+        }
+        var dataPoly = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon",
+        );
+        dataPoly.setAttribute("points", dataPts.join(" "));
+        dataPoly.setAttribute("fill", "rgba(0,200,100,.15)");
+        dataPoly.setAttribute("stroke", "#00c864");
+        dataPoly.setAttribute("stroke-width", "2");
+        svg.appendChild(dataPoly);
+
+        for (var i4 = 0; i4 < n; i4++) {
+          var angle4 = (Math.PI * 2 * i4) / n - Math.PI / 2;
+          var vr2 = (r * avgScores[i4]) / maxScore;
+          var circle = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+          );
+          circle.setAttribute("cx", cx + vr2 * Math.cos(angle4));
+          circle.setAttribute("cy", cy + vr2 * Math.sin(angle4));
+          circle.setAttribute("r", "5");
+          circle.setAttribute("fill", "#00c864");
+          svg.appendChild(circle);
+
+          var valTxt = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          valTxt.setAttribute("x", cx + (vr2 + 14) * Math.cos(angle4));
+          valTxt.setAttribute("y", cy + (vr2 + 14) * Math.sin(angle4));
+          valTxt.setAttribute("text-anchor", "middle");
+          valTxt.setAttribute("font-size", "10");
+          valTxt.setAttribute("fill", "#00c864");
+          valTxt.setAttribute("font-weight", "600");
+          valTxt.textContent = avgScores[i4].toFixed(0) + "%";
+          svg.appendChild(valTxt);
+        }
+      }
+
+      // Timeline
+      function renderTimeline() {
+        var tl = document.getElementById("timeline");
+        tl.textContent = "";
+        mitigationSteps.forEach(function (step, i) {
+          var row = document.createElement("div");
+          row.className = "tl-row";
+          row.style.animation = "fadeSlideUp .4s " + i * 0.1 + "s backwards";
+
+          var dot = document.createElement("div");
+          dot.className = "tl-dot";
+          dot.style.background = step.done ? step.color : "#2a2a4a";
+          if (step.done) dot.style.boxShadow = "0 0 8px " + step.color;
+
+          var label = document.createElement("div");
+          label.className = "tl-label";
+          label.textContent = step.label;
+
+          var bar = document.createElement("div");
+          bar.className = "tl-bar";
+          var fill = document.createElement("div");
+          fill.className = "tl-fill";
+          fill.style.width = step.pct + "%";
+          fill.style.background = step.color;
+          fill.style.opacity = step.done ? "0.8" : "0.4";
+
+          var pctLabel = document.createElement("div");
+          pctLabel.className = "tl-pct";
+          pctLabel.textContent = step.pct + "%";
+          fill.appendChild(pctLabel);
+
+          bar.appendChild(fill);
+          row.appendChild(dot);
+          row.appendChild(label);
+          row.appendChild(bar);
+          tl.appendChild(row);
+        });
+      }
+
+      renderMetrics();
+      renderChartControls();
       renderBarChart();
-    });
-    controls.appendChild(btn);
-  });
-}
-
-function renderBarChart() {
-  var svg = document.getElementById('barChart');
-  svg.textContent = '';
-  var filtered = biasTypes.filter(function(b) {
-    if (chartMode === 'highrisk') return b.value > 60;
-    if (chartMode === 'lowrisk') return b.value <= 60;
-    return true;
-  });
-
-  var barH = 36;
-  var gap = 12;
-  var maxW = 550;
-  var startX = 160;
-  var startY = 10;
-
-  filtered.forEach(function(b, i) {
-    var y = startY + i * (barH + gap);
-
-    var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', startX - 10);
-    label.setAttribute('y', y + barH / 2 + 4);
-    label.setAttribute('text-anchor', 'end');
-    label.setAttribute('class', 'bar-label');
-    label.textContent = b.name;
-    svg.appendChild(label);
-
-    var bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    bgRect.setAttribute('x', startX);
-    bgRect.setAttribute('y', y);
-    bgRect.setAttribute('width', maxW);
-    bgRect.setAttribute('height', barH);
-    bgRect.setAttribute('rx', 6);
-    bgRect.setAttribute('fill', '#0f1629');
-    svg.appendChild(bgRect);
-
-    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', startX);
-    rect.setAttribute('y', y);
-    rect.setAttribute('width', 0);
-    rect.setAttribute('height', barH);
-    rect.setAttribute('rx', 6);
-    rect.setAttribute('fill', b.color);
-    rect.setAttribute('opacity', '.7');
-    var targetW = (b.value / 100) * maxW;
-    rect.style.transition = 'width 1s ' + (i * 0.1) + 's ease';
-    svg.appendChild(rect);
-    requestAnimationFrame(function() { rect.setAttribute('width', targetW); });
-
-    var val = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    val.setAttribute('x', startX + targetW + 8);
-    val.setAttribute('y', y + barH / 2 + 4);
-    val.setAttribute('class', 'bar-value');
-    val.setAttribute('fill', b.color);
-    val.textContent = b.value + '%';
-    svg.appendChild(val);
-  });
-}
-
-// Radar chart
-function renderRadar() {
-  var svg = document.getElementById('radarChart');
-  svg.textContent = '';
-  var cx = 200, cy = 200, r = 140, n = demographics.length;
-  var maxScore = 100;
-
-  // rings
-  for (var ring = 1; ring <= 4; ring++) {
-    var rr = r * ring / 4;
-    var pts = [];
-    for (var i = 0; i < n; i++) {
-      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-      pts.push((cx + rr * Math.cos(angle)) + ',' + (cy + rr * Math.sin(angle)));
-    }
-    var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    poly.setAttribute('points', pts.join(' '));
-    poly.setAttribute('fill', 'none');
-    poly.setAttribute('stroke', '#2a2a4a');
-    svg.appendChild(poly);
-
-    var ringLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    ringLabel.setAttribute('x', cx + 4);
-    ringLabel.setAttribute('y', cy - rr + 4);
-    ringLabel.setAttribute('fill', '#555');
-    ringLabel.setAttribute('font-size', '9');
-    ringLabel.textContent = (ring * 25) + '%';
-    svg.appendChild(ringLabel);
-  }
-
-  // axes + labels
-  for (var i2 = 0; i2 < n; i2++) {
-    var angle2 = (Math.PI * 2 * i2 / n) - Math.PI / 2;
-    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', cx); line.setAttribute('y1', cy);
-    line.setAttribute('x2', cx + r * Math.cos(angle2)); line.setAttribute('y2', cy + r * Math.sin(angle2));
-    line.setAttribute('stroke', '#2a2a4a');
-    svg.appendChild(line);
-
-    var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    txt.setAttribute('x', cx + (r + 24) * Math.cos(angle2));
-    txt.setAttribute('y', cy + (r + 24) * Math.sin(angle2));
-    txt.setAttribute('text-anchor', 'middle');
-    txt.setAttribute('dominant-baseline', 'middle');
-    txt.setAttribute('fill', '#9e9eb8');
-    txt.setAttribute('font-size', '11');
-    txt.textContent = demographics[i2].name;
-    svg.appendChild(txt);
-  }
-
-  // average scores per demographic
-  var avgScores = demographics.map(function(d) {
-    return d.scores.reduce(function(a, b) { return a + b; }, 0) / d.scores.length;
-  });
-
-  var dataPts = [];
-  for (var i3 = 0; i3 < n; i3++) {
-    var angle3 = (Math.PI * 2 * i3 / n) - Math.PI / 2;
-    var vr = r * avgScores[i3] / maxScore;
-    dataPts.push((cx + vr * Math.cos(angle3)) + ',' + (cy + vr * Math.sin(angle3)));
-  }
-  var dataPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  dataPoly.setAttribute('points', dataPts.join(' '));
-  dataPoly.setAttribute('fill', 'rgba(0,200,100,.15)');
-  dataPoly.setAttribute('stroke', '#00c864');
-  dataPoly.setAttribute('stroke-width', '2');
-  svg.appendChild(dataPoly);
-
-  for (var i4 = 0; i4 < n; i4++) {
-    var angle4 = (Math.PI * 2 * i4 / n) - Math.PI / 2;
-    var vr2 = r * avgScores[i4] / maxScore;
-    var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', cx + vr2 * Math.cos(angle4));
-    circle.setAttribute('cy', cy + vr2 * Math.sin(angle4));
-    circle.setAttribute('r', '5');
-    circle.setAttribute('fill', '#00c864');
-    svg.appendChild(circle);
-
-    var valTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    valTxt.setAttribute('x', cx + (vr2 + 14) * Math.cos(angle4));
-    valTxt.setAttribute('y', cy + (vr2 + 14) * Math.sin(angle4));
-    valTxt.setAttribute('text-anchor', 'middle');
-    valTxt.setAttribute('font-size', '10');
-    valTxt.setAttribute('fill', '#00c864');
-    valTxt.setAttribute('font-weight', '600');
-    valTxt.textContent = avgScores[i4].toFixed(0) + '%';
-    svg.appendChild(valTxt);
-  }
-}
-
-// Timeline
-function renderTimeline() {
-  var tl = document.getElementById('timeline');
-  tl.textContent = '';
-  mitigationSteps.forEach(function(step, i) {
-    var row = document.createElement('div');
-    row.className = 'tl-row';
-    row.style.animation = 'fadeSlideUp .4s ' + (i * 0.1) + 's backwards';
-
-    var dot = document.createElement('div');
-    dot.className = 'tl-dot';
-    dot.style.background = step.done ? step.color : '#2a2a4a';
-    if (step.done) dot.style.boxShadow = '0 0 8px ' + step.color;
-
-    var label = document.createElement('div');
-    label.className = 'tl-label';
-    label.textContent = step.label;
-
-    var bar = document.createElement('div');
-    bar.className = 'tl-bar';
-    var fill = document.createElement('div');
-    fill.className = 'tl-fill';
-    fill.style.width = step.pct + '%';
-    fill.style.background = step.color;
-    fill.style.opacity = step.done ? '0.8' : '0.4';
-
-    var pctLabel = document.createElement('div');
-    pctLabel.className = 'tl-pct';
-    pctLabel.textContent = step.pct + '%';
-    fill.appendChild(pctLabel);
-
-    bar.appendChild(fill);
-    row.appendChild(dot);
-    row.appendChild(label);
-    row.appendChild(bar);
-    tl.appendChild(row);
-  });
-}
-
-renderMetrics();
-renderChartControls();
-renderBarChart();
-renderRadar();
-renderTimeline();
-</script>
-</body>
+      renderRadar();
+      renderTimeline();
+    </script>
+  </body>
 </html>

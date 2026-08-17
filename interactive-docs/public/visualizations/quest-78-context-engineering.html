@@ -1,123 +1,408 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Context Window Budget</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.5rem}
-h1{color:#4f2bdf;font-size:1.5rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.2rem}
-.window{width:100%;max-width:600px;background:#16213e;border:2px solid #333;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-.window-header{background:#0d1117;padding:.5rem .8rem;font-size:.75rem;color:#888;display:flex;justify-content:space-between}
-.window-bar{height:40px;display:flex;transition:all .3s}
-.seg{display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#1a1a2e;transition:width .3s;overflow:hidden;white-space:nowrap}
-.seg-sys{background:#4f2bdf}
-.seg-ctx{background:#00c864}
-.seg-hist{background:#e8a838}
-.seg-out{background:#e74c3c}
-.overflow-indicator{height:0;background:repeating-linear-gradient(45deg,#e8433e,#e8433e 5px,#c0392b 5px,#c0392b 10px);transition:height .3s;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:700;overflow:hidden}
-.sliders{width:100%;max-width:600px;display:flex;flex-direction:column;gap:.8rem}
-.slider-row{display:flex;align-items:center;gap:.8rem;background:#16213e;padding:.6rem .8rem;border-radius:8px;border:1px solid #333}
-.slider-row label{width:100px;font-size:.8rem;color:#888;flex-shrink:0}
-.slider-row input[type=range]{flex:1;accent-color:var(--clr)}
-.slider-row .val{width:50px;text-align:right;font-size:.85rem;font-weight:700;color:var(--clr)}
-.legend{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
-.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.75rem;color:#888}
-.legend-dot{width:10px;height:10px;border-radius:3px}
-.budget-info{margin-top:1rem;width:100%;max-width:600px;background:#16213e;border:1px solid #333;border-radius:10px;padding:.8rem;font-size:.8rem;display:flex;justify-content:space-around;flex-wrap:wrap;gap:.5rem}
-.budget-info span{font-weight:700}
-.total-ok{color:#00c864}.total-over{color:#e8433e}
-.handle-overflow{margin-top:.8rem;padding:.7rem 1rem;background:#16213e;border:1px solid #333;border-radius:8px;font-size:.8rem;color:#888;width:100%;max-width:600px}
-.handle-overflow strong{color:#e8433e}
-.strategy-btns{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap}
-.strategy-btns button{padding:.4rem .8rem;border:1px solid #444;border-radius:6px;background:#0d1117;color:#ccc;font-size:.75rem;cursor:pointer;transition:all .2s}
-.strategy-btns button:hover,.strategy-btns button.active{border-color:#4f2bdf;color:#4f2bdf;background:rgba(79,43,223,.1)}
-</style>
-</head>
-<body>
-<h1>📐 Context Window Budget</h1>
-<p class="sub">Adjust token allocations — see overflow handling in action</p>
-<div class="window">
-  <div class="window-header"><span>Context Window</span><span id="totalTokens">4096 tokens</span></div>
-  <div class="window-bar" id="windowBar"></div>
-  <div class="overflow-indicator" id="overflowBar"></div>
-</div>
-<div class="sliders">
-  <div class="slider-row" style="--clr:#4f2bdf">
-    <label>System Prompt</label>
-    <input type="range" id="sys" min="0" max="4096" value="500" oninput="update()">
-    <div class="val" style="color:#4f2bdf" id="sysVal">500</div>
-  </div>
-  <div class="slider-row" style="--clr:#00c864">
-    <label>Context Docs</label>
-    <input type="range" id="ctx" min="0" max="4096" value="1200" oninput="update()">
-    <div class="val" style="color:#00c864" id="ctxVal">1200</div>
-  </div>
-  <div class="slider-row" style="--clr:#e8a838">
-    <label>Chat History</label>
-    <input type="range" id="hist" min="0" max="4096" value="1000" oninput="update()">
-    <div class="val" style="color:#e8a838" id="histVal">1000</div>
-  </div>
-  <div class="slider-row" style="--clr:#e74c3c">
-    <label>Output Reserve</label>
-    <input type="range" id="out" min="128" max="4096" value="800" oninput="update()">
-    <div class="val" style="color:#e74c3c" id="outVal">800</div>
-  </div>
-</div>
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#4f2bdf"></div>System</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#00c864"></div>Context</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#e8a838"></div>History</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div>Output</div>
-</div>
-<div class="budget-info" id="budgetInfo"></div>
-<div class="handle-overflow" id="overflowInfo" style="display:none">
-  <strong>⚠️ Overflow detected!</strong> Strategies to handle:
-  <div class="strategy-btns" id="strats"></div>
-  <p id="stratResult" style="margin-top:.5rem;color:#ccc"></p>
-</div>
-<script>
-const MAX=4096;let activeStrat=null;
-const strategies=[
-  {name:'Truncate History',apply:()=>{document.getElementById('hist').value=Math.max(0,MAX-parseInt(document.getElementById('sys').value)-parseInt(document.getElementById('ctx').value)-parseInt(document.getElementById('out').value))}},
-  {name:'Summarize Context',apply:()=>{document.getElementById('ctx').value=Math.round(parseInt(document.getElementById('ctx').value)*.5)}},
-  {name:'Reduce Output',apply:()=>{document.getElementById('out').value=Math.round(parseInt(document.getElementById('out').value)*.6)}},
-  {name:'Slide Window',apply:()=>{const h=parseInt(document.getElementById('hist').value);document.getElementById('hist').value=Math.round(h*.4)}}
-];
-function renderBar(){
-  const bar=document.getElementById('windowBar');while(bar.firstChild)bar.removeChild(bar.firstChild);
-  const parts=[
-    {id:'sys',cls:'seg-sys'},{id:'ctx',cls:'seg-ctx'},{id:'hist',cls:'seg-hist'},{id:'out',cls:'seg-out'}
-  ];
-  parts.forEach(p=>{
-    const v=parseInt(document.getElementById(p.id).value);
-    const s=document.createElement('div');s.className='seg '+p.cls;s.style.width=(v/MAX*100)+'%';
-    s.textContent=v>=200?v+'t':v+'';
-    bar.appendChild(s);
-  });
-}
-function update(){
-  ['sys','ctx','hist','out'].forEach(id=>{document.getElementById(id+'Val').textContent=document.getElementById(id).value});
-  const total=parseInt(document.getElementById('sys').value)+parseInt(document.getElementById('ctx').value)+parseInt(document.getElementById('hist').value)+parseInt(document.getElementById('out').value);
-  renderBar();
-  const ov=document.getElementById('overflowBar');ov.style.height=total>MAX?Math.round((total-MAX)/MAX*60)+'px':'0';
-  const info=document.getElementById('budgetInfo');
-  while(info.firstChild)info.removeChild(info.firstChild);
-  const used=document.createElement('span');used.textContent='Used: '+total.toLocaleString();const cls=total<=MAX?'total-ok':'total-over';used.className=cls;
-  const rem=document.createElement('span');rem.textContent='Remaining: '+(MAX-total).toLocaleString();rem.className=MAX-total>=0?'total-ok':'total-over';
-  const pct=document.createElement('span');pct.textContent=Math.round(total/MAX*100)+'%';pct.className=cls;
-  info.appendChild(used);info.appendChild(rem);info.appendChild(pct);
-  const oi=document.getElementById('overflowInfo');oi.style.display=total>MAX?'block':'none';
-  if(total>MAX){
-    const sb=document.getElementById('strats');while(sb.firstChild)sb.removeChild(sb.firstChild);
-    strategies.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.name;b.addEventListener('click',()=>{activeStrat=i;s.apply();update();
-      document.getElementById('stratResult').textContent='✅ Applied: '+s.name+' — budget rebalanced.';
-    });sb.appendChild(b)});
-  }else{document.getElementById('stratResult').textContent='';activeStrat=null}
-}
-renderBar();update();
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Context Window Budget</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1.5rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+      }
+      .window {
+        width: 100%;
+        max-width: 600px;
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+      .window-header {
+        background: #0d1117;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+        color: #888;
+        display: flex;
+        justify-content: space-between;
+      }
+      .window-bar {
+        height: 40px;
+        display: flex;
+        transition: all 0.3s;
+      }
+      .seg {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        transition: width 0.3s;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .seg-sys {
+        background: #4f2bdf;
+      }
+      .seg-ctx {
+        background: #00c864;
+      }
+      .seg-hist {
+        background: #e8a838;
+      }
+      .seg-out {
+        background: #e74c3c;
+      }
+      .overflow-indicator {
+        height: 0;
+        background: repeating-linear-gradient(
+          45deg,
+          #e8433e,
+          #e8433e 5px,
+          #c0392b 5px,
+          #c0392b 10px
+        );
+        transition: height 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: #fff;
+        font-weight: 700;
+        overflow: hidden;
+      }
+      .sliders {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: #16213e;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+      }
+      .slider-row label {
+        width: 100px;
+        font-size: 0.8rem;
+        color: #888;
+        flex-shrink: 0;
+      }
+      .slider-row input[type="range"] {
+        flex: 1;
+        accent-color: var(--clr);
+      }
+      .slider-row .val {
+        width: 50px;
+        text-align: right;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--clr);
+      }
+      .legend {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        color: #888;
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+      }
+      .budget-info {
+        margin-top: 1rem;
+        width: 100%;
+        max-width: 600px;
+        background: #16213e;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 0.8rem;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .budget-info span {
+        font-weight: 700;
+      }
+      .total-ok {
+        color: #00c864;
+      }
+      .total-over {
+        color: #e8433e;
+      }
+      .handle-overflow {
+        margin-top: 0.8rem;
+        padding: 0.7rem 1rem;
+        background: #16213e;
+        border: 1px solid #333;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: #888;
+        width: 100%;
+        max-width: 600px;
+      }
+      .handle-overflow strong {
+        color: #e8433e;
+      }
+      .strategy-btns {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .strategy-btns button {
+        padding: 0.4rem 0.8rem;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #0d1117;
+        color: #ccc;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .strategy-btns button:hover,
+      .strategy-btns button.active {
+        border-color: #4f2bdf;
+        color: #4f2bdf;
+        background: rgba(79, 43, 223, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📐 Context Window Budget</h1>
+    <p class="sub">
+      Adjust token allocations — see overflow handling in action
+    </p>
+    <div class="window">
+      <div class="window-header">
+        <span>Context Window</span><span id="totalTokens">4096 tokens</span>
+      </div>
+      <div class="window-bar" id="windowBar"></div>
+      <div class="overflow-indicator" id="overflowBar"></div>
+    </div>
+    <div class="sliders">
+      <div class="slider-row" style="--clr: #4f2bdf">
+        <label>System Prompt</label>
+        <input
+          type="range"
+          id="sys"
+          min="0"
+          max="4096"
+          value="500"
+          oninput="update()"
+        />
+        <div class="val" style="color: #4f2bdf" id="sysVal">500</div>
+      </div>
+      <div class="slider-row" style="--clr: #00c864">
+        <label>Context Docs</label>
+        <input
+          type="range"
+          id="ctx"
+          min="0"
+          max="4096"
+          value="1200"
+          oninput="update()"
+        />
+        <div class="val" style="color: #00c864" id="ctxVal">1200</div>
+      </div>
+      <div class="slider-row" style="--clr: #e8a838">
+        <label>Chat History</label>
+        <input
+          type="range"
+          id="hist"
+          min="0"
+          max="4096"
+          value="1000"
+          oninput="update()"
+        />
+        <div class="val" style="color: #e8a838" id="histVal">1000</div>
+      </div>
+      <div class="slider-row" style="--clr: #e74c3c">
+        <label>Output Reserve</label>
+        <input
+          type="range"
+          id="out"
+          min="128"
+          max="4096"
+          value="800"
+          oninput="update()"
+        />
+        <div class="val" style="color: #e74c3c" id="outVal">800</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #4f2bdf"></div>
+        System
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #00c864"></div>
+        Context
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #e8a838"></div>
+        History
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #e74c3c"></div>
+        Output
+      </div>
+    </div>
+    <div class="budget-info" id="budgetInfo"></div>
+    <div class="handle-overflow" id="overflowInfo" style="display: none">
+      <strong>⚠️ Overflow detected!</strong> Strategies to handle:
+      <div class="strategy-btns" id="strats"></div>
+      <p id="stratResult" style="margin-top: 0.5rem; color: #ccc"></p>
+    </div>
+    <script>
+      const MAX = 4096;
+      let activeStrat = null;
+      const strategies = [
+        {
+          name: "Truncate History",
+          apply: () => {
+            document.getElementById("hist").value = Math.max(
+              0,
+              MAX -
+                parseInt(document.getElementById("sys").value) -
+                parseInt(document.getElementById("ctx").value) -
+                parseInt(document.getElementById("out").value),
+            );
+          },
+        },
+        {
+          name: "Summarize Context",
+          apply: () => {
+            document.getElementById("ctx").value = Math.round(
+              parseInt(document.getElementById("ctx").value) * 0.5,
+            );
+          },
+        },
+        {
+          name: "Reduce Output",
+          apply: () => {
+            document.getElementById("out").value = Math.round(
+              parseInt(document.getElementById("out").value) * 0.6,
+            );
+          },
+        },
+        {
+          name: "Slide Window",
+          apply: () => {
+            const h = parseInt(document.getElementById("hist").value);
+            document.getElementById("hist").value = Math.round(h * 0.4);
+          },
+        },
+      ];
+      function renderBar() {
+        const bar = document.getElementById("windowBar");
+        while (bar.firstChild) bar.removeChild(bar.firstChild);
+        const parts = [
+          { id: "sys", cls: "seg-sys" },
+          { id: "ctx", cls: "seg-ctx" },
+          { id: "hist", cls: "seg-hist" },
+          { id: "out", cls: "seg-out" },
+        ];
+        parts.forEach((p) => {
+          const v = parseInt(document.getElementById(p.id).value);
+          const s = document.createElement("div");
+          s.className = "seg " + p.cls;
+          s.style.width = (v / MAX) * 100 + "%";
+          s.textContent = v >= 200 ? v + "t" : v + "";
+          bar.appendChild(s);
+        });
+      }
+      function update() {
+        ["sys", "ctx", "hist", "out"].forEach((id) => {
+          document.getElementById(id + "Val").textContent =
+            document.getElementById(id).value;
+        });
+        const total =
+          parseInt(document.getElementById("sys").value) +
+          parseInt(document.getElementById("ctx").value) +
+          parseInt(document.getElementById("hist").value) +
+          parseInt(document.getElementById("out").value);
+        renderBar();
+        const ov = document.getElementById("overflowBar");
+        ov.style.height =
+          total > MAX ? Math.round(((total - MAX) / MAX) * 60) + "px" : "0";
+        const info = document.getElementById("budgetInfo");
+        while (info.firstChild) info.removeChild(info.firstChild);
+        const used = document.createElement("span");
+        used.textContent = "Used: " + total.toLocaleString();
+        const cls = total <= MAX ? "total-ok" : "total-over";
+        used.className = cls;
+        const rem = document.createElement("span");
+        rem.textContent = "Remaining: " + (MAX - total).toLocaleString();
+        rem.className = MAX - total >= 0 ? "total-ok" : "total-over";
+        const pct = document.createElement("span");
+        pct.textContent = Math.round((total / MAX) * 100) + "%";
+        pct.className = cls;
+        info.appendChild(used);
+        info.appendChild(rem);
+        info.appendChild(pct);
+        const oi = document.getElementById("overflowInfo");
+        oi.style.display = total > MAX ? "block" : "none";
+        if (total > MAX) {
+          const sb = document.getElementById("strats");
+          while (sb.firstChild) sb.removeChild(sb.firstChild);
+          strategies.forEach((s, i) => {
+            const b = document.createElement("button");
+            b.textContent = s.name;
+            b.addEventListener("click", () => {
+              activeStrat = i;
+              s.apply();
+              update();
+              document.getElementById("stratResult").textContent =
+                "✅ Applied: " + s.name + " — budget rebalanced.";
+            });
+            sb.appendChild(b);
+          });
+        } else {
+          document.getElementById("stratResult").textContent = "";
+          activeStrat = null;
+        }
+      }
+      renderBar();
+      update();
+    </script>
+  </body>
 </html>

@@ -1,109 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LLM Observability Dashboard — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:1.5rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.2rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;width:100%;max-width:900px}
-.card{background:#16213e;border-radius:10px;padding:1rem;border:1px solid #4f2bdf33}
-.card .label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem}
-.card .value{font-size:1.6rem;font-weight:700}
-.card .trend{font-size:.7rem;margin-top:.3rem}
-.trend.up{color:#00c864}.trend.down{color:#ff4466}.trend.flat{color:#e8a020}
-.card:nth-child(1) .value{color:#4f2bdf}.card:nth-child(2) .value{color:#00c864}
-.card:nth-child(3) .value{color:#e8a020}.card:nth-child(4) .value{color:#ff4466}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.2rem;width:100%;max-width:900px}
-@media(max-width:600px){.charts{grid-template-columns:1fr}}
-.chart-box{background:#16213e;border-radius:10px;padding:1rem;border:1px solid #4f2bdf33}
-.chart-box h3{font-size:.8rem;color:#888;margin-bottom:.8rem}
-canvas{width:100%!important;height:140px!important}
-.log{margin-top:1.2rem;width:100%;max-width:900px;background:#16213e;border-radius:10px;padding:1rem;border:1px solid #4f2bdf33;max-height:160px;overflow-y:auto}
-.log h3{font-size:.8rem;color:#888;margin-bottom:.5rem}
-.log-entry{font-family:'Courier New',monospace;font-size:.72rem;padding:2px 0;border-bottom:1px solid #ffffff08;display:flex;gap:.6rem}
-.log-time{color:#555;flex-shrink:0}
-.log-msg{color:#aaa}
-.log-msg.error{color:#ff4466}.log-msg.warn{color:#e8a020}.log-msg.ok{color:#00c864}
-</style>
-</head>
-<body>
-<h1>LLM Observability Dashboard</h1>
-<p class="sub">Live metrics — charts update every 2 seconds</p>
-<div class="grid" id="cards"></div>
-<div class="charts">
-  <div class="chart-box"><h3>📈 Latency (ms)</h3><canvas id="latChart"></canvas></div>
-  <div class="chart-box"><h3>💰 Cost per Request ($)</h3><canvas id="costChart"></canvas></div>
-  <div class="chart-box"><h3>🔤 Token Usage</h3><canvas id="tokChart"></canvas></div>
-  <div class="chart-box"><h3>⚠️ Error Rate (%)</h3><canvas id="errChart"></canvas></div>
-</div>
-<div class="log" id="log"><h3>📋 Recent Activity</h3></div>
-<script>
-const metrics=[
-  {label:'Avg Latency',value:342,unit:'ms',trend:'+12%',trendCls:'down'},
-  {label:'Success Rate',value:98.7,unit:'%',trend:'-0.2%',trendCls:'down'},
-  {label:'Avg Cost',value:0.0034,unit:'$',trend:'-8%',trendCls:'up'},
-  {label:'Error Rate',value:1.3,unit:'%',trend:'+0.1%',trendCls:'flat'}
-];
-const cards=document.getElementById('cards');
-metrics.forEach(m=>{
-  const card=document.createElement('div');card.className='card';
-  const lb=document.createElement('div');lb.className='label';lb.textContent=m.label;
-  const vl=document.createElement('div');vl.className='value';vl.id='v-'+m.label.replace(/\s/g,'');
-  vl.textContent=m.value+m.unit;
-  const tr=document.createElement('div');tr.className='trend '+m.trendCls;tr.textContent=m.trend+' vs last hour';
-  card.appendChild(lb);card.appendChild(vl);card.appendChild(tr);
-  cards.appendChild(card);
-});
-function drawChart(canvasId,data,color,min,max){
-  const cv=document.getElementById(canvasId);if(!cv)return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width=cv.offsetWidth*2;const H=cv.height=280;
-  ctx.clearRect(0,0,W,H);
-  const n=data.length;if(n<2)return;
-  const step=W/(n-1);
-  const range=max-min||1;
-  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;
-  data.forEach((v,i)=>{const x=i*step;const y=H-((v-min)/range)*(H-40)-20;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
-  ctx.stroke();
-  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();
-  ctx.fillStyle=color+'15';ctx.fill();
-}
-const dLen=30;
-const latData=Array.from({length:dLen},()=>280+Math.random()*200);
-const costData=Array.from({length:dLen},()=>0.002+Math.random()*0.004);
-const tokData=Array.from({length:dLen},()=>800+Math.random()*600);
-const errData=Array.from({length:dLen},()=>Math.random()*4);
-const logEl=document.getElementById('log');
-const logMsgs=['GET /v1/chat/completions 200','POST /v1/embeddings 200','GET /v1/models 200','POST /v1/chat/completions 500 Rate limit exceeded','GET /v1/usage 200','POST /v1/completions 429 Token limit','GET /v1/health 200'];
-function addLog(){
-  const now=new Date();const ts=now.toTimeString().slice(0,8);
-  const msg=logMsgs[Math.floor(Math.random()*logMsgs.length)];
-  const entry=document.createElement('div');entry.className='log-entry';
-  const time=document.createElement('span');time.className='log-time';time.textContent=ts;
-  const m=document.createElement('span');m.className='log-msg '+(msg.includes('500')?'error':msg.includes('429')?'warn':'ok');m.textContent=msg;
-  entry.appendChild(time);entry.appendChild(m);
-  logEl.appendChild(entry);
-  if(logEl.children.length>20)logEl.removeChild(logEl.children[1]);
-}
-function update(){
-  latData.push(280+Math.random()*200);latData.shift();
-  costData.push(0.002+Math.random()*0.004);costData.shift();
-  tokData.push(800+Math.random()*600);tokData.shift();
-  errData.push(Math.random()*4);errData.shift();
-  drawChart('latChart',latData,'#4f2bdf',200,500);
-  drawChart('costChart',costData,'#00c864',0,0.008);
-  drawChart('tokChart',tokData,'#e8a020',500,1500);
-  drawChart('errChart',errData,'#ff4466',0,5);
-  const lv=document.getElementById('v-AvgLatency');if(lv)lv.textContent=Math.round(latData[latData.length-1])+'ms';
-  const sv=document.getElementById('v-SuccessRate');if(sv)sv.textContent=(100-errData[errData.length-1]).toFixed(1)+'%';
-  const cv2=document.getElementById('v-AvgCost');if(cv2)cv2.textContent='$'+costData[costData.length-1].toFixed(4);
-  const ev=document.getElementById('v-ErrorRate');if(ev)ev.textContent=errData[errData.length-1].toFixed(1)+'%';
-  addLog();
-}
-update();setInterval(update,2000);
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LLM Observability Dashboard — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 1.5rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.2rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        width: 100%;
+        max-width: 900px;
+      }
+      .card {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid #4f2bdf33;
+      }
+      .card .label {
+        font-size: 0.7rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.3rem;
+      }
+      .card .value {
+        font-size: 1.6rem;
+        font-weight: 700;
+      }
+      .card .trend {
+        font-size: 0.7rem;
+        margin-top: 0.3rem;
+      }
+      .trend.up {
+        color: #00c864;
+      }
+      .trend.down {
+        color: #ff4466;
+      }
+      .trend.flat {
+        color: #e8a020;
+      }
+      .card:nth-child(1) .value {
+        color: #4f2bdf;
+      }
+      .card:nth-child(2) .value {
+        color: #00c864;
+      }
+      .card:nth-child(3) .value {
+        color: #e8a020;
+      }
+      .card:nth-child(4) .value {
+        color: #ff4466;
+      }
+      .charts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.2rem;
+        width: 100%;
+        max-width: 900px;
+      }
+      @media (max-width: 600px) {
+        .charts {
+          grid-template-columns: 1fr;
+        }
+      }
+      .chart-box {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid #4f2bdf33;
+      }
+      .chart-box h3 {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 0.8rem;
+      }
+      canvas {
+        width: 100% !important;
+        height: 140px !important;
+      }
+      .log {
+        margin-top: 1.2rem;
+        width: 100%;
+        max-width: 900px;
+        background: #16213e;
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid #4f2bdf33;
+        max-height: 160px;
+        overflow-y: auto;
+      }
+      .log h3 {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 0.5rem;
+      }
+      .log-entry {
+        font-family: "Courier New", monospace;
+        font-size: 0.72rem;
+        padding: 2px 0;
+        border-bottom: 1px solid #ffffff08;
+        display: flex;
+        gap: 0.6rem;
+      }
+      .log-time {
+        color: #555;
+        flex-shrink: 0;
+      }
+      .log-msg {
+        color: #aaa;
+      }
+      .log-msg.error {
+        color: #ff4466;
+      }
+      .log-msg.warn {
+        color: #e8a020;
+      }
+      .log-msg.ok {
+        color: #00c864;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LLM Observability Dashboard</h1>
+    <p class="sub">Live metrics — charts update every 2 seconds</p>
+    <div class="grid" id="cards"></div>
+    <div class="charts">
+      <div class="chart-box">
+        <h3>📈 Latency (ms)</h3>
+        <canvas id="latChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>💰 Cost per Request ($)</h3>
+        <canvas id="costChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>🔤 Token Usage</h3>
+        <canvas id="tokChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>⚠️ Error Rate (%)</h3>
+        <canvas id="errChart"></canvas>
+      </div>
+    </div>
+    <div class="log" id="log"><h3>📋 Recent Activity</h3></div>
+    <script>
+      const metrics = [
+        {
+          label: "Avg Latency",
+          value: 342,
+          unit: "ms",
+          trend: "+12%",
+          trendCls: "down",
+        },
+        {
+          label: "Success Rate",
+          value: 98.7,
+          unit: "%",
+          trend: "-0.2%",
+          trendCls: "down",
+        },
+        {
+          label: "Avg Cost",
+          value: 0.0034,
+          unit: "$",
+          trend: "-8%",
+          trendCls: "up",
+        },
+        {
+          label: "Error Rate",
+          value: 1.3,
+          unit: "%",
+          trend: "+0.1%",
+          trendCls: "flat",
+        },
+      ];
+      const cards = document.getElementById("cards");
+      metrics.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const lb = document.createElement("div");
+        lb.className = "label";
+        lb.textContent = m.label;
+        const vl = document.createElement("div");
+        vl.className = "value";
+        vl.id = "v-" + m.label.replace(/\s/g, "");
+        vl.textContent = m.value + m.unit;
+        const tr = document.createElement("div");
+        tr.className = "trend " + m.trendCls;
+        tr.textContent = m.trend + " vs last hour";
+        card.appendChild(lb);
+        card.appendChild(vl);
+        card.appendChild(tr);
+        cards.appendChild(card);
+      });
+      function drawChart(canvasId, data, color, min, max) {
+        const cv = document.getElementById(canvasId);
+        if (!cv) return;
+        const ctx = cv.getContext("2d");
+        const W = (cv.width = cv.offsetWidth * 2);
+        const H = (cv.height = 280);
+        ctx.clearRect(0, 0, W, H);
+        const n = data.length;
+        if (n < 2) return;
+        const step = W / (n - 1);
+        const range = max - min || 1;
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        data.forEach((v, i) => {
+          const x = i * step;
+          const y = H - ((v - min) / range) * (H - 40) - 20;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.lineTo(W, H);
+        ctx.lineTo(0, H);
+        ctx.closePath();
+        ctx.fillStyle = color + "15";
+        ctx.fill();
+      }
+      const dLen = 30;
+      const latData = Array.from(
+        { length: dLen },
+        () => 280 + Math.random() * 200,
+      );
+      const costData = Array.from(
+        { length: dLen },
+        () => 0.002 + Math.random() * 0.004,
+      );
+      const tokData = Array.from(
+        { length: dLen },
+        () => 800 + Math.random() * 600,
+      );
+      const errData = Array.from({ length: dLen }, () => Math.random() * 4);
+      const logEl = document.getElementById("log");
+      const logMsgs = [
+        "GET /v1/chat/completions 200",
+        "POST /v1/embeddings 200",
+        "GET /v1/models 200",
+        "POST /v1/chat/completions 500 Rate limit exceeded",
+        "GET /v1/usage 200",
+        "POST /v1/completions 429 Token limit",
+        "GET /v1/health 200",
+      ];
+      function addLog() {
+        const now = new Date();
+        const ts = now.toTimeString().slice(0, 8);
+        const msg = logMsgs[Math.floor(Math.random() * logMsgs.length)];
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        const time = document.createElement("span");
+        time.className = "log-time";
+        time.textContent = ts;
+        const m = document.createElement("span");
+        m.className =
+          "log-msg " +
+          (msg.includes("500") ? "error" : msg.includes("429") ? "warn" : "ok");
+        m.textContent = msg;
+        entry.appendChild(time);
+        entry.appendChild(m);
+        logEl.appendChild(entry);
+        if (logEl.children.length > 20) logEl.removeChild(logEl.children[1]);
+      }
+      function update() {
+        latData.push(280 + Math.random() * 200);
+        latData.shift();
+        costData.push(0.002 + Math.random() * 0.004);
+        costData.shift();
+        tokData.push(800 + Math.random() * 600);
+        tokData.shift();
+        errData.push(Math.random() * 4);
+        errData.shift();
+        drawChart("latChart", latData, "#4f2bdf", 200, 500);
+        drawChart("costChart", costData, "#00c864", 0, 0.008);
+        drawChart("tokChart", tokData, "#e8a020", 500, 1500);
+        drawChart("errChart", errData, "#ff4466", 0, 5);
+        const lv = document.getElementById("v-AvgLatency");
+        if (lv) lv.textContent = Math.round(latData[latData.length - 1]) + "ms";
+        const sv = document.getElementById("v-SuccessRate");
+        if (sv)
+          sv.textContent = (100 - errData[errData.length - 1]).toFixed(1) + "%";
+        const cv2 = document.getElementById("v-AvgCost");
+        if (cv2)
+          cv2.textContent = "$" + costData[costData.length - 1].toFixed(4);
+        const ev = document.getElementById("v-ErrorRate");
+        if (ev) ev.textContent = errData[errData.length - 1].toFixed(1) + "%";
+        addLog();
+      }
+      update();
+      setInterval(update, 2000);
+    </script>
+  </body>
 </html>

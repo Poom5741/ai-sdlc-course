@@ -1,54 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Docstring Standards — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
-.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
-.ctn{max-width:900px;margin:0 auto}
-/* Format toggle */
-.format-row{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.fmt-btn{padding:8px 18px;border-radius:20px;background:#16213e;border:1px solid #333;color:#aaa;font-size:.8rem;cursor:pointer;transition:all .3s}
-.fmt-btn.active{background:#4f2bdf;color:#fff;border-color:#4f2bdf}
-/* Editor panels */
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-@media(max-width:640px){.panels{grid-template-columns:1fr}}
-.panel{background:#16213e;border-radius:12px;overflow:hidden;border:1px solid #333}
-.panel-head{padding:8px 14px;background:#0d1117;border-bottom:1px solid #333;font-size:.8rem;font-weight:600;color:#4f2bdf;display:flex;justify-content:space-between;align-items:center}
-.panel-head .tag{font-size:.65rem;padding:2px 8px;border-radius:99px;background:#4f2bdf22;color:#4f2bdf}
-.editor{width:100%;min-height:260px;background:#0d1117;border:none;color:#e0e0e0;font-family:'Courier New',monospace;font-size:.78rem;padding:14px;resize:vertical;outline:none;line-height:1.6}
-.editor:focus{box-shadow:inset 0 0 0 1px #4f2bdf}
-.output-editor{width:100%;min-height:260px;background:#0d1117;border:none;color:#e0e0e0;font-family:'Courier New',monospace;font-size:.78rem;padding:14px;outline:none;line-height:1.6;white-space:pre-wrap}
-/* Annotations panel */
-.annots{background:#16213e;border-radius:12px;padding:16px;border:1px solid #333;margin-bottom:20px}
-.annots h2{font-size:.9rem;color:#4f2bdf;margin-bottom:10px}
-.annot-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #222;font-size:.8rem}
-.annot-item:last-child{border:none}
-.annot-num{width:24px;height:24px;border-radius:50%;background:#4f2bdf33;color:#4f2bdf;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
-.annot-text{color:#ccc;line-height:1.4}
-.annot-text strong{color:#00c864}
-/* Tips */
-.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px}
-.tip-card{background:#0d1117;border-radius:8px;padding:12px;border:1px solid #333;font-size:.78rem}
-.tip-card .ico{font-size:1.2rem;margin-bottom:4px}
-.tip-card .ttl{color:#4f2bdf;font-weight:600;margin-bottom:4px}
-.tip-card .desc{color:#888;line-height:1.4}
-.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
-.btn:hover{background:#6143e8}
-</style>
-</head>
-<body>
-<h1>📝 Docstring Generator</h1>
-<p class="sub">Paste code → choose format → get structured documentation</p>
-<div class="ctn">
-<div class="format-row" id="fmtRow"></div>
-<div class="panels">
-  <div class="panel">
-    <div class="panel-head">Input Code <span class="tag">editable</span></div>
-    <textarea class="editor" id="codeIn" spellcheck="false">function calculateDiscount(
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Docstring Standards — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #4f2bdf;
+        margin-bottom: 6px;
+        font-size: 1.5rem;
+      }
+      .sub {
+        text-align: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .ctn {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      /* Format toggle */
+      .format-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .fmt-btn {
+        padding: 8px 18px;
+        border-radius: 20px;
+        background: #16213e;
+        border: 1px solid #333;
+        color: #aaa;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .fmt-btn.active {
+        background: #4f2bdf;
+        color: #fff;
+        border-color: #4f2bdf;
+      }
+      /* Editor panels */
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 640px) {
+        .panels {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: #16213e;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #333;
+      }
+      .panel-head {
+        padding: 8px 14px;
+        background: #0d1117;
+        border-bottom: 1px solid #333;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #4f2bdf;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .panel-head .tag {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 99px;
+        background: #4f2bdf22;
+        color: #4f2bdf;
+      }
+      .editor {
+        width: 100%;
+        min-height: 260px;
+        background: #0d1117;
+        border: none;
+        color: #e0e0e0;
+        font-family: "Courier New", monospace;
+        font-size: 0.78rem;
+        padding: 14px;
+        resize: vertical;
+        outline: none;
+        line-height: 1.6;
+      }
+      .editor:focus {
+        box-shadow: inset 0 0 0 1px #4f2bdf;
+      }
+      .output-editor {
+        width: 100%;
+        min-height: 260px;
+        background: #0d1117;
+        border: none;
+        color: #e0e0e0;
+        font-family: "Courier New", monospace;
+        font-size: 0.78rem;
+        padding: 14px;
+        outline: none;
+        line-height: 1.6;
+        white-space: pre-wrap;
+      }
+      /* Annotations panel */
+      .annots {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+      .annots h2 {
+        font-size: 0.9rem;
+        color: #4f2bdf;
+        margin-bottom: 10px;
+      }
+      .annot-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #222;
+        font-size: 0.8rem;
+      }
+      .annot-item:last-child {
+        border: none;
+      }
+      .annot-num {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #4f2bdf33;
+        color: #4f2bdf;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .annot-text {
+        color: #ccc;
+        line-height: 1.4;
+      }
+      .annot-text strong {
+        color: #00c864;
+      }
+      /* Tips */
+      .tips {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .tip-card {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #333;
+        font-size: 0.78rem;
+      }
+      .tip-card .ico {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+      }
+      .tip-card .ttl {
+        color: #4f2bdf;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .tip-card .desc {
+        color: #888;
+        line-height: 1.4;
+      }
+      .btn {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 28px;
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #6143e8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📝 Docstring Generator</h1>
+    <p class="sub">Paste code → choose format → get structured documentation</p>
+    <div class="ctn">
+      <div class="format-row" id="fmtRow"></div>
+      <div class="panels">
+        <div class="panel">
+          <div class="panel-head">
+            Input Code <span class="tag">editable</span>
+          </div>
+          <textarea class="editor" id="codeIn" spellcheck="false">
+function calculateDiscount(
   price: number,
   quantity: number,
   customerType: 'regular' | 'premium' | 'vip'
@@ -58,106 +230,173 @@ h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
   if (quantity >= 10) return price * quantity * 0.95;
   return price * quantity;
 }</textarea>
-  </div>
-  <div class="panel">
-    <div class="panel-head">Generated Docstring <span class="tag" id="fmtTag">JSDoc</span></div>
-    <div class="output-editor" id="codeOut"></div>
-  </div>
-</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            Generated Docstring <span class="tag" id="fmtTag">JSDoc</span>
+          </div>
+          <div class="output-editor" id="codeOut"></div>
+        </div>
+      </div>
 
-<div class="annots" id="annots">
-  <h2>📖 Annotation Guide</h2>
-</div>
+      <div class="annots" id="annots">
+        <h2>📖 Annotation Guide</h2>
+      </div>
 
-<div class="tips">
-  <div class="tip-card"><div class="ico">🎯</div><div class="ttl">Be Specific</div><div class="desc">Describe what the function does, not how. Avoid restating the code.</div></div>
-  <div class="tip-card"><div class="ico">⚠️</div><div class="ttl">Document Edge Cases</div><div class="desc">Note what happens with null, empty arrays, negative numbers, etc.</div></div>
-  <div class="tip-card"><div class="ico">🔗</div><div class="ttl">Link Related</div><div class="desc">Reference related functions, classes, or external docs.</div></div>
-  <div class="tip-card"><div class="ico">📐</div><div class="ttl">Stay Consistent</div><div class="desc">Pick one format per project and stick to it across the codebase.</div></div>
-</div>
-<button class="btn" onclick="generate()">✨ Generate Docstring</button>
-</div>
+      <div class="tips">
+        <div class="tip-card">
+          <div class="ico">🎯</div>
+          <div class="ttl">Be Specific</div>
+          <div class="desc">
+            Describe what the function does, not how. Avoid restating the code.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="ico">⚠️</div>
+          <div class="ttl">Document Edge Cases</div>
+          <div class="desc">
+            Note what happens with null, empty arrays, negative numbers, etc.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="ico">🔗</div>
+          <div class="ttl">Link Related</div>
+          <div class="desc">
+            Reference related functions, classes, or external docs.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="ico">📐</div>
+          <div class="ttl">Stay Consistent</div>
+          <div class="desc">
+            Pick one format per project and stick to it across the codebase.
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="generate()">✨ Generate Docstring</button>
+    </div>
 
-<script>
-const formats=[
-  {id:'jsdoc',name:'JSDoc'},
-  {id:'google',name:'Google'},
-  {id:'numpy',name:'NumPy'},
-];
-let currentFmt='jsdoc';
+    <script>
+      const formats = [
+        { id: "jsdoc", name: "JSDoc" },
+        { id: "google", name: "Google" },
+        { id: "numpy", name: "NumPy" },
+      ];
+      let currentFmt = "jsdoc";
 
-function renderToggles(){
-  const $r=document.getElementById('fmtRow');$r.innerHTML='';
-  formats.forEach(f=>{
-    const b=document.createElement('span');b.className='fmt-btn'+(f.id===currentFmt?' active':'');
-    b.textContent=f.name;b.onclick=()=>{currentFmt=f.id;renderToggles();generate();};
-    $r.appendChild(b);
-  });
-  document.getElementById('fmtTag').textContent=formats.find(f=>f.id===currentFmt).name;
-}
+      function renderToggles() {
+        const $r = document.getElementById("fmtRow");
+        $r.innerHTML = "";
+        formats.forEach((f) => {
+          const b = document.createElement("span");
+          b.className = "fmt-btn" + (f.id === currentFmt ? " active" : "");
+          b.textContent = f.name;
+          b.onclick = () => {
+            currentFmt = f.id;
+            renderToggles();
+            generate();
+          };
+          $r.appendChild(b);
+        });
+        document.getElementById("fmtTag").textContent = formats.find(
+          (f) => f.id === currentFmt,
+        ).name;
+      }
 
-function parseFunction(code){
-  const nameMatch=code.match(/function\s+(\w+)/);
-  const name=nameMatch?nameMatch[1]:'myFunction';
-  const params=[];const paramRegex=/(\w+)\s*(?::\s*([^,\)]+))?(?:\s*\|\s*'(\w+)')?/g;
-  // Simple param parsing
-  const paramSection=code.match(/\(([\s\S]*?)\)\s*(?::\s*\w+|\{[^}]+\}|\=\>)/);
-  if(paramSection){
-    const lines=paramSection[1].split(',').map(s=>s.trim()).filter(Boolean);
-    lines.forEach(l=>{
-      const parts=l.match(/(\w+)\s*:\s*(.+)/);
-      if(parts)params.push({name:parts[1],type:parts[2].trim()});
-    });
-  }
-  const returnMatch=code.match(/:\s*(\w+)[\s{]/);
-  const retType=returnMatch?returnMatch[1]:'number';
-  return{name,params,retType};
-}
+      function parseFunction(code) {
+        const nameMatch = code.match(/function\s+(\w+)/);
+        const name = nameMatch ? nameMatch[1] : "myFunction";
+        const params = [];
+        const paramRegex = /(\w+)\s*(?::\s*([^,\)]+))?(?:\s*\|\s*'(\w+)')?/g;
+        // Simple param parsing
+        const paramSection = code.match(
+          /\(([\s\S]*?)\)\s*(?::\s*\w+|\{[^}]+\}|\=\>)/,
+        );
+        if (paramSection) {
+          const lines = paramSection[1]
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          lines.forEach((l) => {
+            const parts = l.match(/(\w+)\s*:\s*(.+)/);
+            if (parts) params.push({ name: parts[1], type: parts[2].trim() });
+          });
+        }
+        const returnMatch = code.match(/:\s*(\w+)[\s{]/);
+        const retType = returnMatch ? returnMatch[1] : "number";
+        return { name, params, retType };
+      }
 
-function generate(){
-  const code=document.getElementById('codeIn').value;
-  const fn=parseFunction(code);
-  let out='',annots=[];
-  if(currentFmt==='jsdoc'){
-    out=`/**\n * Calculates the final price after applying discount rules.\n * VIP customers get 20% off, premium get 10%, and bulk\n * orders (10+ items) get 5% off regular price.\n *\n`;
-    fn.params.forEach(p=>{out+=` * @param {${p.type}} ${p.name} - The ${p.name.replace(/([A-Z])/g,' $1').toLowerCase()} for the order\n`;});
-    out+=` * @returns {${fn.retType}} The total price after discount is applied\n * @throws {Error} If price is negative\n * @example\n * // VIP customer buying 5 items at $100 each\n * calculateDiscount(100, 5, 'vip') // returns 400\n */`;
-    annots=[
-      {t:'<strong>@param</strong> tags describe each parameter with its type and purpose.'},
-      {t:'<strong>@returns</strong> specifies the return type and meaning.'},
-      {t:'<strong>@throws</strong> documents possible errors.'},
-      {t:'<strong>@example</strong> provides a usage snippet for quick reference.'},
-    ];
-  } else if(currentFmt==='google'){
-    out=`Calculates the final price after applying discount rules.\n\nVIP customers get 20% off, premium get 10%, and bulk\norders (10+ items) get 5% off regular price.\n\n`;
-    fn.params.forEach(p=>{out+=`Args:\n    ${p.name}: The ${p.name.replace(/([A-Z])/g,' $1').toLowerCase()} for the order.\n\n`;});
-    out+=`Returns:\n    ${fn.retType}: The total price after discount is applied.\n\nRaises:\n    Error: If price is negative.\n\nExample:\n    >>> calculateDiscount(100, 5, 'vip')\n    400`;
-    annots=[
-      {t:'<strong>Args:</strong> section lists each parameter with its description.'},
-      {t:'<strong>Returns:</strong> describes the return value type and meaning.'},
-      {t:'<strong>Raises:</strong> documents exceptions that may be thrown.'},
-      {t:'<strong>Example:</strong> shows a quick usage snippet.'},
-    ];
-  } else {
-    out=`Calculates the final price after applying discount rules.\n\nVIP customers get 20% off, premium get 10%, and bulk\norders (10+ items) get 5% off regular price.\n\nParameters\n----------`;
-    fn.params.forEach(p=>{out+=`\n${p.name} : ${p.type}\n    The ${p.name.replace(/([A-Z])/g,' $1').toLowerCase()} for the order.`;});
-    out+=`\n\nReturns\n-------\n${fn.retType}\n    The total price after discount is applied.\n\nRaises\n------\nError\n    If price is negative.\n\nExamples\n--------\n>>> calculateDiscount(100, 5, 'vip')\n400`;
-    annots=[
-      {t:'<strong>Parameters</strong> uses the <code>name : type</code> convention with indented descriptions.'},
-      {t:'<strong>Returns</strong> section lists type and description on separate lines.'},
-      {t:'<strong>Raises</strong> documents exception types.'},
-      {t:'<strong>Examples</strong> uses Python doctest style with <code>>>></code> prompts.'},
-    ];
-  }
-  document.getElementById('codeOut').textContent=out;
-  const $a=document.getElementById('annots');
-  $a.innerHTML='<h2>📖 Annotation Guide</h2>';
-  annots.forEach((a,i)=>{
-    $a.innerHTML+=`<div class="annot-item"><span class="annot-num">${i+1}</span><span class="annot-text">${a.t}</span></div>`;
-  });
-}
-renderToggles();generate();
-document.getElementById('codeIn').addEventListener('input',generate);
-</script>
-</body>
+      function generate() {
+        const code = document.getElementById("codeIn").value;
+        const fn = parseFunction(code);
+        let out = "",
+          annots = [];
+        if (currentFmt === "jsdoc") {
+          out = `/**\n * Calculates the final price after applying discount rules.\n * VIP customers get 20% off, premium get 10%, and bulk\n * orders (10+ items) get 5% off regular price.\n *\n`;
+          fn.params.forEach((p) => {
+            out += ` * @param {${p.type}} ${p.name} - The ${p.name.replace(/([A-Z])/g, " $1").toLowerCase()} for the order\n`;
+          });
+          out += ` * @returns {${fn.retType}} The total price after discount is applied\n * @throws {Error} If price is negative\n * @example\n * // VIP customer buying 5 items at $100 each\n * calculateDiscount(100, 5, 'vip') // returns 400\n */`;
+          annots = [
+            {
+              t: "<strong>@param</strong> tags describe each parameter with its type and purpose.",
+            },
+            {
+              t: "<strong>@returns</strong> specifies the return type and meaning.",
+            },
+            { t: "<strong>@throws</strong> documents possible errors." },
+            {
+              t: "<strong>@example</strong> provides a usage snippet for quick reference.",
+            },
+          ];
+        } else if (currentFmt === "google") {
+          out = `Calculates the final price after applying discount rules.\n\nVIP customers get 20% off, premium get 10%, and bulk\norders (10+ items) get 5% off regular price.\n\n`;
+          fn.params.forEach((p) => {
+            out += `Args:\n    ${p.name}: The ${p.name.replace(/([A-Z])/g, " $1").toLowerCase()} for the order.\n\n`;
+          });
+          out += `Returns:\n    ${fn.retType}: The total price after discount is applied.\n\nRaises:\n    Error: If price is negative.\n\nExample:\n    >>> calculateDiscount(100, 5, 'vip')\n    400`;
+          annots = [
+            {
+              t: "<strong>Args:</strong> section lists each parameter with its description.",
+            },
+            {
+              t: "<strong>Returns:</strong> describes the return value type and meaning.",
+            },
+            {
+              t: "<strong>Raises:</strong> documents exceptions that may be thrown.",
+            },
+            { t: "<strong>Example:</strong> shows a quick usage snippet." },
+          ];
+        } else {
+          out = `Calculates the final price after applying discount rules.\n\nVIP customers get 20% off, premium get 10%, and bulk\norders (10+ items) get 5% off regular price.\n\nParameters\n----------`;
+          fn.params.forEach((p) => {
+            out += `\n${p.name} : ${p.type}\n    The ${p.name.replace(/([A-Z])/g, " $1").toLowerCase()} for the order.`;
+          });
+          out += `\n\nReturns\n-------\n${fn.retType}\n    The total price after discount is applied.\n\nRaises\n------\nError\n    If price is negative.\n\nExamples\n--------\n>>> calculateDiscount(100, 5, 'vip')\n400`;
+          annots = [
+            {
+              t: "<strong>Parameters</strong> uses the <code>name : type</code> convention with indented descriptions.",
+            },
+            {
+              t: "<strong>Returns</strong> section lists type and description on separate lines.",
+            },
+            { t: "<strong>Raises</strong> documents exception types." },
+            {
+              t: "<strong>Examples</strong> uses Python doctest style with <code>>>></code> prompts.",
+            },
+          ];
+        }
+        document.getElementById("codeOut").textContent = out;
+        const $a = document.getElementById("annots");
+        $a.innerHTML = "<h2>📖 Annotation Guide</h2>";
+        annots.forEach((a, i) => {
+          $a.innerHTML += `<div class="annot-item"><span class="annot-num">${i + 1}</span><span class="annot-text">${a.t}</span></div>`;
+        });
+      }
+      renderToggles();
+      generate();
+      document.getElementById("codeIn").addEventListener("input", generate);
+    </script>
+  </body>
 </html>

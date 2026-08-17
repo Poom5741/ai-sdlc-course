@@ -1,100 +1,377 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Loop Architecture</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:2rem}
-h1{color:#4f2bdf;margin-bottom:.5rem;font-size:1.6rem}
-p.subtitle{color:#888;margin-bottom:1.5rem;font-size:.9rem}
-.loop-container{position:relative;width:100%;max-width:700px;height:420px}
-.node{position:absolute;width:130px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;transition:transform .2s,box-shadow .2s;cursor:default}
-.node:hover{transform:scale(1.08)}
-.generate{top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#4f2bdf,#6c47ff);color:#fff}
-.review{bottom:60px;right:40px;background:linear-gradient(135deg,#e8a838,#f5c462);color:#1a1a2e}
-.fix{bottom:60px;left:40px;background:linear-gradient(135deg,#00c864,#34e07a);color:#1a1a2e}
-svg.arrows{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-.arrow-path{fill:none;stroke:#4f2bdf;stroke-width:2.5;stroke-dasharray:8 4;opacity:.5}
-.arrow-path.active{stroke:#00c864;opacity:1;filter:drop-shadow(0 0 6px #00c864)}
-.dot{r:5;fill:#00c864;opacity:0}
-.dot.moving{opacity:1}
-.controls{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center}
-button{padding:.6rem 1.4rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;transition:all .2s}
-.btn-start{background:#4f2bdf;color:#fff}
-.btn-start:hover{background:#6c47ff}
-.btn-reset{background:#333;color:#ccc}
-.btn-reset:hover{background:#444}
-.stats{margin-top:1.2rem;display:flex;gap:2rem;font-size:.95rem;flex-wrap:wrap;justify-content:center}
-.stat{background:#16213e;padding:.6rem 1.2rem;border-radius:8px;border:1px solid #333}
-.stat span{color:#00c864;font-weight:700}
-.guard{margin-top:1rem;padding:.8rem 1.2rem;background:#16213e;border-left:4px solid #e8a838;border-radius:0 8px 8px 0;font-size:.85rem;color:#e8a838;max-width:700px;width:100%}
-.phase-label{position:absolute;font-size:.7rem;color:#aaa;text-transform:uppercase;letter-spacing:1px}
-@media(max-width:500px){.node{width:100px;height:48px;font-size:.8rem}h1{font-size:1.2rem}}
-</style>
-</head>
-<body>
-<h1>Agent Loop Architecture</h1>
-<p class="subtitle">Generate → Review → Fix — with max iteration guard</p>
-<div class="loop-container">
-  <svg class="arrows" viewBox="0 0 700 420">
-    <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4f2bdf"/></marker></defs>
-    <path class="arrow-path" id="a1" d="M350,80 Q490,100 500,210" marker-end="url(#ah)"/>
-    <path class="arrow-path" id="a2" d="M410,250 Q350,300 180,250" marker-end="url(#ah)"/>
-    <path class="arrow-path" id="a3" d="M200,200 Q250,120 310,80" marker-end="url(#ah)"/>
-    <circle class="dot" id="d1"><animateMotion dur="1s" begin="indefinite" path="M350,80 Q490,100 500,210" fill="freeze" id="anim1"/></circle>
-    <circle class="dot" id="d2"><animateMotion dur="1s" begin="indefinite" path="M410,250 Q350,300 180,250" fill="freeze" id="anim2"/></circle>
-    <circle class="dot" id="d3"><animateMotion dur="1s" begin="indefinite" path="M200,200 Q250,120 310,80" fill="freeze" id="anim3"/></circle>
-  </svg>
-  <div class="node generate">⚡ Generate</div>
-  <div class="node review">🔍 Review</div>
-  <div class="node fix">🔧 Fix</div>
-</div>
-<div class="controls">
-  <button class="btn-start" onclick="startLoop()">▶ Start Loop</button>
-  <button class="btn-reset" onclick="resetLoop()">↺ Reset</button>
-</div>
-<div class="stats">
-  <div class="stat">Iteration: <span id="iter">0</span> / <span id="maxIterDisplay">5</span></div>
-  <div class="stat">Status: <span id="status">Idle</span></div>
-  <div class="stat">Score: <span id="score">0</span>%</div>
-</div>
-<div class="guard">⚠️ Max iterations guard: loop stops automatically after max iterations to prevent infinite loops. Set max iterations:</div>
-<div class="controls">
-  <button onclick="setMaxIter(3)" style="font-size:.75rem;padding:.4rem .8rem">3</button>
-  <button onclick="setMaxIter(5)" style="font-size:.75rem;padding:.4rem .8rem" id="btn5" class="btn-start">5</button>
-  <button onclick="setMaxIter(10)" style="font-size:.75rem;padding:.4rem .8rem">10</button>
-</div>
-<script>
-let iter=0,maxIter=5,running=false,timer=null,currentStep=0;
-const phases=[{id:'a1',dot:'d1',anim:'anim1',node:'generate',label:'Generating...'},
-  {id:'a2',dot:'d2',anim:'anim2',node:'review',label:'Reviewing...'},
-  {id:'a3',dot:'d3',anim:'anim3',node:'fix',label:'Fixing...'}];
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Loop Architecture</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        margin-bottom: 0.5rem;
+        font-size: 1.6rem;
+      }
+      p.subtitle {
+        color: #888;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+      }
+      .loop-container {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        height: 420px;
+      }
+      .node {
+        position: absolute;
+        width: 130px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        cursor: default;
+      }
+      .node:hover {
+        transform: scale(1.08);
+      }
+      .generate {
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #4f2bdf, #6c47ff);
+        color: #fff;
+      }
+      .review {
+        bottom: 60px;
+        right: 40px;
+        background: linear-gradient(135deg, #e8a838, #f5c462);
+        color: #1a1a2e;
+      }
+      .fix {
+        bottom: 60px;
+        left: 40px;
+        background: linear-gradient(135deg, #00c864, #34e07a);
+        color: #1a1a2e;
+      }
+      svg.arrows {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .arrow-path {
+        fill: none;
+        stroke: #4f2bdf;
+        stroke-width: 2.5;
+        stroke-dasharray: 8 4;
+        opacity: 0.5;
+      }
+      .arrow-path.active {
+        stroke: #00c864;
+        opacity: 1;
+        filter: drop-shadow(0 0 6px #00c864);
+      }
+      .dot {
+        r: 5;
+        fill: #00c864;
+        opacity: 0;
+      }
+      .dot.moving {
+        opacity: 1;
+      }
+      .controls {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 0.6rem 1.4rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      .btn-start {
+        background: #4f2bdf;
+        color: #fff;
+      }
+      .btn-start:hover {
+        background: #6c47ff;
+      }
+      .btn-reset {
+        background: #333;
+        color: #ccc;
+      }
+      .btn-reset:hover {
+        background: #444;
+      }
+      .stats {
+        margin-top: 1.2rem;
+        display: flex;
+        gap: 2rem;
+        font-size: 0.95rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .stat {
+        background: #16213e;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+      }
+      .stat span {
+        color: #00c864;
+        font-weight: 700;
+      }
+      .guard {
+        margin-top: 1rem;
+        padding: 0.8rem 1.2rem;
+        background: #16213e;
+        border-left: 4px solid #e8a838;
+        border-radius: 0 8px 8px 0;
+        font-size: 0.85rem;
+        color: #e8a838;
+        max-width: 700px;
+        width: 100%;
+      }
+      .phase-label {
+        position: absolute;
+        font-size: 0.7rem;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      @media (max-width: 500px) {
+        .node {
+          width: 100px;
+          height: 48px;
+          font-size: 0.8rem;
+        }
+        h1 {
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Agent Loop Architecture</h1>
+    <p class="subtitle">Generate → Review → Fix — with max iteration guard</p>
+    <div class="loop-container">
+      <svg class="arrows" viewBox="0 0 700 420">
+        <defs>
+          <marker
+            id="ah"
+            markerWidth="8"
+            markerHeight="6"
+            refX="8"
+            refY="3"
+            orient="auto"
+          >
+            <polygon points="0 0,8 3,0 6" fill="#4f2bdf" />
+          </marker>
+        </defs>
+        <path
+          class="arrow-path"
+          id="a1"
+          d="M350,80 Q490,100 500,210"
+          marker-end="url(#ah)"
+        />
+        <path
+          class="arrow-path"
+          id="a2"
+          d="M410,250 Q350,300 180,250"
+          marker-end="url(#ah)"
+        />
+        <path
+          class="arrow-path"
+          id="a3"
+          d="M200,200 Q250,120 310,80"
+          marker-end="url(#ah)"
+        />
+        <circle class="dot" id="d1">
+          <animateMotion
+            dur="1s"
+            begin="indefinite"
+            path="M350,80 Q490,100 500,210"
+            fill="freeze"
+            id="anim1"
+          />
+        </circle>
+        <circle class="dot" id="d2">
+          <animateMotion
+            dur="1s"
+            begin="indefinite"
+            path="M410,250 Q350,300 180,250"
+            fill="freeze"
+            id="anim2"
+          />
+        </circle>
+        <circle class="dot" id="d3">
+          <animateMotion
+            dur="1s"
+            begin="indefinite"
+            path="M200,200 Q250,120 310,80"
+            fill="freeze"
+            id="anim3"
+          />
+        </circle>
+      </svg>
+      <div class="node generate">⚡ Generate</div>
+      <div class="node review">🔍 Review</div>
+      <div class="node fix">🔧 Fix</div>
+    </div>
+    <div class="controls">
+      <button class="btn-start" onclick="startLoop()">▶ Start Loop</button>
+      <button class="btn-reset" onclick="resetLoop()">↺ Reset</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        Iteration: <span id="iter">0</span> / <span id="maxIterDisplay">5</span>
+      </div>
+      <div class="stat">Status: <span id="status">Idle</span></div>
+      <div class="stat">Score: <span id="score">0</span>%</div>
+    </div>
+    <div class="guard">
+      ⚠️ Max iterations guard: loop stops automatically after max iterations to
+      prevent infinite loops. Set max iterations:
+    </div>
+    <div class="controls">
+      <button
+        onclick="setMaxIter(3)"
+        style="font-size: 0.75rem; padding: 0.4rem 0.8rem"
+      >
+        3
+      </button>
+      <button
+        onclick="setMaxIter(5)"
+        style="font-size: 0.75rem; padding: 0.4rem 0.8rem"
+        id="btn5"
+        class="btn-start"
+      >
+        5
+      </button>
+      <button
+        onclick="setMaxIter(10)"
+        style="font-size: 0.75rem; padding: 0.4rem 0.8rem"
+      >
+        10
+      </button>
+    </div>
+    <script>
+      let iter = 0,
+        maxIter = 5,
+        running = false,
+        timer = null,
+        currentStep = 0;
+      const phases = [
+        {
+          id: "a1",
+          dot: "d1",
+          anim: "anim1",
+          node: "generate",
+          label: "Generating...",
+        },
+        {
+          id: "a2",
+          dot: "d2",
+          anim: "anim2",
+          node: "review",
+          label: "Reviewing...",
+        },
+        { id: "a3", dot: "d3", anim: "anim3", node: "fix", label: "Fixing..." },
+      ];
 
-function setMaxIter(n){maxIter=n;document.getElementById('maxIterDisplay').textContent=n;
-  document.querySelectorAll('.controls:last-of-type button').forEach(b=>b.classList.remove('btn-start'));
-  event.target.classList.add('btn-start');}
+      function setMaxIter(n) {
+        maxIter = n;
+        document.getElementById("maxIterDisplay").textContent = n;
+        document
+          .querySelectorAll(".controls:last-of-type button")
+          .forEach((b) => b.classList.remove("btn-start"));
+        event.target.classList.add("btn-start");
+      }
 
-function highlightPhase(i){
-  phases.forEach((p,j)=>{document.getElementById(p.id).classList.toggle('active',j===i);const d=document.getElementById(p.dot);d.classList.toggle('moving',j===i);});
-  document.querySelectorAll('.node').forEach((n,j)=>{n.style.boxShadow=j===i?'0 0 20px rgba(79,43,223,.7)':'none'});
-  document.getElementById('status').textContent=phases[i].label;
-}
+      function highlightPhase(i) {
+        phases.forEach((p, j) => {
+          document.getElementById(p.id).classList.toggle("active", j === i);
+          const d = document.getElementById(p.dot);
+          d.classList.toggle("moving", j === i);
+        });
+        document.querySelectorAll(".node").forEach((n, j) => {
+          n.style.boxShadow = j === i ? "0 0 20px rgba(79,43,223,.7)" : "none";
+        });
+        document.getElementById("status").textContent = phases[i].label;
+      }
 
-function step(){
-  if(iter>=maxIter){stopLoop();document.getElementById('status').textContent='⛔ Max reached';return}
-  if(currentStep===0)iter++;
-  document.getElementById('iter').textContent=iter;
-  highlightPhase(currentStep);
-  currentStep=(currentStep+1)%3;
-  if(currentStep===0){const s=parseInt(document.getElementById('score').textContent);document.getElementById('score').textContent=Math.min(100,s+Math.floor(Math.random()*25)+10)}
-  timer=setTimeout(step,1200);
-}
+      function step() {
+        if (iter >= maxIter) {
+          stopLoop();
+          document.getElementById("status").textContent = "⛔ Max reached";
+          return;
+        }
+        if (currentStep === 0) iter++;
+        document.getElementById("iter").textContent = iter;
+        highlightPhase(currentStep);
+        currentStep = (currentStep + 1) % 3;
+        if (currentStep === 0) {
+          const s = parseInt(document.getElementById("score").textContent);
+          document.getElementById("score").textContent = Math.min(
+            100,
+            s + Math.floor(Math.random() * 25) + 10,
+          );
+        }
+        timer = setTimeout(step, 1200);
+      }
 
-function startLoop(){if(running)return;running=true;step()}
-function stopLoop(){running=false;clearTimeout(timer)}
-function resetLoop(){stopLoop();iter=0;currentStep=0;document.getElementById('iter').textContent='0';document.getElementById('score').textContent='0';document.getElementById('status').textContent='Idle';phases.forEach(p=>{document.getElementById(p.id).classList.remove('active');document.getElementById(p.dot).classList.remove('moving')});document.querySelectorAll('.node').forEach(n=>n.style.boxShadow='none')}
-</script>
-</body>
+      function startLoop() {
+        if (running) return;
+        running = true;
+        step();
+      }
+      function stopLoop() {
+        running = false;
+        clearTimeout(timer);
+      }
+      function resetLoop() {
+        stopLoop();
+        iter = 0;
+        currentStep = 0;
+        document.getElementById("iter").textContent = "0";
+        document.getElementById("score").textContent = "0";
+        document.getElementById("status").textContent = "Idle";
+        phases.forEach((p) => {
+          document.getElementById(p.id).classList.remove("active");
+          document.getElementById(p.dot).classList.remove("moving");
+        });
+        document
+          .querySelectorAll(".node")
+          .forEach((n) => (n.style.boxShadow = "none"));
+      }
+    </script>
+  </body>
 </html>

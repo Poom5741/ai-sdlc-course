@@ -1,292 +1,680 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Git Repository Setup — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'SF Mono',system-ui,monospace;min-height:100vh;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1100px;margin:0 auto}
-@media(max-width:800px){.panels{grid-template-columns:1fr}}
-.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
-.panel:hover{border-color:#4f2bdf}
-.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
-.panel h2 span{font-size:1.2rem}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Git Repository Setup — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "SF Mono", system-ui, monospace;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      @media (max-width: 800px) {
+        .panels {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.2rem;
+        transition: border-color 0.3s;
+      }
+      .panel:hover {
+        border-color: #4f2bdf;
+      }
+      .panel h2 {
+        color: #4f2bdf;
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .panel h2 span {
+        font-size: 1.2rem;
+      }
 
-/* Tree */
-.tree{font-size:.82rem;line-height:1.8}
-.tree-item{cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .2s;display:flex;align-items:center;gap:6px}
-.tree-item:hover{background:#ffffff10}
-.tree-item .icon{width:16px;text-align:center;flex-shrink:0}
-.tree-children{margin-left:1.2rem;overflow:hidden;transition:max-height .3s ease}
-.tree-children.collapsed{max-height:0!important}
-.tracked{color:#00c864}.untracked{color:#ff4466}.ignored{color:#555;font-style:italic}
-.tree-badge{font-size:.65rem;padding:1px 5px;border-radius:3px;margin-left:auto}
-.badge-track{background:#00c86422;color:#00c864}
-.badge-untrack{background:#ff446622;color:#ff4466}
-.badge-ignore{background:#55555533;color:#777}
+      /* Tree */
+      .tree {
+        font-size: 0.82rem;
+        line-height: 1.8;
+      }
+      .tree-item {
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .tree-item:hover {
+        background: #ffffff10;
+      }
+      .tree-item .icon {
+        width: 16px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .tree-children {
+        margin-left: 1.2rem;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .tree-children.collapsed {
+        max-height: 0 !important;
+      }
+      .tracked {
+        color: #00c864;
+      }
+      .untracked {
+        color: #ff4466;
+      }
+      .ignored {
+        color: #555;
+        font-style: italic;
+      }
+      .tree-badge {
+        font-size: 0.65rem;
+        padding: 1px 5px;
+        border-radius: 3px;
+        margin-left: auto;
+      }
+      .badge-track {
+        background: #00c86422;
+        color: #00c864;
+      }
+      .badge-untrack {
+        background: #ff446622;
+        color: #ff4466;
+      }
+      .badge-ignore {
+        background: #55555533;
+        color: #777;
+      }
 
-/* Gitignore */
-.gitignore-toggle{display:flex;align-items:center;gap:.5rem;padding:4px 0;font-size:.8rem;border-bottom:1px solid #ffffff08;cursor:pointer}
-.gitignore-toggle:hover{background:#ffffff05;border-radius:4px}
-.toggle-box{width:18px;height:18px;border:2px solid #555;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.toggle-box.on{background:#4f2bdf;border-color:#4f2bdf}
-.toggle-box.on::after{content:'✓';color:#fff;font-size:.7rem}
-.gitignore-preview{background:#0d1117;border-radius:8px;padding:.8rem;margin-top:.8rem;font-size:.78rem;color:#00c864;max-height:180px;overflow-y:auto;white-space:pre;border:1px solid #333}
+      /* Gitignore */
+      .gitignore-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 4px 0;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #ffffff08;
+        cursor: pointer;
+      }
+      .gitignore-toggle:hover {
+        background: #ffffff05;
+        border-radius: 4px;
+      }
+      .toggle-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #555;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .toggle-box.on {
+        background: #4f2bdf;
+        border-color: #4f2bdf;
+      }
+      .toggle-box.on::after {
+        content: "✓";
+        color: #fff;
+        font-size: 0.7rem;
+      }
+      .gitignore-preview {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 0.8rem;
+        margin-top: 0.8rem;
+        font-size: 0.78rem;
+        color: #00c864;
+        max-height: 180px;
+        overflow-y: auto;
+        white-space: pre;
+        border: 1px solid #333;
+      }
 
-/* Remote Steps */
-.step{background:#0d1117;border:2px solid #333;border-radius:10px;padding:.8rem;margin-bottom:.6rem;cursor:pointer;transition:all .3s}
-.step:hover{border-color:#4f2bdf}
-.step.active{border-color:#00c864;box-shadow:0 0 15px #00c86422}
-.step-header{display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:700}
-.step-num{background:#4f2bdf;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
-.step-cmd{background:#1a1a2e;border-radius:6px;padding:.5rem .7rem;margin-top:.5rem;font-size:.78rem;color:#00c864;overflow:hidden;transition:max-height .3s;max-height:0}
-.step.active .step-cmd{max-height:100px}
-.step-desc{color:#888;font-size:.75rem;margin-top:.3rem;display:none}
-.step.active .step-desc{display:block}
+      /* Remote Steps */
+      .step {
+        background: #0d1117;
+        border: 2px solid #333;
+        border-radius: 10px;
+        padding: 0.8rem;
+        margin-bottom: 0.6rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .step:hover {
+        border-color: #4f2bdf;
+      }
+      .step.active {
+        border-color: #00c864;
+        box-shadow: 0 0 15px #00c86422;
+      }
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+      .step-num {
+        background: #4f2bdf;
+        color: #fff;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+      }
+      .step-cmd {
+        background: #1a1a2e;
+        border-radius: 6px;
+        padding: 0.5rem 0.7rem;
+        margin-top: 0.5rem;
+        font-size: 0.78rem;
+        color: #00c864;
+        overflow: hidden;
+        transition: max-height 0.3s;
+        max-height: 0;
+      }
+      .step.active .step-cmd {
+        max-height: 100px;
+      }
+      .step-desc {
+        color: #888;
+        font-size: 0.75rem;
+        margin-top: 0.3rem;
+        display: none;
+      }
+      .step.active .step-desc {
+        display: block;
+      }
 
-/* Remote Flow SVG */
-.remote-flow{width:100%;height:60px;margin-top:.5rem}
-.flow-line{stroke:#333;stroke-width:2;fill:none;stroke-dasharray:6 4}
-.flow-dot{fill:#4f2bdf;r:5;opacity:0}
-.flow-dot.animate{animation:flowMove 2s ease-in-out forwards}
-@keyframes flowMove{0%{offset-distance:0%;opacity:1}100%{offset-distance:100%;opacity:1}}
+      /* Remote Flow SVG */
+      .remote-flow {
+        width: 100%;
+        height: 60px;
+        margin-top: 0.5rem;
+      }
+      .flow-line {
+        stroke: #333;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 6 4;
+      }
+      .flow-dot {
+        fill: #4f2bdf;
+        r: 5;
+        opacity: 0;
+      }
+      .flow-dot.animate {
+        animation: flowMove 2s ease-in-out forwards;
+      }
+      @keyframes flowMove {
+        0% {
+          offset-distance: 0%;
+          opacity: 1;
+        }
+        100% {
+          offset-distance: 100%;
+          opacity: 1;
+        }
+      }
 
-.full-width{grid-column:1/-1}
-.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
-button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
-button:hover{background:#6143e8}
-</style>
-</head>
-<body>
-<h1>Git Repository Setup</h1>
-<p class="sub">Interactive guide — click to explore each section</p>
+      .full-width {
+        grid-column: 1/-1;
+      }
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6143e8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Git Repository Setup</h1>
+    <p class="sub">Interactive guide — click to explore each section</p>
 
-<div class="panels">
-  <!-- Repo Structure Tree -->
-  <div class="panel">
-    <h2><span>📁</span> Repository Structure</h2>
-    <div class="tree" id="repoTree"></div>
-  </div>
+    <div class="panels">
+      <!-- Repo Structure Tree -->
+      <div class="panel">
+        <h2><span>📁</span> Repository Structure</h2>
+        <div class="tree" id="repoTree"></div>
+      </div>
 
-  <!-- .gitignore Builder -->
-  <div class="panel">
-    <h2><span>🚫</span> .gitignore Builder</h2>
-    <div id="gitignoreToggles"></div>
-    <div class="gitignore-preview" id="gitignorePreview"># .gitignore</div>
-  </div>
+      <!-- .gitignore Builder -->
+      <div class="panel">
+        <h2><span>🚫</span> .gitignore Builder</h2>
+        <div id="gitignoreToggles"></div>
+        <div class="gitignore-preview" id="gitignorePreview"># .gitignore</div>
+      </div>
 
-  <!-- Remote Setup -->
-  <div class="panel full-width">
-    <h2><span>🌐</span> Remote Setup Flow</h2>
-    <svg class="remote-flow" id="remoteFlowSvg" viewBox="0 0 700 60">
-      <defs>
-        <linearGradient id="flowGrad" x1="0" y2="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#4f2bdf"/><stop offset="100%" stop-color="#00c864"/>
-        </linearGradient>
-      </defs>
-      <line x1="80" y1="30" x2="620" y2="30" stroke="#333" stroke-width="2" stroke-dasharray="6 4"/>
-      <circle id="flowDot1" cx="80" cy="30" r="6" fill="#4f2bdf" opacity="0"/>
-      <circle id="flowDot2" cx="80" cy="30" r="4" fill="#00c864" opacity="0"/>
-      <text x="50" y="55" fill="#4f2bdf" font-size="10" text-anchor="middle">Local</text>
-      <text x="650" y="55" fill="#00c864" font-size="10" text-anchor="middle">Remote</text>
-      <rect x="610" y="20" width="30" height="20" rx="4" fill="none" stroke="#00c864" stroke-width="1.5"/>
-    </svg>
-    <div id="remoteSteps"></div>
-  </div>
-</div>
+      <!-- Remote Setup -->
+      <div class="panel full-width">
+        <h2><span>🌐</span> Remote Setup Flow</h2>
+        <svg class="remote-flow" id="remoteFlowSvg" viewBox="0 0 700 60">
+          <defs>
+            <linearGradient id="flowGrad" x1="0" y2="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4f2bdf" />
+              <stop offset="100%" stop-color="#00c864" />
+            </linearGradient>
+          </defs>
+          <line
+            x1="80"
+            y1="30"
+            x2="620"
+            y2="30"
+            stroke="#333"
+            stroke-width="2"
+            stroke-dasharray="6 4"
+          />
+          <circle
+            id="flowDot1"
+            cx="80"
+            cy="30"
+            r="6"
+            fill="#4f2bdf"
+            opacity="0"
+          />
+          <circle
+            id="flowDot2"
+            cx="80"
+            cy="30"
+            r="4"
+            fill="#00c864"
+            opacity="0"
+          />
+          <text
+            x="50"
+            y="55"
+            fill="#4f2bdf"
+            font-size="10"
+            text-anchor="middle"
+          >
+            Local
+          </text>
+          <text
+            x="650"
+            y="55"
+            fill="#00c864"
+            font-size="10"
+            text-anchor="middle"
+          >
+            Remote
+          </text>
+          <rect
+            x="610"
+            y="20"
+            width="30"
+            height="20"
+            rx="4"
+            fill="none"
+            stroke="#00c864"
+            stroke-width="1.5"
+          />
+        </svg>
+        <div id="remoteSteps"></div>
+      </div>
+    </div>
 
-<div class="controls">
-  <button onclick="resetAll()">↺ Reset All</button>
-</div>
+    <div class="controls">
+      <button onclick="resetAll()">↺ Reset All</button>
+    </div>
 
-<script>
-// Repo tree data
-const repoTree=[
-  {name:'my-project/',icon:'📁',open:true,children:[
-    {name:'.git/',icon:'📁',open:false,children:[
-      {name:'HEAD',icon:'📄',status:'ignored'},{name:'config',icon:'📄',status:'ignored'},{name:'objects/',icon:'📁',status:'ignored'}
-    ]},
-    {name:'.github/',icon:'📁',open:false,children:[
-      {name:'workflows/',icon:'📁',open:false,children:[
-        {name:'ci.yml',icon:'⚙️',status:'tracked'}
-      ]},
-      {name:'PULL_REQUEST_TEMPLATE.md',icon:'📄',status:'tracked'}
-    ]},
-    {name:'src/',icon:'📁',open:true,children:[
-      {name:'index.ts',icon:'📄',status:'tracked'},{name:'app.ts',icon:'📄',status:'tracked'},
-      {name:'utils/',icon:'📁',open:false,children:[
-        {name:'helpers.ts',icon:'📄',status:'tracked'},{name:'api.ts',icon:'📄',status:'tracked'}
-      ]}
-    ]},
-    {name:'tests/',icon:'📁',open:false,children:[
-      {name:'app.test.ts',icon:'📄',status:'tracked'},{name:'utils.test.ts',icon:'📄',status:'tracked'}
-    ]},
-    {name:'dist/',icon:'📁',open:false,children:[
-      {name:'index.js',icon:'📄',status:'ignored'},{name:'bundle.js',icon:'📄',status:'ignored'}
-    ]},
-    {name:'node_modules/',icon:'📁',open:false,children:[
-      {name:'... (1432 packages)',icon:'📦',status:'ignored'}
-    ]},
-    {name:'.env',icon:'🔒',status:'ignored'},
-    {name:'.env.example',icon:'🔒',status:'tracked'},
-    {name:'.gitignore',icon:'📄',status:'tracked'},
-    {name:'package.json',icon:'📦',status:'tracked'},
-    {name:'tsconfig.json',icon:'⚙️',status:'tracked'},
-    {name:'README.md',icon:'📖',status:'tracked'},
-    {name:'todo-notes.txt',icon:'📝',status:'untracked'},
-    {name:'.DS_Store',icon:'🍎',status:'untracked'}
-  ]}
-];
+    <script>
+      // Repo tree data
+      const repoTree = [
+        {
+          name: "my-project/",
+          icon: "📁",
+          open: true,
+          children: [
+            {
+              name: ".git/",
+              icon: "📁",
+              open: false,
+              children: [
+                { name: "HEAD", icon: "📄", status: "ignored" },
+                { name: "config", icon: "📄", status: "ignored" },
+                { name: "objects/", icon: "📁", status: "ignored" },
+              ],
+            },
+            {
+              name: ".github/",
+              icon: "📁",
+              open: false,
+              children: [
+                {
+                  name: "workflows/",
+                  icon: "📁",
+                  open: false,
+                  children: [{ name: "ci.yml", icon: "⚙️", status: "tracked" }],
+                },
+                {
+                  name: "PULL_REQUEST_TEMPLATE.md",
+                  icon: "📄",
+                  status: "tracked",
+                },
+              ],
+            },
+            {
+              name: "src/",
+              icon: "📁",
+              open: true,
+              children: [
+                { name: "index.ts", icon: "📄", status: "tracked" },
+                { name: "app.ts", icon: "📄", status: "tracked" },
+                {
+                  name: "utils/",
+                  icon: "📁",
+                  open: false,
+                  children: [
+                    { name: "helpers.ts", icon: "📄", status: "tracked" },
+                    { name: "api.ts", icon: "📄", status: "tracked" },
+                  ],
+                },
+              ],
+            },
+            {
+              name: "tests/",
+              icon: "📁",
+              open: false,
+              children: [
+                { name: "app.test.ts", icon: "📄", status: "tracked" },
+                { name: "utils.test.ts", icon: "📄", status: "tracked" },
+              ],
+            },
+            {
+              name: "dist/",
+              icon: "📁",
+              open: false,
+              children: [
+                { name: "index.js", icon: "📄", status: "ignored" },
+                { name: "bundle.js", icon: "📄", status: "ignored" },
+              ],
+            },
+            {
+              name: "node_modules/",
+              icon: "📁",
+              open: false,
+              children: [
+                { name: "... (1432 packages)", icon: "📦", status: "ignored" },
+              ],
+            },
+            { name: ".env", icon: "🔒", status: "ignored" },
+            { name: ".env.example", icon: "🔒", status: "tracked" },
+            { name: ".gitignore", icon: "📄", status: "tracked" },
+            { name: "package.json", icon: "📦", status: "tracked" },
+            { name: "tsconfig.json", icon: "⚙️", status: "tracked" },
+            { name: "README.md", icon: "📖", status: "tracked" },
+            { name: "todo-notes.txt", icon: "📝", status: "untracked" },
+            { name: ".DS_Store", icon: "🍎", status: "untracked" },
+          ],
+        },
+      ];
 
-function renderTree(items, container) {
-  items.forEach(item => {
-    const div = document.createElement('div');
-    const toggle = document.createElement('div');
-    toggle.className = 'tree-item';
-    const icon = document.createElement('span');
-    icon.className = 'icon';
-    icon.textContent = item.children ? (item.open ? '▾' : '▸') : '';
-    icon.style.width = '14px';
-    const fileIcon = document.createElement('span');
-    fileIcon.className = 'icon';
-    fileIcon.textContent = item.icon;
-    const name = document.createElement('span');
-    name.textContent = item.name;
-    name.className = item.status || '';
-    toggle.appendChild(icon);
-    toggle.appendChild(fileIcon);
-    toggle.appendChild(name);
+      function renderTree(items, container) {
+        items.forEach((item) => {
+          const div = document.createElement("div");
+          const toggle = document.createElement("div");
+          toggle.className = "tree-item";
+          const icon = document.createElement("span");
+          icon.className = "icon";
+          icon.textContent = item.children ? (item.open ? "▾" : "▸") : "";
+          icon.style.width = "14px";
+          const fileIcon = document.createElement("span");
+          fileIcon.className = "icon";
+          fileIcon.textContent = item.icon;
+          const name = document.createElement("span");
+          name.textContent = item.name;
+          name.className = item.status || "";
+          toggle.appendChild(icon);
+          toggle.appendChild(fileIcon);
+          toggle.appendChild(name);
 
-    if (item.status) {
-      const badge = document.createElement('span');
-      badge.className = 'tree-badge ' + (item.status === 'tracked' ? 'badge-track' : item.status === 'untracked' ? 'badge-untrack' : 'badge-ignore');
-      badge.textContent = item.status === 'tracked' ? 'tracked' : item.status === 'untracked' ? 'untracked' : 'ignored';
-      toggle.appendChild(badge);
-    }
+          if (item.status) {
+            const badge = document.createElement("span");
+            badge.className =
+              "tree-badge " +
+              (item.status === "tracked"
+                ? "badge-track"
+                : item.status === "untracked"
+                  ? "badge-untrack"
+                  : "badge-ignore");
+            badge.textContent =
+              item.status === "tracked"
+                ? "tracked"
+                : item.status === "untracked"
+                  ? "untracked"
+                  : "ignored";
+            toggle.appendChild(badge);
+          }
 
-    div.appendChild(toggle);
+          div.appendChild(toggle);
 
-    if (item.children) {
-      const childDiv = document.createElement('div');
-      childDiv.className = 'tree-children' + (item.open ? '' : ' collapsed');
-      childDiv.style.maxHeight = item.open ? (item.children.length * 30 + 100) + 'px' : '0';
-      renderTree(item.children, childDiv);
-      div.appendChild(childDiv);
+          if (item.children) {
+            const childDiv = document.createElement("div");
+            childDiv.className =
+              "tree-children" + (item.open ? "" : " collapsed");
+            childDiv.style.maxHeight = item.open
+              ? item.children.length * 30 + 100 + "px"
+              : "0";
+            renderTree(item.children, childDiv);
+            div.appendChild(childDiv);
 
-      toggle.onclick = () => {
-        item.open = !item.open;
-        icon.textContent = item.open ? '▾' : '▸';
-        childDiv.classList.toggle('collapsed');
-        if (item.open) childDiv.style.maxHeight = (item.children.length * 30 + 100) + 'px';
-      };
-    }
-    container.appendChild(div);
-  });
-}
-renderTree(repoTree, document.getElementById('repoTree'));
+            toggle.onclick = () => {
+              item.open = !item.open;
+              icon.textContent = item.open ? "▾" : "▸";
+              childDiv.classList.toggle("collapsed");
+              if (item.open)
+                childDiv.style.maxHeight =
+                  item.children.length * 30 + 100 + "px";
+            };
+          }
+          container.appendChild(div);
+        });
+      }
+      renderTree(repoTree, document.getElementById("repoTree"));
 
-// Gitignore Builder
-const gitignorePatterns = [
-  {pattern:'node_modules/', label:'node_modules/', default:true},
-  {pattern:'.env', label:'.env files', default:true},
-  {pattern:'dist/', label:'dist/ (build output)', default:true},
-  {pattern:'.DS_Store', label:'.DS_Store (macOS)', default:true},
-  {pattern:'*.log', label:'*.log files', default:false},
-  {pattern:'.vscode/', label:'.vscode/', default:false},
-  {pattern:'*.swp', label:'*.swp (Vim swap)', default:false},
-  {pattern:'coverage/', label:'coverage/ (test reports)', default:true},
-  {pattern:'.idea/', label:'.idea/ (JetBrains)', default:false},
-  {pattern:'*.tgz', label:'*.tgz (npm pack)', default:false},
-  {pattern:'.cache/', label:'.cache/', default:false},
-  {pattern:'*.local', label:'*.local', default:true},
-];
-const activePatterns = new Set(gitignorePatterns.filter(p => p.default).map(p => p.pattern));
+      // Gitignore Builder
+      const gitignorePatterns = [
+        { pattern: "node_modules/", label: "node_modules/", default: true },
+        { pattern: ".env", label: ".env files", default: true },
+        { pattern: "dist/", label: "dist/ (build output)", default: true },
+        { pattern: ".DS_Store", label: ".DS_Store (macOS)", default: true },
+        { pattern: "*.log", label: "*.log files", default: false },
+        { pattern: ".vscode/", label: ".vscode/", default: false },
+        { pattern: "*.swp", label: "*.swp (Vim swap)", default: false },
+        {
+          pattern: "coverage/",
+          label: "coverage/ (test reports)",
+          default: true,
+        },
+        { pattern: ".idea/", label: ".idea/ (JetBrains)", default: false },
+        { pattern: "*.tgz", label: "*.tgz (npm pack)", default: false },
+        { pattern: ".cache/", label: ".cache/", default: false },
+        { pattern: "*.local", label: "*.local", default: true },
+      ];
+      const activePatterns = new Set(
+        gitignorePatterns.filter((p) => p.default).map((p) => p.pattern),
+      );
 
-function renderGitignore() {
-  const container = document.getElementById('gitignoreToggles');
-  while (container.firstChild) container.removeChild(container.firstChild);
-  gitignorePatterns.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'gitignore-toggle';
-    const box = document.createElement('div');
-    box.className = 'toggle-box' + (activePatterns.has(p.pattern) ? ' on' : '');
-    const label = document.createElement('span');
-    label.textContent = p.label;
-    row.appendChild(box);
-    row.appendChild(label);
-    row.onclick = () => {
-      if (activePatterns.has(p.pattern)) activePatterns.delete(p.pattern);
-      else activePatterns.add(p.pattern);
-      box.classList.toggle('on');
+      function renderGitignore() {
+        const container = document.getElementById("gitignoreToggles");
+        while (container.firstChild)
+          container.removeChild(container.firstChild);
+        gitignorePatterns.forEach((p) => {
+          const row = document.createElement("div");
+          row.className = "gitignore-toggle";
+          const box = document.createElement("div");
+          box.className =
+            "toggle-box" + (activePatterns.has(p.pattern) ? " on" : "");
+          const label = document.createElement("span");
+          label.textContent = p.label;
+          row.appendChild(box);
+          row.appendChild(label);
+          row.onclick = () => {
+            if (activePatterns.has(p.pattern)) activePatterns.delete(p.pattern);
+            else activePatterns.add(p.pattern);
+            box.classList.toggle("on");
+            updatePreview();
+          };
+          container.appendChild(row);
+        });
+      }
+      function updatePreview() {
+        const lines = ["# .gitignore", ""];
+        gitignorePatterns.forEach((p) => {
+          if (activePatterns.has(p.pattern)) lines.push(p.pattern);
+        });
+        document.getElementById("gitignorePreview").textContent =
+          lines.join("\n");
+      }
+      renderGitignore();
       updatePreview();
-    };
-    container.appendChild(row);
-  });
-}
-function updatePreview() {
-  const lines = ['# .gitignore', ''];
-  gitignorePatterns.forEach(p => {
-    if (activePatterns.has(p.pattern)) lines.push(p.pattern);
-  });
-  document.getElementById('gitignorePreview').textContent = lines.join('\n');
-}
-renderGitignore();
-updatePreview();
 
-// Remote Setup
-const remoteStepsData = [
-  {cmd:'git init',desc:'Initialize a new Git repository in your project directory. Creates the .git folder.'},
-  {cmd:'git remote add origin git@github.com:user/repo.git',desc:'Link your local repo to a remote GitHub repository. "origin" is the default remote name.'},
-  {cmd:'git add .',desc:'Stage all files for the first commit.'},
-  {cmd:'git commit -m "Initial commit"',desc:'Create the first commit with all project files.'},
-  {cmd:'git push -u origin main',desc:'Push your code to the remote and set upstream tracking. -u links local main to remote main.'},
-  {cmd:'git pull origin main',desc:'Fetch and merge changes from the remote. Keep your local repo in sync.'}
-];
+      // Remote Setup
+      const remoteStepsData = [
+        {
+          cmd: "git init",
+          desc: "Initialize a new Git repository in your project directory. Creates the .git folder.",
+        },
+        {
+          cmd: "git remote add origin git@github.com:user/repo.git",
+          desc: 'Link your local repo to a remote GitHub repository. "origin" is the default remote name.',
+        },
+        { cmd: "git add .", desc: "Stage all files for the first commit." },
+        {
+          cmd: 'git commit -m "Initial commit"',
+          desc: "Create the first commit with all project files.",
+        },
+        {
+          cmd: "git push -u origin main",
+          desc: "Push your code to the remote and set upstream tracking. -u links local main to remote main.",
+        },
+        {
+          cmd: "git pull origin main",
+          desc: "Fetch and merge changes from the remote. Keep your local repo in sync.",
+        },
+      ];
 
-function renderRemoteSteps() {
-  const container = document.getElementById('remoteSteps');
-  remoteStepsData.forEach((s, i) => {
-    const step = document.createElement('div');
-    step.className = 'step';
-    const header = document.createElement('div'); header.className='step-header'; const num = document.createElement('span'); num.className='step-num'; num.textContent=String(i+1); header.appendChild(num); header.appendChild(document.createTextNode(s.cmd)); const cmd = document.createElement('div'); cmd.className='step-cmd'; cmd.textContent='$ ' + s.cmd; const desc = document.createElement('div'); desc.className='step-desc'; desc.textContent=s.desc; step.appendChild(header); step.appendChild(cmd); step.appendChild(desc);
-    step.onclick = () => {
-      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-      step.classList.add('active');
-      if (i <= 4) animateFlowDot(i);
-    };
-    container.appendChild(step);
-  });
-}
-renderRemoteSteps();
+      function renderRemoteSteps() {
+        const container = document.getElementById("remoteSteps");
+        remoteStepsData.forEach((s, i) => {
+          const step = document.createElement("div");
+          step.className = "step";
+          const header = document.createElement("div");
+          header.className = "step-header";
+          const num = document.createElement("span");
+          num.className = "step-num";
+          num.textContent = String(i + 1);
+          header.appendChild(num);
+          header.appendChild(document.createTextNode(s.cmd));
+          const cmd = document.createElement("div");
+          cmd.className = "step-cmd";
+          cmd.textContent = "$ " + s.cmd;
+          const desc = document.createElement("div");
+          desc.className = "step-desc";
+          desc.textContent = s.desc;
+          step.appendChild(header);
+          step.appendChild(cmd);
+          step.appendChild(desc);
+          step.onclick = () => {
+            document
+              .querySelectorAll(".step")
+              .forEach((el) => el.classList.remove("active"));
+            step.classList.add("active");
+            if (i <= 4) animateFlowDot(i);
+          };
+          container.appendChild(step);
+        });
+      }
+      renderRemoteSteps();
 
-function animateFlowDot(stepIndex) {
-  const dot1 = document.getElementById('flowDot1');
-  const dot2 = document.getElementById('flowDot2');
-  dot1.setAttribute('opacity','1');
-  dot2.setAttribute('opacity','1');
-  const startPositions = [80, 180, 280, 350, 450, 550];
-  const x = startPositions[Math.min(stepIndex, 5)];
-  dot1.setAttribute('cx', x);
-  dot2.setAttribute('cx', x);
-  dot1.style.transition = 'cx 0.5s ease';
-  dot2.style.transition = 'cx 0.5s ease';
-  dot1.setAttribute('cx', Math.min(x + 80, 620));
-  setTimeout(() => dot2.setAttribute('cx', Math.min(x + 120, 620)), 200);
-  setTimeout(() => { dot1.setAttribute('opacity','0'); dot2.setAttribute('opacity','0'); }, 1500);
-}
+      function animateFlowDot(stepIndex) {
+        const dot1 = document.getElementById("flowDot1");
+        const dot2 = document.getElementById("flowDot2");
+        dot1.setAttribute("opacity", "1");
+        dot2.setAttribute("opacity", "1");
+        const startPositions = [80, 180, 280, 350, 450, 550];
+        const x = startPositions[Math.min(stepIndex, 5)];
+        dot1.setAttribute("cx", x);
+        dot2.setAttribute("cx", x);
+        dot1.style.transition = "cx 0.5s ease";
+        dot2.style.transition = "cx 0.5s ease";
+        dot1.setAttribute("cx", Math.min(x + 80, 620));
+        setTimeout(() => dot2.setAttribute("cx", Math.min(x + 120, 620)), 200);
+        setTimeout(() => {
+          dot1.setAttribute("opacity", "0");
+          dot2.setAttribute("opacity", "0");
+        }, 1500);
+      }
 
-function resetAll() {
-  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-  document.getElementById('flowDot1').setAttribute('opacity','0');
-  document.getElementById('flowDot2').setAttribute('opacity','0');
-  document.querySelectorAll('.tree-children').forEach(el => {
-    el.classList.add('collapsed');
-    el.style.maxHeight = '0';
-  });
-}
-</script>
-</body>
+      function resetAll() {
+        document
+          .querySelectorAll(".step")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById("flowDot1").setAttribute("opacity", "0");
+        document.getElementById("flowDot2").setAttribute("opacity", "0");
+        document.querySelectorAll(".tree-children").forEach((el) => {
+          el.classList.add("collapsed");
+          el.style.maxHeight = "0";
+        });
+      }
+    </script>
+  </body>
 </html>

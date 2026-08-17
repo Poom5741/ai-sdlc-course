@@ -1,162 +1,510 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Design Pattern Selector — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
-.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
-.ctn{max-width:800px;margin:0 auto}
-/* Breadcrumb path */
-.breadcrumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:20px;font-size:.78rem}
-.bc-item{padding:4px 10px;border-radius:99px;background:#16213e;color:#888;border:1px solid #333;transition:all .3s}
-.bc-item.current{background:#4f2bdf;color:#fff;border-color:#4f2bdf}
-.bc-sep{color:#555}
-/* Decision node */
-.node{background:#16213e;border-radius:12px;padding:24px;border:2px solid #4f2bdf;text-align:center;animation:fadeUp .4s ease;margin-bottom:20px}
-@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-.node h2{color:#4f2bdf;font-size:1.1rem;margin-bottom:6px}
-.node .q{color:#ccc;font-size:.9rem;margin-bottom:18px;line-height:1.5}
-.choices{display:flex;flex-direction:column;gap:10px;max-width:500px;margin:0 auto}
-.choice{padding:12px 18px;border-radius:10px;background:#0d1117;border:1px solid #333;cursor:pointer;text-align:left;font-size:.85rem;transition:all .3s;display:flex;align-items:center;gap:10px}
-.choice:hover{border-color:#4f2bdf;background:#4f2bdf15;transform:translateX(4px)}
-.choice .icon{font-size:1.2rem;flex-shrink:0}
-.choice .lbl{flex:1}.choice .hint{color:#888;font-size:.7rem}
-/* Result */
-.result{background:#16213e;border-radius:12px;padding:24px;border:2px solid #00c864;text-align:center;animation:fadeUp .5s ease}
-.result h2{color:#00c864;font-size:1.3rem;margin-bottom:8px}
-.result .desc{color:#ccc;font-size:.88rem;margin-bottom:14px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto}
-.result .use-cases{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
-.result .use-tag{padding:4px 12px;border-radius:99px;background:#00c86422;color:#00c864;font-size:.75rem}
-.result .code{background:#0d1117;border-radius:8px;padding:12px;font-family:'Courier New',monospace;font-size:.75rem;text-align:left;color:#ccc;margin-bottom:14px;line-height:1.5;overflow-x:auto}
-.result .code .kw{color:#c792ea}.result .code .fn{color:#82aaff}.result .code .str{color:#c3e88d}
-.btn{display:block;margin:16px auto 0;padding:8px 20px;background:#333;color:#fff;border:none;border-radius:8px;font-size:.8rem;cursor:pointer;transition:background .2s}
-.btn:hover{background:#4f2bdf}
-/* History */
-.history{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
-.hist-step{font-size:.7rem;padding:3px 10px;border-radius:99px;background:#16213e;border:1px solid #333;color:#888}
-.hist-step.chosen{border-color:#00c864;color:#00c864}
-</style>
-</head>
-<body>
-<h1>🌳 Design Pattern Selector</h1>
-<p class="sub">Answer questions to find the right pattern for your problem</p>
-<div class="ctn">
-  <div class="breadcrumb" id="breadcrumb"></div>
-  <div id="area"></div>
-</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Design Pattern Selector — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #4f2bdf;
+        margin-bottom: 6px;
+        font-size: 1.5rem;
+      }
+      .sub {
+        text-align: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .ctn {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      /* Breadcrumb path */
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        font-size: 0.78rem;
+      }
+      .bc-item {
+        padding: 4px 10px;
+        border-radius: 99px;
+        background: #16213e;
+        color: #888;
+        border: 1px solid #333;
+        transition: all 0.3s;
+      }
+      .bc-item.current {
+        background: #4f2bdf;
+        color: #fff;
+        border-color: #4f2bdf;
+      }
+      .bc-sep {
+        color: #555;
+      }
+      /* Decision node */
+      .node {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 24px;
+        border: 2px solid #4f2bdf;
+        text-align: center;
+        animation: fadeUp 0.4s ease;
+        margin-bottom: 20px;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .node h2 {
+        color: #4f2bdf;
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+      }
+      .node .q {
+        color: #ccc;
+        font-size: 0.9rem;
+        margin-bottom: 18px;
+        line-height: 1.5;
+      }
+      .choices {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .choice {
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: #0d1117;
+        border: 1px solid #333;
+        cursor: pointer;
+        text-align: left;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .choice:hover {
+        border-color: #4f2bdf;
+        background: #4f2bdf15;
+        transform: translateX(4px);
+      }
+      .choice .icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .choice .lbl {
+        flex: 1;
+      }
+      .choice .hint {
+        color: #888;
+        font-size: 0.7rem;
+      }
+      /* Result */
+      .result {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 24px;
+        border: 2px solid #00c864;
+        text-align: center;
+        animation: fadeUp 0.5s ease;
+      }
+      .result h2 {
+        color: #00c864;
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+      }
+      .result .desc {
+        color: #ccc;
+        font-size: 0.88rem;
+        margin-bottom: 14px;
+        line-height: 1.6;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .result .use-cases {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 14px;
+      }
+      .result .use-tag {
+        padding: 4px 12px;
+        border-radius: 99px;
+        background: #00c86422;
+        color: #00c864;
+        font-size: 0.75rem;
+      }
+      .result .code {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 12px;
+        font-family: "Courier New", monospace;
+        font-size: 0.75rem;
+        text-align: left;
+        color: #ccc;
+        margin-bottom: 14px;
+        line-height: 1.5;
+        overflow-x: auto;
+      }
+      .result .code .kw {
+        color: #c792ea;
+      }
+      .result .code .fn {
+        color: #82aaff;
+      }
+      .result .code .str {
+        color: #c3e88d;
+      }
+      .btn {
+        display: block;
+        margin: 16px auto 0;
+        padding: 8px 20px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #4f2bdf;
+      }
+      /* History */
+      .history {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-top: 16px;
+      }
+      .hist-step {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        border-radius: 99px;
+        background: #16213e;
+        border: 1px solid #333;
+        color: #888;
+      }
+      .hist-step.chosen {
+        border-color: #00c864;
+        color: #00c864;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌳 Design Pattern Selector</h1>
+    <p class="sub">
+      Answer questions to find the right pattern for your problem
+    </p>
+    <div class="ctn">
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div id="area"></div>
+    </div>
 
-<script>
-const tree={
-  q:"What problem are you trying to solve?",
-  opts:[
-    {icon:'🏗️',label:'Object creation',hint:'Need to control how objects are created',to:'create'},
-    {icon:'🔗',label:'Object interaction',hint:'How objects communicate',to:'interact'},
-    {icon:'📐',label:'Code structure',hint:'Organizing algorithms or responsibilities',to:'structure'},
-    {icon:'🔄',label:'State management',hint:'Managing object state changes',to:'state_q'},
-  ],
-  children:{
-    create:{
-      q:'Do you need to create different types of objects based on context?',
-      opts:[
-        {icon:'🎲',label:'Yes, varying types',hint:'Factory Method pattern',to:'factory'},
-        {icon:'🧱',label:'Yes, complex objects',hint:'Need step-by-step building',to:'builder'},
-        {icon:'♻️',label:'Yes, expensive objects',hint:'Want to reuse existing ones',to:'prototype'},
-      ]
-    },
-    interact:{
-      q:'How should objects communicate?',
-      opts:[
-        {icon:'📡',label:'Loosely coupled',hint:'Don\'t want direct dependencies',to:'observer'},
-        {icon:'🔌',label:'Interface adaptation',hint:'Make incompatible interfaces work',to:'adapter'},
-        {icon:'🎭',label:'Add behavior dynamically',hint:'Without modifying the class',to:'decorator'},
-      ]
-    },
-    structure:{
-      q:'What kind of structural challenge?',
-      opts:[
-        {icon:'🚶',label:'Algorithm selection',hint:'Choose algorithm at runtime',to:'strategy'},
-        {icon:'🎪',label:'Simplify complex subsystem',hint:'Provide a simple interface',to:'facade'},
-        {icon:'🧩',label:'Compose tree structures',hint:'Uniform treatment of parts & wholes',to:'composite'},
-      ]
-    },
-    state_q:{
-      q:'How does state affect behavior?',
-      opts:[
-        {icon:'🔀',label:'Behavior changes with state',hint:'Object behaves differently per state',to:'state_pattern'},
-        {icon:'📜',label:'Undo/redo operations',hint:'Need to capture & replay',to:'command'},
-        {icon:'🗄️',label:'Memento pattern',hint:'Save & restore object state',to:'memento'},
-      ]
-    }
-  }
-};
+    <script>
+      const tree = {
+        q: "What problem are you trying to solve?",
+        opts: [
+          {
+            icon: "🏗️",
+            label: "Object creation",
+            hint: "Need to control how objects are created",
+            to: "create",
+          },
+          {
+            icon: "🔗",
+            label: "Object interaction",
+            hint: "How objects communicate",
+            to: "interact",
+          },
+          {
+            icon: "📐",
+            label: "Code structure",
+            hint: "Organizing algorithms or responsibilities",
+            to: "structure",
+          },
+          {
+            icon: "🔄",
+            label: "State management",
+            hint: "Managing object state changes",
+            to: "state_q",
+          },
+        ],
+        children: {
+          create: {
+            q: "Do you need to create different types of objects based on context?",
+            opts: [
+              {
+                icon: "🎲",
+                label: "Yes, varying types",
+                hint: "Factory Method pattern",
+                to: "factory",
+              },
+              {
+                icon: "🧱",
+                label: "Yes, complex objects",
+                hint: "Need step-by-step building",
+                to: "builder",
+              },
+              {
+                icon: "♻️",
+                label: "Yes, expensive objects",
+                hint: "Want to reuse existing ones",
+                to: "prototype",
+              },
+            ],
+          },
+          interact: {
+            q: "How should objects communicate?",
+            opts: [
+              {
+                icon: "📡",
+                label: "Loosely coupled",
+                hint: "Don't want direct dependencies",
+                to: "observer",
+              },
+              {
+                icon: "🔌",
+                label: "Interface adaptation",
+                hint: "Make incompatible interfaces work",
+                to: "adapter",
+              },
+              {
+                icon: "🎭",
+                label: "Add behavior dynamically",
+                hint: "Without modifying the class",
+                to: "decorator",
+              },
+            ],
+          },
+          structure: {
+            q: "What kind of structural challenge?",
+            opts: [
+              {
+                icon: "🚶",
+                label: "Algorithm selection",
+                hint: "Choose algorithm at runtime",
+                to: "strategy",
+              },
+              {
+                icon: "🎪",
+                label: "Simplify complex subsystem",
+                hint: "Provide a simple interface",
+                to: "facade",
+              },
+              {
+                icon: "🧩",
+                label: "Compose tree structures",
+                hint: "Uniform treatment of parts & wholes",
+                to: "composite",
+              },
+            ],
+          },
+          state_q: {
+            q: "How does state affect behavior?",
+            opts: [
+              {
+                icon: "🔀",
+                label: "Behavior changes with state",
+                hint: "Object behaves differently per state",
+                to: "state_pattern",
+              },
+              {
+                icon: "📜",
+                label: "Undo/redo operations",
+                hint: "Need to capture & replay",
+                to: "command",
+              },
+              {
+                icon: "🗄️",
+                label: "Memento pattern",
+                hint: "Save & restore object state",
+                to: "memento",
+              },
+            ],
+          },
+        },
+      };
 
-const results={
-  factory:{name:'🏭 Factory Method',desc:'Defines an interface for creating objects but lets subclasses decide which class to instantiate. Decouples creation from usage.',use:['Database connectors','UI component rendering','Payment processing'],code:'<span class="kw">interface</span> <span class="fn">Logger</span> { log(msg: string): void }\n\n<span class="kw">function</span> <span class="fn">createLogger</span>(type): Logger {\n  <span class="kw">if</span> (type === <span class="str">"file"</span>) <span class="kw">return new</span> FileLogger();\n  <span class="kw">if</span> (type === <span class="str">"cloud"</span>) <span class="kw">return new</span> CloudLogger();\n  <span class="kw">return new</span> ConsoleLogger();\n}'},
-  builder:{name:'🧱 Builder',desc:'Separates construction of complex objects from representation. Enables step-by-step construction with fluent API.',use:['HTTP requests','SQL queries','UI forms'],code:'<span class="kw">const</span> user = <span class="kw">new</span> UserBuilder()\n  .setName(<span class="str">"Alice"</span>)\n  .setEmail(<span class="str">"alice@example.com"</span>)\n  .setRole(<span class="str">"admin"</span>)\n  .build();'},
-  prototype:{name:'♻️ Prototype',desc:'Creates new objects by cloning an existing instance. Useful when object creation is expensive.',use:['Caching layers','Undo systems','Game entities'],code:'<span class="kw">const</span> baseEnemy = { hp: 100, speed: 5 };\n<span class="kw">const</span> boss = structuredClone(baseEnemy);\nboss.hp = 500;  <span class="cmt">// customize clone</span>'},
-  observer:{name:'📡 Observer',desc:'Defines a one-to-many dependency so when one object changes state, all dependents are notified automatically.',use:['Event systems','Reactive data','Real-time updates'],code:'<span class="kw">class</span> <span class="fn">EventBus</span> {\n  <span class="kw">private</span> listeners = <span class="kw">new</span> Map();\n  on(event, fn) { <span class="cmt">/* register */</span> }\n  emit(event, data) {\n    <span class="kw">this</span>.listeners.get(event)?.forEach(fn => fn(data));\n  }\n}'},
-  adapter:{name:'🔌 Adapter',desc:'Converts one interface to another, allowing incompatible classes to work together.',use:['Legacy API integration','Third-party libs','Data format conversion'],code:'<span class="kw">class</span> <span class="fn">OldApiAdapter</span> <span class="kw">implements</span> NewApi {\n  <span class="kw">private</span> legacy: OldApi;\n  <span class="kw">async</span> <span class="fn">fetch</span>(url) {\n    <span class="kw">return this</span>.legacy.get(url, { format: <span class="str">"json"</span> });\n  }\n}'},
-  decorator:{name:'🎭 Decorator',desc:'Attaches additional responsibilities to an object dynamically. Provides flexible alternative to subclassing.',use:['Logging middleware','Caching layers','Input validation'],code:'<span class="kw">function</span> <span class="fn">withLogging</span>(fn) {\n  <span class="kw">return</span> (...args) => {\n    console.log(<span class="str">`Calling ${fn.name}`</span>);\n    <span class="kw">const</span> result = fn(...args);\n    console.log(<span class="str">`Result: ${result}`</span>);\n    <span class="kw">return</span> result;\n  };\n}'},
-  strategy:{name:'🚶 Strategy',desc:'Defines a family of algorithms, encapsulates each one, and makes them interchangeable at runtime.',use:['Sorting algorithms','Pricing rules','Route planning'],code:'<span class="kw">interface</span> <span class="fn">SortStrategy</span> {\n  sort(data: number[]): number[];\n}\n<span class="kw">class</span> <span class="fn">QuickSort</span> <span class="kw">implements</span> SortStrategy { ... }\n<span class="kw">class</span> <span class="fn">MergeSort</span> <span class="kw">implements</span> SortStrategy { ... }\n\n<span class="kw">const</span> sorter = <span class="kw">new</span> Sorter(<span class="kw">new</span> QuickSort());'},
-  facade:{name:'🎪 Facade',desc:'Provides a simplified interface to a complex subsystem, reducing coupling and improving readability.',use:['Library wrappers','Microservice gateways','Build tools'],code:'<span class="kw">class</span> <span class="fn">PaymentFacade</span> {\n  <span class="kw">async</span> <span class="fn">charge</span>(amount, card) {\n    <span class="kw">await this</span>.validate(card);\n    <span class="kw">await this</span>.fraudCheck(amount);\n    <span class="kw">await this</span>.processPayment(amount, card);\n    <span class="kw">await this</span>.sendReceipt(amount);\n  }\n}'},
-  composite:{name:'🧩 Composite',desc:'Composes objects into tree structures and lets clients treat individual objects and compositions uniformly.',use:['File systems','UI component trees','Org charts'],code:'<span class="kw">interface</span> <span class="fn">Component</span> {\n  render(): string;\n  cost(): number;\n}\n<span class="kw">class</span> <span class="fn">Box</span> <span class="kw">implements</span> Component {\n  <span class="kw">private</span> children: Component[] = [];\n  add(c: Component) { <span class="kw">this</span>.children.push(c); }\n}'},
-  state_pattern:{name:'🔀 State',desc:'Allows an object to alter its behavior when its internal state changes. Appears to change its class.',use:['Game states','Order workflows','Connection handling'],code:'<span class="kw">interface</span> <span class="fn">OrderState</span> {\n  next(order: Order): void;\n  cancel(order: Order): void;\n}\n<span class="kw">class</span> <span class="fn">PendingState</span> <span class="kw">implements</span> OrderState {\n  next(o) { o.setState(<span class="kw">new</span> ProcessingState()); }\n}'},
-  command:{name:'📜 Command',desc:'Encapsulates a request as an object, enabling parameterization, queuing, logging, and undo/redo.',use:['Undo/redo systems','Task queues','Macro recording'],code:'<span class="kw">interface</span> <span class="fn">Command</span> {\n  execute(): void;\n  undo(): void;\n}\n<span class="kw">class</span> <span class="fn">MoveCommand</span> <span class="kw">implements</span> Command {\n  <span class="fn">execute</span>() { <span class="cmt">/* move */</span> }\n  <span class="fn">undo</span>() { <span class="cmt">/* reverse move */</span> }\n}'},
-  memento:{name:'🗄️ Memento',desc:'Captures and externalizes an object\'s internal state so it can be restored later without exposing implementation.',use:['Save/load systems','Snapshot features','Version history'],code:'<span class="kw">class</span> <span class="fn">Editor</span> {\n  <span class="fn">save</span>(): Memento {\n    <span class="kw">return new</span> Memento(<span class="kw">this</span>.content);\n  }\n  <span class="fn">restore</span>(m: Memento) {\n    <span class="kw">this</span>.content = m.content;\n  }\n}'},
-};
+      const results = {
+        factory: {
+          name: "🏭 Factory Method",
+          desc: "Defines an interface for creating objects but lets subclasses decide which class to instantiate. Decouples creation from usage.",
+          use: [
+            "Database connectors",
+            "UI component rendering",
+            "Payment processing",
+          ],
+          code: '<span class="kw">interface</span> <span class="fn">Logger</span> { log(msg: string): void }\n\n<span class="kw">function</span> <span class="fn">createLogger</span>(type): Logger {\n  <span class="kw">if</span> (type === <span class="str">"file"</span>) <span class="kw">return new</span> FileLogger();\n  <span class="kw">if</span> (type === <span class="str">"cloud"</span>) <span class="kw">return new</span> CloudLogger();\n  <span class="kw">return new</span> ConsoleLogger();\n}',
+        },
+        builder: {
+          name: "🧱 Builder",
+          desc: "Separates construction of complex objects from representation. Enables step-by-step construction with fluent API.",
+          use: ["HTTP requests", "SQL queries", "UI forms"],
+          code: '<span class="kw">const</span> user = <span class="kw">new</span> UserBuilder()\n  .setName(<span class="str">"Alice"</span>)\n  .setEmail(<span class="str">"alice@example.com"</span>)\n  .setRole(<span class="str">"admin"</span>)\n  .build();',
+        },
+        prototype: {
+          name: "♻️ Prototype",
+          desc: "Creates new objects by cloning an existing instance. Useful when object creation is expensive.",
+          use: ["Caching layers", "Undo systems", "Game entities"],
+          code: '<span class="kw">const</span> baseEnemy = { hp: 100, speed: 5 };\n<span class="kw">const</span> boss = structuredClone(baseEnemy);\nboss.hp = 500;  <span class="cmt">// customize clone</span>',
+        },
+        observer: {
+          name: "📡 Observer",
+          desc: "Defines a one-to-many dependency so when one object changes state, all dependents are notified automatically.",
+          use: ["Event systems", "Reactive data", "Real-time updates"],
+          code: '<span class="kw">class</span> <span class="fn">EventBus</span> {\n  <span class="kw">private</span> listeners = <span class="kw">new</span> Map();\n  on(event, fn) { <span class="cmt">/* register */</span> }\n  emit(event, data) {\n    <span class="kw">this</span>.listeners.get(event)?.forEach(fn => fn(data));\n  }\n}',
+        },
+        adapter: {
+          name: "🔌 Adapter",
+          desc: "Converts one interface to another, allowing incompatible classes to work together.",
+          use: [
+            "Legacy API integration",
+            "Third-party libs",
+            "Data format conversion",
+          ],
+          code: '<span class="kw">class</span> <span class="fn">OldApiAdapter</span> <span class="kw">implements</span> NewApi {\n  <span class="kw">private</span> legacy: OldApi;\n  <span class="kw">async</span> <span class="fn">fetch</span>(url) {\n    <span class="kw">return this</span>.legacy.get(url, { format: <span class="str">"json"</span> });\n  }\n}',
+        },
+        decorator: {
+          name: "🎭 Decorator",
+          desc: "Attaches additional responsibilities to an object dynamically. Provides flexible alternative to subclassing.",
+          use: ["Logging middleware", "Caching layers", "Input validation"],
+          code: '<span class="kw">function</span> <span class="fn">withLogging</span>(fn) {\n  <span class="kw">return</span> (...args) => {\n    console.log(<span class="str">`Calling ${fn.name}`</span>);\n    <span class="kw">const</span> result = fn(...args);\n    console.log(<span class="str">`Result: ${result}`</span>);\n    <span class="kw">return</span> result;\n  };\n}',
+        },
+        strategy: {
+          name: "🚶 Strategy",
+          desc: "Defines a family of algorithms, encapsulates each one, and makes them interchangeable at runtime.",
+          use: ["Sorting algorithms", "Pricing rules", "Route planning"],
+          code: '<span class="kw">interface</span> <span class="fn">SortStrategy</span> {\n  sort(data: number[]): number[];\n}\n<span class="kw">class</span> <span class="fn">QuickSort</span> <span class="kw">implements</span> SortStrategy { ... }\n<span class="kw">class</span> <span class="fn">MergeSort</span> <span class="kw">implements</span> SortStrategy { ... }\n\n<span class="kw">const</span> sorter = <span class="kw">new</span> Sorter(<span class="kw">new</span> QuickSort());',
+        },
+        facade: {
+          name: "🎪 Facade",
+          desc: "Provides a simplified interface to a complex subsystem, reducing coupling and improving readability.",
+          use: ["Library wrappers", "Microservice gateways", "Build tools"],
+          code: '<span class="kw">class</span> <span class="fn">PaymentFacade</span> {\n  <span class="kw">async</span> <span class="fn">charge</span>(amount, card) {\n    <span class="kw">await this</span>.validate(card);\n    <span class="kw">await this</span>.fraudCheck(amount);\n    <span class="kw">await this</span>.processPayment(amount, card);\n    <span class="kw">await this</span>.sendReceipt(amount);\n  }\n}',
+        },
+        composite: {
+          name: "🧩 Composite",
+          desc: "Composes objects into tree structures and lets clients treat individual objects and compositions uniformly.",
+          use: ["File systems", "UI component trees", "Org charts"],
+          code: '<span class="kw">interface</span> <span class="fn">Component</span> {\n  render(): string;\n  cost(): number;\n}\n<span class="kw">class</span> <span class="fn">Box</span> <span class="kw">implements</span> Component {\n  <span class="kw">private</span> children: Component[] = [];\n  add(c: Component) { <span class="kw">this</span>.children.push(c); }\n}',
+        },
+        state_pattern: {
+          name: "🔀 State",
+          desc: "Allows an object to alter its behavior when its internal state changes. Appears to change its class.",
+          use: ["Game states", "Order workflows", "Connection handling"],
+          code: '<span class="kw">interface</span> <span class="fn">OrderState</span> {\n  next(order: Order): void;\n  cancel(order: Order): void;\n}\n<span class="kw">class</span> <span class="fn">PendingState</span> <span class="kw">implements</span> OrderState {\n  next(o) { o.setState(<span class="kw">new</span> ProcessingState()); }\n}',
+        },
+        command: {
+          name: "📜 Command",
+          desc: "Encapsulates a request as an object, enabling parameterization, queuing, logging, and undo/redo.",
+          use: ["Undo/redo systems", "Task queues", "Macro recording"],
+          code: '<span class="kw">interface</span> <span class="fn">Command</span> {\n  execute(): void;\n  undo(): void;\n}\n<span class="kw">class</span> <span class="fn">MoveCommand</span> <span class="kw">implements</span> Command {\n  <span class="fn">execute</span>() { <span class="cmt">/* move */</span> }\n  <span class="fn">undo</span>() { <span class="cmt">/* reverse move */</span> }\n}',
+        },
+        memento: {
+          name: "🗄️ Memento",
+          desc: "Captures and externalizes an object's internal state so it can be restored later without exposing implementation.",
+          use: ["Save/load systems", "Snapshot features", "Version history"],
+          code: '<span class="kw">class</span> <span class="fn">Editor</span> {\n  <span class="fn">save</span>(): Memento {\n    <span class="kw">return new</span> Memento(<span class="kw">this</span>.content);\n  }\n  <span class="fn">restore</span>(m: Memento) {\n    <span class="kw">this</span>.content = m.content;\n  }\n}',
+        },
+      };
 
-let path=[];// breadcrumb trail
+      let path = []; // breadcrumb trail
 
-function renderBreadcrumb(){
-  const $bc=document.getElementById('breadcrumb');$bc.innerHTML='';
-  path.forEach((p,i)=>{
-    const span=document.createElement('span');span.className='bc-item'+(i===path.length-1?' current':'');
-    span.textContent=p.label;$bc.appendChild(span);
-    if(i<path.length-1){const sep=document.createElement('span');sep.className='bc-sep';sep.textContent='›';$bc.appendChild(sep);}
-  });
-}
+      function renderBreadcrumb() {
+        const $bc = document.getElementById("breadcrumb");
+        $bc.innerHTML = "";
+        path.forEach((p, i) => {
+          const span = document.createElement("span");
+          span.className =
+            "bc-item" + (i === path.length - 1 ? " current" : "");
+          span.textContent = p.label;
+          $bc.appendChild(span);
+          if (i < path.length - 1) {
+            const sep = document.createElement("span");
+            sep.className = "bc-sep";
+            sep.textContent = "›";
+            $bc.appendChild(sep);
+          }
+        });
+      }
 
-function showNode(node, breadcrumbLabel){
-  renderBreadcrumb();
-  const $area=document.getElementById('area');
-  $area.innerHTML=`<div class="node"><h2>${node.q}</h2><div class="choices" id="choices"></div></div>`;
-  const $c=document.getElementById('choices');
-  node.opts.forEach(o=>{
-    const div=document.createElement('div');div.className='choice';
-    div.innerHTML=`<span class="icon">${o.icon}</span><span class="lbl">${o.label}<br><span class="hint">${o.hint}</span></span>`;
-    div.onclick=()=>choose(o);
-    $c.appendChild(div);
-  });
-}
+      function showNode(node, breadcrumbLabel) {
+        renderBreadcrumb();
+        const $area = document.getElementById("area");
+        $area.innerHTML = `<div class="node"><h2>${node.q}</h2><div class="choices" id="choices"></div></div>`;
+        const $c = document.getElementById("choices");
+        node.opts.forEach((o) => {
+          const div = document.createElement("div");
+          div.className = "choice";
+          div.innerHTML = `<span class="icon">${o.icon}</span><span class="lbl">${o.label}<br><span class="hint">${o.hint}</span></span>`;
+          div.onclick = () => choose(o);
+          $c.appendChild(div);
+        });
+      }
 
-function choose(opt){
-  const child=tree.children[opt.to];
-  if(child){
-    path.push({label:opt.label});
-    showNode(child,opt.label);
-  } else {
-    // result
-    const r=results[opt.to];
-    path.push({label:opt.label});
-    renderBreadcrumb();
-    const $area=document.getElementById('area');
-    $area.innerHTML=`<div class="result">
+      function choose(opt) {
+        const child = tree.children[opt.to];
+        if (child) {
+          path.push({ label: opt.label });
+          showNode(child, opt.label);
+        } else {
+          // result
+          const r = results[opt.to];
+          path.push({ label: opt.label });
+          renderBreadcrumb();
+          const $area = document.getElementById("area");
+          $area.innerHTML = `<div class="result">
       <h2>${r.name}</h2>
       <p class="desc">${r.desc}</p>
-      <div class="use-cases">${r.use.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div>
+      <div class="use-cases">${r.use.map((u) => `<span class="use-tag">${u}</span>`).join("")}</div>
       <div class="code">${r.code}</div>
       <div class="history" id="hist"></div>
     </div>`;
-    const $h=document.getElementById('hist');
-    path.forEach(p=>{const s=document.createElement('span');s.className='hist-step chosen';s.textContent=p.label;$h.appendChild(s);});
-  }
-}
+          const $h = document.getElementById("hist");
+          path.forEach((p) => {
+            const s = document.createElement("span");
+            s.className = "hist-step chosen";
+            s.textContent = p.label;
+            $h.appendChild(s);
+          });
+        }
+      }
 
-function start(){path=[];showNode(tree,'Root');}
-start();
-</script>
-</body>
+      function start() {
+        path = [];
+        showNode(tree, "Root");
+      }
+      start();
+    </script>
+  </body>
 </html>

@@ -1,114 +1,323 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Agent Debate</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.5rem}
-h1{color:#4f2bdf;font-size:1.5rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.2rem}
-.arena{width:100%;max-width:800px;position:relative}
-.agent{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;opacity:0;transform:translateY(10px);transition:all .5s}
-.agent.visible{opacity:1;transform:translateY(0)}
-.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.a1 .avatar{background:#4f2bdf}.a2 .avatar{background:#e8a838}.a3 .avatar{background:#00c864}
-.bubble{background:#16213e;border:1px solid #333;border-radius:12px;padding:.8rem 1rem;font-size:.85rem;position:relative;max-width:85%}
-.bubble::before{content:'';position:absolute;left:-6px;top:14px;border:6px solid transparent;border-right-color:#16213e}
-.agent:nth-child(2) .bubble::before{left:auto;right:-6px;border-right-color:transparent;border-left-color:#16213e}
-.agent:nth-child(2){justify-content:flex-end;flex-direction:row-reverse}
-.score-bar{width:100%;max-width:800px;margin-top:1.2rem;display:flex;gap:1rem;flex-wrap:wrap}
-.score-card{flex:1;min-width:120px;background:#16213e;border-radius:10px;padding:.8rem;text-align:center;border:1px solid #333;transition:border-color .3s}
-.score-card.lead{border-color:#4f2bdf}
-.score-card .name{font-size:.75rem;color:#888;margin-bottom:.4rem}
-.score-card .pts{font-size:1.8rem;font-weight:700}
-.a1 .pts{color:#4f2bdf}.a2 .pts{color:#e8a838}.a3 .pts{color:#00c864}
-.consensus{margin-top:1.2rem;background:#16213e;border:2px solid #4f2bdf;border-radius:12px;padding:1rem;text-align:center;opacity:0;transition:all .5s;max-width:800px;width:100%}
-.consensus.show{opacity:1;border-color:#00c864;box-shadow:0 0 20px rgba(0,200,100,.2)}
-.consensus h3{color:#00c864;font-size:.95rem;margin-bottom:.3rem}
-.controls{margin-top:1.2rem;display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
-button{padding:.55rem 1.3rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;transition:all .2s}
-.go{background:#4f2bdf;color:#fff}.go:hover{background:#6c47ff}
-.rst{background:#333;color:#ccc}.rst:hover{background:#444}
-.round-label{color:#888;font-size:.8rem;margin-bottom:.5rem;min-height:1.2rem}
-</style>
-</head>
-<body>
-<h1>🤖 Multi-Agent Debate</h1>
-<p class="sub">3 agents argue, score, and reach consensus</p>
-<div class="round-label" id="round">Round: 0 / 4</div>
-<div class="arena">
-  <div class="agent a1"><div class="avatar">🅰️</div><div class="bubble" id="b1"></div></div>
-  <div class="agent a2"><div class="avatar">🅱️</div><div class="bubble" id="b2"></div></div>
-  <div class="agent a3"><div class="avatar">🅲</div><div class="bubble" id="b3"></div></div>
-</div>
-<div class="score-bar">
-  <div class="score-card" id="sc1"><div class="name">Agent A — Logic</div><div class="pts" id="s1">0</div></div>
-  <div class="score-card" id="sc2"><div class="name">Agent B — Creativity</div><div class="pts" id="s2">0</div></div>
-  <div class="score-card" id="sc3"><div class="name">Agent C — Pragmatism</div><div class="pts" id="s3">0</div></div>
-</div>
-<div class="consensus" id="consensus"><h3>🤝 Consensus Reached</h3><p id="consensusText"></p></div>
-<div class="controls">
-  <button class="go" onclick="runDebate()">▶ Run Debate</button>
-  <button class="rst" onclick="resetDebate()">↺ Reset</button>
-</div>
-<script>
-const arguments_=[
-  [
-    ['We should use a microservices architecture for scalability.'],
-    ['What about a monolith-first approach? Less complexity early on.'],
-    ['Both have merit—ship fast now, refactor later if needed.']
-  ],
-  [
-    ['My data shows microservices reduce deployment risk by 40%.'],
-    ['Creative solutions emerge simpler from monoliths. Less glue code.'],
-    ['Hybrid wins: modular monolith gives both speed and optionality.']
-  ],
-  [
-    ['Agreed on modular monolith, but we need clear service boundaries.'],
-    ['Exactly—bounded contexts from DDD can guide the split.'],
-    ['So: modular monolith with DDD boundaries. Team agrees?']
-  ],
-  [
-    ['Final position: modular monolith with event-driven seams.'],
-    ['I support this—it balances innovation with reliability.'],
-    ['Consensus: modular monolith, DDD boundaries, future-ready for split.']
-  ]
-];
-const scores=[[0,0,0],[8,3,5],[5,6,7],[6,4,8]];
-let round=0,timer=null;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Agent Debate</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1.5rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+      }
+      .arena {
+        width: 100%;
+        max-width: 800px;
+        position: relative;
+      }
+      .agent {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.5s;
+      }
+      .agent.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+      .a1 .avatar {
+        background: #4f2bdf;
+      }
+      .a2 .avatar {
+        background: #e8a838;
+      }
+      .a3 .avatar {
+        background: #00c864;
+      }
+      .bubble {
+        background: #16213e;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
+        position: relative;
+        max-width: 85%;
+      }
+      .bubble::before {
+        content: "";
+        position: absolute;
+        left: -6px;
+        top: 14px;
+        border: 6px solid transparent;
+        border-right-color: #16213e;
+      }
+      .agent:nth-child(2) .bubble::before {
+        left: auto;
+        right: -6px;
+        border-right-color: transparent;
+        border-left-color: #16213e;
+      }
+      .agent:nth-child(2) {
+        justify-content: flex-end;
+        flex-direction: row-reverse;
+      }
+      .score-bar {
+        width: 100%;
+        max-width: 800px;
+        margin-top: 1.2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .score-card {
+        flex: 1;
+        min-width: 120px;
+        background: #16213e;
+        border-radius: 10px;
+        padding: 0.8rem;
+        text-align: center;
+        border: 1px solid #333;
+        transition: border-color 0.3s;
+      }
+      .score-card.lead {
+        border-color: #4f2bdf;
+      }
+      .score-card .name {
+        font-size: 0.75rem;
+        color: #888;
+        margin-bottom: 0.4rem;
+      }
+      .score-card .pts {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+      .a1 .pts {
+        color: #4f2bdf;
+      }
+      .a2 .pts {
+        color: #e8a838;
+      }
+      .a3 .pts {
+        color: #00c864;
+      }
+      .consensus {
+        margin-top: 1.2rem;
+        background: #16213e;
+        border: 2px solid #4f2bdf;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        opacity: 0;
+        transition: all 0.5s;
+        max-width: 800px;
+        width: 100%;
+      }
+      .consensus.show {
+        opacity: 1;
+        border-color: #00c864;
+        box-shadow: 0 0 20px rgba(0, 200, 100, 0.2);
+      }
+      .consensus h3 {
+        color: #00c864;
+        font-size: 0.95rem;
+        margin-bottom: 0.3rem;
+      }
+      .controls {
+        margin-top: 1.2rem;
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 0.55rem 1.3rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      .go {
+        background: #4f2bdf;
+        color: #fff;
+      }
+      .go:hover {
+        background: #6c47ff;
+      }
+      .rst {
+        background: #333;
+        color: #ccc;
+      }
+      .rst:hover {
+        background: #444;
+      }
+      .round-label {
+        color: #888;
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        min-height: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🤖 Multi-Agent Debate</h1>
+    <p class="sub">3 agents argue, score, and reach consensus</p>
+    <div class="round-label" id="round">Round: 0 / 4</div>
+    <div class="arena">
+      <div class="agent a1">
+        <div class="avatar">🅰️</div>
+        <div class="bubble" id="b1"></div>
+      </div>
+      <div class="agent a2">
+        <div class="avatar">🅱️</div>
+        <div class="bubble" id="b2"></div>
+      </div>
+      <div class="agent a3">
+        <div class="avatar">🅲</div>
+        <div class="bubble" id="b3"></div>
+      </div>
+    </div>
+    <div class="score-bar">
+      <div class="score-card" id="sc1">
+        <div class="name">Agent A — Logic</div>
+        <div class="pts" id="s1">0</div>
+      </div>
+      <div class="score-card" id="sc2">
+        <div class="name">Agent B — Creativity</div>
+        <div class="pts" id="s2">0</div>
+      </div>
+      <div class="score-card" id="sc3">
+        <div class="name">Agent C — Pragmatism</div>
+        <div class="pts" id="s3">0</div>
+      </div>
+    </div>
+    <div class="consensus" id="consensus">
+      <h3>🤝 Consensus Reached</h3>
+      <p id="consensusText"></p>
+    </div>
+    <div class="controls">
+      <button class="go" onclick="runDebate()">▶ Run Debate</button>
+      <button class="rst" onclick="resetDebate()">↺ Reset</button>
+    </div>
+    <script>
+      const arguments_ = [
+        [
+          ["We should use a microservices architecture for scalability."],
+          ["What about a monolith-first approach? Less complexity early on."],
+          ["Both have merit—ship fast now, refactor later if needed."],
+        ],
+        [
+          ["My data shows microservices reduce deployment risk by 40%."],
+          ["Creative solutions emerge simpler from monoliths. Less glue code."],
+          ["Hybrid wins: modular monolith gives both speed and optionality."],
+        ],
+        [
+          ["Agreed on modular monolith, but we need clear service boundaries."],
+          ["Exactly—bounded contexts from DDD can guide the split."],
+          ["So: modular monolith with DDD boundaries. Team agrees?"],
+        ],
+        [
+          ["Final position: modular monolith with event-driven seams."],
+          ["I support this—it balances innovation with reliability."],
+          [
+            "Consensus: modular monolith, DDD boundaries, future-ready for split.",
+          ],
+        ],
+      ];
+      const scores = [
+        [0, 0, 0],
+        [8, 3, 5],
+        [5, 6, 7],
+        [6, 4, 8],
+      ];
+      let round = 0,
+        timer = null;
 
-function showRound(r){
-  const a=arguments_[r];
-  document.getElementById('round').textContent=`Round: ${r+1} / ${arguments_.length}`;
-  ['b1','b2','b3'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    el.parentElement.classList.remove('visible');
-    setTimeout(()=>{el.textContent=a[i][0];el.parentElement.classList.add('visible')},i*400);
-  });
-  const sc=scores[r];
-  ['s1','s2','s3'].forEach((id,i)=>document.getElementById(id).textContent=sc[i]);
-  document.querySelectorAll('.score-card').forEach((c,i)=>c.classList.toggle('lead',sc[i]===Math.max(...sc)));
-}
+      function showRound(r) {
+        const a = arguments_[r];
+        document.getElementById("round").textContent =
+          `Round: ${r + 1} / ${arguments_.length}`;
+        ["b1", "b2", "b3"].forEach((id, i) => {
+          const el = document.getElementById(id);
+          el.parentElement.classList.remove("visible");
+          setTimeout(() => {
+            el.textContent = a[i][0];
+            el.parentElement.classList.add("visible");
+          }, i * 400);
+        });
+        const sc = scores[r];
+        ["s1", "s2", "s3"].forEach(
+          (id, i) => (document.getElementById(id).textContent = sc[i]),
+        );
+        document
+          .querySelectorAll(".score-card")
+          .forEach((c, i) =>
+            c.classList.toggle("lead", sc[i] === Math.max(...sc)),
+          );
+      }
 
-function runDebate(){
-  if(round>=arguments_.length)return;
-  showRound(round);round++;
-  if(round<arguments_.length)timer=setTimeout(runDebate,2500);
-  else setTimeout(()=>{
-    document.getElementById('consensus').classList.add('show');
-    document.getElementById('consensusText').textContent=arguments_[3][2][0];
-  },1500);
-}
+      function runDebate() {
+        if (round >= arguments_.length) return;
+        showRound(round);
+        round++;
+        if (round < arguments_.length) timer = setTimeout(runDebate, 2500);
+        else
+          setTimeout(() => {
+            document.getElementById("consensus").classList.add("show");
+            document.getElementById("consensusText").textContent =
+              arguments_[3][2][0];
+          }, 1500);
+      }
 
-function resetDebate(){
-  clearTimeout(timer);round=0;document.getElementById('round').textContent='Round: 0 / 4';
-  document.querySelectorAll('.agent').forEach(a=>a.classList.remove('visible'));
-  ['s1','s2','s3'].forEach(id=>document.getElementById(id).textContent='0');
-  document.getElementById('consensus').classList.remove('show');
-  document.querySelectorAll('.score-card').forEach(c=>c.classList.remove('lead'));
-}
-</script>
-</body>
+      function resetDebate() {
+        clearTimeout(timer);
+        round = 0;
+        document.getElementById("round").textContent = "Round: 0 / 4";
+        document
+          .querySelectorAll(".agent")
+          .forEach((a) => a.classList.remove("visible"));
+        ["s1", "s2", "s3"].forEach(
+          (id) => (document.getElementById(id).textContent = "0"),
+        );
+        document.getElementById("consensus").classList.remove("show");
+        document
+          .querySelectorAll(".score-card")
+          .forEach((c) => c.classList.remove("lead"));
+      }
+    </script>
+  </body>
 </html>

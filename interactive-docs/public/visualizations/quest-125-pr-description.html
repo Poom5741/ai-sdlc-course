@@ -1,322 +1,698 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PR Description Builder — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
-.container{max-width:1100px;margin:0 auto}
-.builder-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-@media(max-width:800px){.builder-layout{grid-template-columns:1fr}}
-.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
-.panel:hover{border-color:#4f2bdf}
-.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem}
-.section{margin-bottom:1rem}
-.section-label{font-size:.82rem;color:#888;margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
-.section-label .req{color:#ff4466;font-size:.7rem}
-.form-input{width:100%;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.5rem .7rem;color:#e0e0e0;font-size:.82rem;transition:border-color .2s;font-family:system-ui,sans-serif}
-.form-input:focus{outline:none;border-color:#4f2bdf}
-.form-input::placeholder{color:#555}
-textarea.form-input{min-height:60px;resize:vertical}
-.checkbox-group{display:flex;flex-wrap:wrap;gap:.5rem}
-.cb-label{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#aaa;cursor:pointer;padding:.3rem .6rem;background:#0d1117;border:1px solid #333;border-radius:6px;transition:all .2s}
-.cb-label:hover{border-color:#4f2bdf}
-.cb-label.checked{border-color:#00c864;color:#00c864;background:#00c86410}
-.cb-label input{display:none}
-.bullet-list{list-style:none}
-.bullet-item{display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem}
-.bullet-item .form-input{flex:1}
-.bullet-remove{background:none;border:none;color:#ff4466;cursor:pointer;font-size:1rem;padding:0 .3rem}
-.bullet-add{background:#0d1117;border:1px dashed #444;border-radius:6px;padding:.3rem .8rem;color:#4f2bdf;cursor:pointer;font-size:.78rem;transition:all .2s;width:100%;text-align:center}
-.bullet-add:hover{border-color:#4f2bdf;background:#4f2bdf10}
-.preview-box{background:#0d1117;border-radius:8px;padding:1rem;font-family:'SF Mono',monospace;font-size:.78rem;border:1px solid #333;white-space:pre-wrap;min-height:200px;max-height:400px;overflow-y:auto;line-height:1.5}
-.preview-box .md-h{color:#4f2bdf;font-weight:700}
-.preview-box .md-b{color:#00c864}
-.preview-box .md-i{color:#e8a020}
-.preview-box .md-list{color:#aaa}
-.preview-box .md-empty{color:#555;font-style:italic}
-.score-ring{width:80px;height:80px;margin:0 auto .8rem}
-.score-text{font-size:.85rem;color:#888;text-align:center}
-.score-text strong{color:#00c864}
-.preset-row{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
-.preset-btn{background:#0d1117;border:1px solid #333;border-radius:6px;padding:.3rem .7rem;font-size:.75rem;cursor:pointer;transition:all .2s;color:#aaa}
-.preset-btn:hover{border-color:#4f2bdf;color:#e0e0e0}
-.preset-btn.active{border-color:#00c864;color:#00c864}
-.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
-button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
-button:hover{background:#6143e8}
-.btn-green{background:#00c864;color:#1a1a2e}
-.btn-green:hover{background:#00dd70}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#00c864;color:#1a1a2e;padding:.6rem 1.5rem;border-radius:8px;font-size:.85rem;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
-.toast.show{opacity:1}
-</style>
-</head>
-<body>
-<h1>PR Description Builder</h1>
-<p class="sub">Build a complete PR description with live markdown preview</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PR Description Builder — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .builder-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+      @media (max-width: 800px) {
+        .builder-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.2rem;
+        transition: border-color 0.3s;
+      }
+      .panel:hover {
+        border-color: #4f2bdf;
+      }
+      .panel h2 {
+        color: #4f2bdf;
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+      }
+      .section {
+        margin-bottom: 1rem;
+      }
+      .section-label {
+        font-size: 0.82rem;
+        color: #888;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .section-label .req {
+        color: #ff4466;
+        font-size: 0.7rem;
+      }
+      .form-input {
+        width: 100%;
+        background: #0d1117;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 0.5rem 0.7rem;
+        color: #e0e0e0;
+        font-size: 0.82rem;
+        transition: border-color 0.2s;
+        font-family: system-ui, sans-serif;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #4f2bdf;
+      }
+      .form-input::placeholder {
+        color: #555;
+      }
+      textarea.form-input {
+        min-height: 60px;
+        resize: vertical;
+      }
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .cb-label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        color: #aaa;
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        background: #0d1117;
+        border: 1px solid #333;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+      .cb-label:hover {
+        border-color: #4f2bdf;
+      }
+      .cb-label.checked {
+        border-color: #00c864;
+        color: #00c864;
+        background: #00c86410;
+      }
+      .cb-label input {
+        display: none;
+      }
+      .bullet-list {
+        list-style: none;
+      }
+      .bullet-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.3rem;
+      }
+      .bullet-item .form-input {
+        flex: 1;
+      }
+      .bullet-remove {
+        background: none;
+        border: none;
+        color: #ff4466;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0 0.3rem;
+      }
+      .bullet-add {
+        background: #0d1117;
+        border: 1px dashed #444;
+        border-radius: 6px;
+        padding: 0.3rem 0.8rem;
+        color: #4f2bdf;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: center;
+      }
+      .bullet-add:hover {
+        border-color: #4f2bdf;
+        background: #4f2bdf10;
+      }
+      .preview-box {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: "SF Mono", monospace;
+        font-size: 0.78rem;
+        border: 1px solid #333;
+        white-space: pre-wrap;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        line-height: 1.5;
+      }
+      .preview-box .md-h {
+        color: #4f2bdf;
+        font-weight: 700;
+      }
+      .preview-box .md-b {
+        color: #00c864;
+      }
+      .preview-box .md-i {
+        color: #e8a020;
+      }
+      .preview-box .md-list {
+        color: #aaa;
+      }
+      .preview-box .md-empty {
+        color: #555;
+        font-style: italic;
+      }
+      .score-ring {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 0.8rem;
+      }
+      .score-text {
+        font-size: 0.85rem;
+        color: #888;
+        text-align: center;
+      }
+      .score-text strong {
+        color: #00c864;
+      }
+      .preset-row {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .preset-btn {
+        background: #0d1117;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 0.3rem 0.7rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #aaa;
+      }
+      .preset-btn:hover {
+        border-color: #4f2bdf;
+        color: #e0e0e0;
+      }
+      .preset-btn.active {
+        border-color: #00c864;
+        color: #00c864;
+      }
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6143e8;
+      }
+      .btn-green {
+        background: #00c864;
+        color: #1a1a2e;
+      }
+      .btn-green:hover {
+        background: #00dd70;
+      }
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #00c864;
+        color: #1a1a2e;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>PR Description Builder</h1>
+    <p class="sub">
+      Build a complete PR description with live markdown preview
+    </p>
 
-<div class="container">
-  <div class="preset-row" id="presetRow"></div>
-  <div class="builder-layout">
-    <!-- Builder Form -->
-    <div class="panel">
-      <h2>✏️ PR Builder</h2>
+    <div class="container">
+      <div class="preset-row" id="presetRow"></div>
+      <div class="builder-layout">
+        <!-- Builder Form -->
+        <div class="panel">
+          <h2>✏️ PR Builder</h2>
 
-      <div class="section">
-        <div class="section-label">Summary <span class="req">required</span></div>
-        <textarea class="form-input" id="summaryInput" placeholder="What does this PR do? Keep it under 72 characters."></textarea>
-      </div>
+          <div class="section">
+            <div class="section-label">
+              Summary <span class="req">required</span>
+            </div>
+            <textarea
+              class="form-input"
+              id="summaryInput"
+              placeholder="What does this PR do? Keep it under 72 characters."
+            ></textarea>
+          </div>
 
-      <div class="section">
-        <div class="section-label">Type of Change</div>
-        <div class="checkbox-group" id="typeCheckboxes"></div>
-      </div>
+          <div class="section">
+            <div class="section-label">Type of Change</div>
+            <div class="checkbox-group" id="typeCheckboxes"></div>
+          </div>
 
-      <div class="section">
-        <div class="section-label">Changes Made</div>
-        <ul class="bullet-list" id="bulletList"></ul>
-        <div class="bullet-add" id="bulletAdd">+ Add change</div>
-      </div>
+          <div class="section">
+            <div class="section-label">Changes Made</div>
+            <ul class="bullet-list" id="bulletList"></ul>
+            <div class="bullet-add" id="bulletAdd">+ Add change</div>
+          </div>
 
-      <div class="section">
-        <div class="section-label">Testing</div>
-        <textarea class="form-input" id="testInput" placeholder="What tests were added or modified? How to verify?"></textarea>
-        <div class="checkbox-group" style="margin-top:.5rem">
-          <label class="cb-label" id="testsPassCb">
-            <span class="cb-box">☐</span> Tests pass locally
-          </label>
+          <div class="section">
+            <div class="section-label">Testing</div>
+            <textarea
+              class="form-input"
+              id="testInput"
+              placeholder="What tests were added or modified? How to verify?"
+            ></textarea>
+            <div class="checkbox-group" style="margin-top: 0.5rem">
+              <label class="cb-label" id="testsPassCb">
+                <span class="cb-box">☐</span> Tests pass locally
+              </label>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-label">Related Issues</div>
+            <input
+              class="form-input"
+              id="issueInput"
+              placeholder="#123, #456"
+            />
+          </div>
+
+          <div class="section">
+            <div class="section-label">Screenshots (optional)</div>
+            <input
+              class="form-input"
+              id="screenshotInput"
+              placeholder="Paste image URL or leave empty"
+            />
+          </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="panel">
+          <h2>👁️ Markdown Preview</h2>
+
+          <div style="text-align: center; margin-bottom: 1rem">
+            <svg class="score-ring" viewBox="0 0 100 100" id="scoreRing">
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#333"
+                stroke-width="6"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#00c864"
+                stroke-width="6"
+                stroke-dasharray="264"
+                stroke-dashoffset="264"
+                stroke-linecap="round"
+                transform="rotate(-90 50 50)"
+                id="scoreArc"
+              />
+              <text
+                x="50"
+                y="50"
+                text-anchor="middle"
+                dominant-baseline="central"
+                fill="#e0e0e0"
+                font-size="18"
+                font-weight="700"
+                id="scoreNum"
+              >
+                0
+              </text>
+              <text
+                x="50"
+                y="66"
+                text-anchor="middle"
+                fill="#888"
+                font-size="8"
+              >
+                quality
+              </text>
+            </svg>
+            <div class="score-text" id="scoreText">
+              Fill in the PR description
+            </div>
+          </div>
+
+          <div class="preview-box" id="previewBox">
+            <span class="md-empty"
+              >Your PR description will appear here...</span
+            >
+          </div>
+
+          <div class="controls" style="margin-top: 1rem">
+            <button class="btn-green" onclick="copyMarkdown()">
+              📋 Copy Markdown
+            </button>
+          </div>
         </div>
       </div>
-
-      <div class="section">
-        <div class="section-label">Related Issues</div>
-        <input class="form-input" id="issueInput" placeholder="#123, #456">
-      </div>
-
-      <div class="section">
-        <div class="section-label">Screenshots (optional)</div>
-        <input class="form-input" id="screenshotInput" placeholder="Paste image URL or leave empty">
-      </div>
     </div>
 
-    <!-- Preview Panel -->
-    <div class="panel">
-      <h2>👁️ Markdown Preview</h2>
+    <div class="toast" id="toast">Copied to clipboard!</div>
 
-      <div style="text-align:center;margin-bottom:1rem">
-        <svg class="score-ring" viewBox="0 0 100 100" id="scoreRing">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#333" stroke-width="6"/>
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#00c864" stroke-width="6"
-            stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round"
-            transform="rotate(-90 50 50)" id="scoreArc"/>
-          <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="#e0e0e0" font-size="18" font-weight="700" id="scoreNum">0</text>
-          <text x="50" y="66" text-anchor="middle" fill="#888" font-size="8">quality</text>
-        </svg>
-        <div class="score-text" id="scoreText">Fill in the PR description</div>
-      </div>
+    <script>
+      const changeTypes = [
+        "Bug Fix",
+        "New Feature",
+        "Breaking Change",
+        "Documentation",
+        "Refactor",
+        "Performance",
+        "Test",
+      ];
+      const selectedTypes = new Set();
+      const bulletItems = [];
+      let testsPass = false;
 
-      <div class="preview-box" id="previewBox">
-        <span class="md-empty">Your PR description will appear here...</span>
-      </div>
+      // Presets
+      const presets = [
+        {
+          name: "🐛 Bugfix",
+          summary: "Fix user login validation error on expired tokens",
+          types: ["Bug Fix"],
+          bullets: [
+            "Check token expiry before validation",
+            "Return 401 for expired tokens",
+            "Add unit tests for edge cases",
+          ],
+          tests: "Added unit tests for TokenValidator, run npm test",
+          issues: "#234",
+        },
+        {
+          name: "✨ Feature",
+          summary: "Add dark mode toggle to settings page",
+          types: ["New Feature"],
+          bullets: [
+            "Add ThemeContext provider",
+            "Create toggle component in settings",
+            "Persist preference in localStorage",
+          ],
+          tests:
+            "Manual testing on Chrome/Safari/Firefox, added snapshot tests",
+          issues: "#156",
+        },
+        {
+          name: "🔥 Hotfix",
+          summary: "Fix production crash on empty user profile",
+          types: ["Bug Fix"],
+          bullets: [
+            "Add null check for profile data",
+            "Show fallback avatar when missing",
+            "Graceful degradation for bio field",
+          ],
+          tests: "Verified fix on staging with null profile data",
+          issues: "#789",
+        },
+      ];
 
-      <div class="controls" style="margin-top:1rem">
-        <button class="btn-green" onclick="copyMarkdown()">📋 Copy Markdown</button>
-      </div>
-    </div>
-  </div>
-</div>
+      // Render presets
+      const presetRow = document.getElementById("presetRow");
+      presets.forEach((p, i) => {
+        const btn = document.createElement("div");
+        btn.className = "preset-btn";
+        btn.textContent = p.name;
+        btn.onclick = () => applyPreset(i);
+        presetRow.appendChild(btn);
+      });
 
-<div class="toast" id="toast">Copied to clipboard!</div>
+      // Render type checkboxes
+      const typeContainer = document.getElementById("typeCheckboxes");
+      changeTypes.forEach((t) => {
+        const label = document.createElement("label");
+        label.className = "cb-label";
+        const box = document.createElement("span");
+        box.className = "cb-box";
+        box.textContent = "☐";
+        const text = document.createTextNode(t);
+        label.appendChild(box);
+        label.appendChild(text);
+        label.onclick = () => {
+          if (selectedTypes.has(t)) {
+            selectedTypes.delete(t);
+            label.classList.remove("checked");
+            box.textContent = "☐";
+          } else {
+            selectedTypes.add(t);
+            label.classList.add("checked");
+            box.textContent = "☑";
+          }
+          updatePreview();
+        };
+        typeContainer.appendChild(label);
+      });
 
-<script>
-const changeTypes = ['Bug Fix', 'New Feature', 'Breaking Change', 'Documentation', 'Refactor', 'Performance', 'Test'];
-const selectedTypes = new Set();
-const bulletItems = [];
-let testsPass = false;
-
-// Presets
-const presets = [
-  {name:'🐛 Bugfix', summary:'Fix user login validation error on expired tokens', types:['Bug Fix'], bullets:['Check token expiry before validation','Return 401 for expired tokens','Add unit tests for edge cases'], tests:'Added unit tests for TokenValidator, run npm test', issues:'#234'},
-  {name:'✨ Feature', summary:'Add dark mode toggle to settings page', types:['New Feature'], bullets:['Add ThemeContext provider','Create toggle component in settings','Persist preference in localStorage'], tests:'Manual testing on Chrome/Safari/Firefox, added snapshot tests', issues:'#156'},
-  {name:'🔥 Hotfix', summary:'Fix production crash on empty user profile', types:['Bug Fix'], bullets:['Add null check for profile data','Show fallback avatar when missing','Graceful degradation for bio field'], tests:'Verified fix on staging with null profile data', issues:'#789'},
-];
-
-// Render presets
-const presetRow = document.getElementById('presetRow');
-presets.forEach((p, i) => {
-  const btn = document.createElement('div');
-  btn.className = 'preset-btn';
-  btn.textContent = p.name;
-  btn.onclick = () => applyPreset(i);
-  presetRow.appendChild(btn);
-});
-
-// Render type checkboxes
-const typeContainer = document.getElementById('typeCheckboxes');
-changeTypes.forEach(t => {
-  const label = document.createElement('label');
-  label.className = 'cb-label';
-  const box = document.createElement('span');
-  box.className = 'cb-box';
-  box.textContent = '☐';
-  const text = document.createTextNode(t);
-  label.appendChild(box);
-  label.appendChild(text);
-  label.onclick = () => {
-    if (selectedTypes.has(t)) { selectedTypes.delete(t); label.classList.remove('checked'); box.textContent = '☐'; }
-    else { selectedTypes.add(t); label.classList.add('checked'); box.textContent = '☑'; }
-    updatePreview();
-  };
-  typeContainer.appendChild(label);
-});
-
-// Render bullets
-function renderBullets() {
-  const list = document.getElementById('bulletList');
-  while (list.firstChild) list.removeChild(list.firstChild);
-  bulletItems.forEach((item, i) => {
-    const li = document.createElement('li');
-    li.className = 'bullet-item';
-    const input = document.createElement('input');
-    input.className = 'form-input';
-    input.value = item;
-    input.placeholder = 'Describe a change...';
-    input.oninput = () => { bulletItems[i] = input.value; updatePreview(); };
-    const remove = document.createElement('span');
-    remove.className = 'bullet-remove';
-    remove.textContent = '✕';
-    remove.onclick = () => { bulletItems.splice(i, 1); renderBullets(); updatePreview(); };
-    li.appendChild(input);
-    li.appendChild(remove);
-    list.appendChild(li);
-  });
-}
-renderBullets();
-
-document.getElementById('bulletAdd').onclick = () => {
-  bulletItems.push('');
-  renderBullets();
-  const inputs = document.querySelectorAll('#bulletList .form-input');
-  if (inputs.length) inputs[inputs.length - 1].focus();
-};
-
-// Tests checkbox
-document.getElementById('testsPassCb').onclick = () => {
-  testsPass = !testsPass;
-  const cb = document.getElementById('testsPassCb');
-  cb.classList.toggle('checked', testsPass);
-  cb.querySelector('.cb-box').textContent = testsPass ? '☑' : '☐';
-  updatePreview();
-};
-
-// Input listeners
-['summaryInput', 'testInput', 'issueInput', 'screenshotInput'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updatePreview);
-});
-
-function applyPreset(i) {
-  const p = presets[i];
-  document.getElementById('summaryInput').value = p.summary;
-  document.getElementById('testInput').value = p.tests;
-  document.getElementById('issueInput').value = p.issues;
-  selectedTypes.clear();
-  document.querySelectorAll('#typeCheckboxes .cb-label').forEach(l => {
-    const t = l.textContent.trim();
-    if (p.types.includes(t)) { selectedTypes.add(t); l.classList.add('checked'); l.querySelector('.cb-box').textContent = '☑'; }
-    else { l.classList.remove('checked'); l.querySelector('.cb-box').textContent = '☐'; }
-  });
-  bulletItems.length = 0;
-  p.bullets.forEach(b => bulletItems.push(b));
-  renderBullets();
-  document.querySelectorAll('.preset-btn').forEach((b, j) => b.classList.toggle('active', j === i));
-  updatePreview();
-}
-
-function generateMarkdown() {
-  const summary = document.getElementById('summaryInput').value.trim();
-  const types = [...selectedTypes];
-  const bullets = bulletItems.filter(b => b.trim());
-  const tests = document.getElementById('testInput').value.trim();
-  const issues = document.getElementById('issueInput').value.trim();
-  const screenshot = document.getElementById('screenshotInput').value.trim();
-
-  let md = '';
-  md += '## Summary\n' + (summary || '_(no summary)_') + '\n\n';
-  if (types.length) md += '## Type of Change\n' + types.map(t => '- ' + t).join('\n') + '\n\n';
-  if (bullets.length) md += '## Changes Made\n' + bullets.map(b => '- ' + b).join('\n') + '\n\n';
-  if (tests) md += '## Testing\n' + tests + '\n\n';
-  if (testsPass) md += '- [x] Tests pass locally\n\n';
-  if (issues) md += '## Related Issues\n' + issues.split(',').map(i => '- ' + i.trim()).join('\n') + '\n\n';
-  if (screenshot) md += '## Screenshots\n![screenshot](' + screenshot + ')\n\n';
-  return md;
-}
-
-function updatePreview() {
-  const md = generateMarkdown();
-  const preview = document.getElementById('previewBox');
-  while (preview.firstChild) preview.removeChild(preview.firstChild);
-
-  if (!md.trim()) {
-    preview.appendChild(document.createTextNode('Your PR description will appear here...'));
-    preview.style.color = '#555';
-  } else {
-    preview.style.color = '';
-    md.split('\n').forEach(line => {
-      if (line.startsWith('## ')) {
-        const span = document.createElement('span');
-        span.className = 'md-h';
-        span.textContent = line;
-        preview.appendChild(span);
-        preview.appendChild(document.createTextNode('\n'));
-      } else if (line.startsWith('- [')) {
-        const span = document.createElement('span');
-        span.className = 'md-b';
-        span.textContent = line;
-        preview.appendChild(span);
-        preview.appendChild(document.createTextNode('\n'));
-      } else if (line.startsWith('- ')) {
-        const span = document.createElement('span');
-        span.className = 'md-list';
-        span.textContent = line;
-        preview.appendChild(span);
-        preview.appendChild(document.createTextNode('\n'));
-      } else {
-        preview.appendChild(document.createTextNode(line + '\n'));
+      // Render bullets
+      function renderBullets() {
+        const list = document.getElementById("bulletList");
+        while (list.firstChild) list.removeChild(list.firstChild);
+        bulletItems.forEach((item, i) => {
+          const li = document.createElement("li");
+          li.className = "bullet-item";
+          const input = document.createElement("input");
+          input.className = "form-input";
+          input.value = item;
+          input.placeholder = "Describe a change...";
+          input.oninput = () => {
+            bulletItems[i] = input.value;
+            updatePreview();
+          };
+          const remove = document.createElement("span");
+          remove.className = "bullet-remove";
+          remove.textContent = "✕";
+          remove.onclick = () => {
+            bulletItems.splice(i, 1);
+            renderBullets();
+            updatePreview();
+          };
+          li.appendChild(input);
+          li.appendChild(remove);
+          list.appendChild(li);
+        });
       }
-    });
-  }
+      renderBullets();
 
-  // Score
-  let score = 0;
-  if (document.getElementById('summaryInput').value.trim()) score += 25;
-  if (selectedTypes.size > 0) score += 15;
-  if (bulletItems.filter(b => b.trim()).length > 0) score += 20;
-  if (document.getElementById('testInput').value.trim()) score += 20;
-  if (document.getElementById('issueInput').value.trim()) score += 10;
-  if (testsPass) score += 10;
+      document.getElementById("bulletAdd").onclick = () => {
+        bulletItems.push("");
+        renderBullets();
+        const inputs = document.querySelectorAll("#bulletList .form-input");
+        if (inputs.length) inputs[inputs.length - 1].focus();
+      };
 
-  const offset = 264 - (264 * score / 100);
-  document.getElementById('scoreArc').setAttribute('stroke-dashoffset', offset);
-  document.getElementById('scoreNum').textContent = score;
-  document.getElementById('scoreArc').setAttribute('stroke', score >= 80 ? '#00c864' : score >= 50 ? '#e8a020' : '#ff4466');
-  const stEl = document.getElementById('scoreText'); while (stEl.firstChild) stEl.removeChild(stEl.firstChild);
-  const strong = document.createElement('strong');
-  strong.textContent = score + '% complete';
-  document.getElementById('scoreText').appendChild(strong);
-}
+      // Tests checkbox
+      document.getElementById("testsPassCb").onclick = () => {
+        testsPass = !testsPass;
+        const cb = document.getElementById("testsPassCb");
+        cb.classList.toggle("checked", testsPass);
+        cb.querySelector(".cb-box").textContent = testsPass ? "☑" : "☐";
+        updatePreview();
+      };
 
-function copyMarkdown() {
-  navigator.clipboard.writeText(generateMarkdown()).then(() => {
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  });
-}
+      // Input listeners
+      ["summaryInput", "testInput", "issueInput", "screenshotInput"].forEach(
+        (id) => {
+          document.getElementById(id).addEventListener("input", updatePreview);
+        },
+      );
 
-updatePreview();
-</script>
-</body>
+      function applyPreset(i) {
+        const p = presets[i];
+        document.getElementById("summaryInput").value = p.summary;
+        document.getElementById("testInput").value = p.tests;
+        document.getElementById("issueInput").value = p.issues;
+        selectedTypes.clear();
+        document.querySelectorAll("#typeCheckboxes .cb-label").forEach((l) => {
+          const t = l.textContent.trim();
+          if (p.types.includes(t)) {
+            selectedTypes.add(t);
+            l.classList.add("checked");
+            l.querySelector(".cb-box").textContent = "☑";
+          } else {
+            l.classList.remove("checked");
+            l.querySelector(".cb-box").textContent = "☐";
+          }
+        });
+        bulletItems.length = 0;
+        p.bullets.forEach((b) => bulletItems.push(b));
+        renderBullets();
+        document
+          .querySelectorAll(".preset-btn")
+          .forEach((b, j) => b.classList.toggle("active", j === i));
+        updatePreview();
+      }
+
+      function generateMarkdown() {
+        const summary = document.getElementById("summaryInput").value.trim();
+        const types = [...selectedTypes];
+        const bullets = bulletItems.filter((b) => b.trim());
+        const tests = document.getElementById("testInput").value.trim();
+        const issues = document.getElementById("issueInput").value.trim();
+        const screenshot = document
+          .getElementById("screenshotInput")
+          .value.trim();
+
+        let md = "";
+        md += "## Summary\n" + (summary || "_(no summary)_") + "\n\n";
+        if (types.length)
+          md +=
+            "## Type of Change\n" +
+            types.map((t) => "- " + t).join("\n") +
+            "\n\n";
+        if (bullets.length)
+          md +=
+            "## Changes Made\n" +
+            bullets.map((b) => "- " + b).join("\n") +
+            "\n\n";
+        if (tests) md += "## Testing\n" + tests + "\n\n";
+        if (testsPass) md += "- [x] Tests pass locally\n\n";
+        if (issues)
+          md +=
+            "## Related Issues\n" +
+            issues
+              .split(",")
+              .map((i) => "- " + i.trim())
+              .join("\n") +
+            "\n\n";
+        if (screenshot)
+          md += "## Screenshots\n![screenshot](" + screenshot + ")\n\n";
+        return md;
+      }
+
+      function updatePreview() {
+        const md = generateMarkdown();
+        const preview = document.getElementById("previewBox");
+        while (preview.firstChild) preview.removeChild(preview.firstChild);
+
+        if (!md.trim()) {
+          preview.appendChild(
+            document.createTextNode("Your PR description will appear here..."),
+          );
+          preview.style.color = "#555";
+        } else {
+          preview.style.color = "";
+          md.split("\n").forEach((line) => {
+            if (line.startsWith("## ")) {
+              const span = document.createElement("span");
+              span.className = "md-h";
+              span.textContent = line;
+              preview.appendChild(span);
+              preview.appendChild(document.createTextNode("\n"));
+            } else if (line.startsWith("- [")) {
+              const span = document.createElement("span");
+              span.className = "md-b";
+              span.textContent = line;
+              preview.appendChild(span);
+              preview.appendChild(document.createTextNode("\n"));
+            } else if (line.startsWith("- ")) {
+              const span = document.createElement("span");
+              span.className = "md-list";
+              span.textContent = line;
+              preview.appendChild(span);
+              preview.appendChild(document.createTextNode("\n"));
+            } else {
+              preview.appendChild(document.createTextNode(line + "\n"));
+            }
+          });
+        }
+
+        // Score
+        let score = 0;
+        if (document.getElementById("summaryInput").value.trim()) score += 25;
+        if (selectedTypes.size > 0) score += 15;
+        if (bulletItems.filter((b) => b.trim()).length > 0) score += 20;
+        if (document.getElementById("testInput").value.trim()) score += 20;
+        if (document.getElementById("issueInput").value.trim()) score += 10;
+        if (testsPass) score += 10;
+
+        const offset = 264 - (264 * score) / 100;
+        document
+          .getElementById("scoreArc")
+          .setAttribute("stroke-dashoffset", offset);
+        document.getElementById("scoreNum").textContent = score;
+        document
+          .getElementById("scoreArc")
+          .setAttribute(
+            "stroke",
+            score >= 80 ? "#00c864" : score >= 50 ? "#e8a020" : "#ff4466",
+          );
+        const stEl = document.getElementById("scoreText");
+        while (stEl.firstChild) stEl.removeChild(stEl.firstChild);
+        const strong = document.createElement("strong");
+        strong.textContent = score + "% complete";
+        document.getElementById("scoreText").appendChild(strong);
+      }
+
+      function copyMarkdown() {
+        navigator.clipboard.writeText(generateMarkdown()).then(() => {
+          const toast = document.getElementById("toast");
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 2000);
+        });
+      }
+
+      updatePreview();
+    </script>
+  </body>
 </html>

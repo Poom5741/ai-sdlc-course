@@ -1,195 +1,521 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dependency Audit Dashboard — Quest 49</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
-  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
-  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
-  .dashboard{width:100%;max-width:1000px}
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem}
-  .stat-card{background:#16213e;border-radius:10px;padding:1rem;text-align:center;border:1px solid #2a2a4a}
-  .stat-card .num{font-size:1.8rem;font-weight:700;font-family:'Fira Code',monospace}
-  .stat-card .label{font-size:.75rem;color:#9e9eb8;text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
-  .stat-card.safe .num{color:#00c864}
-  .stat-card.warn .num{color:#f0c040}
-  .stat-card.danger .num{color:#ff4757}
-  .stat-card.info .num{color:#61afef}
-  .search-bar{background:#16213e;border-radius:8px;padding:.6rem 1rem;border:1px solid #2a2a4a;margin-bottom:1.5rem;display:flex;gap:.8rem;align-items:center}
-  .search-bar input{flex:1;background:none;border:none;color:#e0e0e0;font-size:.9rem;outline:none}
-  .search-bar .filter-btn{padding:.3rem .7rem;border-radius:12px;font-size:.75rem;cursor:pointer;border:1px solid #2a2a4a;background:#0f1629;transition:all .2s}
-  .search-bar .filter-btn.active{background:#4f2bdf;border-color:#4f2bdf;color:#fff}
-  .tree{background:#16213e;border-radius:12px;border:1px solid #2a2a4a;overflow:hidden}
-  .tree-header{padding:.8rem 1rem;background:#0f1629;display:flex;justify-content:space-between;font-size:.8rem;color:#9e9eb8;border-bottom:1px solid #2a2a4a}
-  .dep-row{padding:.6rem 1rem;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:background .15s;font-size:.85rem}
-  .dep-row:hover{background:rgba(79,43,223,.08)}
-  .dep-row:last-child{border-bottom:none}
-  .dep-name{font-weight:600;color:#e0e0e0;min-width:180px}
-  .dep-version{color:#9e9eb8;font-family:'Fira Code',monospace;font-size:.8rem;min-width:80px}
-  .dep-latest{color:#61afef;font-family:'Fira Code',monospace;font-size:.8rem;min-width:80px}
-  .severity-badge{padding:.15rem .5rem;border-radius:10px;font-size:.7rem;font-weight:600;text-transform:uppercase}
-  .severity-badge.critical{background:rgba(255,71,87,.15);color:#ff4757}
-  .severity-badge.high{background:rgba(255,159,67,.15);color:#ff9f43}
-  .severity-badge.moderate{background:rgba(240,192,64,.15);color:#f0c040}
-  .severity-badge.low{background:rgba(97,175,239,.15);color:#61afef}
-  .severity-badge.safe{background:rgba(0,200,100,.15);color:#00c864}
-  .dep-bar{flex:1;height:4px;background:#2a2a4a;border-radius:2px;overflow:hidden}
-  .dep-bar-fill{height:100%;border-radius:2px;transition:width .5s}
-  .expand-panel{background:#0f1629;padding:.8rem 1rem;font-size:.8rem;line-height:1.6;color:#aaa;display:none;border-top:1px solid #1a1a2e}
-  .expand-panel.show{display:block}
-  .expand-panel code{background:#1a1a2e;padding:.1rem .4rem;border-radius:3px;font-size:.75rem}
-  .cve-link{color:#61afef;text-decoration:none}
-  .cve-link:hover{text-decoration:underline}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-  .dep-row{animation:fadeIn .3s backwards}
-</style>
-</head>
-<body>
-<h1>🛡️ Dependency Audit Dashboard</h1>
-<p class="subtitle">Quest 49 · Scan, analyze, and remediate dependency vulnerabilities</p>
-<div class="dashboard">
-  <div class="stats-row" id="statsRow"></div>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search packages...">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="vulnerable">Vulnerable</button>
-    <button class="filter-btn" data-filter="outdated">Outdated</button>
-  </div>
-  <div class="tree">
-    <div class="tree-header"><span>Package</span><span>Current</span><span>Latest</span><span>Status</span></div>
-    <div id="depList"></div>
-  </div>
-</div>
-<script>
-var deps = [
-  { name: 'react', current: '18.2.0', latest: '18.3.1', vulns: 0, sev: 'safe', age: 3, detail: 'No known vulnerabilities. Minor version available.' },
-  { name: 'react-dom', current: '18.2.0', latest: '18.3.1', vulns: 0, sev: 'safe', age: 3, detail: 'No known vulnerabilities. Minor version available.' },
-  { name: 'axios', current: '0.27.2', latest: '1.7.2', vulns: 2, sev: 'high', age: 18, detail: 'CVE-2023-45857: CSRF token exposure. CVE-2024-39338: SSRF in server-side requests. <a class="cve-link" href="#">View details →</a>' },
-  { name: 'lodash', current: '4.17.20', latest: '4.17.21', vulns: 1, sev: 'moderate', age: 36, detail: 'CVE-2021-23337: Command injection via template. Patch available in 4.17.21.' },
-  { name: 'express', current: '4.18.2', latest: '4.21.0', vulns: 0, sev: 'safe', age: 6, detail: 'No known vulnerabilities. Update recommended for bug fixes.' },
-  { name: 'jsonwebtoken', current: '8.5.1', latest: '9.0.2', vulns: 3, sev: 'critical', age: 30, detail: 'CVE-2022-23529: insecure key handling. CVE-2022-23540: alg bypass. CVE-2022-23541: insecure input validation. <a class="cve-link" href="#">View details →</a>' },
-  { name: 'minimist', current: '1.2.5', latest: '1.2.8', vulns: 1, sev: 'high', age: 30, detail: 'CVE-2021-44906: prototype pollution. Upgrade to 1.2.6+.' },
-  { name: 'webpack', current: '5.88.0', latest: '5.93.0', vulns: 0, sev: 'safe', age: 5, detail: 'No known vulnerabilities. Build performance improvements available.' },
-  { name: 'typescript', current: '5.1.6', latest: '5.5.3', vulns: 0, sev: 'safe', age: 8, detail: 'No known vulnerabilities. Major improvements in type inference.' },
-  { name: 'next', current: '13.4.1', latest: '14.2.5', vulns: 2, sev: 'high', age: 12, detail: 'CVE-2024-34351: SSRF via Host header. CVE-2024-34350: HTTP request smuggling. Major version upgrade required.' },
-  { name: 'postcss', current: '8.4.27', latest: '8.4.40', vulns: 1, sev: 'moderate', age: 6, detail: 'CVE-2023-44270: line return parsing issue. Update to 8.4.31+.' },
-  { name: 'socket.io', current: '4.6.1', latest: '4.7.5', vulns: 1, sev: 'low', age: 8, detail: 'CVE-2024-38355: resource exhaustion on large HTTP headers.' },
-];
-
-var currentFilter = 'all';
-
-function renderStats() {
-  var total = deps.length;
-  var vulnCount = deps.filter(function(d) { return d.vulns > 0; }).length;
-  var totalVulns = deps.reduce(function(a, d) { return a + d.vulns; }, 0);
-  var critical = deps.filter(function(d) { return d.sev === 'critical' || d.sev === 'high'; }).length;
-
-  var stats = [
-    { num: total, label: 'Total Deps', cls: 'info' },
-    { num: vulnCount, label: 'Vulnerable', cls: vulnCount > 0 ? 'warn' : 'safe' },
-    { num: totalVulns, label: 'CVEs Found', cls: totalVulns > 3 ? 'danger' : vulnCount > 0 ? 'warn' : 'safe' },
-    { num: critical, label: 'Critical/High', cls: critical > 0 ? 'danger' : 'safe' }
-  ];
-
-  var row = document.getElementById('statsRow');
-  row.textContent = '';
-  stats.forEach(function(s) {
-    var card = document.createElement('div');
-    card.className = 'stat-card ' + s.cls;
-    var numEl = document.createElement('div');
-    numEl.className = 'num';
-    numEl.textContent = String(s.num);
-    var labelEl = document.createElement('div');
-    labelEl.className = 'label';
-    labelEl.textContent = s.label;
-    card.appendChild(numEl);
-    card.appendChild(labelEl);
-    row.appendChild(card);
-  });
-}
-
-function renderDeps(filter, search) {
-  var list = document.getElementById('depList');
-  list.textContent = '';
-  var filtered = deps.filter(function(d) {
-    if (filter === 'vulnerable' && d.vulns === 0) return false;
-    if (filter === 'outdated' && d.current === d.latest) return false;
-    if (search && d.name.toLowerCase().indexOf(search.toLowerCase()) === -1) return false;
-    return true;
-  });
-
-  filtered.forEach(function(d, i) {
-    var row = document.createElement('div');
-    row.className = 'dep-row';
-    row.style.animationDelay = (i * 30) + 'ms';
-
-    var nameEl = document.createElement('span');
-    nameEl.className = 'dep-name';
-    nameEl.textContent = d.name;
-
-    var curEl = document.createElement('span');
-    curEl.className = 'dep-version';
-    curEl.textContent = d.current;
-
-    var latEl = document.createElement('span');
-    latEl.className = 'dep-latest';
-    latEl.textContent = d.latest;
-
-    var badge = document.createElement('span');
-    badge.className = 'severity-badge ' + d.sev;
-    if (d.vulns > 0) badge.textContent = d.vulns + ' CVE' + (d.vulns > 1 ? 's' : '');
-    else badge.textContent = '✓ OK';
-
-    row.appendChild(nameEl);
-    row.appendChild(curEl);
-    row.appendChild(latEl);
-    row.appendChild(badge);
-
-    var panel = document.createElement('div');
-    panel.className = 'expand-panel';
-
-    row.addEventListener('click', function() {
-      var isOpen = panel.classList.contains('show');
-      document.querySelectorAll('.expand-panel.show').forEach(function(p) { p.classList.remove('show'); });
-      if (!isOpen) {
-        panel.classList.add('show');
-        panel.textContent = '';
-        var detailText = document.createElement('span');
-        detailText.textContent = d.detail;
-        panel.appendChild(detailText);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dependency Audit Dashboard — Quest 49</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-    });
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+        color: #fff;
+      }
+      .subtitle {
+        color: #9e9eb8;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      .dashboard {
+        width: 100%;
+        max-width: 1000px;
+      }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .stat-card {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid #2a2a4a;
+      }
+      .stat-card .num {
+        font-size: 1.8rem;
+        font-weight: 700;
+        font-family: "Fira Code", monospace;
+      }
+      .stat-card .label {
+        font-size: 0.75rem;
+        color: #9e9eb8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.2rem;
+      }
+      .stat-card.safe .num {
+        color: #00c864;
+      }
+      .stat-card.warn .num {
+        color: #f0c040;
+      }
+      .stat-card.danger .num {
+        color: #ff4757;
+      }
+      .stat-card.info .num {
+        color: #61afef;
+      }
+      .search-bar {
+        background: #16213e;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        border: 1px solid #2a2a4a;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+      }
+      .search-bar input {
+        flex: 1;
+        background: none;
+        border: none;
+        color: #e0e0e0;
+        font-size: 0.9rem;
+        outline: none;
+      }
+      .search-bar .filter-btn {
+        padding: 0.3rem 0.7rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: 1px solid #2a2a4a;
+        background: #0f1629;
+        transition: all 0.2s;
+      }
+      .search-bar .filter-btn.active {
+        background: #4f2bdf;
+        border-color: #4f2bdf;
+        color: #fff;
+      }
+      .tree {
+        background: #16213e;
+        border-radius: 12px;
+        border: 1px solid #2a2a4a;
+        overflow: hidden;
+      }
+      .tree-header {
+        padding: 0.8rem 1rem;
+        background: #0f1629;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #9e9eb8;
+        border-bottom: 1px solid #2a2a4a;
+      }
+      .dep-row {
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid #1a1a2e;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-size: 0.85rem;
+      }
+      .dep-row:hover {
+        background: rgba(79, 43, 223, 0.08);
+      }
+      .dep-row:last-child {
+        border-bottom: none;
+      }
+      .dep-name {
+        font-weight: 600;
+        color: #e0e0e0;
+        min-width: 180px;
+      }
+      .dep-version {
+        color: #9e9eb8;
+        font-family: "Fira Code", monospace;
+        font-size: 0.8rem;
+        min-width: 80px;
+      }
+      .dep-latest {
+        color: #61afef;
+        font-family: "Fira Code", monospace;
+        font-size: 0.8rem;
+        min-width: 80px;
+      }
+      .severity-badge {
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .severity-badge.critical {
+        background: rgba(255, 71, 87, 0.15);
+        color: #ff4757;
+      }
+      .severity-badge.high {
+        background: rgba(255, 159, 67, 0.15);
+        color: #ff9f43;
+      }
+      .severity-badge.moderate {
+        background: rgba(240, 192, 64, 0.15);
+        color: #f0c040;
+      }
+      .severity-badge.low {
+        background: rgba(97, 175, 239, 0.15);
+        color: #61afef;
+      }
+      .severity-badge.safe {
+        background: rgba(0, 200, 100, 0.15);
+        color: #00c864;
+      }
+      .dep-bar {
+        flex: 1;
+        height: 4px;
+        background: #2a2a4a;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .dep-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.5s;
+      }
+      .expand-panel {
+        background: #0f1629;
+        padding: 0.8rem 1rem;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: #aaa;
+        display: none;
+        border-top: 1px solid #1a1a2e;
+      }
+      .expand-panel.show {
+        display: block;
+      }
+      .expand-panel code {
+        background: #1a1a2e;
+        padding: 0.1rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+      }
+      .cve-link {
+        color: #61afef;
+        text-decoration: none;
+      }
+      .cve-link:hover {
+        text-decoration: underline;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .dep-row {
+        animation: fadeIn 0.3s backwards;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛡️ Dependency Audit Dashboard</h1>
+    <p class="subtitle">
+      Quest 49 · Scan, analyze, and remediate dependency vulnerabilities
+    </p>
+    <div class="dashboard">
+      <div class="stats-row" id="statsRow"></div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search packages..." />
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="vulnerable">Vulnerable</button>
+        <button class="filter-btn" data-filter="outdated">Outdated</button>
+      </div>
+      <div class="tree">
+        <div class="tree-header">
+          <span>Package</span><span>Current</span><span>Latest</span
+          ><span>Status</span>
+        </div>
+        <div id="depList"></div>
+      </div>
+    </div>
+    <script>
+      var deps = [
+        {
+          name: "react",
+          current: "18.2.0",
+          latest: "18.3.1",
+          vulns: 0,
+          sev: "safe",
+          age: 3,
+          detail: "No known vulnerabilities. Minor version available.",
+        },
+        {
+          name: "react-dom",
+          current: "18.2.0",
+          latest: "18.3.1",
+          vulns: 0,
+          sev: "safe",
+          age: 3,
+          detail: "No known vulnerabilities. Minor version available.",
+        },
+        {
+          name: "axios",
+          current: "0.27.2",
+          latest: "1.7.2",
+          vulns: 2,
+          sev: "high",
+          age: 18,
+          detail:
+            'CVE-2023-45857: CSRF token exposure. CVE-2024-39338: SSRF in server-side requests. <a class="cve-link" href="#">View details →</a>',
+        },
+        {
+          name: "lodash",
+          current: "4.17.20",
+          latest: "4.17.21",
+          vulns: 1,
+          sev: "moderate",
+          age: 36,
+          detail:
+            "CVE-2021-23337: Command injection via template. Patch available in 4.17.21.",
+        },
+        {
+          name: "express",
+          current: "4.18.2",
+          latest: "4.21.0",
+          vulns: 0,
+          sev: "safe",
+          age: 6,
+          detail: "No known vulnerabilities. Update recommended for bug fixes.",
+        },
+        {
+          name: "jsonwebtoken",
+          current: "8.5.1",
+          latest: "9.0.2",
+          vulns: 3,
+          sev: "critical",
+          age: 30,
+          detail:
+            'CVE-2022-23529: insecure key handling. CVE-2022-23540: alg bypass. CVE-2022-23541: insecure input validation. <a class="cve-link" href="#">View details →</a>',
+        },
+        {
+          name: "minimist",
+          current: "1.2.5",
+          latest: "1.2.8",
+          vulns: 1,
+          sev: "high",
+          age: 30,
+          detail: "CVE-2021-44906: prototype pollution. Upgrade to 1.2.6+.",
+        },
+        {
+          name: "webpack",
+          current: "5.88.0",
+          latest: "5.93.0",
+          vulns: 0,
+          sev: "safe",
+          age: 5,
+          detail:
+            "No known vulnerabilities. Build performance improvements available.",
+        },
+        {
+          name: "typescript",
+          current: "5.1.6",
+          latest: "5.5.3",
+          vulns: 0,
+          sev: "safe",
+          age: 8,
+          detail:
+            "No known vulnerabilities. Major improvements in type inference.",
+        },
+        {
+          name: "next",
+          current: "13.4.1",
+          latest: "14.2.5",
+          vulns: 2,
+          sev: "high",
+          age: 12,
+          detail:
+            "CVE-2024-34351: SSRF via Host header. CVE-2024-34350: HTTP request smuggling. Major version upgrade required.",
+        },
+        {
+          name: "postcss",
+          current: "8.4.27",
+          latest: "8.4.40",
+          vulns: 1,
+          sev: "moderate",
+          age: 6,
+          detail:
+            "CVE-2023-44270: line return parsing issue. Update to 8.4.31+.",
+        },
+        {
+          name: "socket.io",
+          current: "4.6.1",
+          latest: "4.7.5",
+          vulns: 1,
+          sev: "low",
+          age: 8,
+          detail: "CVE-2024-38355: resource exhaustion on large HTTP headers.",
+        },
+      ];
 
-    list.appendChild(row);
-    list.appendChild(panel);
-  });
+      var currentFilter = "all";
 
-  if (!filtered.length) {
-    var empty = document.createElement('div');
-    empty.style.cssText = 'padding:2rem;text-align:center;color:#555;font-style:italic';
-    empty.textContent = 'No packages match the current filter.';
-    list.appendChild(empty);
-  }
-}
+      function renderStats() {
+        var total = deps.length;
+        var vulnCount = deps.filter(function (d) {
+          return d.vulns > 0;
+        }).length;
+        var totalVulns = deps.reduce(function (a, d) {
+          return a + d.vulns;
+        }, 0);
+        var critical = deps.filter(function (d) {
+          return d.sev === "critical" || d.sev === "high";
+        }).length;
 
-document.querySelectorAll('.filter-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-    this.classList.add('active');
-    currentFilter = this.getAttribute('data-filter');
-    renderDeps(currentFilter, document.getElementById('searchInput').value);
-  });
-});
+        var stats = [
+          { num: total, label: "Total Deps", cls: "info" },
+          {
+            num: vulnCount,
+            label: "Vulnerable",
+            cls: vulnCount > 0 ? "warn" : "safe",
+          },
+          {
+            num: totalVulns,
+            label: "CVEs Found",
+            cls: totalVulns > 3 ? "danger" : vulnCount > 0 ? "warn" : "safe",
+          },
+          {
+            num: critical,
+            label: "Critical/High",
+            cls: critical > 0 ? "danger" : "safe",
+          },
+        ];
 
-document.getElementById('searchInput').addEventListener('input', function() {
-  renderDeps(currentFilter, this.value);
-});
+        var row = document.getElementById("statsRow");
+        row.textContent = "";
+        stats.forEach(function (s) {
+          var card = document.createElement("div");
+          card.className = "stat-card " + s.cls;
+          var numEl = document.createElement("div");
+          numEl.className = "num";
+          numEl.textContent = String(s.num);
+          var labelEl = document.createElement("div");
+          labelEl.className = "label";
+          labelEl.textContent = s.label;
+          card.appendChild(numEl);
+          card.appendChild(labelEl);
+          row.appendChild(card);
+        });
+      }
 
-renderStats();
-renderDeps('all', '');
-</script>
-</body>
+      function renderDeps(filter, search) {
+        var list = document.getElementById("depList");
+        list.textContent = "";
+        var filtered = deps.filter(function (d) {
+          if (filter === "vulnerable" && d.vulns === 0) return false;
+          if (filter === "outdated" && d.current === d.latest) return false;
+          if (
+            search &&
+            d.name.toLowerCase().indexOf(search.toLowerCase()) === -1
+          )
+            return false;
+          return true;
+        });
+
+        filtered.forEach(function (d, i) {
+          var row = document.createElement("div");
+          row.className = "dep-row";
+          row.style.animationDelay = i * 30 + "ms";
+
+          var nameEl = document.createElement("span");
+          nameEl.className = "dep-name";
+          nameEl.textContent = d.name;
+
+          var curEl = document.createElement("span");
+          curEl.className = "dep-version";
+          curEl.textContent = d.current;
+
+          var latEl = document.createElement("span");
+          latEl.className = "dep-latest";
+          latEl.textContent = d.latest;
+
+          var badge = document.createElement("span");
+          badge.className = "severity-badge " + d.sev;
+          if (d.vulns > 0)
+            badge.textContent = d.vulns + " CVE" + (d.vulns > 1 ? "s" : "");
+          else badge.textContent = "✓ OK";
+
+          row.appendChild(nameEl);
+          row.appendChild(curEl);
+          row.appendChild(latEl);
+          row.appendChild(badge);
+
+          var panel = document.createElement("div");
+          panel.className = "expand-panel";
+
+          row.addEventListener("click", function () {
+            var isOpen = panel.classList.contains("show");
+            document
+              .querySelectorAll(".expand-panel.show")
+              .forEach(function (p) {
+                p.classList.remove("show");
+              });
+            if (!isOpen) {
+              panel.classList.add("show");
+              panel.textContent = "";
+              var detailText = document.createElement("span");
+              detailText.textContent = d.detail;
+              panel.appendChild(detailText);
+            }
+          });
+
+          list.appendChild(row);
+          list.appendChild(panel);
+        });
+
+        if (!filtered.length) {
+          var empty = document.createElement("div");
+          empty.style.cssText =
+            "padding:2rem;text-align:center;color:#555;font-style:italic";
+          empty.textContent = "No packages match the current filter.";
+          list.appendChild(empty);
+        }
+      }
+
+      document.querySelectorAll(".filter-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".filter-btn").forEach(function (b) {
+            b.classList.remove("active");
+          });
+          this.classList.add("active");
+          currentFilter = this.getAttribute("data-filter");
+          renderDeps(
+            currentFilter,
+            document.getElementById("searchInput").value,
+          );
+        });
+      });
+
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          renderDeps(currentFilter, this.value);
+        });
+
+      renderStats();
+      renderDeps("all", "");
+    </script>
+  </body>
 </html>

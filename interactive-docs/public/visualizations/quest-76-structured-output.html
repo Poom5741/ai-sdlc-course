@@ -1,139 +1,345 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JSON Parsing Flow</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.5rem}
-h1{color:#4f2bdf;font-size:1.5rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.2rem}
-.flow{width:100%;max-width:700px;display:flex;flex-direction:column;gap:.8rem;align-items:center}
-.step{width:100%;background:#16213e;border:2px solid #333;border-radius:10px;padding:.8rem 1rem;display:flex;align-items:center;gap:.8rem;opacity:.4;transition:all .4s}
-.step.active{opacity:1;border-color:#4f2bdf;box-shadow:0 0 12px rgba(79,43,223,.3)}
-.step.success{opacity:1;border-color:#00c864;box-shadow:0 0 12px rgba(0,200,100,.3)}
-.step.error{opacity:1;border-color:#e8433e;box-shadow:0 0 12px rgba(232,67,62,.3)}
-.step-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.step-icon.gen{background:rgba(79,43,223,.2);color:#4f2bdf}
-.step-icon.parse{background:rgba(232,168,56,.2);color:#e8a838}
-.step-icon.valid{background:rgba(0,200,100,.2);color:#00c864}
-.step-icon.retry{background:rgba(232,67,62,.2);color:#e8433e}
-.step-text{font-size:.85rem;flex:1}
-.step-text strong{display:block;margin-bottom:.15rem}
-.step-text span{color:#888;font-size:.75rem}
-.code-preview{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.6rem;font-size:.75rem;font-family:'Courier New',monospace;white-space:pre-wrap;max-height:100px;overflow:auto;width:100%;max-width:700px;transition:all .3s}
-.code-preview.valid{border-color:#00c864;color:#00c864}
-.code-preview.invalid{border-color:#e8433e;color:#e8433e}
-.controls{margin-top:1rem;display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
-button{padding:.6rem 1.2rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;background:#4f2bdf;color:#fff;transition:all .2s}
-button:hover{background:#6c47ff}
-.btn-rst{background:#333;color:#ccc}
-.btn-rst:hover{background:#444}
-.stats-bar{display:flex;gap:1rem;margin-top:1rem;font-size:.8rem;flex-wrap:wrap;justify-content:center}
-.stat{background:#16213e;padding:.4rem .8rem;border-radius:6px;border:1px solid #333}
-.stat span{font-weight:700;color:#4f2bdf}
-.arrow-down{color:#333;font-size:1.2rem;text-align:center}
-</style>
-</head>
-<body>
-<h1>📋 JSON Parsing Flow</h1>
-<p class="sub">LLM output → Parse → Validate → Retry on failure</p>
-<div class="flow" id="flow">
-  <div class="step" id="step1"><div class="step-icon gen">⚡</div><div class="step-text"><strong>LLM generates output</strong><span>Raw text response from model</span></div></div>
-  <div class="arrow-down">↓</div>
-  <div class="step" id="step2"><div class="step-icon parse">🔧</div><div class="step-text"><strong>JSON.parse()</strong><span>Attempt to parse raw output</span></div></div>
-  <div class="arrow-down">↓</div>
-  <div class="step" id="step3"><div class="step-icon valid">✅</div><div class="step-text"><strong>Schema validation</strong><span>Check required fields & types</span></div></div>
-  <div class="arrow-down" id="retryArrow" style="display:none">↑ retry</div>
-  <div class="step" id="step4" style="display:none"><div class="step-icon retry">🔄</div><div class="step-text"><strong>Retry with error feedback</strong><span>Send validation error back to LLM</span></div></div>
-</div>
-<div class="code-preview" id="codePreview">// Output will appear here...</div>
-<div class="controls">
-  <button onclick="runFlow('valid')">▶ Valid Output</button>
-  <button onclick="runFlow('invalid')">▶ Invalid JSON</button>
-  <button onclick="runFlow('badSchema')">▶ Bad Schema</button>
-  <button class="btn-rst" onclick="resetFlow()">↺ Reset</button>
-</div>
-<div class="stats-bar">
-  <div class="stat">Attempts: <span id="attempts">0</span></div>
-  <div class="stat">Successes: <span id="successes">0</span></div>
-  <div class="stat">Failures: <span id="failures">0</span></div>
-</div>
-<script>
-let attempts=0,successes=0,failures=0,timers=[];
-const outputs={
-  valid:'{"name":"Alice","age":30,"role":"engineer"}',
-  invalid:'{name: Alice, age: 30, role: "engineer"}',  // missing quotes
-  badSchema:'{"name":"Alice"}'  // missing required fields
-};
-const schemas={
-  valid:()=>true,
-  invalid:null,  // parse will fail
-  badSchema:(obj)=>obj.age!==undefined&&obj.role!==undefined
-};
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSON Parsing Flow</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1.5rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+      }
+      .flow {
+        width: 100%;
+        max-width: 700px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: center;
+      }
+      .step {
+        width: 100%;
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        opacity: 0.4;
+        transition: all 0.4s;
+      }
+      .step.active {
+        opacity: 1;
+        border-color: #4f2bdf;
+        box-shadow: 0 0 12px rgba(79, 43, 223, 0.3);
+      }
+      .step.success {
+        opacity: 1;
+        border-color: #00c864;
+        box-shadow: 0 0 12px rgba(0, 200, 100, 0.3);
+      }
+      .step.error {
+        opacity: 1;
+        border-color: #e8433e;
+        box-shadow: 0 0 12px rgba(232, 67, 62, 0.3);
+      }
+      .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .step-icon.gen {
+        background: rgba(79, 43, 223, 0.2);
+        color: #4f2bdf;
+      }
+      .step-icon.parse {
+        background: rgba(232, 168, 56, 0.2);
+        color: #e8a838;
+      }
+      .step-icon.valid {
+        background: rgba(0, 200, 100, 0.2);
+        color: #00c864;
+      }
+      .step-icon.retry {
+        background: rgba(232, 67, 62, 0.2);
+        color: #e8433e;
+      }
+      .step-text {
+        font-size: 0.85rem;
+        flex: 1;
+      }
+      .step-text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .step-text span {
+        color: #888;
+        font-size: 0.75rem;
+      }
+      .code-preview {
+        background: #0d1117;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 0.6rem;
+        font-size: 0.75rem;
+        font-family: "Courier New", monospace;
+        white-space: pre-wrap;
+        max-height: 100px;
+        overflow: auto;
+        width: 100%;
+        max-width: 700px;
+        transition: all 0.3s;
+      }
+      .code-preview.valid {
+        border-color: #00c864;
+        color: #00c864;
+      }
+      .code-preview.invalid {
+        border-color: #e8433e;
+        color: #e8433e;
+      }
+      .controls {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+        background: #4f2bdf;
+        color: #fff;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6c47ff;
+      }
+      .btn-rst {
+        background: #333;
+        color: #ccc;
+      }
+      .btn-rst:hover {
+        background: #444;
+      }
+      .stats-bar {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .stat {
+        background: #16213e;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        border: 1px solid #333;
+      }
+      .stat span {
+        font-weight: 700;
+        color: #4f2bdf;
+      }
+      .arrow-down {
+        color: #333;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📋 JSON Parsing Flow</h1>
+    <p class="sub">LLM output → Parse → Validate → Retry on failure</p>
+    <div class="flow" id="flow">
+      <div class="step" id="step1">
+        <div class="step-icon gen">⚡</div>
+        <div class="step-text">
+          <strong>LLM generates output</strong
+          ><span>Raw text response from model</span>
+        </div>
+      </div>
+      <div class="arrow-down">↓</div>
+      <div class="step" id="step2">
+        <div class="step-icon parse">🔧</div>
+        <div class="step-text">
+          <strong>JSON.parse()</strong><span>Attempt to parse raw output</span>
+        </div>
+      </div>
+      <div class="arrow-down">↓</div>
+      <div class="step" id="step3">
+        <div class="step-icon valid">✅</div>
+        <div class="step-text">
+          <strong>Schema validation</strong
+          ><span>Check required fields & types</span>
+        </div>
+      </div>
+      <div class="arrow-down" id="retryArrow" style="display: none">
+        ↑ retry
+      </div>
+      <div class="step" id="step4" style="display: none">
+        <div class="step-icon retry">🔄</div>
+        <div class="step-text">
+          <strong>Retry with error feedback</strong
+          ><span>Send validation error back to LLM</span>
+        </div>
+      </div>
+    </div>
+    <div class="code-preview" id="codePreview">
+      // Output will appear here...
+    </div>
+    <div class="controls">
+      <button onclick="runFlow('valid')">▶ Valid Output</button>
+      <button onclick="runFlow('invalid')">▶ Invalid JSON</button>
+      <button onclick="runFlow('badSchema')">▶ Bad Schema</button>
+      <button class="btn-rst" onclick="resetFlow()">↺ Reset</button>
+    </div>
+    <div class="stats-bar">
+      <div class="stat">Attempts: <span id="attempts">0</span></div>
+      <div class="stat">Successes: <span id="successes">0</span></div>
+      <div class="stat">Failures: <span id="failures">0</span></div>
+    </div>
+    <script>
+      let attempts = 0,
+        successes = 0,
+        failures = 0,
+        timers = [];
+      const outputs = {
+        valid: '{"name":"Alice","age":30,"role":"engineer"}',
+        invalid: '{name: Alice, age: 30, role: "engineer"}', // missing quotes
+        badSchema: '{"name":"Alice"}', // missing required fields
+      };
+      const schemas = {
+        valid: () => true,
+        invalid: null, // parse will fail
+        badSchema: (obj) => obj.age !== undefined && obj.role !== undefined,
+      };
 
-function resetFlow(){
-  timers.forEach(clearTimeout);timers=[];
-  document.querySelectorAll('.step').forEach(s=>{s.className='step'});
-  document.getElementById('step4').style.display='none';
-  document.getElementById('retryArrow').style.display='none';
-  const cp=document.getElementById('codePreview');cp.textContent='// Output will appear here...';cp.className='code-preview';
-}
+      function resetFlow() {
+        timers.forEach(clearTimeout);
+        timers = [];
+        document.querySelectorAll(".step").forEach((s) => {
+          s.className = "step";
+        });
+        document.getElementById("step4").style.display = "none";
+        document.getElementById("retryArrow").style.display = "none";
+        const cp = document.getElementById("codePreview");
+        cp.textContent = "// Output will appear here...";
+        cp.className = "code-preview";
+      }
 
-function highlight(id,cls){
-  const el=document.getElementById(id);
-  el.className='step '+cls;
-}
+      function highlight(id, cls) {
+        const el = document.getElementById(id);
+        el.className = "step " + cls;
+      }
 
-function updateStats(){
-  document.getElementById('attempts').textContent=attempts;
-  document.getElementById('successes').textContent=successes;
-  document.getElementById('failures').textContent=failures;
-}
+      function updateStats() {
+        document.getElementById("attempts").textContent = attempts;
+        document.getElementById("successes").textContent = successes;
+        document.getElementById("failures").textContent = failures;
+      }
 
-function runFlow(type){
-  resetFlow();attempts++;updateStats();
-  const code=outputs[type];
-  const cp=document.getElementById('codePreview');
+      function runFlow(type) {
+        resetFlow();
+        attempts++;
+        updateStats();
+        const code = outputs[type];
+        const cp = document.getElementById("codePreview");
 
-  timers.push(setTimeout(()=>{highlight('step1','active')},200));
-  timers.push(setTimeout(()=>{cp.textContent=code;highlight('step1','success');highlight('step2','active')},800));
+        timers.push(
+          setTimeout(() => {
+            highlight("step1", "active");
+          }, 200),
+        );
+        timers.push(
+          setTimeout(() => {
+            cp.textContent = code;
+            highlight("step1", "success");
+            highlight("step2", "active");
+          }, 800),
+        );
 
-  timers.push(setTimeout(()=>{
-    try{
-      const obj=JSON.parse(code);
-      highlight('step2','success');highlight('step3','active');
-      timers.push(setTimeout(()=>{
-        if(schemas[type]&&!schemas[type](obj)){
-          highlight('step3','error');failures++;updateStats();
-          showRetry(code,cp);
-        }else{
-          highlight('step3','success');successes++;updateStats();
-          cp.className='code-preview valid';
-        }
-      },600));
-    }catch(e){
-      highlight('step2','error');highlight('step3','error');failures++;updateStats();
-      cp.className='code-preview invalid';
-      timers.push(setTimeout(()=>showRetry(code,cp),400));
-    }
-  },1400));
-}
+        timers.push(
+          setTimeout(() => {
+            try {
+              const obj = JSON.parse(code);
+              highlight("step2", "success");
+              highlight("step3", "active");
+              timers.push(
+                setTimeout(() => {
+                  if (schemas[type] && !schemas[type](obj)) {
+                    highlight("step3", "error");
+                    failures++;
+                    updateStats();
+                    showRetry(code, cp);
+                  } else {
+                    highlight("step3", "success");
+                    successes++;
+                    updateStats();
+                    cp.className = "code-preview valid";
+                  }
+                }, 600),
+              );
+            } catch (e) {
+              highlight("step2", "error");
+              highlight("step3", "error");
+              failures++;
+              updateStats();
+              cp.className = "code-preview invalid";
+              timers.push(setTimeout(() => showRetry(code, cp), 400));
+            }
+          }, 1400),
+        );
+      }
 
-function showRetry(code,cp){
-  document.getElementById('retryArrow').style.display='block';
-  const retryStep=document.getElementById('step4');retryStep.style.display='flex';
-  timers.push(setTimeout(()=>highlight('step4','active'),300));
-  timers.push(setTimeout(()=>{
-    highlight('step4','success');
-    attempts++;updateStats();
-    cp.textContent='{"name":"Alice","age":30,"role":"engineer"}';
-    cp.className='code-preview valid';
-    cp.textContent+=' // ✓ corrected output';
-    successes++;updateStats();
-  },1000));
-}
-</script>
-</body>
+      function showRetry(code, cp) {
+        document.getElementById("retryArrow").style.display = "block";
+        const retryStep = document.getElementById("step4");
+        retryStep.style.display = "flex";
+        timers.push(setTimeout(() => highlight("step4", "active"), 300));
+        timers.push(
+          setTimeout(() => {
+            highlight("step4", "success");
+            attempts++;
+            updateStats();
+            cp.textContent = '{"name":"Alice","age":30,"role":"engineer"}';
+            cp.className = "code-preview valid";
+            cp.textContent += " // ✓ corrected output";
+            successes++;
+            updateStats();
+          }, 1000),
+        );
+      }
+    </script>
+  </body>
 </html>

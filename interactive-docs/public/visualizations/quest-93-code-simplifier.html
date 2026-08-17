@@ -1,104 +1,360 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Code Complexity Meter — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
-.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
-.ctn{max-width:900px;margin:0 auto}
-/* Gauge */
-.gauge-area{display:flex;justify-content:center;align-items:flex-start;gap:32px;margin-bottom:24px;flex-wrap:wrap}
-.gauge-wrap{position:relative;width:220px;height:130px}
-.gauge-wrap svg{width:100%;height:100%}
-.gauge-bg{fill:none;stroke:#333;stroke-width:14;stroke-linecap:round}
-.gauge-fg{fill:none;stroke-width:14;stroke-linecap:round;transition:all 1.2s ease;filter:drop-shadow(0 0 6px rgba(0,200,100,.3))}
-.gauge-val{position:absolute;bottom:0;left:50%;transform:translateX(-50%);text-align:center}
-.gauge-val .num{font-size:2rem;font-weight:700;transition:color .5s}
-.gauge-val .lbl{font-size:.7rem;color:#888}
-/* Metrics sidebar */
-.metrics{display:flex;flex-direction:column;gap:10px;min-width:180px}
-.metric-card{background:#16213e;border-radius:8px;padding:10px 14px;border:1px solid #333}
-.metric-card .mv{font-size:1.1rem;font-weight:700}
-.metric-card .ml{font-size:.7rem;color:#888}
-/* Code panels */
-.code-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-@media(max-width:640px){.code-panels{grid-template-columns:1fr}}
-.cp{background:#16213e;border-radius:12px;overflow:hidden;border:1px solid #333}
-.cp-head{padding:8px 14px;background:#0d1117;border-bottom:1px solid #333;font-size:.8rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-.cp-head.bad{color:#ff4466}.cp-head.good{color:#00c864}
-.cp-head .badge{font-size:.65rem;padding:2px 8px;border-radius:99px}
-.cp-head.bad .badge{background:#ff446633;color:#ff4466}
-.cp-head.good .badge{background:#00c86433;color:#00c864}
-pre{padding:14px;font-family:'Courier New',monospace;font-size:.75rem;line-height:1.6;overflow-x:auto;color:#ccc}
-pre .kw{color:#c792ea}.pre .fn{color:#82aaff}.pre .str{color:#c3e88d}.pre .num{color:#f78c6c}.pre .cmt{color:#546e7a}
-pre .hl{background:#ff446615;border-left:3px solid #ff4466;padding-left:8px;margin-left:-11px;display:block}
-pre .hl-good{background:#00c86415;border-left:3px solid #00c864;padding-left:8px;margin-left:-11px;display:block}
-/* Complexity breakdown */
-.breakdown{background:#16213e;border-radius:12px;padding:16px;border:1px solid #333;margin-bottom:20px}
-.breakdown h2{font-size:.9rem;color:#4f2bdf;margin-bottom:12px}
-.cb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.cb-row .cb-label{min-width:120px;font-size:.78rem;color:#aaa}
-.cb-row .cb-bar{flex:1;height:18px;background:#0d1117;border-radius:99px;overflow:hidden;position:relative}
-.cb-row .cb-fill{height:100%;border-radius:99px;transition:width 1s ease}
-.cb-row .cb-val{min-width:40px;text-align:right;font-size:.78rem;font-weight:700}
-/* Rules */
-.rules{background:#16213e;border-radius:12px;padding:16px;border:1px solid #333;margin-bottom:20px}
-.rules h2{font-size:.9rem;color:#4f2bdf;margin-bottom:10px}
-.rule{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #222;font-size:.78rem}
-.rule:last-child{border:none}
-.rule .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.rule .range{color:#888;min-width:80px}
-.rule .desc{flex:1;color:#ccc}
-.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
-.btn:hover{background:#6143e8}
-</style>
-</head>
-<body>
-<h1>📊 Code Complexity Meter</h1>
-<p class="sub">Interactive cyclomatic complexity visualization</p>
-<div class="ctn">
-<div class="gauge-area">
-  <div class="metrics" id="metrics"></div>
-  <div class="gauge-wrap">
-    <svg viewBox="0 0 200 120">
-      <path class="gauge-bg" d="M 20 110 A 80 80 0 0 1 180 110"/>
-      <path class="gauge-fg" id="gaugeFg" d="M 20 110 A 80 80 0 0 1 180 110" stroke-dasharray="251" stroke-dashoffset="251"/>
-    </svg>
-    <div class="gauge-val"><span class="num" id="gaugeNum">0</span><span class="lbl">Cyclomatic Complexity</span></div>
-  </div>
-</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Code Complexity Meter — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #4f2bdf;
+        margin-bottom: 6px;
+        font-size: 1.5rem;
+      }
+      .sub {
+        text-align: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .ctn {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      /* Gauge */
+      .gauge-area {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 32px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .gauge-wrap {
+        position: relative;
+        width: 220px;
+        height: 130px;
+      }
+      .gauge-wrap svg {
+        width: 100%;
+        height: 100%;
+      }
+      .gauge-bg {
+        fill: none;
+        stroke: #333;
+        stroke-width: 14;
+        stroke-linecap: round;
+      }
+      .gauge-fg {
+        fill: none;
+        stroke-width: 14;
+        stroke-linecap: round;
+        transition: all 1.2s ease;
+        filter: drop-shadow(0 0 6px rgba(0, 200, 100, 0.3));
+      }
+      .gauge-val {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+      }
+      .gauge-val .num {
+        font-size: 2rem;
+        font-weight: 700;
+        transition: color 0.5s;
+      }
+      .gauge-val .lbl {
+        font-size: 0.7rem;
+        color: #888;
+      }
+      /* Metrics sidebar */
+      .metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 180px;
+      }
+      .metric-card {
+        background: #16213e;
+        border-radius: 8px;
+        padding: 10px 14px;
+        border: 1px solid #333;
+      }
+      .metric-card .mv {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+      .metric-card .ml {
+        font-size: 0.7rem;
+        color: #888;
+      }
+      /* Code panels */
+      .code-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 640px) {
+        .code-panels {
+          grid-template-columns: 1fr;
+        }
+      }
+      .cp {
+        background: #16213e;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #333;
+      }
+      .cp-head {
+        padding: 8px 14px;
+        background: #0d1117;
+        border-bottom: 1px solid #333;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .cp-head.bad {
+        color: #ff4466;
+      }
+      .cp-head.good {
+        color: #00c864;
+      }
+      .cp-head .badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 99px;
+      }
+      .cp-head.bad .badge {
+        background: #ff446633;
+        color: #ff4466;
+      }
+      .cp-head.good .badge {
+        background: #00c86433;
+        color: #00c864;
+      }
+      pre {
+        padding: 14px;
+        font-family: "Courier New", monospace;
+        font-size: 0.75rem;
+        line-height: 1.6;
+        overflow-x: auto;
+        color: #ccc;
+      }
+      pre .kw {
+        color: #c792ea;
+      }
+      .pre .fn {
+        color: #82aaff;
+      }
+      .pre .str {
+        color: #c3e88d;
+      }
+      .pre .num {
+        color: #f78c6c;
+      }
+      .pre .cmt {
+        color: #546e7a;
+      }
+      pre .hl {
+        background: #ff446615;
+        border-left: 3px solid #ff4466;
+        padding-left: 8px;
+        margin-left: -11px;
+        display: block;
+      }
+      pre .hl-good {
+        background: #00c86415;
+        border-left: 3px solid #00c864;
+        padding-left: 8px;
+        margin-left: -11px;
+        display: block;
+      }
+      /* Complexity breakdown */
+      .breakdown {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+      .breakdown h2 {
+        font-size: 0.9rem;
+        color: #4f2bdf;
+        margin-bottom: 12px;
+      }
+      .cb-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .cb-row .cb-label {
+        min-width: 120px;
+        font-size: 0.78rem;
+        color: #aaa;
+      }
+      .cb-row .cb-bar {
+        flex: 1;
+        height: 18px;
+        background: #0d1117;
+        border-radius: 99px;
+        overflow: hidden;
+        position: relative;
+      }
+      .cb-row .cb-fill {
+        height: 100%;
+        border-radius: 99px;
+        transition: width 1s ease;
+      }
+      .cb-row .cb-val {
+        min-width: 40px;
+        text-align: right;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      /* Rules */
+      .rules {
+        background: #16213e;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+      .rules h2 {
+        font-size: 0.9rem;
+        color: #4f2bdf;
+        margin-bottom: 10px;
+      }
+      .rule {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid #222;
+        font-size: 0.78rem;
+      }
+      .rule:last-child {
+        border: none;
+      }
+      .rule .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .rule .range {
+        color: #888;
+        min-width: 80px;
+      }
+      .rule .desc {
+        flex: 1;
+        color: #ccc;
+      }
+      .btn {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 28px;
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #6143e8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📊 Code Complexity Meter</h1>
+    <p class="sub">Interactive cyclomatic complexity visualization</p>
+    <div class="ctn">
+      <div class="gauge-area">
+        <div class="metrics" id="metrics"></div>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 200 120">
+            <path class="gauge-bg" d="M 20 110 A 80 80 0 0 1 180 110" />
+            <path
+              class="gauge-fg"
+              id="gaugeFg"
+              d="M 20 110 A 80 80 0 0 1 180 110"
+              stroke-dasharray="251"
+              stroke-dashoffset="251"
+            />
+          </svg>
+          <div class="gauge-val">
+            <span class="num" id="gaugeNum">0</span
+            ><span class="lbl">Cyclomatic Complexity</span>
+          </div>
+        </div>
+      </div>
 
-<div class="code-panels">
-  <div class="cp">
-    <div class="cp-head bad" id="badHead">⚠️ Complex Version <span class="badge">CC: 18</span></div>
-    <pre id="codeBad"></pre>
-  </div>
-  <div class="cp">
-    <div class="cp-head good" id="goodHead">✅ Simplified Version <span class="badge">CC: 4</span></div>
-    <pre id="codeGood"></pre>
-  </div>
-</div>
+      <div class="code-panels">
+        <div class="cp">
+          <div class="cp-head bad" id="badHead">
+            ⚠️ Complex Version <span class="badge">CC: 18</span>
+          </div>
+          <pre id="codeBad"></pre>
+        </div>
+        <div class="cp">
+          <div class="cp-head good" id="goodHead">
+            ✅ Simplified Version <span class="badge">CC: 4</span>
+          </div>
+          <pre id="codeGood"></pre>
+        </div>
+      </div>
 
-<div class="breakdown">
-  <h2>Complexity Breakdown</h2>
-  <div id="cbRows"></div>
-</div>
+      <div class="breakdown">
+        <h2>Complexity Breakdown</h2>
+        <div id="cbRows"></div>
+      </div>
 
-<div class="rules">
-  <h2>Complexity Scale</h2>
-  <div class="rule"><span class="dot" style="background:#00c864"></span><span class="range">1 — 10</span><span class="desc">Simple — Low risk, easy to test</span></div>
-  <div class="rule"><span class="dot" style="background:#4fc3f7"></span><span class="range">11 — 20</span><span class="desc">Moderate — More testing needed</span></div>
-  <div class="rule"><span class="dot" style="background:#ffb347"></span><span class="range">21 — 50</span><span class="desc">Complex — High risk, refactor</span></div>
-  <div class="rule"><span class="dot" style="background:#ff4466"></span><span class="range">50+</span><span class="desc">Untestable — Must refactor</span></div>
-</div>
-<button class="btn" onclick="toggleVersion()">🔄 Toggle Version</button>
-</div>
+      <div class="rules">
+        <h2>Complexity Scale</h2>
+        <div class="rule">
+          <span class="dot" style="background: #00c864"></span
+          ><span class="range">1 — 10</span
+          ><span class="desc">Simple — Low risk, easy to test</span>
+        </div>
+        <div class="rule">
+          <span class="dot" style="background: #4fc3f7"></span
+          ><span class="range">11 — 20</span
+          ><span class="desc">Moderate — More testing needed</span>
+        </div>
+        <div class="rule">
+          <span class="dot" style="background: #ffb347"></span
+          ><span class="range">21 — 50</span
+          ><span class="desc">Complex — High risk, refactor</span>
+        </div>
+        <div class="rule">
+          <span class="dot" style="background: #ff4466"></span
+          ><span class="range">50+</span
+          ><span class="desc">Untestable — Must refactor</span>
+        </div>
+      </div>
+      <button class="btn" onclick="toggleVersion()">🔄 Toggle Version</button>
+    </div>
 
-<script>
-const badCode=`<span class="kw">function</span> processOrder(order) {
+    <script>
+      const badCode = `<span class="kw">function</span> processOrder(order) {
 <span class="hl">  <span class="kw">if</span> (order.items.length > 0) {</span>
 <span class="hl">    <span class="kw">if</span> (order.customer.type === 'vip') {</span>
 <span class="hl">      <span class="kw">if</span> (order.total > 100) {</span>
@@ -131,7 +387,7 @@ const badCode=`<span class="kw">function</span> processOrder(order) {
   <span class="kw">return</span> <span class="num">0</span>;
 }`;
 
-const goodCode=`<span class="kw">const</span> DISCOUNTS = {
+      const goodCode = `<span class="kw">const</span> DISCOUNTS = {
   vip:     [{min:<span class="num">100</span>,rate:<span class="num">0.2</span>},{min:<span class="num">50</span>,rate:<span class="num">0.15</span>}],
   premium: [{min:<span class="num">100</span>,rate:<span class="num">0.1</span>}],
 };
@@ -153,67 +409,95 @@ const goodCode=`<span class="kw">const</span> DISCOUNTS = {
   <span class="kw">return</span> total;
 }`;
 
-document.getElementById('codeBad').innerHTML=badCode;
-document.getElementById('codeGood').innerHTML=goodCode;
+      document.getElementById("codeBad").innerHTML = badCode;
+      document.getElementById("codeGood").innerHTML = goodCode;
 
-let showComplex=true;
-function toggleVersion(){
-  showComplex=!showComplex;
-  if(showComplex) animateGauge(18);
-  else animateGauge(4);
-}
+      let showComplex = true;
+      function toggleVersion() {
+        showComplex = !showComplex;
+        if (showComplex) animateGauge(18);
+        else animateGauge(4);
+      }
 
-const complexityData=[
-  {label:'Conditionals',bad:8,good:2,color:'#ff4466'},
-  {label:'Branches',bad:5,good:2,color:'#ffb347'},
-  {label:'Functions',bad:1,good:2,color:'#4fc3f7'},
-  {label:'Loops',bad:1,good:0,color:'#c792ea'},
-  {label:'Early Returns',bad:1,good:2,color:'#00c864'},
-];
+      const complexityData = [
+        { label: "Conditionals", bad: 8, good: 2, color: "#ff4466" },
+        { label: "Branches", bad: 5, good: 2, color: "#ffb347" },
+        { label: "Functions", bad: 1, good: 2, color: "#4fc3f7" },
+        { label: "Loops", bad: 1, good: 0, color: "#c792ea" },
+        { label: "Early Returns", bad: 1, good: 2, color: "#00c864" },
+      ];
 
-function renderMetrics(cc){
-  const color=cc<=10?'#00c864':cc<=20?'#4fc3f7':cc<=50?'#ffb347':'#ff4466';
-  const risk=cc<=10?'Low':cc<=20?'Moderate':cc<=50?'High':'Critical';
-  document.getElementById('metrics').innerHTML=`
+      function renderMetrics(cc) {
+        const color =
+          cc <= 10
+            ? "#00c864"
+            : cc <= 20
+              ? "#4fc3f7"
+              : cc <= 50
+                ? "#ffb347"
+                : "#ff4466";
+        const risk =
+          cc <= 10
+            ? "Low"
+            : cc <= 20
+              ? "Moderate"
+              : cc <= 50
+                ? "High"
+                : "Critical";
+        document.getElementById("metrics").innerHTML = `
     <div class="metric-card"><div class="mv" style="color:${color}">${cc}</div><div class="ml">Cyclomatic Complexity</div></div>
     <div class="metric-card"><div class="mv" style="color:${color}">${risk}</div><div class="ml">Risk Level</div></div>
-    <div class="metric-card"><div class="mv" style="color:#aaa">${Math.max(1,Math.ceil(cc/3))}</div><div class="ml">Min Test Cases</div></div>`;
-}
+    <div class="metric-card"><div class="mv" style="color:#aaa">${Math.max(1, Math.ceil(cc / 3))}</div><div class="ml">Min Test Cases</div></div>`;
+      }
 
-function renderBreakdown(cc){
-  const $r=document.getElementById('cbRows');$r.innerHTML='';
-  complexityData.forEach(d=>{
-    const val=cc>=10?d.bad:d.good;
-    const pct=Math.min(100,val*10);
-    $r.innerHTML+=`<div class="cb-row"><span class="cb-label">${d.label}</span><div class="cb-bar"><div class="cb-fill" style="width:0%;background:${d.color}" data-w="${pct}"></div></div><span class="cb-val" style="color:${d.color}">${val}</span></div>`;
-  });
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    $r.querySelectorAll('.cb-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});
-  }));
-}
+      function renderBreakdown(cc) {
+        const $r = document.getElementById("cbRows");
+        $r.innerHTML = "";
+        complexityData.forEach((d) => {
+          const val = cc >= 10 ? d.bad : d.good;
+          const pct = Math.min(100, val * 10);
+          $r.innerHTML += `<div class="cb-row"><span class="cb-label">${d.label}</span><div class="cb-bar"><div class="cb-fill" style="width:0%;background:${d.color}" data-w="${pct}"></div></div><span class="cb-val" style="color:${d.color}">${val}</span></div>`;
+        });
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            $r.querySelectorAll(".cb-fill").forEach((f) => {
+              f.style.width = f.dataset.w + "%";
+            });
+          }),
+        );
+      }
 
-function animateGauge(cc){
-  const maxCC=30;
-  const pct=Math.min(cc/maxCC,1);
-  const arcLen=251;
-  const offset=arcLen-(arcLen*pct);
-  const color=cc<=10?'#00c864':cc<=20?'#4fc3f7':cc<=50?'#ffb347':'#ff4466';
-  const fg=document.getElementById('gaugeFg');
-  fg.style.strokeDashoffset=offset;
-  fg.style.stroke=color;
-  fg.style.filter=`drop-shadow(0 0 8px ${color}55)`;
-  // Animate number
-  const $num=document.getElementById('gaugeNum');
-  let cur=0;
-  const iv=setInterval(()=>{
-    cur++;$num.textContent=cur;$num.style.color=color;
-    if(cur>=cc)clearInterval(iv);
-  },60);
-  renderMetrics(cc);
-  renderBreakdown(cc);
-}
+      function animateGauge(cc) {
+        const maxCC = 30;
+        const pct = Math.min(cc / maxCC, 1);
+        const arcLen = 251;
+        const offset = arcLen - arcLen * pct;
+        const color =
+          cc <= 10
+            ? "#00c864"
+            : cc <= 20
+              ? "#4fc3f7"
+              : cc <= 50
+                ? "#ffb347"
+                : "#ff4466";
+        const fg = document.getElementById("gaugeFg");
+        fg.style.strokeDashoffset = offset;
+        fg.style.stroke = color;
+        fg.style.filter = `drop-shadow(0 0 8px ${color}55)`;
+        // Animate number
+        const $num = document.getElementById("gaugeNum");
+        let cur = 0;
+        const iv = setInterval(() => {
+          cur++;
+          $num.textContent = cur;
+          $num.style.color = color;
+          if (cur >= cc) clearInterval(iv);
+        }, 60);
+        renderMetrics(cc);
+        renderBreakdown(cc);
+      }
 
-animateGauge(18);
-</script>
-</body>
+      animateGauge(18);
+    </script>
+  </body>
 </html>

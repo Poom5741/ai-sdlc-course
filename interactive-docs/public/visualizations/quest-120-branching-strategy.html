@@ -1,345 +1,760 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Git Branching Strategies — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
-.strategies{display:flex;gap:1rem;max-width:1100px;margin:0 auto 1.5rem;flex-wrap:wrap;justify-content:center}
-.strategy-card{background:#16213e;border:2px solid #333;border-radius:12px;padding:1rem;cursor:pointer;transition:all .3s;width:320px;text-align:center}
-.strategy-card:hover{border-color:#4f2bdf;transform:translateY(-2px)}
-.strategy-card.active{border-color:#00c864;box-shadow:0 0 20px #00c86422}
-.strategy-card h3{font-size:1rem;margin-bottom:.3rem}
-.strategy-card p{color:#888;font-size:.78rem}
-.strategy-icon{font-size:2rem;margin-bottom:.4rem}
-.diagram-area{max-width:1100px;margin:0 auto 1.5rem;background:#16213e;border:2px solid #333;border-radius:12px;padding:1.5rem;min-height:300px;display:flex;align-items:center;justify-content:center}
-.diagram-area svg{width:100%;max-height:320px}
-.branch-label{font-size:11px;font-family:system-ui,sans-serif;fill:#e0e0e0}
-.branch-line{stroke-width:3;fill:none;stroke-linecap:round}
-.branch-main{stroke:#00c864}
-.branch-feature{stroke:#4f2bdf}
-.branch-develop{stroke:#e8a020}
-.branch-release{stroke:#ff6b9d}
-.branch-hotfix{stroke:#ff4466}
-.commit-dot{r:7;stroke-width:2;stroke:#1a1a2e;cursor:pointer;transition:r .2s}
-.commit-dot:hover{r:10}
-.merge-arrow{stroke:#555;stroke-width:1.5;fill:none;marker-end:url(#arrowhead)}
-.legend{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888}
-.legend-color{width:14px;height:3px;border-radius:2px}
-.comparison{max-width:1100px;margin:0 auto 1.5rem;background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;display:none}
-.comparison.show{display:block}
-.comparison table{width:100%;border-collapse:collapse;font-size:.82rem}
-.comparison th{color:#4f2bdf;text-align:left;padding:.5rem;border-bottom:2px solid #333}
-.comparison td{padding:.5rem;border-bottom:1px solid #ffffff0a;color:#aaa}
-.comparison tr:hover td{color:#e0e0e0;background:#ffffff05}
-.quiz{max-width:1100px;margin:0 auto;background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;display:none}
-.quiz.show{display:block}
-.quiz h3{color:#4f2bdf;margin-bottom:.8rem;font-size:1rem}
-.quiz-q{margin-bottom:1rem}
-.quiz-q label{font-size:.85rem;color:#aaa;display:block;margin-bottom:.4rem}
-.quiz-options{display:flex;gap:.5rem;flex-wrap:wrap}
-.quiz-opt{background:#0d1117;border:2px solid #333;border-radius:8px;padding:.4rem .8rem;font-size:.78rem;cursor:pointer;transition:all .2s;color:#aaa}
-.quiz-opt:hover{border-color:#4f2bdf;color:#e0e0e0}
-.quiz-opt.selected{border-color:#00c864;color:#00c864;background:#00c86415}
-.quiz-result{margin-top:1rem;padding:1rem;background:#0d1117;border-radius:8px;font-size:.85rem;display:none}
-.quiz-result.show{display:block}
-.quiz-result strong{color:#00c864}
-.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
-button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
-button:hover{background:#6143e8}
-.btn-green{background:#00c864;color:#1a1a2e}
-.btn-green:hover{background:#00dd70}
-.narration{margin-top:.8rem;font-size:.8rem;color:#888;text-align:center;min-height:2em;transition:opacity .3s}
-</style>
-</head>
-<body>
-<h1>Git Branching Strategies</h1>
-<p class="sub">Click a strategy to explore its workflow</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Git Branching Strategies — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .strategies {
+        display: flex;
+        gap: 1rem;
+        max-width: 1100px;
+        margin: 0 auto 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .strategy-card {
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 320px;
+        text-align: center;
+      }
+      .strategy-card:hover {
+        border-color: #4f2bdf;
+        transform: translateY(-2px);
+      }
+      .strategy-card.active {
+        border-color: #00c864;
+        box-shadow: 0 0 20px #00c86422;
+      }
+      .strategy-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+      }
+      .strategy-card p {
+        color: #888;
+        font-size: 0.78rem;
+      }
+      .strategy-icon {
+        font-size: 2rem;
+        margin-bottom: 0.4rem;
+      }
+      .diagram-area {
+        max-width: 1100px;
+        margin: 0 auto 1.5rem;
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.5rem;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .diagram-area svg {
+        width: 100%;
+        max-height: 320px;
+      }
+      .branch-label {
+        font-size: 11px;
+        font-family: system-ui, sans-serif;
+        fill: #e0e0e0;
+      }
+      .branch-line {
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+      }
+      .branch-main {
+        stroke: #00c864;
+      }
+      .branch-feature {
+        stroke: #4f2bdf;
+      }
+      .branch-develop {
+        stroke: #e8a020;
+      }
+      .branch-release {
+        stroke: #ff6b9d;
+      }
+      .branch-hotfix {
+        stroke: #ff4466;
+      }
+      .commit-dot {
+        r: 7;
+        stroke-width: 2;
+        stroke: #1a1a2e;
+        cursor: pointer;
+        transition: r 0.2s;
+      }
+      .commit-dot:hover {
+        r: 10;
+      }
+      .merge-arrow {
+        stroke: #555;
+        stroke-width: 1.5;
+        fill: none;
+        marker-end: url(#arrowhead);
+      }
+      .legend {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: #888;
+      }
+      .legend-color {
+        width: 14px;
+        height: 3px;
+        border-radius: 2px;
+      }
+      .comparison {
+        max-width: 1100px;
+        margin: 0 auto 1.5rem;
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.2rem;
+        display: none;
+      }
+      .comparison.show {
+        display: block;
+      }
+      .comparison table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+      .comparison th {
+        color: #4f2bdf;
+        text-align: left;
+        padding: 0.5rem;
+        border-bottom: 2px solid #333;
+      }
+      .comparison td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #ffffff0a;
+        color: #aaa;
+      }
+      .comparison tr:hover td {
+        color: #e0e0e0;
+        background: #ffffff05;
+      }
+      .quiz {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #16213e;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 1.2rem;
+        display: none;
+      }
+      .quiz.show {
+        display: block;
+      }
+      .quiz h3 {
+        color: #4f2bdf;
+        margin-bottom: 0.8rem;
+        font-size: 1rem;
+      }
+      .quiz-q {
+        margin-bottom: 1rem;
+      }
+      .quiz-q label {
+        font-size: 0.85rem;
+        color: #aaa;
+        display: block;
+        margin-bottom: 0.4rem;
+      }
+      .quiz-options {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .quiz-opt {
+        background: #0d1117;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #aaa;
+      }
+      .quiz-opt:hover {
+        border-color: #4f2bdf;
+        color: #e0e0e0;
+      }
+      .quiz-opt.selected {
+        border-color: #00c864;
+        color: #00c864;
+        background: #00c86415;
+      }
+      .quiz-result {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #0d1117;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        display: none;
+      }
+      .quiz-result.show {
+        display: block;
+      }
+      .quiz-result strong {
+        color: #00c864;
+      }
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6143e8;
+      }
+      .btn-green {
+        background: #00c864;
+        color: #1a1a2e;
+      }
+      .btn-green:hover {
+        background: #00dd70;
+      }
+      .narration {
+        margin-top: 0.8rem;
+        font-size: 0.8rem;
+        color: #888;
+        text-align: center;
+        min-height: 2em;
+        transition: opacity 0.3s;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Git Branching Strategies</h1>
+    <p class="sub">Click a strategy to explore its workflow</p>
 
-<div class="strategies">
-  <div class="strategy-card" id="card-gitflow" onclick="selectStrategy('gitflow')">
-    <div class="strategy-icon">🌊</div>
-    <h3>Git Flow</h3>
-    <p>Structured branching with develop, release, and hotfix branches</p>
-  </div>
-  <div class="strategy-card" id="card-github" onclick="selectStrategy('github')">
-    <div class="strategy-icon">🐙</div>
-    <h3>GitHub Flow</h3>
-    <p>Simple: branch, commit, open PR, merge to main</p>
-  </div>
-  <div class="strategy-card" id="card-trunk" onclick="selectStrategy('trunk')">
-    <div class="strategy-icon">🌳</div>
-    <h3>Trunk-Based</h3>
-    <p>Everyone commits to main with short-lived branches</p>
-  </div>
-</div>
-
-<div class="diagram-area" id="diagramArea">
-  <svg id="diagramSvg" viewBox="0 0 800 300">
-    <defs>
-      <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555"/></marker>
-    </defs>
-    <text x="400" y="155" text-anchor="middle" fill="#555" font-size="14" font-family="system-ui,sans-serif">← Select a strategy above →</text>
-  </svg>
-</div>
-
-<div class="legend" id="legend" style="display:none">
-  <div class="legend-item"><div class="legend-color" style="background:#00c864"></div>main</div>
-  <div class="legend-item"><div class="legend-color" style="background:#e8a020"></div>develop</div>
-  <div class="legend-item"><div class="legend-color" style="background:#4f2bdf"></div>feature</div>
-  <div class="legend-item"><div class="legend-color" style="background:#ff6b9d"></div>release</div>
-  <div class="legend-item"><div class="legend-color" style="background:#ff4466"></div>hotfix</div>
-</div>
-
-<div class="narration" id="narration"></div>
-
-<div class="controls">
-  <button class="btn-green" id="playBtn" onclick="playAnimation()" style="display:none">▶ Animate Workflow</button>
-  <button id="compareBtn" onclick="toggleComparison()">📊 Compare All</button>
-  <button id="quizBtn" onclick="toggleQuiz()">🎯 Which Strategy?</button>
-</div>
-
-<div class="comparison" id="comparisonPanel">
-  <table>
-    <tr><th>Criteria</th><th>Git Flow</th><th>GitHub Flow</th><th>Trunk-Based</th></tr>
-    <tr><td>Complexity</td><td>High</td><td>Low</td><td>Low</td></tr>
-    <tr><td>Best for</td><td>Scheduled releases</td><td>Continuous deployment</td><td>CI/CD mature teams</td></tr>
-    <tr><td>Team size</td><td>Large (10+)</td><td>Small–Medium (2–20)</td><td>Any size</td></tr>
-    <tr><td>Release cadence</td><td>Weekly/Monthly</td><td>On merge to main</td><td>Multiple per day</td></tr>
-    <tr><td>Feature branches</td><td>Long-lived</td><td>Short-lived</td><td>Very short-lived</td></tr>
-    <tr><td>Hotfix path</td><td>Hotfix branch → main + develop</td><td>Fix branch → PR → main</td><td>Direct to main</td></tr>
-    <tr><td>Learning curve</td><td>Steep</td><td>Gentle</td><td>Moderate</td></tr>
-  </table>
-</div>
-
-<div class="quiz" id="quizPanel">
-  <h3>🎯 Find Your Strategy</h3>
-  <div class="quiz-q">
-    <label>How big is your team?</label>
-    <div class="quiz-options" data-q="size">
-      <div class="quiz-opt" onclick="selectQuiz(this,'size','small')">1–5 developers</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'size','medium')">6–20 developers</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'size','large')">20+ developers</div>
+    <div class="strategies">
+      <div
+        class="strategy-card"
+        id="card-gitflow"
+        onclick="selectStrategy('gitflow')"
+      >
+        <div class="strategy-icon">🌊</div>
+        <h3>Git Flow</h3>
+        <p>Structured branching with develop, release, and hotfix branches</p>
+      </div>
+      <div
+        class="strategy-card"
+        id="card-github"
+        onclick="selectStrategy('github')"
+      >
+        <div class="strategy-icon">🐙</div>
+        <h3>GitHub Flow</h3>
+        <p>Simple: branch, commit, open PR, merge to main</p>
+      </div>
+      <div
+        class="strategy-card"
+        id="card-trunk"
+        onclick="selectStrategy('trunk')"
+      >
+        <div class="strategy-icon">🌳</div>
+        <h3>Trunk-Based</h3>
+        <p>Everyone commits to main with short-lived branches</p>
+      </div>
     </div>
-  </div>
-  <div class="quiz-q">
-    <label>How often do you release?</label>
-    <div class="quiz-options" data-q="cadence">
-      <div class="quiz-opt" onclick="selectQuiz(this,'cadence','daily')">Multiple times/day</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'cadence','weekly')">Weekly</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'cadence','monthly')">Monthly or less</div>
+
+    <div class="diagram-area" id="diagramArea">
+      <svg id="diagramSvg" viewBox="0 0 800 300">
+        <defs>
+          <marker
+            id="arrowhead"
+            markerWidth="8"
+            markerHeight="6"
+            refX="8"
+            refY="3"
+            orient="auto"
+          >
+            <polygon points="0 0, 8 3, 0 6" fill="#555" />
+          </marker>
+        </defs>
+        <text
+          x="400"
+          y="155"
+          text-anchor="middle"
+          fill="#555"
+          font-size="14"
+          font-family="system-ui,sans-serif"
+        >
+          ← Select a strategy above →
+        </text>
+      </svg>
     </div>
-  </div>
-  <div class="quiz-q">
-    <label>How mature is your CI/CD?</label>
-    <div class="quiz-options" data-q="cicd">
-      <div class="quiz-opt" onclick="selectQuiz(this,'cicd','mature')">Fully automated</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'cicd','partial')">Partially automated</div>
-      <div class="quiz-opt" onclick="selectQuiz(this,'cicd','manual')">Mostly manual</div>
+
+    <div class="legend" id="legend" style="display: none">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00c864"></div>
+        main
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #e8a020"></div>
+        develop
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #4f2bdf"></div>
+        feature
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff6b9d"></div>
+        release
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff4466"></div>
+        hotfix
+      </div>
     </div>
-  </div>
-  <div class="quiz-result" id="quizResult"></div>
-</div>
 
-<script>
-let currentStrategy = null;
-const quizAnswers = {};
+    <div class="narration" id="narration"></div>
 
-function selectStrategy(id) {
-  currentStrategy = id;
-  document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
-  document.getElementById('card-' + id).classList.add('active');
-  document.getElementById('legend').style.display = 'flex';
-  document.getElementById('playBtn').style.display = 'inline-block';
-  drawDiagram(id, false);
-}
+    <div class="controls">
+      <button
+        class="btn-green"
+        id="playBtn"
+        onclick="playAnimation()"
+        style="display: none"
+      >
+        ▶ Animate Workflow
+      </button>
+      <button id="compareBtn" onclick="toggleComparison()">
+        📊 Compare All
+      </button>
+      <button id="quizBtn" onclick="toggleQuiz()">🎯 Which Strategy?</button>
+    </div>
 
-function drawDiagram(id, animated) {
-  const svg = document.getElementById('diagramSvg');
-  while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
-  const narr = document.getElementById('narration');
+    <div class="comparison" id="comparisonPanel">
+      <table>
+        <tr>
+          <th>Criteria</th>
+          <th>Git Flow</th>
+          <th>GitHub Flow</th>
+          <th>Trunk-Based</th>
+        </tr>
+        <tr>
+          <td>Complexity</td>
+          <td>High</td>
+          <td>Low</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Scheduled releases</td>
+          <td>Continuous deployment</td>
+          <td>CI/CD mature teams</td>
+        </tr>
+        <tr>
+          <td>Team size</td>
+          <td>Large (10+)</td>
+          <td>Small–Medium (2–20)</td>
+          <td>Any size</td>
+        </tr>
+        <tr>
+          <td>Release cadence</td>
+          <td>Weekly/Monthly</td>
+          <td>On merge to main</td>
+          <td>Multiple per day</td>
+        </tr>
+        <tr>
+          <td>Feature branches</td>
+          <td>Long-lived</td>
+          <td>Short-lived</td>
+          <td>Very short-lived</td>
+        </tr>
+        <tr>
+          <td>Hotfix path</td>
+          <td>Hotfix branch → main + develop</td>
+          <td>Fix branch → PR → main</td>
+          <td>Direct to main</td>
+        </tr>
+        <tr>
+          <td>Learning curve</td>
+          <td>Steep</td>
+          <td>Gentle</td>
+          <td>Moderate</td>
+        </tr>
+      </table>
+    </div>
 
-  if (id === 'gitflow') drawGitFlow(svg, animated, narr);
-  else if (id === 'github') drawGitHubFlow(svg, animated, narr);
-  else if (id === 'trunk') drawTrunkBased(svg, animated, narr);
-}
+    <div class="quiz" id="quizPanel">
+      <h3>🎯 Find Your Strategy</h3>
+      <div class="quiz-q">
+        <label>How big is your team?</label>
+        <div class="quiz-options" data-q="size">
+          <div class="quiz-opt" onclick="selectQuiz(this, 'size', 'small')">
+            1–5 developers
+          </div>
+          <div class="quiz-opt" onclick="selectQuiz(this, 'size', 'medium')">
+            6–20 developers
+          </div>
+          <div class="quiz-opt" onclick="selectQuiz(this, 'size', 'large')">
+            20+ developers
+          </div>
+        </div>
+      </div>
+      <div class="quiz-q">
+        <label>How often do you release?</label>
+        <div class="quiz-options" data-q="cadence">
+          <div class="quiz-opt" onclick="selectQuiz(this, 'cadence', 'daily')">
+            Multiple times/day
+          </div>
+          <div class="quiz-opt" onclick="selectQuiz(this, 'cadence', 'weekly')">
+            Weekly
+          </div>
+          <div
+            class="quiz-opt"
+            onclick="selectQuiz(this, 'cadence', 'monthly')"
+          >
+            Monthly or less
+          </div>
+        </div>
+      </div>
+      <div class="quiz-q">
+        <label>How mature is your CI/CD?</label>
+        <div class="quiz-options" data-q="cicd">
+          <div class="quiz-opt" onclick="selectQuiz(this, 'cicd', 'mature')">
+            Fully automated
+          </div>
+          <div class="quiz-opt" onclick="selectQuiz(this, 'cicd', 'partial')">
+            Partially automated
+          </div>
+          <div class="quiz-opt" onclick="selectQuiz(this, 'cicd', 'manual')">
+            Mostly manual
+          </div>
+        </div>
+      </div>
+      <div class="quiz-result" id="quizResult"></div>
+    </div>
 
-function addLine(svg, x1, y1, x2, y2, cls) {
-  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-  line.setAttribute('class', 'branch-line ' + cls);
-  svg.appendChild(line);
-}
+    <script>
+      let currentStrategy = null;
+      const quizAnswers = {};
 
-function addPath(svg, d, cls) {
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', d); path.setAttribute('class', 'branch-line ' + cls);
-  svg.appendChild(path);
-}
+      function selectStrategy(id) {
+        currentStrategy = id;
+        document
+          .querySelectorAll(".strategy-card")
+          .forEach((c) => c.classList.remove("active"));
+        document.getElementById("card-" + id).classList.add("active");
+        document.getElementById("legend").style.display = "flex";
+        document.getElementById("playBtn").style.display = "inline-block";
+        drawDiagram(id, false);
+      }
 
-function addDot(svg, cx, cy, fill, label) {
-  const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  c.setAttribute('cx', cx); c.setAttribute('cy', cy);
-  c.setAttribute('fill', fill); c.setAttribute('class', 'commit-dot');
-  svg.appendChild(c);
-  if (label) {
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', cx); t.setAttribute('y', cy - 14);
-    t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'branch-label');
-    t.textContent = label;
-    svg.appendChild(t);
-  }
-}
+      function drawDiagram(id, animated) {
+        const svg = document.getElementById("diagramSvg");
+        while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
+        const narr = document.getElementById("narration");
 
-function addLabel(svg, x, y, text, color) {
-  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  t.setAttribute('x', x); t.setAttribute('y', y);
-  t.setAttribute('fill', color); t.setAttribute('font-size', '10');
-  t.setAttribute('font-family', 'system-ui,sans-serif');
-  t.textContent = text;
-  svg.appendChild(t);
-}
+        if (id === "gitflow") drawGitFlow(svg, animated, narr);
+        else if (id === "github") drawGitHubFlow(svg, animated, narr);
+        else if (id === "trunk") drawTrunkBased(svg, animated, narr);
+      }
 
-function drawGitFlow(svg, anim, narr) {
-  narr.textContent = 'Git Flow: main, develop, feature, release, and hotfix branches';
-  // main line
-  addLine(svg, 40, 60, 760, 60, 'branch-main');
-  addLabel(svg, 10, 63, 'main', '#00c864');
-  // develop line
-  addLine(svg, 120, 140, 760, 140, 'branch-develop');
-  addLabel(svg, 10, 143, 'develop', '#e8a020');
-  // main→develop
-  addPath(svg, 'M 120 60 L 120 140', 'branch-develop');
-  addDot(svg, 120, 60, '#00c864', 'init');
-  // feature branch
-  addPath(svg, 'M 240 140 L 240 220', 'branch-feature');
-  addLine(svg, 240, 220, 400, 220, 'branch-feature');
-  addPath(svg, 'M 400 220 L 400 140', 'branch-feature');
-  addLabel(svg, 320, 235, 'feature', '#4f2bdf');
-  addDot(svg, 240, 140, '#e8a020');
-  addDot(svg, 320, 220, '#4f2bdf', 'feat');
-  addDot(svg, 400, 140, '#e8a020', 'merge');
-  // release branch
-  addPath(svg, 'M 480 140 L 480 100', 'branch-release');
-  addLine(svg, 480, 100, 600, 100, 'branch-release');
-  addPath(svg, 'M 600 100 L 600 60', 'branch-main');
-  addPath(svg, 'M 600 100 L 600 140', 'branch-develop');
-  addLabel(svg, 540, 93, 'release', '#ff6b9d');
-  addDot(svg, 480, 140, '#e8a020');
-  addDot(svg, 540, 100, '#ff6b9d', 'rc');
-  addDot(svg, 600, 60, '#00c864', 'v1.0');
-  addDot(svg, 600, 140, '#e8a020');
-  // hotfix
-  addPath(svg, 'M 680 60 L 680 20', 'branch-hotfix');
-  addLine(svg, 680, 20, 760, 20, 'branch-hotfix');
-  addPath(svg, 'M 760 20 L 760 60', 'branch-main');
-  addPath(svg, 'M 760 20 L 760 140', 'branch-develop');
-  addLabel(svg, 720, 13, 'hotfix', '#ff4466');
-  addDot(svg, 680, 60, '#00c864');
-  addDot(svg, 720, 20, '#ff4466', 'fix');
-  addDot(svg, 760, 60, '#00c864', 'v1.0.1');
-  addDot(svg, 760, 140, '#e8a020');
-}
+      function addLine(svg, x1, y1, x2, y2, cls) {
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line",
+        );
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("class", "branch-line " + cls);
+        svg.appendChild(line);
+      }
 
-function drawGitHubFlow(svg, anim, narr) {
-  narr.textContent = 'GitHub Flow: branch from main, PR back to main, deploy on merge';
-  addLine(svg, 40, 100, 760, 100, 'branch-main');
-  addLabel(svg, 10, 103, 'main', '#00c864');
-  // feature 1
-  addPath(svg, 'M 160 100 L 160 180', 'branch-feature');
-  addLine(svg, 160, 180, 320, 180, 'branch-feature');
-  addPath(svg, 'M 320 180 L 320 100', 'branch-feature');
-  addLabel(svg, 240, 195, 'feature-1', '#4f2bdf');
-  addDot(svg, 160, 100, '#00c864');
-  addDot(svg, 240, 180, '#4f2bdf', 'feat');
-  addDot(svg, 320, 100, '#00c864', 'merge');
-  // feature 2
-  addPath(svg, 'M 360 100 L 360 240', 'branch-feature');
-  addLine(svg, 360, 240, 560, 240, 'branch-feature');
-  addPath(svg, 'M 560 240 L 560 100', 'branch-feature');
-  addLabel(svg, 460, 255, 'feature-2', '#4f2bdf');
-  addDot(svg, 360, 100, '#00c864');
-  addDot(svg, 460, 240, '#4f2bdf', 'fix');
-  addDot(svg, 560, 100, '#00c864', 'PR ✓');
-  // feature 3
-  addPath(svg, 'M 600 100 L 600 180', 'branch-feature');
-  addLine(svg, 600, 180, 760, 180, 'branch-feature');
-  addPath(svg, 'M 760 180 L 760 100', 'branch-feature');
-  addLabel(svg, 680, 195, 'feature-3', '#4f2bdf');
-  addDot(svg, 600, 100, '#00c864');
-  addDot(svg, 680, 180, '#4f2bdf', 'docs');
-  addDot(svg, 760, 100, '#00c864', '🚀');
-}
+      function addPath(svg, d, cls) {
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path",
+        );
+        path.setAttribute("d", d);
+        path.setAttribute("class", "branch-line " + cls);
+        svg.appendChild(path);
+      }
 
-function drawTrunkBased(svg, anim, narr) {
-  narr.textContent = 'Trunk-Based: everyone commits directly to main with short-lived branches';
-  addLine(svg, 40, 120, 760, 120, 'branch-main');
-  addLabel(svg, 10, 123, 'main', '#00c864');
-  // short branches
-  const branches = [{x1:120,x2:200,y:80,l:'fix-1'},{x1:240,x2:320,y:170,l:'feat-a'},{x1:360,x2:420,y:70,l:'fix-2'},{x1:460,x2:560,y:180,l:'feat-b'},{x1:600,x2:680,y:80,l:'chore'}];
-  branches.forEach((b, i) => {
-    addPath(svg, `M ${b.x1} 120 L ${b.x1} ${b.y}`, 'branch-feature');
-    addLine(svg, b.x1, b.y, b.x2, b.y, 'branch-feature');
-    addPath(svg, `M ${b.x2} ${b.y} L ${b.x2} 120`, 'branch-feature');
-    addLabel(svg, (b.x1+b.x2)/2, b.y + (b.y < 120 ? -10 : 16), b.l, '#4f2bdf');
-    addDot(svg, b.x1, 120, '#00c864');
-    addDot(svg, (b.x1+b.x2)/2, b.y, '#4f2bdf');
-    addDot(svg, b.x2, 120, '#00c864');
-  });
-  // main commits
-  [40,120,200,320,420,560,680,760].forEach((x, i) => {
-    addDot(svg, x, 120, '#00c864', i === 0 || i === 7 ? '' : '');
-  });
-}
+      function addDot(svg, cx, cy, fill, label) {
+        const c = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle",
+        );
+        c.setAttribute("cx", cx);
+        c.setAttribute("cy", cy);
+        c.setAttribute("fill", fill);
+        c.setAttribute("class", "commit-dot");
+        svg.appendChild(c);
+        if (label) {
+          const t = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          t.setAttribute("x", cx);
+          t.setAttribute("y", cy - 14);
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("class", "branch-label");
+          t.textContent = label;
+          svg.appendChild(t);
+        }
+      }
 
-function playAnimation() {
-  if (!currentStrategy) return;
-  const narr = document.getElementById('narration');
-  const steps = currentStrategy === 'gitflow'
-    ? ['Create develop branch from main','Develop features on feature branches','Merge feature into develop','Create release branch for QA','Merge release to main + develop','Hotfix branches for urgent fixes']
-    : currentStrategy === 'github'
-    ? ['Create feature branch from main','Work on feature, push commits','Open Pull Request','Code review & discussion','Merge PR to main','Auto-deploy to production']
-    : ['Branch off main (short-lived)','Make small, focused change','Open PR for quick review','Merge to main within hours','CI/CD deploys automatically','Feature flags control rollout'];
-  let step = 0;
-  narr.style.opacity = '1';
-  function showStep() {
-    if (step >= steps.length) { narr.textContent = '✅ Workflow complete!'; return; }
-    narr.textContent = `Step ${step + 1}: ${steps[step]}`;
-    step++;
-    setTimeout(showStep, 2000);
-  }
-  showStep();
-}
+      function addLabel(svg, x, y, text, color) {
+        const t = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text",
+        );
+        t.setAttribute("x", x);
+        t.setAttribute("y", y);
+        t.setAttribute("fill", color);
+        t.setAttribute("font-size", "10");
+        t.setAttribute("font-family", "system-ui,sans-serif");
+        t.textContent = text;
+        svg.appendChild(t);
+      }
 
-function toggleComparison() {
-  document.getElementById('comparisonPanel').classList.toggle('show');
-  document.getElementById('quizPanel').classList.remove('show');
-}
+      function drawGitFlow(svg, anim, narr) {
+        narr.textContent =
+          "Git Flow: main, develop, feature, release, and hotfix branches";
+        // main line
+        addLine(svg, 40, 60, 760, 60, "branch-main");
+        addLabel(svg, 10, 63, "main", "#00c864");
+        // develop line
+        addLine(svg, 120, 140, 760, 140, "branch-develop");
+        addLabel(svg, 10, 143, "develop", "#e8a020");
+        // main→develop
+        addPath(svg, "M 120 60 L 120 140", "branch-develop");
+        addDot(svg, 120, 60, "#00c864", "init");
+        // feature branch
+        addPath(svg, "M 240 140 L 240 220", "branch-feature");
+        addLine(svg, 240, 220, 400, 220, "branch-feature");
+        addPath(svg, "M 400 220 L 400 140", "branch-feature");
+        addLabel(svg, 320, 235, "feature", "#4f2bdf");
+        addDot(svg, 240, 140, "#e8a020");
+        addDot(svg, 320, 220, "#4f2bdf", "feat");
+        addDot(svg, 400, 140, "#e8a020", "merge");
+        // release branch
+        addPath(svg, "M 480 140 L 480 100", "branch-release");
+        addLine(svg, 480, 100, 600, 100, "branch-release");
+        addPath(svg, "M 600 100 L 600 60", "branch-main");
+        addPath(svg, "M 600 100 L 600 140", "branch-develop");
+        addLabel(svg, 540, 93, "release", "#ff6b9d");
+        addDot(svg, 480, 140, "#e8a020");
+        addDot(svg, 540, 100, "#ff6b9d", "rc");
+        addDot(svg, 600, 60, "#00c864", "v1.0");
+        addDot(svg, 600, 140, "#e8a020");
+        // hotfix
+        addPath(svg, "M 680 60 L 680 20", "branch-hotfix");
+        addLine(svg, 680, 20, 760, 20, "branch-hotfix");
+        addPath(svg, "M 760 20 L 760 60", "branch-main");
+        addPath(svg, "M 760 20 L 760 140", "branch-develop");
+        addLabel(svg, 720, 13, "hotfix", "#ff4466");
+        addDot(svg, 680, 60, "#00c864");
+        addDot(svg, 720, 20, "#ff4466", "fix");
+        addDot(svg, 760, 60, "#00c864", "v1.0.1");
+        addDot(svg, 760, 140, "#e8a020");
+      }
 
-function toggleQuiz() {
-  document.getElementById('quizPanel').classList.toggle('show');
-  document.getElementById('comparisonPanel').classList.remove('show');
-}
+      function drawGitHubFlow(svg, anim, narr) {
+        narr.textContent =
+          "GitHub Flow: branch from main, PR back to main, deploy on merge";
+        addLine(svg, 40, 100, 760, 100, "branch-main");
+        addLabel(svg, 10, 103, "main", "#00c864");
+        // feature 1
+        addPath(svg, "M 160 100 L 160 180", "branch-feature");
+        addLine(svg, 160, 180, 320, 180, "branch-feature");
+        addPath(svg, "M 320 180 L 320 100", "branch-feature");
+        addLabel(svg, 240, 195, "feature-1", "#4f2bdf");
+        addDot(svg, 160, 100, "#00c864");
+        addDot(svg, 240, 180, "#4f2bdf", "feat");
+        addDot(svg, 320, 100, "#00c864", "merge");
+        // feature 2
+        addPath(svg, "M 360 100 L 360 240", "branch-feature");
+        addLine(svg, 360, 240, 560, 240, "branch-feature");
+        addPath(svg, "M 560 240 L 560 100", "branch-feature");
+        addLabel(svg, 460, 255, "feature-2", "#4f2bdf");
+        addDot(svg, 360, 100, "#00c864");
+        addDot(svg, 460, 240, "#4f2bdf", "fix");
+        addDot(svg, 560, 100, "#00c864", "PR ✓");
+        // feature 3
+        addPath(svg, "M 600 100 L 600 180", "branch-feature");
+        addLine(svg, 600, 180, 760, 180, "branch-feature");
+        addPath(svg, "M 760 180 L 760 100", "branch-feature");
+        addLabel(svg, 680, 195, "feature-3", "#4f2bdf");
+        addDot(svg, 600, 100, "#00c864");
+        addDot(svg, 680, 180, "#4f2bdf", "docs");
+        addDot(svg, 760, 100, "#00c864", "🚀");
+      }
 
-function selectQuiz(el, q, val) {
-  el.parentElement.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  quizAnswers[q] = val;
-  if (Object.keys(quizAnswers).length === 3) {
-    const result = document.getElementById('quizResult');
-    let rec;
-    if (quizAnswers.cadence === 'daily' && quizAnswers.cicd === 'mature') rec = '🌳 <strong>Trunk-Based Development</strong> — your mature CI/CD can handle rapid commits to main.';
-    else if (quizAnswers.size === 'large' || quizAnswers.cadence === 'monthly') rec = '🌊 <strong>Git Flow</strong> — structured branches suit your release cadence and team size.';
-    else rec = '🐙 <strong>GitHub Flow</strong> — simple branch/PR/merge fits your team perfectly.';
-    while (result.firstChild) result.removeChild(result.firstChild); const s = document.createElement('span'); s.textContent = rec; /* safe plain text */ result.appendChild(s);
-    result.classList.add('show');
-  }
-}
-</script>
-</body>
+      function drawTrunkBased(svg, anim, narr) {
+        narr.textContent =
+          "Trunk-Based: everyone commits directly to main with short-lived branches";
+        addLine(svg, 40, 120, 760, 120, "branch-main");
+        addLabel(svg, 10, 123, "main", "#00c864");
+        // short branches
+        const branches = [
+          { x1: 120, x2: 200, y: 80, l: "fix-1" },
+          { x1: 240, x2: 320, y: 170, l: "feat-a" },
+          { x1: 360, x2: 420, y: 70, l: "fix-2" },
+          { x1: 460, x2: 560, y: 180, l: "feat-b" },
+          { x1: 600, x2: 680, y: 80, l: "chore" },
+        ];
+        branches.forEach((b, i) => {
+          addPath(svg, `M ${b.x1} 120 L ${b.x1} ${b.y}`, "branch-feature");
+          addLine(svg, b.x1, b.y, b.x2, b.y, "branch-feature");
+          addPath(svg, `M ${b.x2} ${b.y} L ${b.x2} 120`, "branch-feature");
+          addLabel(
+            svg,
+            (b.x1 + b.x2) / 2,
+            b.y + (b.y < 120 ? -10 : 16),
+            b.l,
+            "#4f2bdf",
+          );
+          addDot(svg, b.x1, 120, "#00c864");
+          addDot(svg, (b.x1 + b.x2) / 2, b.y, "#4f2bdf");
+          addDot(svg, b.x2, 120, "#00c864");
+        });
+        // main commits
+        [40, 120, 200, 320, 420, 560, 680, 760].forEach((x, i) => {
+          addDot(svg, x, 120, "#00c864", i === 0 || i === 7 ? "" : "");
+        });
+      }
+
+      function playAnimation() {
+        if (!currentStrategy) return;
+        const narr = document.getElementById("narration");
+        const steps =
+          currentStrategy === "gitflow"
+            ? [
+                "Create develop branch from main",
+                "Develop features on feature branches",
+                "Merge feature into develop",
+                "Create release branch for QA",
+                "Merge release to main + develop",
+                "Hotfix branches for urgent fixes",
+              ]
+            : currentStrategy === "github"
+              ? [
+                  "Create feature branch from main",
+                  "Work on feature, push commits",
+                  "Open Pull Request",
+                  "Code review & discussion",
+                  "Merge PR to main",
+                  "Auto-deploy to production",
+                ]
+              : [
+                  "Branch off main (short-lived)",
+                  "Make small, focused change",
+                  "Open PR for quick review",
+                  "Merge to main within hours",
+                  "CI/CD deploys automatically",
+                  "Feature flags control rollout",
+                ];
+        let step = 0;
+        narr.style.opacity = "1";
+        function showStep() {
+          if (step >= steps.length) {
+            narr.textContent = "✅ Workflow complete!";
+            return;
+          }
+          narr.textContent = `Step ${step + 1}: ${steps[step]}`;
+          step++;
+          setTimeout(showStep, 2000);
+        }
+        showStep();
+      }
+
+      function toggleComparison() {
+        document.getElementById("comparisonPanel").classList.toggle("show");
+        document.getElementById("quizPanel").classList.remove("show");
+      }
+
+      function toggleQuiz() {
+        document.getElementById("quizPanel").classList.toggle("show");
+        document.getElementById("comparisonPanel").classList.remove("show");
+      }
+
+      function selectQuiz(el, q, val) {
+        el.parentElement
+          .querySelectorAll(".quiz-opt")
+          .forEach((o) => o.classList.remove("selected"));
+        el.classList.add("selected");
+        quizAnswers[q] = val;
+        if (Object.keys(quizAnswers).length === 3) {
+          const result = document.getElementById("quizResult");
+          let rec;
+          if (quizAnswers.cadence === "daily" && quizAnswers.cicd === "mature")
+            rec =
+              "🌳 <strong>Trunk-Based Development</strong> — your mature CI/CD can handle rapid commits to main.";
+          else if (
+            quizAnswers.size === "large" ||
+            quizAnswers.cadence === "monthly"
+          )
+            rec =
+              "🌊 <strong>Git Flow</strong> — structured branches suit your release cadence and team size.";
+          else
+            rec =
+              "🐙 <strong>GitHub Flow</strong> — simple branch/PR/merge fits your team perfectly.";
+          while (result.firstChild) result.removeChild(result.firstChild);
+          const s = document.createElement("span");
+          s.textContent = rec;
+          /* safe plain text */ result.appendChild(s);
+          result.classList.add("show");
+        }
+      }
+    </script>
+  </body>
 </html>

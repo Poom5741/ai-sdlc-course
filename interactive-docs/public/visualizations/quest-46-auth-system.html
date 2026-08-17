@@ -1,86 +1,311 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JWT Auth Flow — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
-h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
-.controls{display:flex;gap:.8rem;margin-bottom:2rem}
-button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
-button:hover{background:#6143e8}
-.flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:620px}
-.step{display:flex;align-items:center;gap:1rem;width:100%;padding:1rem;border-radius:10px;opacity:.2;transition:all .4s;border:1px solid transparent;transform:translateY(6px)}
-.step.active{opacity:1;background:#16213e;border-color:#4f2bdf55;transform:translateY(0)}
-.step.done{opacity:.5}
-.node-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.node-icon.client{background:#4f2bdf44;color:#4f2bdf}
-.node-icon.server{background:#e8a02044;color:#e8a020}
-.node-icon.token{background:#00c86444;color:#00c864}
-.msg{font-size:.85rem;line-height:1.4}
-.msg strong{color:#4f2bdf}
-.msg em{color:#00c864;font-style:normal}
-.arrow{width:2px;height:18px;background:#4f2bdf33;margin:0 auto}
-.token-visual{margin-top:1.5rem;width:100%;max-width:620px;display:none}
-.token-visual.show{display:block}
-.token-visual h3{font-size:.9rem;color:#00c864;margin-bottom:.6rem}
-.jwt-box{display:flex;border-radius:8px;overflow:hidden;font-family:'Courier New',monospace;font-size:.72rem;text-align:center}
-.jwt-box div{padding:.5rem .8rem}
-.jwt-header{background:#4f2bdf;color:#fff}
-.jwt-payload{background:#16213e;border-left:2px solid #4f2bdf;border-right:2px solid #4f2bdf}
-.jwt-sig{background:#00c864;color:#1a1a2e}
-.jwt-label{font-size:.6rem;opacity:.6;display:block;margin-bottom:2px;font-family:system-ui}
-@keyframes glow{0%,100%{box-shadow:0 0 0 transparent}50%{box-shadow:0 0 14px 2px #4f2bdf44}}
-.step.active{animation:glow 1.5s infinite}
-</style>
-</head>
-<body>
-<h1>JWT Auth Flow</h1>
-<p class="sub">JSON Web Token authentication — step through the flow</p>
-<div class="controls"><button id="playBtn">▶ Auto Play</button><button id="resetBtn">↺ Reset</button></div>
-<div class="flow" id="flow"></div>
-<div class="token-visual" id="tokenVis">
-  <h3>🔍 JWT Token Structure</h3>
-  <div class="jwt-box">
-    <div class="jwt-header"><span class="jwt-label">Header</span>eyJhbG...<br>{"alg":"HS256","typ":"JWT"}</div>
-    <div class="jwt-payload"><span class="jwt-label">Payload</span>CJ9.XzA...<br>{"sub":"123","exp":1700}</div>
-    <div class="jwt-sig"><span class="jwt-label">Signature</span>SflKx...<br>HMAC-SHA256(...)</div>
-  </div>
-</div>
-<script>
-const steps=[
-  {icon:'👤',cls:'client',title:'Login Request',desc:'Client sends credentials to server'},
-  {icon:'🔐',cls:'server',title:'Server Validates',desc:'Checks username & password against database'},
-  {icon:'🎫',cls:'token',title:'Issue JWT',desc:'Server creates and signs a JWT token',showToken:true},
-  {icon:'💾',cls:'client',title:'Client Stores Token',desc:'Token saved in localStorage or httpOnly cookie'},
-  {icon:'📤',cls:'client',title:'Request with Token',desc:'Authorization: Bearer <token> header sent'},
-  {icon:'✅',cls:'server',title:'Server Verifies',desc:'Validates signature, expiration, and claims'},
-  {icon:'🎉',cls:'token',title:'Access Granted',desc:'Protected resource returned to client'}
-];
-const flow=document.getElementById('flow'),stepEls=[];
-steps.forEach((s,i)=>{
-  if(i>0){const a=document.createElement('div');a.className='arrow';flow.appendChild(a)}
-  const el=document.createElement('div');el.className='step';
-  const ic=document.createElement('div');ic.className='node-icon '+s.cls;ic.textContent=s.icon;
-  const ct=document.createElement('div');ct.className='msg';
-  const st=document.createElement('strong');st.textContent=s.title;
-  ct.appendChild(st);ct.appendChild(document.createTextNode(' — '+s.desc));
-  el.appendChild(ic);el.appendChild(ct);
-  flow.appendChild(el);stepEls.push(el);
-});
-let cur=-1,timer=null;
-function advance(){
-  if(cur>=0)stepEls[cur].classList.remove('active');
-  cur++;
-  if(cur>=steps.length){cur=stepEls.length-1;clearInterval(timer);return}
-  stepEls[cur].classList.add('active');
-  stepEls[cur].scrollIntoView({behavior:'smooth',block:'nearest'});
-  if(steps[cur].showToken)document.getElementById('tokenVis').classList.add('show');
-}
-document.getElementById('playBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('playBtn').textContent='▶ Auto Play';return}cur=-1;stepEls.forEach(e=>e.classList.remove('active','done'));document.getElementById('tokenVis').classList.remove('show');timer=setInterval(advance,1100);document.getElementById('playBtn').textContent='⏸ Pause';advance()};
-document.getElementById('resetBtn').onclick=()=>{clearInterval(timer);timer=null;cur=-1;stepEls.forEach(e=>e.classList.remove('active','done'));document.getElementById('tokenVis').classList.remove('show');document.getElementById('playBtn').textContent='▶ Auto Play'};
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>JWT Auth Flow — BlueBeltDojo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+      }
+      h1 {
+        color: #4f2bdf;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+      }
+      .sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+      .controls {
+        display: flex;
+        gap: 0.8rem;
+        margin-bottom: 2rem;
+      }
+      button {
+        background: #4f2bdf;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #6143e8;
+      }
+      .flow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        width: 100%;
+        max-width: 620px;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 10px;
+        opacity: 0.2;
+        transition: all 0.4s;
+        border: 1px solid transparent;
+        transform: translateY(6px);
+      }
+      .step.active {
+        opacity: 1;
+        background: #16213e;
+        border-color: #4f2bdf55;
+        transform: translateY(0);
+      }
+      .step.done {
+        opacity: 0.5;
+      }
+      .node-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .node-icon.client {
+        background: #4f2bdf44;
+        color: #4f2bdf;
+      }
+      .node-icon.server {
+        background: #e8a02044;
+        color: #e8a020;
+      }
+      .node-icon.token {
+        background: #00c86444;
+        color: #00c864;
+      }
+      .msg {
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+      .msg strong {
+        color: #4f2bdf;
+      }
+      .msg em {
+        color: #00c864;
+        font-style: normal;
+      }
+      .arrow {
+        width: 2px;
+        height: 18px;
+        background: #4f2bdf33;
+        margin: 0 auto;
+      }
+      .token-visual {
+        margin-top: 1.5rem;
+        width: 100%;
+        max-width: 620px;
+        display: none;
+      }
+      .token-visual.show {
+        display: block;
+      }
+      .token-visual h3 {
+        font-size: 0.9rem;
+        color: #00c864;
+        margin-bottom: 0.6rem;
+      }
+      .jwt-box {
+        display: flex;
+        border-radius: 8px;
+        overflow: hidden;
+        font-family: "Courier New", monospace;
+        font-size: 0.72rem;
+        text-align: center;
+      }
+      .jwt-box div {
+        padding: 0.5rem 0.8rem;
+      }
+      .jwt-header {
+        background: #4f2bdf;
+        color: #fff;
+      }
+      .jwt-payload {
+        background: #16213e;
+        border-left: 2px solid #4f2bdf;
+        border-right: 2px solid #4f2bdf;
+      }
+      .jwt-sig {
+        background: #00c864;
+        color: #1a1a2e;
+      }
+      .jwt-label {
+        font-size: 0.6rem;
+        opacity: 0.6;
+        display: block;
+        margin-bottom: 2px;
+        font-family: system-ui;
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 transparent;
+        }
+        50% {
+          box-shadow: 0 0 14px 2px #4f2bdf44;
+        }
+      }
+      .step.active {
+        animation: glow 1.5s infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>JWT Auth Flow</h1>
+    <p class="sub">JSON Web Token authentication — step through the flow</p>
+    <div class="controls">
+      <button id="playBtn">▶ Auto Play</button
+      ><button id="resetBtn">↺ Reset</button>
+    </div>
+    <div class="flow" id="flow"></div>
+    <div class="token-visual" id="tokenVis">
+      <h3>🔍 JWT Token Structure</h3>
+      <div class="jwt-box">
+        <div class="jwt-header">
+          <span class="jwt-label">Header</span
+          >eyJhbG...<br />{"alg":"HS256","typ":"JWT"}
+        </div>
+        <div class="jwt-payload">
+          <span class="jwt-label">Payload</span
+          >CJ9.XzA...<br />{"sub":"123","exp":1700}
+        </div>
+        <div class="jwt-sig">
+          <span class="jwt-label">Signature</span>SflKx...<br />HMAC-SHA256(...)
+        </div>
+      </div>
+    </div>
+    <script>
+      const steps = [
+        {
+          icon: "👤",
+          cls: "client",
+          title: "Login Request",
+          desc: "Client sends credentials to server",
+        },
+        {
+          icon: "🔐",
+          cls: "server",
+          title: "Server Validates",
+          desc: "Checks username & password against database",
+        },
+        {
+          icon: "🎫",
+          cls: "token",
+          title: "Issue JWT",
+          desc: "Server creates and signs a JWT token",
+          showToken: true,
+        },
+        {
+          icon: "💾",
+          cls: "client",
+          title: "Client Stores Token",
+          desc: "Token saved in localStorage or httpOnly cookie",
+        },
+        {
+          icon: "📤",
+          cls: "client",
+          title: "Request with Token",
+          desc: "Authorization: Bearer <token> header sent",
+        },
+        {
+          icon: "✅",
+          cls: "server",
+          title: "Server Verifies",
+          desc: "Validates signature, expiration, and claims",
+        },
+        {
+          icon: "🎉",
+          cls: "token",
+          title: "Access Granted",
+          desc: "Protected resource returned to client",
+        },
+      ];
+      const flow = document.getElementById("flow"),
+        stepEls = [];
+      steps.forEach((s, i) => {
+        if (i > 0) {
+          const a = document.createElement("div");
+          a.className = "arrow";
+          flow.appendChild(a);
+        }
+        const el = document.createElement("div");
+        el.className = "step";
+        const ic = document.createElement("div");
+        ic.className = "node-icon " + s.cls;
+        ic.textContent = s.icon;
+        const ct = document.createElement("div");
+        ct.className = "msg";
+        const st = document.createElement("strong");
+        st.textContent = s.title;
+        ct.appendChild(st);
+        ct.appendChild(document.createTextNode(" — " + s.desc));
+        el.appendChild(ic);
+        el.appendChild(ct);
+        flow.appendChild(el);
+        stepEls.push(el);
+      });
+      let cur = -1,
+        timer = null;
+      function advance() {
+        if (cur >= 0) stepEls[cur].classList.remove("active");
+        cur++;
+        if (cur >= steps.length) {
+          cur = stepEls.length - 1;
+          clearInterval(timer);
+          return;
+        }
+        stepEls[cur].classList.add("active");
+        stepEls[cur].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        if (steps[cur].showToken)
+          document.getElementById("tokenVis").classList.add("show");
+      }
+      document.getElementById("playBtn").onclick = () => {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+          document.getElementById("playBtn").textContent = "▶ Auto Play";
+          return;
+        }
+        cur = -1;
+        stepEls.forEach((e) => e.classList.remove("active", "done"));
+        document.getElementById("tokenVis").classList.remove("show");
+        timer = setInterval(advance, 1100);
+        document.getElementById("playBtn").textContent = "⏸ Pause";
+        advance();
+      };
+      document.getElementById("resetBtn").onclick = () => {
+        clearInterval(timer);
+        timer = null;
+        cur = -1;
+        stepEls.forEach((e) => e.classList.remove("active", "done"));
+        document.getElementById("tokenVis").classList.remove("show");
+        document.getElementById("playBtn").textContent = "▶ Auto Play";
+      };
+    </script>
+  </body>
 </html>

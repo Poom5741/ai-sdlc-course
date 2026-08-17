@@ -1,91 +1,270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prompt Engineering Patterns</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.5rem}
-h1{color:#4f2bdf;font-size:1.5rem;margin-bottom:.3rem}
-.sub{color:#888;font-size:.85rem;margin-bottom:1.2rem}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;width:100%;max-width:750px}
-.card{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;cursor:pointer;transition:all .3s}
-.card:hover{border-color:#4f2bdf;transform:translateY(-2px)}
-.card.active{border-color:#00c864;box-shadow:0 0 20px rgba(0,200,100,.15)}
-.card-icon{font-size:2rem;margin-bottom:.5rem}
-.card-title{font-weight:700;font-size:1rem;margin-bottom:.3rem}
-.card-desc{font-size:.8rem;color:#888}
-.detail-panel{width:100%;max-width:750px;margin-top:1.2rem;background:#16213e;border:1px solid #333;border-radius:12px;padding:1.5rem;opacity:0;max-height:0;overflow:hidden;transition:all .4s}
-.detail-panel.open{opacity:1;max-height:600px;padding:1.5rem}
-.detail-title{color:#00c864;font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
-.detail-section{margin-bottom:1rem}
-.detail-section h3{font-size:.85rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem}
-.example-box{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.8rem;font-size:.8rem;font-family:'Courier New',monospace;white-space:pre-wrap;line-height:1.5;color:#ccc}
-.pill{display:inline-block;padding:.2rem .6rem;border-radius:12px;font-size:.7rem;font-weight:600;margin-right:.3rem}
-.pill-easy{background:rgba(0,200,100,.15);color:#00c864}
-.pill-med{background:rgba(232,168,56,.15);color:#e8a838}
-.pill-hard{background:rgba(232,67,62,.15);color:#e8433e}
-</style>
-</head>
-<body>
-<h1>✏️ Prompt Engineering Patterns</h1>
-<p class="sub">Click a card to see example prompts and use cases</p>
-<div class="cards" id="cards"></div>
-<div class="detail-panel" id="detail">
-  <div class="detail-title" id="detailTitle"></div>
-  <div class="detail-section"><h3>Description</h3><p id="detailDesc"></p></div>
-  <div class="detail-section"><h3>Example Prompt</h3><div class="example-box" id="detailExample"></div></div>
-  <div class="detail-section"><h3>Tips</h3><p id="detailTips" style="font-size:.85rem;color:#aaa"></p></div>
-</div>
-<script>
-const patterns=[
-  {icon:'🎭',title:'Role Prompting',desc:'Assign an expert role to the LLM',diff:'easy',
-   example:'You are a senior AWS architect with 15 years of experience.\nExplain VPC peering to a junior developer.',
-   tips:'Be specific about expertise level and audience. Works well combined with other patterns.'},
-  {icon:'📝',title:'Few-Shot Examples',desc:'Provide input/output examples for the LLM to follow',diff:'easy',
-   example:'Classify the sentiment:\n"I love this product!" → positive\n"This broke immediately" → negative\n"The delivery was late" → ___',
-   tips:'Use 3-5 examples covering edge cases. Keep format consistent across all examples.'},
-  {icon:'🧠',title:'Chain of Thought',desc:'Ask the LLM to reason step by step',diff:'medium',
-   example:'A farmer has 15 sheep. All but 8 run away.\nHow many are left?\n\nLet\'s think step by step:\n1. "All but 8" means 8 stay\n2. Answer: 8 sheep',
-   tips:'Add "Let\'s think step by step" or "Show your reasoning". Great for math, logic, and complex analysis.'},
-  {icon:'🎯',title:'Structured Output',desc:'Specify exact output format (JSON, markdown, etc)',diff:'medium',
-   example:'Extract entities from this text and return JSON:\n{"people": [], "orgs": [], "locations": []}\n\nText: "Apple\'s Tim Cook visited London."',
-   tips:'Provide a template. Pair with validation. Use system prompts for consistent formatting.'},
-  {icon:'🔒',title:'Guardrails',desc:'Set boundaries and constraints for safe output',diff:'hard',
-   example:'You are a medical info assistant. You MUST:\n- Only provide general health information\n- Always recommend consulting a doctor\n- Never diagnose conditions\n- Refuse dangerous advice requests',
-   tips:'Combine positive instructions (do X) with negative constraints (never Y). Test edge cases.'},
-  {icon:'🔄',title:'Self-Consistency',desc:'Generate multiple answers and pick the most common',diff:'hard',
-   example:'Solve this 3 ways independently:\n1. Use algebraic approach\n2. Use estimation\n3. Use visual reasoning\n\nThen pick the answer that appears most often.',
-   tips:'Higher accuracy for reasoning tasks. Cost scales with N samples. Best for math/logic problems.'}
-];
-let activeIdx=-1;
-function renderCards(){
-  const c=document.getElementById('cards');
-  patterns.forEach((p,i)=>{
-    const card=document.createElement('div');card.className='card';card.setAttribute('role','button');card.setAttribute('tabindex','0');
-    const icon=document.createElement('div');icon.className='card-icon';icon.textContent=p.icon;
-    const title=document.createElement('div');title.className='card-title';title.textContent=p.title;
-    const desc=document.createElement('div');desc.className='card-desc';desc.textContent=p.desc;
-    const pill=document.createElement('span');pill.className='pill pill-'+p.diff;pill.textContent=p.diff;
-    card.appendChild(icon);card.appendChild(title);card.appendChild(desc);card.appendChild(pill);
-    card.addEventListener('click',()=>showDetail(i));
-    card.addEventListener('keydown',e=>{if(e.key==='Enter')showDetail(i)});
-    c.appendChild(card);
-  });
-}
-function showDetail(i){
-  const panel=document.getElementById('detail');
-  document.querySelectorAll('.card').forEach((c,j)=>c.classList.toggle('active',j===i));
-  if(activeIdx===i){panel.classList.remove('open');activeIdx=-1;return}
-  activeIdx=i;const p=patterns[i];
-  document.getElementById('detailTitle').textContent=p.icon+' '+p.title;
-  document.getElementById('detailDesc').textContent=p.desc;
-  document.getElementById('detailExample').textContent=p.example;
-  document.getElementById('detailTips').textContent=p.tips;
-  panel.classList.add('open');
-}
-renderCards();
-</script>
-</body>
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Engineering Patterns</title>
+  <style>
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+   }
+   body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+   }
+   h1 {
+    color: #4f2bdf;
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+   }
+   .sub {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+   }
+   .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 750px;
+   }
+   .card {
+    background: #16213e;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+   }
+   .card:hover {
+    border-color: #4f2bdf;
+    transform: translateY(-2px);
+   }
+   .card.active {
+    border-color: #00c864;
+    box-shadow: 0 0 20px rgba(0, 200, 100, 0.15);
+   }
+   .card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+   }
+   .card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+   }
+   .card-desc {
+    font-size: 0.8rem;
+    color: #888;
+   }
+   .detail-panel {
+    width: 100%;
+    max-width: 750px;
+    margin-top: 1.2rem;
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 1.5rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s;
+   }
+   .detail-panel.open {
+    opacity: 1;
+    max-height: 600px;
+    padding: 1.5rem;
+   }
+   .detail-title {
+    color: #00c864;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+   }
+   .detail-section {
+    margin-bottom: 1rem;
+   }
+   .detail-section h3 {
+    font-size: 0.85rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.4rem;
+   }
+   .example-box {
+    background: #0d1117;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0.8rem;
+    font-size: 0.8rem;
+    font-family: "Courier New", monospace;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: #ccc;
+   }
+   .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-right: 0.3rem;
+   }
+   .pill-easy {
+    background: rgba(0, 200, 100, 0.15);
+    color: #00c864;
+   }
+   .pill-med {
+    background: rgba(232, 168, 56, 0.15);
+    color: #e8a838;
+   }
+   .pill-hard {
+    background: rgba(232, 67, 62, 0.15);
+    color: #e8433e;
+   }
+  </style>
+ </head>
+ <body>
+  <h1>✏️ Prompt Engineering Patterns</h1>
+  <p class="sub">Click a card to see example prompts and use cases</p>
+  <div class="cards" id="cards"></div>
+  <div class="detail-panel" id="detail">
+   <div class="detail-title" id="detailTitle"></div>
+   <div class="detail-section">
+    <h3>Description</h3>
+    <p id="detailDesc"></p>
+   </div>
+   <div class="detail-section">
+    <h3>Example Prompt</h3>
+    <div class="example-box" id="detailExample"></div>
+   </div>
+   <div class="detail-section">
+    <h3>Tips</h3>
+    <p id="detailTips" style="font-size: 0.85rem; color: #aaa"></p>
+   </div>
+  </div>
+  <script>
+   const patterns = [
+    {
+     icon: "🎭",
+     title: "Role Prompting",
+     desc: "Assign an expert role to the LLM",
+     diff: "easy",
+     example:
+      "You are a senior AWS architect with 15 years of experience.\nExplain VPC peering to a junior developer.",
+     tips:
+      "Be specific about expertise level and audience. Works well combined with other patterns.",
+    },
+    {
+     icon: "📝",
+     title: "Few-Shot Examples",
+     desc: "Provide input/output examples for the LLM to follow",
+     diff: "easy",
+     example:
+      'Classify the sentiment:\n"I love this product!" → positive\n"This broke immediately" → negative\n"The delivery was late" → ___',
+     tips:
+      "Use 3-5 examples covering edge cases. Keep format consistent across all examples.",
+    },
+    {
+     icon: "🧠",
+     title: "Chain of Thought",
+     desc: "Ask the LLM to reason step by step",
+     diff: "medium",
+     example:
+      'A farmer has 15 sheep. All but 8 run away.\nHow many are left?\n\nLet\'s think step by step:\n1. "All but 8" means 8 stay\n2. Answer: 8 sheep',
+     tips:
+      'Add "Let\'s think step by step" or "Show your reasoning". Great for math, logic, and complex analysis.',
+    },
+    {
+     icon: "🎯",
+     title: "Structured Output",
+     desc: "Specify exact output format (JSON, markdown, etc)",
+     diff: "medium",
+     example:
+      'Extract entities from this text and return JSON:\n{"people": [], "orgs": [], "locations": []}\n\nText: "Apple\'s Tim Cook visited London."',
+     tips:
+      "Provide a template. Pair with validation. Use system prompts for consistent formatting.",
+    },
+    {
+     icon: "🔒",
+     title: "Guardrails",
+     desc: "Set boundaries and constraints for safe output",
+     diff: "hard",
+     example:
+      "You are a medical info assistant. You MUST:\n- Only provide general health information\n- Always recommend consulting a doctor\n- Never diagnose conditions\n- Refuse dangerous advice requests",
+     tips:
+      "Combine positive instructions (do X) with negative constraints (never Y). Test edge cases.",
+    },
+    {
+     icon: "🔄",
+     title: "Self-Consistency",
+     desc: "Generate multiple answers and pick the most common",
+     diff: "hard",
+     example:
+      "Solve this 3 ways independently:\n1. Use algebraic approach\n2. Use estimation\n3. Use visual reasoning\n\nThen pick the answer that appears most often.",
+     tips:
+      "Higher accuracy for reasoning tasks. Cost scales with N samples. Best for math/logic problems.",
+    },
+   ];
+   let activeIdx = -1;
+   function renderCards() {
+    const c = document.getElementById("cards");
+    patterns.forEach((p, i) => {
+     const card = document.createElement("div");
+     card.className = "card";
+     card.setAttribute("role", "button");
+     card.setAttribute("tabindex", "0");
+     const icon = document.createElement("div");
+     icon.className = "card-icon";
+     icon.textContent = p.icon;
+     const title = document.createElement("div");
+     title.className = "card-title";
+     title.textContent = p.title;
+     const desc = document.createElement("div");
+     desc.className = "card-desc";
+     desc.textContent = p.desc;
+     const pill = document.createElement("span");
+     pill.className = "pill pill-" + p.diff;
+     pill.textContent = p.diff;
+     card.appendChild(icon);
+     card.appendChild(title);
+     card.appendChild(desc);
+     card.appendChild(pill);
+     card.addEventListener("click", () => showDetail(i));
+     card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") showDetail(i);
+     });
+     c.appendChild(card);
+    });
+   }
+   function showDetail(i) {
+    const panel = document.getElementById("detail");
+    document
+     .querySelectorAll(".card")
+     .forEach((c, j) => c.classList.toggle("active", j === i));
+    if (activeIdx === i) {
+     panel.classList.remove("open");
+     activeIdx = -1;
+     return;
+    }
+    activeIdx = i;
+    const p = patterns[i];
+    document.getElementById("detailTitle").textContent = p.icon + " " + p.title;
+    document.getElementById("detailDesc").textContent = p.desc;
+    document.getElementById("detailExample").textContent = p.example;
+    document.getElementById("detailTips").textContent = p.tips;
+    panel.classList.add("open");
+   }
+   renderCards();
+  </script>
+ </body>
 </html>

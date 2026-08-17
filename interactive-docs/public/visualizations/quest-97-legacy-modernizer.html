@@ -1,155 +1,508 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Modernization Roadmap — BlueBeltDojo</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
-.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
-.ctn{max-width:900px;margin:0 auto}
-/* Timeline */
-.timeline{position:relative;padding:0 0 0 40px;margin-bottom:24px}
-.timeline::before{content:'';position:absolute;left:16px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#4f2bdf,#00c864);border-radius:99px}
-.tl-phase{position:relative;margin-bottom:20px;cursor:pointer;transition:transform .2s}
-.tl-phase:hover{transform:translateX(4px)}
-.tl-dot{position:absolute;left:-32px;top:14px;width:24px;height:24px;border-radius:50%;border:3px solid #333;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;transition:all .4s;z-index:1;background:#1a1a2e}
-.tl-phase.done .tl-dot{border-color:#00c864;color:#00c864;background:#00c86422}
-.tl-phase.active .tl-dot{border-color:#4f2bdf;color:#fff;background:#4f2bdf;animation:pulse 1.5s infinite}
-.tl-phase.future .tl-dot{border-color:#555;color:#555}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #4f2bdf55}50%{box-shadow:0 0 0 8px #4f2bdf00}}
-.tl-card{background:#16213e;border-radius:10px;padding:14px 18px;border:1px solid #333;transition:border-color .3s}
-.tl-phase.active .tl-card{border-color:#4f2bdf}
-.tl-phase.done .tl-card{border-color:#00c86433}
-.tl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.tl-title{font-size:.9rem;font-weight:600}
-.tl-tag{font-size:.65rem;padding:2px 8px;border-radius:99px}
-.tl-tag.done-t{background:#00c86422;color:#00c864}
-.tl-tag.active-t{background:#4f2bdf22;color:#4f2bdf}
-.tl-tag.future-t{background:#333;color:#888}
-.tl-summary{font-size:.78rem;color:#888;line-height:1.4}
-.tl-detail{max-height:0;overflow:hidden;opacity:0;transition:all .4s}
-.tl-phase.open .tl-detail{max-height:400px;opacity:1;margin-top:10px}
-.tl-detail-inner{background:#0d1117;border-radius:8px;padding:12px;font-size:.78rem;line-height:1.6;color:#ccc}
-.tl-detail-inner h4{color:#4f2bdf;margin-bottom:6px;font-size:.8rem}
-.tl-detail-inner ul{margin:0;padding-left:18px}
-.tl-detail-inner li{margin-bottom:4px}
-.tl-detail-inner .duration{color:#00c864;font-weight:600}
-.tl-detail-inner .risk{color:#ffb347}
-/* Progress bar */
-.progress-area{background:#16213e;border-radius:12px;padding:16px;border:1px solid #333;margin-bottom:20px}
-.progress-area h2{font-size:.9rem;color:#4f2bdf;margin-bottom:10px}
-.pbar{height:12px;background:#0d1117;border-radius:99px;overflow:hidden;display:flex}
-.pbar-seg{height:100%;transition:width 1s ease}
-.pbar-label{display:flex;justify-content:space-between;margin-top:8px;font-size:.7rem;color:#888}
-/* Summary cards */
-.sum-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px}
-.s-card{background:#0d1117;border-radius:8px;padding:12px;text-align:center;border:1px solid #333}
-.s-card .sv{font-size:1.3rem;font-weight:700;color:#00c864}
-.s-card .sl{font-size:.7rem;color:#888;margin-top:4px}
-.btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.btn{padding:8px 20px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.8rem;cursor:pointer;transition:background .2s}
-.btn:hover{background:#6143e8}
-</style>
-</head>
-<body>
-<h1>🗺️ Legacy Modernization Roadmap</h1>
-<p class="sub">Click each phase to explore migration steps and details</p>
-<div class="ctn">
-<div class="sum-cards">
-  <div class="s-card"><div class="sv">6</div><div class="sl">Total Phases</div></div>
-  <div class="s-card"><div class="sv">~18 mo</div><div class="sl">Estimated Duration</div></div>
-  <div class="s-card"><div class="sv">2/6</div><div class="sl">Completed</div></div>
-  <div class="s-card"><div class="sv" id="riskLevel">Medium</div><div class="sl">Current Risk</div></div>
-</div>
-<div class="progress-area">
-  <h2>Migration Progress</h2>
-  <div class="pbar" id="pbar"></div>
-  <div class="pbar-label"><span>Phase 1: Assessment</span><span>Phase 6: Optimization</span></div>
-</div>
-<div class="timeline" id="timeline"></div>
-<div class="btn-row">
-  <button class="btn" onclick="advancePhase()">▶ Advance Phase</button>
-  <button class="btn" onclick="resetTimeline()" style="background:#333">↺ Reset</button>
-</div>
-</div>
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modernization Roadmap — BlueBeltDojo</title>
+  <style>
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+   }
+   body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+   }
+   h1 {
+    text-align: center;
+    color: #4f2bdf;
+    margin-bottom: 6px;
+    font-size: 1.5rem;
+   }
+   .sub {
+    text-align: center;
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+   }
+   .ctn {
+    max-width: 900px;
+    margin: 0 auto;
+   }
+   /* Timeline */
+   .timeline {
+    position: relative;
+    padding: 0 0 0 40px;
+    margin-bottom: 24px;
+   }
+   .timeline::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #4f2bdf, #00c864);
+    border-radius: 99px;
+   }
+   .tl-phase {
+    position: relative;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+   }
+   .tl-phase:hover {
+    transform: translateX(4px);
+   }
+   .tl-dot {
+    position: absolute;
+    left: -32px;
+    top: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 3px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    transition: all 0.4s;
+    z-index: 1;
+    background: #1a1a2e;
+   }
+   .tl-phase.done .tl-dot {
+    border-color: #00c864;
+    color: #00c864;
+    background: #00c86422;
+   }
+   .tl-phase.active .tl-dot {
+    border-color: #4f2bdf;
+    color: #fff;
+    background: #4f2bdf;
+    animation: pulse 1.5s infinite;
+   }
+   .tl-phase.future .tl-dot {
+    border-color: #555;
+    color: #555;
+   }
+   @keyframes pulse {
+    0%,
+    100% {
+     box-shadow: 0 0 0 0 #4f2bdf55;
+    }
+    50% {
+     box-shadow: 0 0 0 8px #4f2bdf00;
+    }
+   }
+   .tl-card {
+    background: #16213e;
+    border-radius: 10px;
+    padding: 14px 18px;
+    border: 1px solid #333;
+    transition: border-color 0.3s;
+   }
+   .tl-phase.active .tl-card {
+    border-color: #4f2bdf;
+   }
+   .tl-phase.done .tl-card {
+    border-color: #00c86433;
+   }
+   .tl-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+   }
+   .tl-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+   }
+   .tl-tag {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+   }
+   .tl-tag.done-t {
+    background: #00c86422;
+    color: #00c864;
+   }
+   .tl-tag.active-t {
+    background: #4f2bdf22;
+    color: #4f2bdf;
+   }
+   .tl-tag.future-t {
+    background: #333;
+    color: #888;
+   }
+   .tl-summary {
+    font-size: 0.78rem;
+    color: #888;
+    line-height: 1.4;
+   }
+   .tl-detail {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.4s;
+   }
+   .tl-phase.open .tl-detail {
+    max-height: 400px;
+    opacity: 1;
+    margin-top: 10px;
+   }
+   .tl-detail-inner {
+    background: #0d1117;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #ccc;
+   }
+   .tl-detail-inner h4 {
+    color: #4f2bdf;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+   }
+   .tl-detail-inner ul {
+    margin: 0;
+    padding-left: 18px;
+   }
+   .tl-detail-inner li {
+    margin-bottom: 4px;
+   }
+   .tl-detail-inner .duration {
+    color: #00c864;
+    font-weight: 600;
+   }
+   .tl-detail-inner .risk {
+    color: #ffb347;
+   }
+   /* Progress bar */
+   .progress-area {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+   }
+   .progress-area h2 {
+    font-size: 0.9rem;
+    color: #4f2bdf;
+    margin-bottom: 10px;
+   }
+   .pbar {
+    height: 12px;
+    background: #0d1117;
+    border-radius: 99px;
+    overflow: hidden;
+    display: flex;
+   }
+   .pbar-seg {
+    height: 100%;
+    transition: width 1s ease;
+   }
+   .pbar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: #888;
+   }
+   /* Summary cards */
+   .sum-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+   }
+   .s-card {
+    background: #0d1117;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #333;
+   }
+   .s-card .sv {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00c864;
+   }
+   .s-card .sl {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 4px;
+   }
+   .btn-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+   }
+   .btn {
+    padding: 8px 20px;
+    background: #4f2bdf;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+   }
+   .btn:hover {
+    background: #6143e8;
+   }
+  </style>
+ </head>
+ <body>
+  <h1>🗺️ Legacy Modernization Roadmap</h1>
+  <p class="sub">Click each phase to explore migration steps and details</p>
+  <div class="ctn">
+   <div class="sum-cards">
+    <div class="s-card">
+     <div class="sv">6</div>
+     <div class="sl">Total Phases</div>
+    </div>
+    <div class="s-card">
+     <div class="sv">~18 mo</div>
+     <div class="sl">Estimated Duration</div>
+    </div>
+    <div class="s-card">
+     <div class="sv">2/6</div>
+     <div class="sl">Completed</div>
+    </div>
+    <div class="s-card">
+     <div class="sv" id="riskLevel">Medium</div>
+     <div class="sl">Current Risk</div>
+    </div>
+   </div>
+   <div class="progress-area">
+    <h2>Migration Progress</h2>
+    <div class="pbar" id="pbar"></div>
+    <div class="pbar-label">
+     <span>Phase 1: Assessment</span><span>Phase 6: Optimization</span>
+    </div>
+   </div>
+   <div class="timeline" id="timeline"></div>
+   <div class="btn-row">
+    <button class="btn" onclick="advancePhase()">▶ Advance Phase</button>
+    <button class="btn" onclick="resetTimeline()" style="background: #333">
+     ↺ Reset
+    </button>
+   </div>
+  </div>
 
-<script>
-const phases=[
-  {id:1,title:'📋 Assessment & Audit',duration:'2-3 months',status:'done',
-   summary:'Map the legacy system — dependencies, code quality, tech debt.',
-   details:{objectives:['Complete codebase inventory','Identify critical paths','Map dependency graph','Assess test coverage','Document technical debt'],risks:['Incomplete documentation','Hidden dependencies'],tools:['SonarQube','madge','Dependency Cruiser','npm audit']}},
-  {id:2,title:'🏗️ Architecture Design',duration:'1-2 months',status:'done',
-   summary:'Design target architecture and define migration boundaries.',
-   details:{objectives:['Define target architecture','Identify strangler fig boundaries','Design API contracts','Set up new project scaffold','Choose migration strategy'],risks:['Over-engineering the target','Underestimating coupling'],tools:['EventStorming','C4 Model','Draw.io','Architecture Decision Records']}},
-  {id:3,title:'🔌 Strangler Fig Implementation',duration:'4-5 months',status:'active',
-   summary:'Gradually replace legacy modules with new implementations behind a facade.',
-   details:{objectives:['Build anti-corruption layer','Migrate highest-value modules first','Implement feature flags','Set up parallel running','Route traffic incrementally'],risks:['Dual maintenance burden','Data consistency issues'],tools:['Feature flags (LaunchDarkly)','API Gateway','Load balancer','Shadow traffic']}},
-  {id:4,title:'🧪 Test Coverage Expansion',duration:'2-3 months',status:'future',
-   summary:'Achieve comprehensive test coverage before full cutover.',
-   details:{objectives:['Add integration tests for new modules','Contract testing between services','Performance baseline testing','Security penetration testing','Chaos engineering experiments'],risks:['Flaky tests slowing pipeline','Test data management'],tools:['Vitest','Playwright','k6','Pact','Chaos Mesh']}},
-  {id:5,title:'🚀 Gradual Migration & Cutover',duration:'3-4 months',status:'future',
-   summary:'Migrate remaining modules and switch traffic to new system.',
-   details:{objectives:['Migrate remaining business logic','Data migration with rollback','Blue-green deployment','Progressive traffic shifting','Monitor error rates & latency'],risks:['Data loss during migration','Performance regression','User disruption'],tools:['Blue-green deploy','Canary releases','Data migration scripts','Rollback procedures']}},
-  {id:6,title:'⚡ Optimization & Cleanup',duration:'2-3 months',status:'future',
-   summary:'Remove legacy code, optimize performance, and close the project.',
-   details:{objectives:['Remove legacy code and infrastructure','Performance optimization pass','Documentation updates','Knowledge transfer sessions','Post-mortem & retrospective'],risks:['Premature legacy removal','Knowledge loss'],tools:['Bundle analyzer','Performance profiling','Cleanup scripts','Runbooks']}},
-];
+  <script>
+   const phases = [
+    {
+     id: 1,
+     title: "📋 Assessment & Audit",
+     duration: "2-3 months",
+     status: "done",
+     summary: "Map the legacy system — dependencies, code quality, tech debt.",
+     details: {
+      objectives: [
+       "Complete codebase inventory",
+       "Identify critical paths",
+       "Map dependency graph",
+       "Assess test coverage",
+       "Document technical debt",
+      ],
+      risks: ["Incomplete documentation", "Hidden dependencies"],
+      tools: ["SonarQube", "madge", "Dependency Cruiser", "npm audit"],
+     },
+    },
+    {
+     id: 2,
+     title: "🏗️ Architecture Design",
+     duration: "1-2 months",
+     status: "done",
+     summary: "Design target architecture and define migration boundaries.",
+     details: {
+      objectives: [
+       "Define target architecture",
+       "Identify strangler fig boundaries",
+       "Design API contracts",
+       "Set up new project scaffold",
+       "Choose migration strategy",
+      ],
+      risks: ["Over-engineering the target", "Underestimating coupling"],
+      tools: [
+       "EventStorming",
+       "C4 Model",
+       "Draw.io",
+       "Architecture Decision Records",
+      ],
+     },
+    },
+    {
+     id: 3,
+     title: "🔌 Strangler Fig Implementation",
+     duration: "4-5 months",
+     status: "active",
+     summary:
+      "Gradually replace legacy modules with new implementations behind a facade.",
+     details: {
+      objectives: [
+       "Build anti-corruption layer",
+       "Migrate highest-value modules first",
+       "Implement feature flags",
+       "Set up parallel running",
+       "Route traffic incrementally",
+      ],
+      risks: ["Dual maintenance burden", "Data consistency issues"],
+      tools: [
+       "Feature flags (LaunchDarkly)",
+       "API Gateway",
+       "Load balancer",
+       "Shadow traffic",
+      ],
+     },
+    },
+    {
+     id: 4,
+     title: "🧪 Test Coverage Expansion",
+     duration: "2-3 months",
+     status: "future",
+     summary: "Achieve comprehensive test coverage before full cutover.",
+     details: {
+      objectives: [
+       "Add integration tests for new modules",
+       "Contract testing between services",
+       "Performance baseline testing",
+       "Security penetration testing",
+       "Chaos engineering experiments",
+      ],
+      risks: ["Flaky tests slowing pipeline", "Test data management"],
+      tools: ["Vitest", "Playwright", "k6", "Pact", "Chaos Mesh"],
+     },
+    },
+    {
+     id: 5,
+     title: "🚀 Gradual Migration & Cutover",
+     duration: "3-4 months",
+     status: "future",
+     summary: "Migrate remaining modules and switch traffic to new system.",
+     details: {
+      objectives: [
+       "Migrate remaining business logic",
+       "Data migration with rollback",
+       "Blue-green deployment",
+       "Progressive traffic shifting",
+       "Monitor error rates & latency",
+      ],
+      risks: [
+       "Data loss during migration",
+       "Performance regression",
+       "User disruption",
+      ],
+      tools: [
+       "Blue-green deploy",
+       "Canary releases",
+       "Data migration scripts",
+       "Rollback procedures",
+      ],
+     },
+    },
+    {
+     id: 6,
+     title: "⚡ Optimization & Cleanup",
+     duration: "2-3 months",
+     status: "future",
+     summary:
+      "Remove legacy code, optimize performance, and close the project.",
+     details: {
+      objectives: [
+       "Remove legacy code and infrastructure",
+       "Performance optimization pass",
+       "Documentation updates",
+       "Knowledge transfer sessions",
+       "Post-mortem & retrospective",
+      ],
+      risks: ["Premature legacy removal", "Knowledge loss"],
+      tools: [
+       "Bundle analyzer",
+       "Performance profiling",
+       "Cleanup scripts",
+       "Runbooks",
+      ],
+     },
+    },
+   ];
 
-function renderTimeline(){
-  const $tl=document.getElementById('timeline');$tl.innerHTML='';
-  phases.forEach((p,i)=>{
-    const div=document.createElement('div');
-    div.className=`tl-phase ${p.status}`;
-    div.innerHTML=`
-      <div class="tl-dot">${p.status==='done'?'✓':p.status==='active'?'▶':i+1}</div>
+   function renderTimeline() {
+    const $tl = document.getElementById("timeline");
+    $tl.innerHTML = "";
+    phases.forEach((p, i) => {
+     const div = document.createElement("div");
+     div.className = `tl-phase ${p.status}`;
+     div.innerHTML = `
+      <div class="tl-dot">${p.status === "done" ? "✓" : p.status === "active" ? "▶" : i + 1}</div>
       <div class="tl-card">
         <div class="tl-head">
           <span class="tl-title">${p.title}</span>
-          <span class="tl-tag ${p.status==='done'?'done-t':p.status==='active'?'active-t':'future-t'}">${p.status==='done'?'✓ Done':p.status==='active'?'▶ Active':'Future'}</span>
+          <span class="tl-tag ${p.status === "done" ? "done-t" : p.status === "active" ? "active-t" : "future-t"}">${p.status === "done" ? "✓ Done" : p.status === "active" ? "▶ Active" : "Future"}</span>
         </div>
         <div class="tl-summary">${p.summary}</div>
         <div class="tl-detail"><div class="tl-detail-inner">
           <h4>Duration: <span class="duration">${p.duration}</span></h4>
-          <h4>Objectives</h4><ul>${p.details.objectives.map(o=>`<li>${o}</li>`).join('')}</ul>
-          <h4 class="risk">⚠️ Risks</h4><ul>${p.details.risks.map(r=>`<li class="risk">${r}</li>`).join('')}</ul>
-          <h4>Tools</h4><ul>${p.details.tools.map(t=>`<li>${t}</li>`).join('')}</ul>
+          <h4>Objectives</h4><ul>${p.details.objectives.map((o) => `<li>${o}</li>`).join("")}</ul>
+          <h4 class="risk">⚠️ Risks</h4><ul>${p.details.risks.map((r) => `<li class="risk">${r}</li>`).join("")}</ul>
+          <h4>Tools</h4><ul>${p.details.tools.map((t) => `<li>${t}</li>`).join("")}</ul>
         </div></div>
       </div>`;
-    div.addEventListener('click',()=>{div.classList.toggle('open');});
-    $tl.appendChild(div);
-  });
-}
+     div.addEventListener("click", () => {
+      div.classList.toggle("open");
+     });
+     $tl.appendChild(div);
+    });
+   }
 
-function renderProgress(){
-  const $p=document.getElementById('pbar');$p.innerHTML='';
-  const colors=['#00c864','#00c864','#4f2bdf','#888','#888','#888'];
-  phases.forEach((p,i)=>{
-    const w=p.status==='done'?100/6:p.status==='active'?50/6:0;
-    $p.innerHTML+=`<div class="pbar-seg" style="width:${w}%;background:${colors[i]}"></div>`;
-  });
-}
+   function renderProgress() {
+    const $p = document.getElementById("pbar");
+    $p.innerHTML = "";
+    const colors = ["#00c864", "#00c864", "#4f2bdf", "#888", "#888", "#888"];
+    phases.forEach((p, i) => {
+     const w =
+      p.status === "done" ? 100 / 6 : p.status === "active" ? 50 / 6 : 0;
+     $p.innerHTML += `<div class="pbar-seg" style="width:${w}%;background:${colors[i]}"></div>`;
+    });
+   }
 
-function advancePhase(){
-  const active=phases.findIndex(p=>p.status==='active');
-  if(active>=0){phases[active].status='done';}
-  const next=phases.findIndex(p=>p.status==='future');
-  if(next>=0){phases[next].status='active';}
-  renderTimeline();renderProgress();
-  const doneCount=phases.filter(p=>p.status==='done').length;
-  document.querySelector('.s-card:nth-child(3) .sv').textContent=`${doneCount}/6`;
-}
+   function advancePhase() {
+    const active = phases.findIndex((p) => p.status === "active");
+    if (active >= 0) {
+     phases[active].status = "done";
+    }
+    const next = phases.findIndex((p) => p.status === "future");
+    if (next >= 0) {
+     phases[next].status = "active";
+    }
+    renderTimeline();
+    renderProgress();
+    const doneCount = phases.filter((p) => p.status === "done").length;
+    document.querySelector(".s-card:nth-child(3) .sv").textContent =
+     `${doneCount}/6`;
+   }
 
-function resetTimeline(){
-  phases[0].status='done';phases[1].status='done';
-  phases[2].status='active';
-  phases[3].status='future';phases[4].status='future';phases[5].status='future';
-  renderTimeline();renderProgress();
-  document.querySelector('.s-card:nth-child(3) .sv').textContent='2/6';
-}
+   function resetTimeline() {
+    phases[0].status = "done";
+    phases[1].status = "done";
+    phases[2].status = "active";
+    phases[3].status = "future";
+    phases[4].status = "future";
+    phases[5].status = "future";
+    renderTimeline();
+    renderProgress();
+    document.querySelector(".s-card:nth-child(3) .sv").textContent = "2/6";
+   }
 
-renderTimeline();renderProgress();
-</script>
-</body>
+   renderTimeline();
+   renderProgress();
+  </script>
+ </body>
 </html>
