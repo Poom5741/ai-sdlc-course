@@ -1,0 +1,210 @@
+---
+interface Question {
+  question: string;
+  choices: string[];
+  answer: number;
+  explanation: string;
+}
+
+interface QuizData {
+  questId: string;
+  questions: Question[];
+}
+
+interface Props {
+  questId: string;
+}
+
+const { questId } = Astro.props;
+
+let quizData: QuizData | null = null;
+try {
+  const quizPath = `${import.meta.env.BASE_URL}quizzes/${questId}.json`;
+  const response = await fetch(quizPath);
+  if (response.ok) {
+    quizData = await response.json();
+  }
+} catch (e) {
+  // Quiz not found for this quest
+}
+---
+
+{quizData && quizData.questions.length > 0 && (
+  <div class="quiz-container" data-quest-id={questId}>
+    <h3>📝 Knowledge Check</h3>
+    
+    {quizData.questions.map((q, qIndex) => (
+      <div class="question" data-question-index={qIndex}>
+        <p class="question-text">
+          <strong>Q{qIndex + 1}:</strong> {q.question}
+        </p>
+        
+        <div class="choices">
+          {q.choices.map((choice, cIndex) => (
+            <label class="choice">
+              <input
+                type="radio"
+                name={`quiz-${questId}-q${qIndex}`}
+                value={cIndex}
+                data-correct={cIndex === q.answer}
+              />
+              <span class="choice-text">{choice}</span>
+            </label>
+          ))}
+        </div>
+        
+        <div class="feedback" hidden>
+          <span class="feedback-icon"></span>
+          <span class="feedback-text"></span>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+  .quiz-container {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background: var(--sl-color-gray-7);
+  }
+  
+  .quiz-container h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--sl-color-white);
+  }
+  
+  .question {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--sl-color-gray-6);
+  }
+  
+  .question:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .question-text {
+    margin-bottom: 0.75rem;
+    color: var(--sl-color-gray-1);
+  }
+  
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .choice:hover {
+    background: var(--sl-color-gray-6);
+    border-color: var(--sl-color-gray-4);
+  }
+  
+  .choice.selected {
+    background: var(--sl-color-gray-6);
+    border-color: var(--sl-color-accent-high);
+  }
+  
+  .choice.correct {
+    background: rgba(0, 200, 100, 0.2);
+    border-color: #00c864;
+  }
+  
+  .choice.incorrect {
+    background: rgba(200, 0, 100, 0.2);
+    border-color: #c80064;
+  }
+  
+  .choice input[type="radio"] {
+    margin: 0;
+  }
+  
+  .choice-text {
+    color: var(--sl-color-gray-1);
+  }
+  
+  .feedback {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .feedback.correct {
+    background: rgba(0, 200, 100, 0.15);
+    color: #00c864;
+  }
+  
+  .feedback.incorrect {
+    background: rgba(200, 0, 100, 0.15);
+    color: #c80064;
+  }
+  
+  .feedback-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.quiz-container').forEach(container => {
+    const questions = container.querySelectorAll<HTMLElement>('.question');
+    
+    questions.forEach(question => {
+      const choices = question.querySelectorAll<HTMLInputElement>('.choice input[type="radio"]');
+      const feedback = question.querySelector<HTMLElement>('.feedback');
+      const feedbackIcon = question.querySelector<HTMLElement>('.feedback-icon');
+      const feedbackText = question.querySelector<HTMLElement>('.feedback-text');
+      
+      choices.forEach(choice => {
+        choice.addEventListener('change', () => {
+          const isCorrect = choice.dataset.correct === 'true';
+          const explanation = choices[0]?.closest('.question')?.querySelector('.explanation')?.textContent || '';
+          
+          // Reset all choices
+          question.querySelectorAll('.choice').forEach(c => {
+            c.classList.remove('selected', 'correct', 'incorrect');
+          });
+          
+          // Mark selected
+          const choiceLabel = choice.closest('.choice');
+          if (choiceLabel) {
+            choiceLabel.classList.add('selected');
+          }
+          
+          // Show feedback
+          if (feedback && feedbackIcon && feedbackText) {
+            feedback.hidden = false;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+            
+            if (isCorrect) {
+              const explanationEl = question.querySelector('.explanation');
+              feedbackText.textContent = explanationEl?.textContent || 'Correct!';
+            } else {
+              feedbackText.textContent = 'Not quite. Try again!';
+            }
+          }
+        });
+      });
+    });
+  });
+</script>

@@ -9,7 +9,7 @@
 // Password: bluebeltdojo2024
 // Role: admin
 
-const fs = require('fs');
+const fs = require("fs");
 
 // Generate the SQL file with a placeholder hash
 // The hash needs to be generated separately using the app's crypto functions
@@ -30,9 +30,9 @@ VALUES (
 );
 `;
 
-fs.writeFileSync('./migrations/seed-admin.sql', sql);
-console.log('Created seed-admin.sql template');
-console.log('');
-console.log('NOTE: You need to generate the password hash first!');
-console.log('Option 1: Register via /register, then update role to admin');
-console.log('Option 2: Use the generate-hash.js script to create the hash');
+fs.writeFileSync("./migrations/seed-admin.sql", sql);
+console.log("Created seed-admin.sql template");
+console.log("");
+console.log("NOTE: You need to generate the password hash first!");
+console.log("Option 1: Register via /register, then update role to admin");
+console.log("Option 2: Use the generate-hash.js script to create the hash");

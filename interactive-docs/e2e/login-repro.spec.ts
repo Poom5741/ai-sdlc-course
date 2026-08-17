@@ -71,7 +71,9 @@ test("dashboard does NOT stack on top of the sign-in form after login", async ({
     await page.click('#login-form button[type="submit"]');
 
     // Wait for the dashboard content to render.
-    await expect(page.locator("#user-name")).toHaveText("Tester", { timeout: 10000 });
+    await expect(page.locator("#user-name")).toHaveText("Tester", {
+        timeout: 10000,
+    });
 
     // THE BUG: the login section must be hidden once login succeeds.
     await expect(loginSection).toBeHidden();

@@ -7,16 +7,16 @@ const rateLimitMap = new Map();
 function checkRateLimit(ip) {
   const now = Date.now();
   const record = rateLimitMap.get(ip);
-  
+
   if (!record || now > record.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + 3600000 }); // 1 hour
     return true;
   }
-  
+
   if (record.count >= 10) {
     return false;
   }
-  
+
   record.count++;
   return true;
 }
@@ -26,45 +26,58 @@ async function generateToken(env, ip) {
   const timestamp = Date.now();
   const expires = timestamp + 12 * 60 * 60 * 1000; // 12 hours
   const payload = `${timestamp}:${expires}:${ip}`;
-  
+
   // Create HMAC signature
   const key = await crypto.subtle.importKey(
-    'raw',
+    "raw",
     new TextEncoder().encode(env.ADMIN_PASSWORD),
-    { name: 'HMAC', hash: 'SHA-256' },
+    { name: "HMAC", hash: "SHA-256" },
     false,
-    ['sign']
+    ["sign"],
   );
-  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
-  const sigHex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  return btoa(`${payload}:${sigHex}`).replace(/=/g, '');
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(payload),
+  );
+  const sigHex = Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return btoa(`${payload}:${sigHex}`).replace(/=/g, "");
 }
 
 // Validate token (stateless)
 export async function validateAdminToken(env, token) {
   try {
-    const decoded = atob(token + '==');
-    const parts = decoded.split(':');
+    const decoded = atob(token + "==");
+    const parts = decoded.split(":");
     if (parts.length !== 4) return false;
-    
+
     const [timestamp, expires, tokenIp, sigHex] = parts;
-    
+
     // Check expiry
     if (Date.now() > parseInt(expires)) return false;
-    
+
     // Verify HMAC
     const payload = `${timestamp}:${expires}:${tokenIp}`;
     const key = await crypto.subtle.importKey(
-      'raw',
+      "raw",
       new TextEncoder().encode(env.ADMIN_PASSWORD),
-      { name: 'HMAC', hash: 'SHA-256' },
+      { name: "HMAC", hash: "SHA-256" },
       false,
-      ['verify']
+      ["verify"],
     );
-    const sigBytes = new Uint8Array(sigHex.match(/.{2}/g).map(b => parseInt(b, 16)));
-    const valid = await crypto.subtle.verify('HMAC', key, sigBytes, new TextEncoder().encode(payload));
-    
+    const sigBytes = new Uint8Array(
+      sigHex.match(/.{2}/g).map((b) => parseInt(b, 16)),
+    );
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      sigBytes,
+      new TextEncoder().encode(payload),
+    );
+
     return valid;
   } catch {
     return false;
@@ -74,7 +87,7 @@ export async function validateAdminToken(env, token) {
 export async function onRequestPost(context) {
   const { request, cf } = context;
   const ip = cf?.connectingIp || "unknown";
-  
+
   // Rate limiting
   if (!checkRateLimit(ip)) {
     return new Response(

@@ -1,0 +1,23 @@
+{
+  "name": "quest-01-first-completion",
+  "version": "1.0.0",
+  "description": "Quest 1.1: First AI Code Completion - factorial with negative-input edge case",
+  "main": "problem.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "workshop",
+    "quest",
+    "block-1"
+  ],
+  "author": "AI SDLC Workshop",
+  "license": "MIT",
+  "quest": {
+    "id": "quest-01-first-completion",
+    "block": "block-1-ai-tools",
+    "slug": "quest-1",
+    "difficulty": "easy"
+  }
+}

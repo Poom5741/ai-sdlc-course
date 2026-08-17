@@ -259,7 +259,9 @@ test.describe("Dashboard page", () => {
   });
 
   test.describe("Admin redirect", () => {
-    test("admin user is redirected to /admin from dashboard", async ({ page }) => {
+    test("admin user is redirected to /admin from dashboard", async ({
+      page,
+    }) => {
       // Mock auth as admin
       await page.route("**/api/auth/me", async (route) => {
         await route.fulfill({

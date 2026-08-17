@@ -1,0 +1,84 @@
+---
+interface Props {
+  questId: string;
+  title: string;
+}
+
+const { questId, title } = Astro.props;
+---
+
+<div class="visualization-container">
+  <h3>🧩 Interactive Demo</h3>
+  <div class="iframe-wrapper">
+    <iframe
+      src={`${import.meta.env.BASE_URL}visualizations/${questId}.html`}
+      title={title}
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin"
+    ></iframe>
+    <div class="loading-fallback">
+      <span>Loading visualization...</span>
+    </div>
+  </div>
+  <p class="visualization-caption">{title}</p>
+</div>
+
+<style>
+  .visualization-container {
+    margin: 1.5rem 0;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--sl-color-gray-7);
+  }
+  
+  .visualization-container h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--sl-color-white);
+  }
+  
+  .iframe-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--sl-color-black);
+  }
+  
+  .iframe-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .loading-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+  
+  .iframe-wrapper iframe:not([src=""]) ~ .loading-fallback {
+    display: none;
+  }
+  
+  .visualization-caption {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-2);
+    text-align: center;
+    font-style: italic;
+  }
+</style>

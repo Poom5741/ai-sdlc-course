@@ -212,7 +212,9 @@ test.describe("Admin Panel", () => {
 
       const createdCodes = page.locator("#created-codes");
       await expect(createdCodes).toBeVisible({ timeout: 5000 });
-      await expect(createdCodes.getByText("Codes Created Successfully")).toBeVisible();
+      await expect(
+        createdCodes.getByText("Codes Created Successfully"),
+      ).toBeVisible();
     });
   });
 });

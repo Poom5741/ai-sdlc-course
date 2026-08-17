@@ -5,64 +5,187 @@ description: "Write a factorial function with AI help"
 
 import { Badge } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
 
 # Quest 1: First AI Completion
 
-<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
-
-## เป้าหมาย
-
-Write a factorial function with AI help
+<Badge text="easy" variant="success" /> <Badge text="25 minutes" variant="note" />
 
 ---
 
-## วิธีทำ
+<LearningObjectives items={[
+  "How to use AI coding tools for code generation",
+  "Why you must verify AI output before trusting it",
+  "How edge cases can silently break naive AI suggestions",
+  "The practice of reading failing tests to understand requirements"
+]} />
+
+---
+
+## 📖 Concept: AI Code Completion
+
+AI coding tools like GitHub Copilot, Cursor, and Claude Code can generate code from natural language comments. You describe what you want, and the AI writes the code for you.
+
+This is incredibly powerful — but it comes with a critical caveat: **AI output is a starting point, not a finished product.** The AI generates code that looks correct for the obvious cases, but it often misses edge cases that a human developer would catch.
+
+Think of AI code completion like a junior developer who writes code fast but doesn't think about edge cases. Your job is to be the senior developer who reviews, tests, and validates.
+
+---
+
+## ⚙️ How It Works
+
+### The AI Code Completion Workflow
+
+```
+1. Write a comment describing what you want
+         ↓
+2. AI generates code suggestion
+         ↓
+3. Accept the suggestion
+         ↓
+4. Run tests — READ the failures carefully
+         ↓
+5. Fix edge cases the AI missed
+         ↓
+6. Verify all tests pass
+```
+
+### Why Verification Matters
+
+Consider this AI suggestion for a factorial function:
+
+```javascript
+// Naive AI suggestion
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+```
+
+**This looks correct, right?** Let's check:
+
+| Input | Expected | AI Output | Correct? |
+| --- | --- | --- | --- |
+| `factorial(5)` | 120 | 120 | ✅ |
+| `factorial(1)` | 1 | 1 | ✅ |
+| `factorial(0)` | 1 | 1 | ✅ |
+| `factorial(-1)` | ❌ Error | 1 | ❌ **WRONG** |
+
+The AI's `if (n <= 1) return 1` returns `1` for negative numbers, but factorial of a negative number is **undefined**. The function should throw an error.
+
+**This is the #1 mistake developers make with AI:** accepting the first suggestion without testing edge cases.
+
+---
+
+## 💡 Example: The Right Way
+
+Here's how an experienced developer handles AI code completion:
+
+**Step 1: Write a descriptive comment**
+
+```javascript
+// Calculate factorial of n using recursion. 
+// Throw error for negative numbers (undefined).
+// Throw error for non-integers.
+```
+
+**Step 2: Review the AI suggestion critically**
+
+```javascript
+function factorial(n) {
+  if (typeof n !== 'number' || !Number.isInteger(n)) {
+    throw new Error('Input must be an integer');
+  }
+  if (n < 0) {
+    throw new Error('Factorial is undefined for negative numbers');
+  }
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+```
+
+**Step 3: Run the tests and READ the output**
+
+```bash
+node test.js
+```
+
+Don't just glance at "all tests pass" — read each test case to understand what it's checking.
+
+**Step 4: If tests fail, understand WHY**
+
+The failing test will tell you exactly what edge case you missed. This is valuable feedback, not a nuisance.
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Trusting AI blindly**
+> "Copilot suggested it, so it must be correct"
+> → Always run tests. Always check edge cases.
+
+**Mistake 2: Not reading test failures**
+> "Tests failed, let me just tweak until they pass"
+> → Read the failure message. Understand what the test expects.
+
+**Mistake 3: Copying from solution files**
+> "I'll just peek at the solution to understand the pattern"
+> → This defeats the learning. Struggle is where growth happens.
+
+**Mistake 4: Ignoring error handling**
+> "The happy path works, good enough"
+> → Production code must handle edge cases. Negative inputs, null, undefined, wrong types.
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-1-first-code" />
+
+---
+
+## 🏋️ Quest: First AI Completion
+
+Now it's time to practice! Write a factorial function using AI assistance.
 
 <Steps>
 
-1. Download ไฟล์เริ่มต้นของ quest:
+1. Download the starter files:
 
    ```bash
    npx bluebeltdojo download quest-01-first-completion
    cd quest-01-first-completion
    ```
 
-2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+2. Open `problem.js` in your editor with your AI tool (Copilot, Claude Code, Cursor, etc.)
 
-3. Implement solution ตาม instructions ใน `problem.js`
+3. Write a comment describing what you want, then accept the AI's suggestion
 
-4. ตรวจสอบ solution ของคุณ:
+4. **Important:** Run `node test.js` and READ the failing tests — especially the negative-input edge case
+
+5. Fix any edge cases the AI missed
+
+6. Verify all tests pass:
 
    ```bash
    node test.js
    ```
 
+7. When all tests pass, submit your solution:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
 </Steps>
 
----
-
-## การตรวจสอบ
-
-```bash
-node test.js
-```
-
-When all tests pass, you will see the completion message.
+> 💡 **Tip:** If you're stuck, re-read the "Common Mistakes" section above. The answer is not in `_solution/solution.js` — it's in understanding why your code fails.
 
 ---
-
-## ส่งคำตอบ
-
-When tests pass, submit your solution:
-
-```bash
-npx bluebeltdojo submit
-```
-
-> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
 
 ## คำใบ้
 
 - อ่าน instructions ใน `problem.js` อย่างละเอียด
-- ตรวจสอบ edge cases ที่กล่าวถึง
-- ถ้าติดขัด ดู `_solution/solution.js`
+- ตรวจสอบ edge cases ที่กล่าวถึง (โดยเฉพาะตัวเลขลบ)
+- ถ้าติดขัด ลองอ่าน "Common Mistakes" อีกครั้ง — อย่าดู solution โดยตรง

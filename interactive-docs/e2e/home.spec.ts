@@ -24,14 +24,14 @@ test.describe("Home page", () => {
 
   test("shows curriculum section with block cards", async ({ page }) => {
     await page.locator("#curriculum").scrollIntoViewIfNeeded();
-    await expect(page.locator("#curriculum")).toContainText("Block 1");
-    await expect(page.locator("#curriculum")).toContainText("Block 2");
-    await expect(page.locator("#curriculum")).toContainText("Block 3");
+    await expect(page.locator("#curriculum")).toContainText("Module 1");
+    await expect(page.locator("#curriculum")).toContainText("Module 2");
+    await expect(page.locator("#curriculum")).toContainText("Module 3");
   });
 
   test("shows FAQ section", async ({ page }) => {
     await page.locator("#faq").scrollIntoViewIfNeeded();
-    await expect(page.locator("#faq")).toContainText("Frequently");
+    await expect(page.locator("#faq")).toContainText("Questions & Answers");
   });
 
   test("has BlueBeltDojo branding", async ({ page }) => {

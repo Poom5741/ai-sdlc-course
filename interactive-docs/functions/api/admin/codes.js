@@ -48,9 +48,9 @@ async function validateAdminAuth(env, request) {
     if (!session) return false;
 
     // Get user from D1 and check admin role
-    const user = await env.DB.prepare(
-      "SELECT id, role FROM users WHERE id = ?"
-    ).bind(session.userId).first();
+    const user = await env.DB.prepare("SELECT id, role FROM users WHERE id = ?")
+      .bind(session.userId)
+      .first();
 
     if (!user) return false;
     return user.role === "admin";

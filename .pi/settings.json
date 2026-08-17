@@ -1,0 +1,17 @@
+{
+  "piGauntlet": {
+    "specCouncil": {
+      "verdict": "council",
+      "members": [
+        "openrouter/deepseek/deepseek-v4-pro",
+        "openrouter/qwen/qwen3.8-max",
+        "openrouter/moonshotai/kimi-k3"
+      ],
+      "chair": "openrouter/deepseek/deepseek-v4-pro"
+    },
+    "closureReview": {
+      "enforce": true,
+      "maxFixRounds": 2
+    }
+  }
+}
