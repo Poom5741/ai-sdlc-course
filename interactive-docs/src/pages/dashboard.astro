@@ -301,6 +301,11 @@ import questSynced from '../data/quest-synced.json';
         });
         if (!res.ok) { localStorage.removeItem('bbd_token'); showLogin(); return; }
         userData = await res.json();
+        // Redirect admin to admin panel
+        if (userData.role === 'admin') {
+          window.location.href = '/admin';
+          return;
+        }
         await loadData();
       } catch { showLogin(); }
     }
