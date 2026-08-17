@@ -308,10 +308,12 @@ import questSynced from '../data/quest-synced.json';
     function showLogin() {
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('login-section').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
     }
 
     function showDashboard() {
       document.getElementById('loading').classList.add('hidden');
+      document.getElementById('login-section').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
     }
 
