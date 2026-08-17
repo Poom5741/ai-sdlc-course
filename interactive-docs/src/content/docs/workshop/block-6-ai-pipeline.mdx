@@ -1,0 +1,278 @@
+---
+title: Block 6 - AI Development Pipeline
+description: เชี่ยวชาญ workflow แบบเต็มจาก planning ถึง autonomous execution ด้วย Matt's skills, GitHub Issues, และ Goal system
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 6: AI Development Pipeline
+
+<Badge text="14:30 - 16:00" variant="note" /> <Badge text="90 นาที" variant="note" /> <Badge text="Pipeline Mastery" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- เข้าใจ AI Development Pipeline 3 ชั้น (Planning → Tracking → Execution)
+- ใช้ Matt Pocock's skills สำหรับ planning
+- สร้าง GitHub Issues เป็น decision tickets
+- ใช้ Goal system สำหรับ autonomous execution
+- เข้าใจ anti-bamboozle architecture
+
+---
+
+## 📖 Concept: AI Development Pipeline (30 นาที)
+
+### ปัญหา: Manual Orchestration
+
+แบบดั้งเดิม developers ต้อง:
+
+1. หาว่าจะทำอะไร
+2. แบ่งงานเป็น tasks
+3. ทำแต่ละ task เอง
+4. Review แต่ละ task เอง
+5. จัดการ dependencies เอง
+
+**ปัญหา**: เหนื่อย, ช้า, ความผิดพลาดจากมนุษย์, context switching
+
+### วิธีแก้: Automated Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 1: PLANNING (Matt's Skills)                             │
+│  Input: ไอเดียไม่ชัด, requirements, problems                  │
+│  Tools: grilling → domain-modeling → wayfinder → research      │
+│  Output: GitHub issues เป็น decision tickets ที่ชัดเจน      │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 2: TRACKING (GitHub Issues)                             │
+│  Input: Decision tickets จาก planning                         │
+│  Format: Issues พร้อม wayfinder labels, blocking relationships  │
+│  Output: Queue ของงานที่เรียงลำดับแล้วพร้อม implement           │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 3: EXECUTION (Goal System)                              │
+│  Input: GitHub issues จาก queue                               │
+│  Tools: /goal, /list, /loop commands                           │
+│  Execution skills: Impeccable, Ponytail, Pi Agent skills       │
+│  Output: งานที่ implement, audit, verify แล้ว                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### ทำถึงสำคัญ: Vibe Coding vs Vibe Engineering
+
+| Vibe Coding | Vibe Engineering |
+| ------------- | ------------------ |
+| "AI, เขียน login page ให้" | "Grill ผมเรื่อง auth requirements → สร้าง issues → Goal execute พร้อม auditing" |
+| ไม่มี planning | Planning มีโครงสร้างด้วย Matt's skills |
+| Manual orchestration | Automated execution ด้วย Goal system |
+| ไม่มี verification | Independent auditor ตรวจสอบงาน |
+| หวังว่าจะใช้ได้ | รับประกันคุณภาพผ่าน pipeline |
+
+---
+
+## 🛠️ Layer 1: Planning ด้วย Matt's Skills
+
+### Planning Toolkit
+
+Matt Pocock's skills สร้าง **planning engine** ที่แปลงไอเดียที่ไม่ชัดเจนให้เป็น decisions ที่ implement ได้
+
+<CardGrid>
+  <Card title="🗣️ Grilling" icon="chat">
+    **วัตถุประสงค์**: สัมภาษณ์คุณอย่างจริงจังเกี่ยวกับ plan
+    **Input**: ไอเดียไม่ชัด, requirements คลุมเครือ
+    **Output**: ความเข้าใจที่ชัดเจนว่าจะสร้างอะไร
+  </Card>
+  <Card title="🧠 Domain Modeling" icon="brain">
+    **วัตถุประสงค์**: ระบุ terminology และ relationships
+    **Input**: ศัพท์เทคนิค, คำที่คลุมเครือ
+    **Output**: Glossary ใน CONTEXT.md
+  </Card>
+  <Card title="🗺️ Wayfinder" icon="map">
+    **วัตถุประสงค์**: วางแผนเส้นทางสำหรับงานที่ซับซ้อน
+    **Input**: ไอเดียใหญ่ที่ยังไม่ชัด
+    **Output**: Map + decision tickets
+  </Card>
+</CardGrid>
+
+### Planning Flow
+
+```
+ไอเดียไม่ชัด
+    ↓
+[Grilling] ──→ "คุณต้องการอะไรล่ะมาก?"
+    ↓
+[Domain Modeling] ──→ "ศัพท์เหล่านี้หมายถึงอะไร?"
+    ↓
+[Wayfinder] ──→ "นี่คือ map + tickets"
+    ↓
+GitHub Issues (decision tickets)
+```
+
+---
+
+## 🛠️ Layer 2: Tracking ด้วย GitHub Issues
+
+### Decision Tickets
+
+แต่ละ GitHub issue คือ **decision ticket** — คำถามที่ต้อง resolve ก่อนจะทำงานต่อได้
+
+**Ticket Format**:
+
+```markdown
+## Question
+<Decision หรือ investigation ที่ ticket นี้ resolve>
+
+## Options
+1. Option A
+2. Option B
+3. Option C
+
+## Recommendation
+<สิ่งที่ Matt's skills แนะนำ>
+```
+
+### Wayfinder Labels
+
+Issues ถูกติดป้ายตามประเภท:
+
+- `wayfinder:research` — ต้องสืบสวน
+- `wayfinder:grilling` — ต้องพูดคุยกับมนุษย์
+- `wayfinder:prototype` — ต้องสร้างเวอร์ชันทิ้ง
+- `wayfinder:task` — งาน manual ที่ block decisions
+
+---
+
+## 🛠️ Layer 3: Execution ด้วย Goal System
+
+### Goal System
+
+Goal system รับ GitHub issues และ **ทำให้ implementation เป็นอัตโนมัติ** พร้อม independent auditing
+
+### สาม Loop Types
+
+<CardGrid>
+  <Card title="/goal" icon="target">
+    **Goal เดี่ยวที่เรียงลำดับ**
+    **Input**: GitHub issue หนึ่งตัว
+    **Process**: Execute → Audit → Verify
+  </Card>
+  <Card title="/list" icon="list">
+    **Queue ของ goals**
+    **Input**: หลาย GitHub issues
+    **Process**: Execute ตามลำดับ, audit แต่ละตัว
+  </Card>
+  <Card title="/loop" icon="repeat">
+    **Metric-driven ต่อเนื่อง**
+    **Input**: Task ปรับปรุงต่อเนื่อง
+    **Process**: Iterate จนกว่า metric ทรงตัว
+  </Card>
+</CardGrid>
+
+### Anti-Bamboozle Architecture
+
+**ปัญหา**: ถ้า AI ตัวเดียวกันทั้งเขียนโค้ดและบอกว่า "เสร็จแล้ว" คุณจะรู้ได้อย่างไรว่าจริงๆ เสร็จแล้ว?
+
+**วิธีแก้**: Independent verification
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  EXECUTOR (เขียนโค้ด)                                          │
+│  - มี skills, extensions, context ทั้งหมด                     │
+│  - Implement goal                                              │
+│  - เรียก complete_goal เมื่อเสร็จ                             │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  AUDITOR (ตรวจสอบงาน)                                         │
+│  - รันใน process แยกกัน                                      │
+│  - ไม่มี extensions, skills, หรือ context                    │
+│  - มีเฉพาะ read/grep/find/ls/bash                               │
+│  - ไม่เห็น implementation conversation                       │
+│  - ต้อง quote raw evidence สำหรับแต่ละ verification item       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🎮 Pipeline Practice
+
+### 🟢 Exercise 6.1: Plan  feature ด้วย Matt's Skills
+
+**เป้าหมาย**: ใช้ grilling เพื่อ plan feature ง่ายๆ
+
+<Steps>
+
+1. **เปิด Claude Code** → `claude`
+2. **เริ่ม grilling** → `/grilling` → "I want to add a dark mode toggle to my website."
+3. **ตอบคำถาม** เกี่ยวกับ: ต้องวาง toggle ที่ไหน? ใช้สีอะไร? ควร persist ข้าม sessions หรือไม่?
+4. **ดู design tree เติบโต**
+5. **บันทึก decisions ที่ทำ**
+
+</Steps>
+
+**ส่งมอบ**: รายการ decisions จาก grilling session
+
+---
+
+### 🟡 Exercise 6.2: สร้าง Decision Tickets
+
+**เป้าหมาย**: แปลง grilling decisions เป็น GitHub issues
+
+<Steps>
+
+1. **สร้าง GitHub repository** (หรือใช้ที่มี)
+2. **สร้าง Issue 1**: "Choose dark mode toggle location" พร้อม Options และ Recommendation
+3. **สร้าง Issue 2**: "Define dark mode color palette" พร้อม Options และ Recommendation
+4. **เพิ่ม labels**: `wayfinder:grilling`
+5. **เพิ่ม blocking**: Issue 2 blocked by Issue 1
+
+</Steps>
+
+**ส่งมอบ**: 2 GitHub issues ที่ format ถูกต้อง
+
+---
+
+### 🔴 Exercise 6.3: Execute ด้วย Goal System
+
+**เป้าหมาย**: ใช้ Goal system implement จาก issues
+
+<Steps>
+
+1. **เริ่ม Pi** → `pi`
+2. **สร้าง goal จาก Issue 1** → `/goal "Choose dark mode toggle location..."`
+3. **ดู drafting interview**
+4. **ยืนยัน goal**
+5. **ดู execution**: Agent วิจัย options → แนะนำ → บันทึก decision → Auditor ตรวจสอบ
+6. **ตรวจสอบ audit result**
+
+</Steps>
+
+**ส่งมอบ**: Decision ที่ implement แล้วพร้อม audit trail
+
+---
+
+## ✅ Block 6 Checklist
+
+- [ ] เข้าใจ 3-layer pipeline
+- [ ] Exercise 6.1 เสร็จแล้ว (Matt's skills)
+- [ ] Exercise 6.2 เสร็จแล้ว (GitHub issues)
+- [ ] Exercise 6.3 เสร็จแล้ว (Goal system)
+- [ ] เข้าใจ anti-bamboozle architecture
+
+---
+
+## 🚀 ขั้นตอนถัดไป
+
+**Reference Docs**: เจาะลึกแต่ละ layer
+
+- [Matt's Skills Reference](/reference/matt-skills)
+- [Goal System Reference](/reference/goal-system)
+- [Execution Skills Reference](/reference/execution-skills)
+
+<a href="/reference/matt-skills" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ดู Matt's Skills Reference →</a>

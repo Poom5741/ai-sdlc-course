@@ -1,0 +1,295 @@
+---
+title: Block 2 - Prompt Engineering
+description: เชี่ยวชาญศิลปะการเขียน prompt ที่มีประสิทธิภาพสำหรับ AI coding assistants
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 2: Prompt Engineering
+
+<Badge text="10:45 - 12:15" variant="note" /> <Badge text="90 นาที" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- เข้าใจหลักการของ Prompt Engineering
+- เขียน prompt ที่มีประสิทธิภาพสำหรับ code generation
+- ใช้ multi-step prompting สำหรับ tasks ที่ซับซ้อน
+- สร้าง domain-specific prompts
+
+---
+
+## 📖 Concept: Prompt Engineering (30 นาที)
+
+### Prompt Engineering คืออะไร?
+
+Prompt Engineering คือศิลปะการสื่อสารกับ AI อย่างมีประสิทธิภาพเพื่อให้ได้ผลลัพธ์ตามต้องการ
+
+### ทำไมคุณภาพ Prompt สำคัญ?
+
+```
+Bad Prompt: "Make a function"
+Good Prompt: "Create a JavaScript function called calculateDiscount that takes:
+- price (number, required)
+- discountPercent (number, 0-100, required)
+- memberType ('gold' | 'silver' | 'bronze', optional, default: 'bronze')
+
+Rules:
+- Gold members get extra 10% off
+- Discount cannot exceed 100%
+- Return { originalPrice, discountAmount, finalPrice }
+- Throw error for invalid inputs"
+```
+
+### โครงสร้างของ Prompt ที่ดี
+
+<CardGrid>
+<Card title="1. Clear Objective" icon="target">
+บอก AI ชัดเจนว่าจะสร้างอะไร
+</Card>
+<Card title="2. Input Specification" icon="input">
+กำหนด parameters ทั้งหมดพร้อม types
+</Card>
+<Card title="3. Output Format" icon="document">
+ระบุโครงสร้าง return
+</Card>
+<Card title="4. Constraints" icon="warning">
+ระบุ rules และ limitations
+</Card>
+</CardGrid>
+
+### Prompt Patterns
+
+#### Pattern 1: Role-Task-Format
+
+```
+Act as a [ROLE]
+[TASK]
+Output in [FORMAT]
+```
+
+#### Pattern 2: Few-Shot Examples
+
+```
+นี่คือตัวอย่างที่ฉันต้องการ:
+Input: [ตัวอย่าง]
+Output: [ตัวอย่าง]
+
+ทำแบบเดียวกันสำหรับ:
+Input: [input ของคุณ]
+```
+
+#### Pattern 3: Chain of Thought
+
+```
+คิดทีละ step:
+1. ก่อน, [step 1]
+2. แล้ว, [step 2]
+3. สุดท้าย, [step 3]
+```
+
+### ความผิดพลาดที่พบบ่อย
+
+| ความผิดพลาด | ทำไมถึงล้มเหลว | แก้ไข |
+| --------- | -------------- | ----- |
+| ค่อนข้าง vague | AI เดาผิด | ระบุ inputs/outputs ให้ชัดเจน |
+| ไม่มีตัวอย่าง | ไม่มีจุดอ้างอิง | ใส่ตัวอย่าง 1-2 ตัว |
+| ไม่มี constraints | พฤติกรรมไม่คาดคิด | ระบุ rules ทั้งหมด |
+| ขอบเขตผิด | ทำมากเกินไป | แบ่งเป็น tasks เล็กๆ |
+
+---
+
+## 🛠️ เทคนิคขั้นสูง
+
+### Multi-Step Prompting
+
+สำหรับ tasks ที่ซับซ้อน แบ่งเป็น steps:
+
+```
+Step 1: ออกแบบ data model
+Step 2: สร้าง API endpoints
+Step 3: เพิ่ม validation
+Step 4: เขียน tests
+```
+
+### Domain-Specific Prompting
+
+เพิ่ม context เกี่ยวกับ domain:
+
+```
+For a healthcare application (HIPAA compliant):
+- Patient data must be encrypted
+- Audit logs required for all access
+- Session timeout: 15 minutes
+```
+
+### Iterative Refinement
+
+```
+Iteration 1: Basic implementation
+Iteration 2: Add error handling
+Iteration 3: Optimize performance
+Iteration 4: Add documentation
+```
+
+---
+
+## 💰 การจัดการต้นทุน Token
+
+### เข้าใจเศรษฐี Token
+
+AI คิดค่าต่อ **token** (หน่วยข้อความที่ model อ่าน/สร้าง) — prompt และ output ยาวขึ้น ต้นทุนสูงขึ้น การเข้าใจสิ่งที่คิดตังแพงกว่าช่วยควบคุมงบประมาณ
+
+**ราคาตัวอย่าง (ต่อ 1M tokens):**
+
+| Model | Input | Output | เมื่อไหร่ควรใช้ |
+| ------- | ------- | -------- | ------------ |
+| GPT-4o | $2.50 | $10.00 | Complex tasks, code generation |
+| GPT-4o-mini | $0.15 | $0.60 | Simple tasks, classification |
+| Claude 3.5 Sonnet | $3.00 | $15.00 | Complex tasks, analysis |
+| Claude 3.5 Haiku | $0.25 | $1.25 | Routine tasks, drafts |
+
+**ปัจจัยที่ส่งผลต่อต้นทุน:**
+
+- **Input tokens** — prompt + context ที่ส่งเข้าไป
+- **Output tokens** — response ที่ model สร้าง (มักแพงกว่า)
+- **Model size** — ใหญ่ขึ้น = แพงขึ้น
+
+### เลือก Model: ต้นทุน vs คุณภาพ
+
+| Task | แนะนำ | เหตุผล |
+| ------ | ------- | -------- |
+| Simple classification | Haiku/Mini | เร็ว, ถูก, พอใช้ |
+| Code generation | Sonnet/GPT-4o | สมดุล คุณภาพ/ต้นทุน |
+| Complex reasoning | Opus/GPT-4 | คุณภาพสูงเมื่อต้องการ |
+| Drafting text | Haiku/Mini | Iterate เร็ว, ต้นทุนต่ำ |
+
+### กลยุทธ์ลดต้นทุน
+
+#### 1. Prompt Efficiency
+
+- ลบ context ที่ไม่เกี่ยวข้อง
+- เขียน instructions แบบกระชับ
+- ใช้ caching สำหรับ prefixes ที่ซ้ำ
+
+#### 2. Model Routing
+
+- Simple tasks → model เล็ก
+- Complex tasks → model ใหญ่
+- A/B test คุณภาพ vs ต้นทุน
+
+#### 3. Token Budgeting
+
+- กำหนด max tokens ต่อ request
+- ติดตามการใช้งานต่อ user/project
+- แจ้งเตือนเมื่อเกินงบ
+
+#### 4. Caching
+
+- Cache requests ที่เหมือนกัน
+- ใช้ semantic similarity สำหรับ requests ใกล้เคียง
+- Invalidate เมื่ออัปเดต models
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 2.1: Fix the Vague Prompt
+
+**เป้าหมาย**: เขียน prompt พร้อม constraints ครบถ้วน จากนั้นสร้าง `createUser`
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-04-fix-prompt my-quest
+   cd my-quest
+   ```
+
+2. **วิเคราะห์ bad prompt** ใน `problem.js` — "Make a function that handles users"
+
+3. **เขียน prompt ที่ดีขึ้น** พร้อม constraints ครบ (input shape, email format, empty/null handling, success/error return shape) จากนั้นใช้ AI สร้าง
+
+4. **ตรวจสอบ**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**ส่งมอบ**: `createUser` ผ่าน constraints ทั้งหมด (handles {} / null / invalid email) + prompt ที่ปรับปรุงแล้ว
+
+---
+
+### 🟡 Quest 2.2: Multi-Step Prompting
+
+**เป้าหมาย**: สร้าง URL validator แบบสองชั้น (core + edge) ด้วยสอง prompts
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-05-multi-step my-quest
+   cd my-quest
+   ```
+
+2. **Step 1 prompt (core)**: "Write `isValidUrl(url)` returning true for well-formed http/https URLs with a host, false otherwise." → implement → `node test.js` (Layer 1 ผ่าน)
+
+3. **Step 2 prompt (edge)**: "Now handle: empty, whitespace, `javascript:` scheme, no-protocol, `https://` with no host → reject all." → implement → `node test.js` (ทั้งหมดผ่าน)
+
+</Steps>
+
+**ส่งมอบ**: `isValidUrl` สองชั้น ผ่าน Layer 1 + Layer 2 edge cases
+
+---
+
+### 🔴 Quest 2.3: Domain-Specific Prompting
+
+**เป้าหมาย**: Validate เบอร์โทรศัพท์ไทยและหมายเลขบัตรประชาชน โดยระบุ domain rules ใน prompt
+
+<Steps>
+
+1. **Download quest files**:
+
+   ```bash
+   npx degit Poom5741/ai-sdlc-course/quests/block-2-prompt-engineering/quest-06-domain-specific my-quest
+   cd my-quest
+   ```
+
+2. **อ่าน domain rules** ใน `problem.js` (เบอร์โทร 10 หลัก prefix 06/08/09; บัตรประชาชน 13 หลักพร้อม checksum)
+
+3. **เขียน prompt** รวม rules ทั้งสองชุด จากนั้นสร้าง `isValidThaiPhone` + `isValidThaiId`
+
+4. **ตรวจสอบ**:
+
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+**ส่งมอบ**: Validators สองตัว ผ่าน Thai format edge cases (รวม checksum ที่ AI เดาไม่ได้)
+
+---
+
+## ✅ Block 2 Checklist
+
+- [ ] เข้าใจโครงสร้าง prompt
+- [ ] Quest 2.1 เสร็จแล้ว
+- [ ] Quest 2.2 เสร็จแล้ว
+- [ ] Quest 2.3 เสร็จแล้ว
+
+---
+
+## 🚀 Block ถัดไป
+
+**Block 3: Security** → เรียนรู้การระบุและแก้ไขช่องโหว่ความปลอดภัยในโค้ดที่สร้างด้วย AI
+
+<a href="/workshop/block-3-security" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ไป Block 3 →</a>

@@ -3,40 +3,41 @@ import { test, expect } from '@playwright/test';
 test.describe('Quest pages', () => {
   test('quest 1 loads with badges and goal section', async ({ page }) => {
     await page.goto('/quests/quest-1-first-code');
-    // Target the article content h1, not sidebar or modal h1s
-    const article = page.locator('article');
-    await expect(article.locator('h1').first()).toContainText('Quest 1.1');
-    await expect(article.getByText('Easy')).toBeVisible();
-    await expect(article.getByText('15 minutes')).toBeVisible();
-    await expect(article.locator('h2').filter({ hasText: 'Goal' })).toBeVisible();
+    const main = page.locator('main');
+    // Root locale serves Thai content; title is in frontmatter
+    await expect(main.locator('h1').first()).toContainText('Quest 1');
+    await expect(main.getByText('medium')).toBeVisible();
+    await expect(main.getByText('25 minutes')).toBeVisible();
+    // Thai heading for "Goal"
+    await expect(main.locator('h2').filter({ hasText: 'เป้าหมาย' })).toBeVisible();
   });
 
   test('quest 1 shows instructions with steps', async ({ page }) => {
     await page.goto('/quests/quest-1-first-code');
-    const article = page.locator('article');
-    await expect(article.locator('h2').filter({ hasText: 'Instructions' })).toBeVisible();
-    await expect(article.locator('ol, ul').first()).toBeVisible();
+    const main = page.locator('main');
+    // Thai heading for "Instructions"
+    await expect(main.locator('h2').filter({ hasText: 'วิธีทำ' })).toBeVisible();
+    await expect(main.locator('ol, ul').first()).toBeVisible();
   });
 
   test('quest 1 has code playground iframe', async ({ page }) => {
     await page.goto('/quests/quest-1-first-code');
-    const article = page.locator('article');
-    await expect(article.locator('h2').filter({ hasText: 'Code Playground' })).toBeVisible();
-    await expect(article.locator('iframe')).toBeVisible();
+    const main = page.locator('main');
+    // Thai content uses code blocks instead of iframes
+    await expect(main.locator('code, pre').first()).toBeVisible();
   });
 
   test('quest 2 multi-prompt page loads', async ({ page }) => {
-    await page.goto('/quests/quest-2-prompts');
-    const article = page.locator('article');
-    await expect(article.locator('h1').first()).toContainText('Quest');
-    await expect(article.locator('h2').first()).toBeVisible();
+    await page.goto('/en/quests/quest-2-prompts');
+    const main = page.locator('main');
+    await expect(main.locator('h1').first()).toContainText('Quest');
+    await expect(main.locator('h2').first()).toBeVisible();
   });
 
   test('sidebar shows quest links within block sections', async ({ page }) => {
     await page.goto('/quests/quest-1-first-code');
-    const sidebar = page.locator('aside#sidebar');
+    const sidebar = page.locator('#starlight__sidebar');
     await expect(sidebar).toBeVisible();
-    // Block 1 should be auto-expanded since we're on a quest in that block
-    await expect(sidebar.getByRole('link', { name: 'Quest 1.1' })).toBeVisible();
+    await expect(sidebar.getByRole('link', { name: 'Quest 1 - First AI Completion' })).toBeVisible();
   });
 });

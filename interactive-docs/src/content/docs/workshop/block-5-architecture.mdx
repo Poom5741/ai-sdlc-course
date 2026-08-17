@@ -1,0 +1,302 @@
+---
+title: Block 5 - Architecture
+description: ออกแบบระบบ AI-powered ที่สมบูรณ์ด้วย RAG และ multi-component architecture
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 5: Architecture
+
+<Badge text="16:45 - 18:00" variant="note" /> <Badge text="75 นาที" variant="note" /> <Badge text="2 Quests" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- ออกแบบ system architecture ของระบบ AI
+- สร้างระบบ RAG (Retrieval-Augmented Generation)
+- บันทึก architectural decisions
+
+---
+
+## 📖 Concept: System Architecture (30 นาที)
+
+### System Architecture คืออะไร?
+
+System Architecture คือการออกแบบโครงสร้างของระบบ รวมถึง:
+
+- **Components**: ส่วนประกอบของระบบ
+- **Interfaces**: การเชื่อมต่อระหว่าง components
+- **Data Flow**: การไหลของข้อมูล
+- **Security**: ความปลอดภัยของระบบ
+
+### AI-Powered System Patterns
+
+#### Pattern 1: RAG (Retrieval-Augmented Generation)
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Documents  │────▶│  Embeddings │────▶│ Vector Store│
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+┌─────────────┐     ┌─────────────┐           │
+│   Query     │────▶│  Embeddings │───────────┘
+└─────────────┘     └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │     LLM     │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   Answer    │
+                    └─────────────┘
+```
+
+**Use Cases**:
+
+- สนทนากับเอกสารของคุณ
+- Knowledge base Q&A
+- ค้นหาเอกสาร
+
+#### Pattern 2: Multi-Agent System
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Planner  │───▶│  Coder   │───▶│ Reviewer │
+└──────────┘    └──────────┘    └────┬─────┘
+                                     │
+                    ┌────────────────┘
+                    ▼
+              ┌──────────┐
+              │  Tester  │
+              └──────────┘
+```
+
+**Use Cases**:
+
+- สร้างโค้ดที่ซับซ้อน
+- Automated workflows
+- Quality assurance
+
+#### Pattern 3: Event-Driven Architecture
+
+```
+┌─────────┐     ┌─────────┐     ┌─────────┐
+│ Event   │────▶│ Handler │────▶│ Side    │
+│ Source  │     │         │     │ Effects │
+└─────────┘     └─────────┘     └─────────┘
+```
+
+**Use Cases**:
+
+- Microservices
+- ระบบ real-time
+- แอปพลิเคชันที่ scalable
+
+---
+
+## 🛠️ Architecture Documentation
+
+### Architecture Decision Records (ADR)
+
+บันทึก architectural decisions:
+
+```markdown
+# ADR-001: [ชื่อ Decision]
+
+## Status
+Accepted
+
+## Context
+[Decision ที่ต้องตัดสินใจ]
+
+## Decision
+[Decision ที่ตัดสินใจ]
+
+## Consequences
+- [ข้อดี]
+- [ข้อเสีย]
+```
+
+### System Design Document
+
+```markdown
+# System Design: [ชื่อระบบ]
+
+## Overview
+- วัตถุประสงค์
+- Users
+- Key Features
+
+## Architecture
+- Components
+- Interfaces
+- Data Flow
+
+## Security
+- Authentication
+- Authorization
+- Encryption
+
+## Deployment
+- Infrastructure
+- CI/CD
+- Monitoring
+```
+
+---
+
+## 🎯 Responsible AI & Ethics
+
+### Data Privacy พื้นฐาน (GDPR)
+
+**หลักการ GDPR สำหรับ AI:**
+
+1. **ความชอบด้วยกฎหมาย** — ฐานทางกฎหมายในการประมวลผลข้อมูล
+2. **จำกัดวัตถุประสงค์** — ใช้ข้อมูลเฉพาะที่ระบุไว้
+3. **ลดข้อมูล** — เก็บเฉพาะข้อมูลที่จำเป็น
+4. **ความถูกต้อง** — รักษาความถูกต้องของข้อมูล
+5. **จำกัดการเก็บ** — ไม่เก็บข้อมูลนานเกินที่จำเป็น
+6. **ความปลอดภัย** — ป้องกันการเข้าถึงโดยไม่ได้รับอนุญาต
+
+**Best Practices สำหรับ AI:**
+
+- อย่าส่ง PII ไปยัง LLM APIs โดยไม่ได้รับความยินยอม
+- ทำให้ข้อมูลเป็น anonymous ก่อนประมวลผล
+- บันทึกว่าข้อมูลอะไรถูกประมวลผลเมื่อไหร่
+- ใช้ data retention policies
+
+---
+
+### การตระหนักถึง Bias
+
+**ประเภทของ AI Bias:**
+
+| Type | คำอธิบาย | ตัวอย่าง |
+| ------ | ------------- | ---------- |
+| Historical bias | Training data สะท้อนการเลือกปฏิบัติในอดีต | Resume screening มี bias |
+| Representation bias | กลุ่มที่ถูกลดตัวแทน | ไม่รู้จักชื่อต่างชาติ |
+| Measurement bias | การเก็บข้อมูลไม่สม่ำเสมอ | ค่า BMI ต่างกันตามเชื้อชาติ |
+| Agnostic bias | สมมติว่า model เดียวใช้ได้กับทุกคน | ไม่ปรับให้เข้ากับความต้องการ |
+
+**วิธีลด Bias:**
+
+- ทดสอบด้วย inputs ที่หลากหลาย
+- ตรวจสอบ outputs เพื่อหาผลกระทบที่แตกต่างกัน
+- บันทึกข้อจำกัดที่ทราบ
+- Human review สำหรับ decisions ที่ sensitive
+
+---
+
+### AI-Generated Code Licensing
+
+**คำถามสำคัญ:**
+
+- ใครเป็นเจ้าของโค้ดที่ AI สร้าง?
+- สามารถใช้เชิงพาณิชย์ได้หรือไม่?
+- ต้องเปิดเผยการใช้ AI หรือไม่?
+
+**สถานะทางกฎหมายในปัจจุบัน:**
+
+- **US**: โค้ดจาก AI อาจไม่สามารถจดทะเบียนลิขสิทธิ์ได้
+- **EU**: เข้มงวดกว่า อาจต้องเปิดเผย
+- **Company policies**: แตกต่างกันไป
+
+**Best Practices:**
+
+- บันทึกการใช้ AI ใน codebase
+- ตรวจสอบ AI output เรื่องลิขสิทธิ์
+- ทำตาม company AI policy
+- ไม่แน่ใจ? ปรึกษาทีมกฎหมาย
+
+---
+
+## 🎮 Code Quests
+
+### 🟡 Quest 5.1: RAG Design
+
+**เป้าหมาย**: ออกแบบระบบ Retrieval-Augmented Generation ที่จัดการ failure modes ได้
+
+Download quest และทำตาม instructions:
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-13-rag-design my-quest
+cd my-quest
+node test.js
+```
+
+ต้องมีใน `rag-design.md`:
+
+1. **Chunking strategy** — วิธีแบ่งเอกสาร (ตาม heading + window size)
+2. **Embedding strategy** — Model ไหน, วิธี embed chunks/queries
+3. **Retrieval quality metric** — recall@5 / precision / NDCG เพื่อวัด retrieval quality
+4. **Failure handling** — ทำอะไรเมื่อ retrieval ว่าง / confidence ต่ำ / query อยู่นอก corpus (fallback, graceful degradation)
+5. **Corpus** — ระบุส่วนใดของ workshop docs ที่จะ index
+
+**Culture ที่ควรเรียนรู้**: **ออกแบบสำหรับ failure mode** — อย่าปล่อยให้ระบบ hallucinate เมื่อข้อมูลไม่เพียงพอ
+
+**ส่งมอบ**: `rag-design.md` ผ่าน `node test.js`
+
+---
+
+### 🔴 Quest 5.2: Full System Design
+
+**เป้าหมาย**: ออกแบบระบบ AI แบบสมบูรณ์ — ระบุ interfaces ก่อน implement
+
+```bash
+npx degit Poom5741/ai-sdlc-course/quests/block-5-architecture/quest-14-full-system my-quest
+cd my-quest
+node test.js
+```
+
+ต้องมีใน `system-design.md`:
+
+1. **Component diagram** — กล่องใน markdown พร้อมลูกศร (`→` หรือ Mermaid `graph`)
+2. **Interface contracts** — function signatures + I/O types สำหรับทุก components
+3. **Data flow** — การไหลของข้อมูล: จาก input ไป output
+4. **Named components** — อย่างน้อย 3 ชื่อ components ที่แตกต่างกัน
+
+**Culture ที่ควรเรียนรู้**: **ระบุ interfaces ก่อน implement** — ล็อก contracts ก่อน เพื่อแต่ละ component สามารถสร้างและทดสอบได้แยกกัน
+
+**ส่งมอบ**: `system-design.md` ผ่าน `node test.js`
+
+---
+
+## ✅ Block 5 Checklist
+
+- [ ] เข้าใจ AI architecture patterns
+- [ ] Quest 5.1 เสร็จแล้ว
+- [ ] Quest 5.2 เสร็จแล้ว
+
+---
+
+## 🎉 Workshop เสร็จสมบูรณ์
+
+ยินดีด้วย! คุณได้เรียนรู้ทุก block:
+
+1. ✅ **Block 1**: ตั้งค่าเครื่องมือ AI
+2. ✅ **Block 2**: Prompt Engineering
+3. ✅ **Block 3**: Security
+4. ✅ **Block 4**: Agentic Workflows
+5. ✅ **Block 5**: Architecture
+
+### สิ่งที่คุณเรียนรู้
+
+- การตั้งค่าและใช้เครื่องมือ AI coding
+- เขียน prompt ที่มีประสิทธิภาพ
+- ระบุและแก้ไขช่องโหว่ความปลอดภัย
+- สร้าง automated development loops
+- ออกแบบระบบ AI-powered
+
+### ขั้นตอนถัดไป
+
+1. **นำไปใช้**: ใช้ skills เหล่านี้ใน project จริงของคุณ
+2. **แบ่งปัน**: สอนสิ่งที่เรียนรู้ให้ผู้อื่น
+3. **พัฒนา**: ปรับปรุง workflow อย่างต่อเนื่อง
+
+<a href="/quests/quest-1-first-code" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ดู Code Quests ทั้งหมด →</a>

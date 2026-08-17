@@ -1,0 +1,66 @@
+---
+title: "Multimodal Input Processor"
+description: "Process combined text and image inputs"
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Multimodal Input Processor
+
+<Badge text="medium" variant="note" /> <Badge text="25-30 minutes" variant="note" />
+
+## เป้าหมาย
+
+Process combined text and image inputs
+
+---
+
+## วิธีทำ
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+   ```bash
+   npx bluebeltdojo download quest-108-multimodal-processor
+   cd quest-108-multimodal-processor
+   ```
+
+2. เปิด `problem.js` ใน editor ของคุณพร้อมความช่วยเหลือของ AI
+
+3. Implement solution ตาม instructions ใน `problem.js`
+
+4. ตรวจสอบ solution ของคุณ:
+   ```bash
+   node test.js
+   ```
+
+</Steps>
+
+---
+
+## การตรวจสอบ
+
+```bash
+node test.js
+```
+
+When all tests pass, you will see the completion message.
+
+---
+
+## ส่งคำตอบ
+
+When tests pass, submit your solution:
+
+```bash
+npx bluebeltdojo submit
+```
+
+> ต้องตั้งค่า access code ก่อน: `npx bluebeltdojo setup <code>`
+
+## คำใบ้
+
+- อ่าน instructions ใน `problem.js` อย่างละเอียด
+- ตรวจสอบ edge cases ที่กล่าวถึง
+- ถ้าติดขัด ดู `_solution/solution.js`

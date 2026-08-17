@@ -1,0 +1,422 @@
+---
+title: Execution Skills Reference
+description: Complete reference for Impeccable, Ponytail, and Pi Agent skills - used within the Goal system execution layer
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+# Execution Skills Reference
+
+<Badge text="Execution Layer" variant="note" /> <Badge text="Maximum Depth" variant="success" />
+
+## ภาพรวม
+
+Execution skills are used **within** the Goal system to implement work. They're the tools the executor uses when carrying out goals.
+
+```
+Goal System → [Execution Skills] → Implemented Work
+                  ↓
+    ┌─────────────┼─────────────┐
+    ↓             ↓             ↓
+Impeccable    Ponytail    Pi Agent Skills
+(UI/Design)   (Minimal)   (Platform)
+```
+
+---
+
+## ✨ Impeccable
+
+**Purpose**: Design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface.
+
+**When to Use**:
+- Any UI/design work
+- Websites, landing pages, dashboards
+- Components, forms, settings
+- UX review, visual hierarchy
+- Accessibility, performance
+- Theming, typography, color
+- Motion, micro-interactions
+
+**When NOT to Use**:
+- Backend-only tasks
+- Non-UI work
+
+### Core Principles
+
+1. **Go all out**: No hedging, no shortcuts
+2. **Dream big and bold**: Distinct, beautiful, outstanding
+3. **Verify in bounded passes**: Not a loop - build fully, inspect once, fix everything, confirm
+
+### Setup
+
+```bash
+node .agents/skills/impeccable/scripts/context.mjs --target <path>
+```
+
+Loads:
+- PRODUCT.md
+- DESIGN.md
+- Surface brief
+- Native-platform guidance
+
+### Modes
+
+| Mode | Purpose | Examples |
+|------|---------|----------|
+| **Persuade** | Visitor decides and acts | Landing pages, marketing, campaigns |
+| **Operate** | Visitor completes a task | App UI, dashboards, editors |
+| **Read** | Visitor understands something | Docs, articles, guides |
+| **Experience** | Visitor is inside the work | Portfolios, galleries |
+
+### Commands
+
+#### Build
+
+| Command | Description |
+|---|---|
+| `shape [feature]` | Plan UX/UI before writing code |
+| `init` | Capture durable product context in PRODUCT.md |
+| `document` | Generate DESIGN.md from existing code |
+| `extract [target]` | Pull reusable tokens and components |
+
+#### Evaluate
+
+| Command | Description |
+|---|---|
+| `critique [target]` | UX design review with heuristic scoring |
+| `audit [target]` | Technical quality checks (a11y, perf, responsive) |
+
+#### Refine
+
+| Command | Description |
+|---|---|
+| `polish [target]` | Final quality pass before shipping |
+| `bolder [target]` | Amplify safe or bland designs |
+| `quieter [target]` | Tone down aggressive designs |
+| `distill [target]` | Strip to essence, remove complexity |
+| `harden [target]` | Production-ready: errors, i18n, edge cases |
+| `onboard [target]` | Design first-run flows, empty states |
+
+#### Enhance
+
+| Command | Description |
+|---|---|
+| `animate [target]` | Add purposeful animations and motion |
+| `colorize [target]` | Add strategic color to monochromatic UIs |
+| `typeset [target]` | Improve typography hierarchy and fonts |
+| `layout [target]` | Fix spacing, rhythm, visual hierarchy |
+| `delight [target]` | Add personality and memorable touches |
+| `overdrive [target]` | Push past conventional limits |
+
+#### Fix
+
+| Command | Description |
+|---|---|
+| `clarify [target]` | Improve UX copy, labels, error messages |
+| `adapt [target]` | Adapt for different devices and screen sizes |
+| `optimize [target]` | Diagnose and fix UI performance |
+
+#### Iterate
+
+| Command | Description |
+|---|---|
+| `live` | Visual variant mode: pick elements, generate alternatives |
+
+### Example Usage
+
+**Within a Goal**:
+
+```bash
+/goal "Add dark mode toggle. Done when: user can toggle themes"
+```
+
+**Agent uses Impeccable**:
+
+```bash
+/impeccable shape "dark mode toggle"
+# Plans UX/UI for the toggle
+
+/impeccable polish "dark mode toggle"
+# Final quality pass
+
+/impeccable audit "dark mode toggle"
+# Check accessibility, performance
+```
+
+### Design Principles
+
+- **The brief wins**: Honor pinned aesthetics
+- **Refinement preserves**: Keep incumbent identity
+- **Redesign replaces**: Treat old look as anti-reference
+- **Visual authority is evidence**: Not just a filename
+
+---
+
+## 🦥 Ponytail
+
+**Purpose**: Force the laziest solution that actually works.
+
+**When to Use**:
+- User says "ponytail", "be lazy", "lazy mode"
+- "Simplest solution", "minimal solution"
+- "YAGNI", "do less", "shortest path"
+- Complaining about over-engineering, bloat
+
+**When NOT to Use**:
+- User explicitly wants full implementation
+- Input validation at trust boundaries
+- Security measures
+- Accessibility basics
+
+### Core Philosophy
+
+You are a lazy senior developer. Lazy means efficient, not careless.
+
+**The best code is the code never written.**
+
+### The Ladder
+
+Stop at the first rung that holds:
+
+1. **Does this need to exist at all?** Speculative need = skip it
+2. **Stdlib does it?** Use it
+3. **Native platform feature covers it?** `<input type="date">` over picker lib
+4. **Already-installed dependency solves it?** Use it
+5. **Can it be one line?** One line
+6. **Only then**: the minimum code that works
+
+### Intensity Levels
+
+| Level | What Change |
+|-------|------------|
+| **lite** | Build what's asked, name lazier alternative in one line |
+| **full** | Ladder enforced. Stdlib and native first. Default. |
+| **ultra** | YAGNI extremist. Deletion before addition. |
+
+**Switch**: `/ponytail lite|full|ultra`
+**Stop**: `stop ponytail` / `normal mode`
+
+### Examples
+
+**Request**: "Add a cache for these API responses"
+
+**lite**:
+```python
+# Done, cache added.
+# FYI: functools.lru_cache covers this in one line
+# if you'd rather not own a cache class.
+```
+
+**full**:
+```python
+@lru_cache(maxsize=1000)
+def fetch_data(url):
+    return requests.get(url).json()
+# Skipped custom cache class, add when lru_cache measurably falls short.
+```
+
+**ultra**:
+```python
+# No cache until a profiler says so.
+# When it does: @lru_cache
+# A hand-rolled TTL cache class is a bug farm with a hit rate.
+```
+
+### Rules
+
+- **No unrequested abstractions**: No interface with one implementation
+- **No boilerplate**: No scaffolding "for later"
+- **Deletion over addition**: Boring over clever
+- **Fewest files possible**: Shortest working diff wins
+- **Mark deliberate simplifications**: `// ponytail: this exists`
+- **Code first**: At most three short lines of explanation
+
+### Output Pattern
+
+```
+[code] → skipped: [X], add when [Y].
+```
+
+### Never Simplify Away
+
+- Input validation at trust boundaries
+- Error handling that prevents data loss
+- Security measures
+- Accessibility basics
+- Anything explicitly requested
+
+### Testing
+
+Non-trivial logic leaves ONE runnable check:
+```python
+# ponytail: minimal self-check
+def demo():
+    assert authenticate("user", "pass") == True
+    assert authenticate("user", "wrong") == False
+
+if __name__ == "__main__":
+    demo()
+    print("✓ All checks passed")
+```
+
+Trivial one-liners need no test (YAGNI applies to tests too).
+
+---
+
+## 🔧 Pi Agent Skills
+
+**Purpose**: Platform-specific tools for Cloudflare, web performance, and other services.
+
+### Available Skills
+
+#### Cloudflare Ecosystem
+
+| Skill | Purpose |
+|---|---|
+| `cloudflare` | Comprehensive Cloudflare platform (Workers, Pages, storage, AI) |
+| `cloudflare-email-service` | Send/receive emails with Cloudflare |
+| `cloudflare-one` | Zero Trust and SASE work |
+| `cloudflare-one-migrations` | Migrate from Zscaler, Palo Alto, etc. |
+| `durable-objects` | Stateful coordination (chat, games, booking) |
+| `workers-best-practices` | Production best practices for Workers |
+| `wrangler` | CLI for deploying/managing Workers |
+
+#### AI & Agents
+
+| Skill | Purpose |
+|---|---|
+| `agents-sdk` | Build AI agents on Cloudflare Workers |
+| `sandbox-stable` | Cloudflare Sandbox apps (stable) |
+| `sandbox-next` | Cloudflare Sandbox apps (@next preview) |
+| `sandbox-migrate-to-next` | Port stable to @next |
+
+#### Web & Performance
+
+| Skill | Purpose |
+|---|---|
+| `web-perf` | Analyze web performance with Chrome DevTools |
+| `turnstile-spin` | Set up Cloudflare Turnstile CAPTCHA |
+
+### Example: web-perf
+
+**When to Use**:
+- Audit page load performance
+- Measure Core Web Vitals
+- Optimize Lighthouse scores
+
+**Workflow**:
+
+```bash
+# 1. Verify MCP tools available
+# (chrome-devtools MCP server must be configured)
+
+# 2. Navigate to target
+navigate_page(url: "https://example.com")
+
+# 3. Start performance trace
+performance_start_trace(autoStop: true, reload: true)
+
+# 4. Analyze insights
+performance_analyze_insight(insightSetId: "<id>", insightName: "LCPBreakdown")
+performance_analyze_insight(insightSetId: "<id>", insightName: "CLSCulprits")
+
+# 5. List network requests
+list_network_requests(resourceTypes: ["Script", "Stylesheet", "Font", "Image"])
+
+# 6. Take accessibility snapshot
+take_snapshot(verbose: true)
+```
+
+**Key Thresholds**:
+
+| Metric | Good | Needs Improvement | Poor |
+|--------|------|-------------------|------|
+| LCP | < 2.5s | < 4s | > 4s |
+| INP | < 200ms | < 500ms | > 500ms |
+| CLS | < 0.1 | < 0.25 | > 0.25 |
+| FCP | < 1.8s | < 3s | > 3s |
+| TTFB | < 800ms | < 1.8s | > 1.8s |
+
+### Example: agents-sdk
+
+**When to Use**:
+- Build AI agents on Cloudflare Workers
+- Stateful agents with durable execution
+- Real-time WebSocket apps
+- Scheduled tasks
+
+**Key Concepts**:
+
+- **Agent class**: Base class for all agents
+- **State management**: Durable object state
+- **Callable RPC**: Remote procedure calls
+- **Workflows**: Durable execution chains
+- **Queues**: Reliable message processing
+
+---
+
+## 🔗 Integration with Goal System
+
+### How Execution Skills Fit
+
+```
+Goal: "Add dark mode toggle"
+    ↓
+Agent executes goal:
+    1. Reads GitHub issue for context
+    2. Plans implementation
+    3. Uses Impeccable for UI work
+    4. Uses Ponytail for minimal solutions
+    5. Uses Pi Agent skills for platform work
+    6. Calls complete_goal when done
+    ↓
+Auditor verifies work
+    ↓
+Goal complete
+```
+
+### Within Goal Context
+
+When a goal is active, the executor has access to:
+- All Impeccable commands
+- All Ponytail modes
+- All Pi Agent skills
+- All Matt Pocock skills
+
+The goal system orchestrates:
+- Which skill to use when
+- How to sequence work
+- When to call complete_goal
+
+### Skill Selection
+
+**UI/Design work** → Impeccable
+**Minimal solutions** → Ponytail
+**Platform-specific** → Pi Agent skills
+**Planning** → Matt Pocock skills
+**Verification** → Goal system auditor
+
+---
+
+## 📚 Learning Path
+
+### For Beginners
+
+1. **Start with Ponytail**: Learn to think minimal
+2. **Add Impeccable**: Learn to design well
+3. **Use Pi Agent skills**: Learn platform tools
+4. **Master Goal system**: Automate everything
+
+### For Experienced Developers
+
+1. **Ponytail**: Unlearn over-engineering
+2. **Impeccable**: Professional UI craft
+3. **Pi Agent skills**: Platform mastery
+4. **Goal system**: Autonomous execution
+
+### For Teams
+
+1. **Establish pipeline**: Planning → Tracking → Execution
+2. **Standardize skills**: Which skills for which tasks
+3. **Share configurations**: /glla settings
+4. **Review together**: Audit trails for learning

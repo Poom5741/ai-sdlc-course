@@ -1,0 +1,309 @@
+---
+title: Block 4 - Agentic Workflows
+description: สร้าง automated development loops และ multi-agent systems
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+# Block 4: Agentic Workflows
+
+<Badge text="15:00 - 16:30" variant="note" /> <Badge text="90 นาที" variant="note" /> <Badge text="3 Quests" variant="success" />
+
+## 🎯 ผลลัพธ์การเรียนรู้
+
+เมื่อจบ block นี้ คุณจะสามารถ:
+
+- สร้าง automated development loops
+- ออกแบบ multi-agent pipelines
+- ใช้ Plan-Implement-Validate (PIV) framework
+
+---
+
+## 📖 Concept: Agentic Workflows (30 นาที)
+
+### Agentic Workflows คืออะไร?
+
+Agentic Workflows คือระบบที่ AI agents ทำงานร่วมกันอย่างอัตโนมัติเพื่อบรรลุเป้าหมาย
+
+### PIV Framework
+
+**Plan-Implement-Validate** คือ core pattern:
+
+```
+┌─────────────┐
+│    PLAN     │  วิเคราะห์งาน แบ่งเป็น steps
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  IMPLEMENT  │  สร้างโค้ดตาม plan
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  VALIDATE   │  Test, ตรวจสอบคุณภาพ
+└──────┬──────┘
+       │
+       ▼
+   Pass? ──Yes──► เสร็จ
+       │
+       No
+       │
+       └──────► กลับไป PLAN
+```
+
+### ทำไมต้องใช้ Loops?
+
+- **คุณภาพ**: ตรวจสอบก่อน deploy
+- **Iteration**: ดีขึ้นทุก iteration
+- **Automation**: ลดงาน manual
+- **ความสม่ำเสมอ**: ผลลัพธ์เดิมทุกครั้ง
+
+---
+
+## 🛠️ Loop Patterns
+
+### Pattern 1: Generate-Review-Fix
+
+```
+Generate Code → AI Review → Fix Issues → Repeat until quality
+```
+
+### Pattern 2: Test-Driven Loop
+
+```
+Write Test → Generate Code → Run Test → Fix → Repeat
+```
+
+### Pattern 3: Multi-Agent Pipeline
+
+```
+Planner → Coder → Reviewer → Tester → Deploy
+```
+
+### Convergence Criteria
+
+Loops ควรหยุดเมื่อ:
+
+- Quality gate ผ่าน (เช่น test coverage 90%)
+- ไม่มี issues สำคัญ
+- ถึง max iterations
+
+---
+
+## 🤖 Multi-Agent Systems กับ Pi
+
+### Subagents คืออะไร?
+
+Subagents คือ AI agents ที่ทำงานภายใต้ main agent — เหมือนทีมที่แบ่งหน้าที่กัน
+
+**ใน Pi:**
+
+- **Main Agent** — คุณ (ผู้ร้องขอ) + Pi (coordinator)
+- **Subagents** — Agents ที่ Pi สร้างสำหรับ tasks เฉพาะ
+
+### Multi-Agent Features ของ Pi
+
+<CardGrid>
+<Card title="Subagent Tool" icon="flow">
+สร้าง child agents สำหรับ tasks เฉพาะ
+</Card>
+<Card title="Workflow Engine" icon="process">
+จัดการ parallel/sequential tasks
+</Card>
+<Card title="Loop Until Done" icon="repeat">
+ทำงานต่อเนื่องจนกว่าจะเสร็จ
+</Card>
+<Card title="Team Agents" icon="users">
+ประสานทีม agents ที่ทำงานร่วมกัน
+</Card>
+</CardGrid>
+
+---
+
+### Loop Engineering กับ Pi
+
+**Loop Engineering** คือการออกแบบระบบที่ AI iterate จนกว่าจะบรรลุเป้าหมาย
+
+#### Pattern 1: Single Agent Loop
+
+```bash
+# Pi ทำงานคนเดียว iterate จนกว่าจะเสร็จ
+pi --loop "Create a REST API with auth, tests, and docs"
+```
+
+**สิ่งที่ Pi ทำ:**
+
+1. Plan
+2. สร้างโค้ด (Implement)
+3. รัน tests (Validate)
+4. แก้ไขถ้า fail
+5. Repeat จนกว่า tests ผ่าน
+
+#### Pattern 2: Subagent Fan-out
+
+```bash
+# Pi สร้าง subagents สำหรับทำงานแบบ parallel
+pi "Build frontend, backend, and docs in parallel"
+```
+
+**สิ่งที่ Pi ทำ:**
+
+1. วิเคราะห์ว่ามี independent tasks กี่ตัว
+2. สร้าง subagent แต่ละตัว
+3. ทำงานพร้อมกัน (parallel)
+4. รวบรวมผลลัพธ์
+5. ตรวจสอบคุณภาพ
+
+#### Pattern 3: Pipeline Flow
+
+```text
+User Request
+    │
+    ▼
+┌─────────┐     ┌─────────┐     ┌─────────┐
+│ Planner │────▶│  Coder  │────▶│ Reviewer │
+└─────────┘     └─────────┘     └────┬────┘
+                                     │
+                           ┌─────────┘
+                           ▼
+                     ┌─────────┐
+                     │  Tester │
+                     └─────────┘
+```
+
+**ใน Pi:**
+
+- `/workflow` — สร้าง pipeline กับหลาย agents
+- `parallel()` — ทำงานแบบ parallel
+- `pipeline()` — ทำงานทีละ step
+
+---
+
+### Pi vs เครื่องมืออื่น
+
+| Feature | Pi | Claude Code | Cursor |
+| --------- | ----- | ------------- | -------- |
+| Subagents | ✅ Built-in | ❌ Manual | ❌ Manual |
+| Parallel work | ✅ `parallel()` | ❌ | ❌ |
+| Loop until done | ✅ `/until-done` | ❌ | ❌ |
+| Workflow engine | ✅ `/workflow` | ❌ | ❌ |
+| Team coordination | ✅ `/team-agents` | ❌ | ❌ |
+
+---
+
+## 🎮 Code Quests
+
+### 🟢 Quest 4.1: Set Up a Loop
+
+**เป้าหมาย**: สร้าง PIV loop แบบพื้นฐาน
+
+<Steps>
+
+1. **เข้าใจ PIV framework**
+   - Plan: วิเคราะห์ task สร้าง steps
+   - Implement: Execute แต่ละ step
+   - Validate: ตรวจสอบว่าผลลัพธ์ตรงตาม requirements
+
+2. **Implement loop controller**
+
+   ```javascript
+   class PIVLoop {
+     async plan(task) { }
+     async implement(plan) { }
+     async validate(implementation) { }
+     async execute(task, maxIterations) { }
+   }
+   ```
+
+3. **ทดสอบด้วย task ง่ายๆ**
+
+4. **ตรวจสอบ convergence**
+
+</Steps>
+
+**ส่งมอบ**: PIV loop ที่ทำงานได้พร้อม tests
+
+---
+
+### 🟡 Quest 4.2: Generate-Review-Fix Loop
+
+**เป้าหมาย**: สร้าง iterative code improvement loop
+
+<Steps>
+
+1. **ออกแบบ loop**
+
+   ```
+   Generate → Review → Fix → Quality Check
+       ↑                      │
+       └──────────────────────┘
+   ```
+
+2. **Implement แต่ละ phase**
+   - Generate: AI เขียนโค้ดเริ่มต้น
+   - Review: AI ตรวจสอบ issues
+   - Fix: AI แก้ไขปัญหาที่พบ
+   - Quality Check: ตรวจสอบว่าตรงมาตรฐาน
+
+3. **เพิ่ม convergence criteria**
+
+4. **ทดสอบด้วย sample task**
+
+</Steps>
+
+**ส่งมอบ**: GRF loop ที่ทำงานได้พร้อม quality gates
+
+---
+
+### 🔴 Quest 4.3: Multi-Agent Pipeline
+
+**เป้าหมาย**: สร้าง pipeline กับหลาย AI agents
+
+<Steps>
+
+1. **ออกแบบ agent roles**
+
+   | Agent | Role | Responsibility |
+   | ------- | ------ | ---------------- |
+   | Planner | Task Analysis | แบ่ง tasks เป็น steps |
+   | Coder | Implementation | เขียนโค้ด |
+   | Reviewer | Quality Check | Review คุณภาพโค้ด |
+   | Tester | Validation | Test โค้ด |
+
+2. **Implement pipeline**
+
+   ```javascript
+   class Pipeline {
+     addAgent(agent) { }
+     async execute(task) { }
+   }
+   ```
+
+3. **เชื่อมต่อ agents** เป็น sequence
+
+4. **ทดสอบด้วย complex task**
+
+</Steps>
+
+**ส่งมอบ**: Multi-agent pipeline ที่ทำงานได้
+
+---
+
+## ✅ Block 4 Checklist
+
+- [ ] เข้าใจ PIV framework
+- [ ] Quest 4.1 เสร็จแล้ว
+- [ ] Quest 4.2 เสร็จแล้ว
+- [ ] Quest 4.3 เสร็จแล้ว
+
+---
+
+## 🚀 Block ถัดไป
+
+**Block 5: Architecture** → ออกแบบระบบ AI-powered ที่สมบูรณ์
+
+<a href="/workshop/block-5-architecture" class="inline-flex items-center gap-2 px-4 py-2 bg-trail-green-light text-trail-green rounded-lg hover:bg-trail-green hover:text-white transition-colors">ไป Block 5 →</a>
