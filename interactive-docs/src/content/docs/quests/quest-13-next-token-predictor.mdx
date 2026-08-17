@@ -1,0 +1,173 @@
+---
+title: "Quest 13 - Next Token Predictor"
+description: "Build a simple next-token predictor to understand how LLMs generate text"
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LearningObjectives from '../../../components/LearningObjectives.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+# Quest 13: Next Token Predictor
+
+<Badge text="medium" variant="caution" /> <Badge text="25 minutes" variant="note" />
+
+---
+
+<LearningObjectives items={[
+  "Understand how LLMs predict the next token in a sequence",
+  "Implement a frequency-based next-token prediction algorithm",
+  "Handle edge cases like empty context and unknown words",
+  "See the connection between simple prediction and modern LLMs"
+]} />
+
+---
+
+## 📖 Concept: Next-Token Prediction
+
+Every large language model — from GPT to Claude to Llama — is fundamentally a **next-token predictor**. Given a sequence of words (tokens), the model predicts what comes next based on patterns learned during training.
+
+At its simplest, next-token prediction is just **counting frequencies**. If you've seen "the cat sat on the" many times followed by "mat", then given "the cat sat on the", the most likely next word is "mat".
+
+This quest builds a simplified version: a frequency-based predictor that looks at context windows and counts how often each word follows that context in training data.
+
+---
+
+## ⚙️ How It Works
+
+### The Prediction Algorithm
+
+```
+1. Tokenize training data into words
+         ↓
+2. For each position, record: (context → next_word) pairs
+         ↓
+3. Given new context, look up all matching pairs
+         ↓
+4. Count frequencies, return most common next word
+         ↓
+5. Fallback: return most common word overall
+```
+
+### Key Data Structures
+
+```javascript
+// Build frequency map from training data
+const nextWordFreq = {};
+// For context "the cat sat on the":
+// nextWordFreq = { "mat": 5, "floor": 2, "couch": 1 }
+```
+
+### Edge Cases
+
+| Scenario | Behavior |
+| --- | --- |
+| Empty context | Return most common word overall |
+| No matching context | Return most common word overall |
+| Empty training data | Return empty string |
+| Tie between words | Return first one (by insertion order) |
+
+---
+
+## 💡 Example: Building the Predictor
+
+**Step 1: Tokenize and count frequencies**
+
+```javascript
+const words = trainingData.toLowerCase().split(/\s+/);
+const wordFreq = {};
+for (const w of words) {
+  wordFreq[w] = (wordFreq[w] || 0) + 1;
+}
+const mostCommon = Object.entries(wordFreq)
+  .sort((a, b) => b[1] - a[1])[0][0];
+```
+
+**Step 2: Find context matches**
+
+```javascript
+const contextWords = context.toLowerCase().split(/\s+/);
+for (let i = 0; i <= words.length - contextLen; i++) {
+  const slice = words.slice(i, i + contextLen);
+  if (slice.every((w, j) => w === contextWords[j])) {
+    // Found a match — record the next word
+    const next = words[i + contextLen];
+    nextWordFreq[next] = (nextWordFreq[next] || 0) + 1;
+  }
+}
+```
+
+**Step 3: Return prediction**
+
+```javascript
+if (Object.keys(nextWordFreq).length === 0) return mostCommon;
+return Object.entries(nextWordFreq)
+  .sort((a, b) => b[1] - a[1])[0][0];
+```
+
+---
+
+## ⚠️ Common Mistakes
+
+**Mistake 1: Not normalizing case**
+> "Comparing 'The' and 'the' as different words"
+> → Always `.toLowerCase()` before comparing tokens
+
+**Mistake 2: Empty string handling**
+> "context.trim() returns '' but we still try to split"
+> → Check for empty context before processing
+
+**Mistake 3: Off-by-one in slice**
+> "Checking words.slice(i, i + contextLen) when there's no next word"
+> → Ensure `i + contextLen < words.length` before accessing next word
+
+**Mistake 4: Forgetting the fallback**
+> "No context match → return undefined"
+> → Always fall back to most common word when no match found
+
+---
+
+## 📝 Knowledge Check
+
+<Quiz questId="quest-13-next-token-predictor" />
+
+---
+
+## 🏋️ Quest: Next Token Predictor
+
+Now it's time to build your own next-token predictor!
+
+<Steps>
+
+1. Download ไฟล์เริ่มต้นของ quest:
+
+   ```bash
+   npx bluebeltdojo download quest-13-next-token-predictor
+   cd quest-13-next-token-predictor
+   ```
+
+2. ทำตาม instructions ใน `problem.js`
+
+3. ตรวจสอบ solution:
+
+   ```bash
+   node test.js
+   ```
+
+4. ส่งคำตอบ:
+
+   ```bash
+   npx bluebeltdojo submit
+   ```
+
+</Steps>
+
+> 💡 **Tip:** Think about how this simple frequency-based approach relates to how modern LLMs work — they're doing the same thing, just with billions of parameters instead of simple counting.
+
+---
+
+## คำใบ้
+
+- ตรวจสอบ edge cases: empty context, empty training data
+- อย่าลืม `.toLowerCase()` สำหรับ case-insensitive matching
+- Fallback ไปหา most common word เมื่อไม่เจอ context match
