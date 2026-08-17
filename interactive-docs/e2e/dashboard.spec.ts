@@ -19,6 +19,7 @@ async function setupDashboardRoutes(
         email: "test@example.com",
         displayName,
         belt,
+        role: "user",
       }),
     });
   });
@@ -254,6 +255,32 @@ test.describe("Dashboard page", () => {
       await expect(page.locator("#continue-title")).toContainText(
         "All quests complete",
       );
+    });
+  });
+
+  test.describe("Admin redirect", () => {
+    test("admin user is redirected to /admin from dashboard", async ({ page }) => {
+      // Mock auth as admin
+      await page.route("**/api/auth/me", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            id: "admin-001",
+            email: "admin@bluebeltdojo.ai",
+            displayName: "Admin",
+            belt: "black",
+            role: "admin",
+          }),
+        });
+      });
+
+      await page.addInitScript(() => {
+        localStorage.setItem("bbd_token", "mock-admin-token");
+      });
+
+      await page.goto("/dashboard");
+      await expect(page).toHaveURL(/\/admin/, { timeout: 10000 });
     });
   });
 });

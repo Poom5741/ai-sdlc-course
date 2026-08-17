@@ -1,128 +1,127 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Admin Panel", () => {
-  test.describe("Login state", () => {
-    test.beforeEach(async ({ page }) => {
+  test.describe("Unauthenticated state", () => {
+    test("shows access denied for unauthenticated users", async ({ page }) => {
       await page.goto("/admin");
+      const deniedSection = page.locator("#denied-section");
+      await expect(deniedSection).toBeVisible({ timeout: 10000 });
+      await expect(deniedSection.getByText("Access Denied")).toBeVisible();
     });
 
-    test("shows login form when not authenticated", async ({ page }) => {
-      const loginSection = page.locator("#login-section");
-      await expect(loginSection).toBeVisible();
-      await expect(loginSection.getByText("Admin Panel")).toBeVisible();
-    });
-
-    test("shows password input field", async ({ page }) => {
-      await expect(page.locator("#password")).toBeVisible();
-    });
-
-    test("shows login button", async ({ page }) => {
-      const loginBtn = page.locator("#login-btn");
-      await expect(loginBtn).toBeVisible();
-      await expect(loginBtn).toContainText("Login");
-    });
-
-    test("shows password placeholder", async ({ page }) => {
-      const passwordInput = page.locator("#password");
-      await expect(passwordInput).toHaveAttribute(
-        "placeholder",
-        "Enter admin password",
-      );
-    });
-
-    test("shows error on invalid password", async ({ page }) => {
-      await page.route("**/api/admin/login", async (route) => {
-        await route.fulfill({
-          status: 401,
-          contentType: "application/json",
-          body: JSON.stringify({ success: false, error: "Invalid password" }),
-        });
-      });
-
-      await page.fill("#password", "wrongpassword");
-      await page.click("#login-btn");
-
-      const errorEl = page.locator("#login-error");
-      await expect(errorEl).toBeVisible();
-      await expect(errorEl).toContainText("Invalid password");
-    });
-
-    test("shows network error on fetch failure", async ({ page }) => {
-      await page.route("**/api/admin/login", async (route) => {
-        await route.abort("connectionrefused");
-      });
-
-      await page.fill("#password", "testpass");
-      await page.click("#login-btn");
-
-      const errorEl = page.locator("#login-error");
-      await expect(errorEl).toBeVisible();
-      await expect(errorEl).toContainText("Network error");
+    test("shows sign in link for unauthenticated users", async ({ page }) => {
+      await page.goto("/admin");
+      const deniedSection = page.locator("#denied-section");
+      await expect(deniedSection).toBeVisible({ timeout: 10000 });
+      const signInLink = deniedSection.getByRole("link", { name: /Sign In/i });
+      await expect(signInLink).toBeVisible();
     });
   });
 
-  test.describe("Authenticated state", () => {
-    test.beforeEach(async ({ page }) => {
-      // Mock admin login
-      await page.route("**/api/admin/login", async (route) => {
+  test.describe("Non-admin user", () => {
+    test("shows access denied for non-admin users", async ({ page }) => {
+      // Mock auth as regular user
+      await page.route("**/api/auth/me", async (route) => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            success: true,
-            sessionId: "test-session-123",
-            expires: new Date(Date.now() + 3600000).toISOString(),
+            userId: "user-123",
+            email: "user@example.com",
+            displayName: "Regular User",
+            belt: "white",
+            role: "user",
           }),
         });
+      });
+
+      await page.goto("/admin");
+
+      // Inject token
+      await page.evaluate(() => {
+        localStorage.setItem("bbd_token", "mock-user-token");
+      });
+
+      const deniedSection = page.locator("#denied-section");
+      await expect(deniedSection).toBeVisible({ timeout: 10000 });
+      await expect(deniedSection.getByText("Access Denied")).toBeVisible();
+    });
+  });
+
+  test.describe("Admin user - authenticated state", () => {
+    test.beforeEach(async ({ page }) => {
+      // Mock auth as admin
+      await page.route("**/api/auth/me", async (route) => {
+        const auth = route.request().headers()["authorization"];
+        if (auth && auth.includes("mock-admin-token")) {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              userId: "admin-001",
+              email: "admin@bluebeltdojo.ai",
+              displayName: "Admin",
+              belt: "black",
+              role: "admin",
+            }),
+          });
+        } else {
+          await route.fulfill({
+            status: 401,
+            contentType: "application/json",
+            body: JSON.stringify({ error: "Unauthorized" }),
+          });
+        }
       });
 
       // Mock admin codes API
       await page.route("**/api/admin/codes*", async (route) => {
         const url = new URL(route.request().url());
-        const page_num = parseInt(url.searchParams.get("page") || "1");
+        const pageNum = parseInt(url.searchParams.get("page") || "1");
         const limit = parseInt(url.searchParams.get("limit") || "20");
 
-        const codes = Array.from({ length: 5 }, (_, i) => ({
-          code: `CODE-${String(i + 1).padStart(3, "0")}`,
-          used: i < 2,
-          usedAt: i < 2 ? "2025-01-10T10:00:00Z" : null,
-          created: "2025-01-01T00:00:00Z",
+        const codes = Array.from({ length: 15 }, (_, i) => ({
+          code: `BBD-TEST${String(i + 1).padStart(2, "0")}-ABCD`,
+          created: new Date(Date.now() - i * 86400000).toISOString(),
+          used: i < 5,
+          usedAt: i < 5 ? new Date().toISOString() : null,
           expires: "2025-12-31T23:59:59Z",
           plan: "workshop-2025",
-          revoked: false,
+          metadata: { batch: "test-batch" },
         }));
 
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            codes: codes.slice((page_num - 1) * limit, page_num * limit),
+            codes: codes.slice((pageNum - 1) * limit, pageNum * limit),
             pagination: {
-              page: page_num,
+              page: pageNum,
               limit,
               total: codes.length,
-              pages: 1,
+              pages: Math.ceil(codes.length / limit),
             },
           }),
         });
       });
 
+      // Inject admin token before navigating
       await page.goto("/admin");
-      // Perform login
-      await page.fill("#password", "testpassword");
-      await page.click("#login-btn");
-      // Wait for dashboard to be visible
-      await expect(page.locator("#dashboard-section")).toBeVisible();
+      await page.evaluate(() => {
+        localStorage.setItem("bbd_token", "mock-admin-token");
+      });
+      await page.reload();
     });
 
-    test("shows admin panel heading", async ({ page }) => {
-      await expect(page.locator("#dashboard-section h1")).toContainText(
-        "Admin Panel",
+    test("shows dashboard section for admin", async ({ page }) => {
+      const dashboardSection = page.locator("#dashboard-section");
+      await expect(dashboardSection).toBeVisible({ timeout: 10000 });
+    });
+
+    test("shows admin email in header", async ({ page }) => {
+      await expect(page.locator("#admin-email")).toContainText(
+        "admin@bluebeltdojo.ai",
       );
-    });
-
-    test("shows subtitle", async ({ page }) => {
-      await expect(page.getByText("Manage access codes")).toBeVisible();
     });
 
     test("shows stats cards", async ({ page }) => {
@@ -133,174 +132,87 @@ test.describe("Admin Panel", () => {
     });
 
     test("shows create codes form", async ({ page }) => {
-      await expect(page.getByText("Create New Codes")).toBeVisible();
+      await expect(page.locator("#create-form")).toBeVisible();
       await expect(page.locator("#plan")).toBeVisible();
       await expect(page.locator("#count")).toBeVisible();
       await expect(page.locator("#expires")).toBeVisible();
-      await expect(page.locator("#batch")).toBeVisible();
-    });
-
-    test("plan dropdown has options", async ({ page }) => {
-      const planSelect = page.locator("#plan");
-      await expect(
-        planSelect.locator("option").filter({ hasText: "Workshop 2024" }),
-      ).toBeAttached();
-      await expect(
-        planSelect.locator("option").filter({ hasText: "Workshop 2025" }),
-      ).toBeAttached();
-      await expect(
-        planSelect.locator("option").filter({ hasText: "Premium" }),
-      ).toBeAttached();
-    });
-
-    test("shows generate codes button", async ({ page }) => {
-      const generateBtn = page.locator("#create-btn");
-      await expect(generateBtn).toBeVisible();
-      await expect(generateBtn).toContainText("Generate Codes");
     });
 
     test("shows codes table", async ({ page }) => {
-      await expect(page.getByText("All Codes")).toBeVisible();
       await expect(page.locator("#codes-tbody")).toBeVisible();
-    });
-
-    test("codes table has correct headers", async ({ page }) => {
-      const table = page.locator("table");
-      await expect(table.getByText("Code")).toBeVisible();
-      await expect(table.getByText("Status")).toBeVisible();
-      await expect(table.getByText("Created")).toBeVisible();
-      await expect(table.getByText("Used At")).toBeVisible();
-      await expect(table.getByText("Plan")).toBeVisible();
-      await expect(table.getByText("Actions")).toBeVisible();
-    });
-
-    test("shows filter controls", async ({ page }) => {
-      await expect(page.locator("#filter-status")).toBeVisible();
-      await expect(page.locator("#filter-search")).toBeVisible();
-    });
-
-    test("filter status has options", async ({ page }) => {
-      const filterSelect = page.locator("#filter-status");
-      await expect(
-        filterSelect.locator("option").filter({ hasText: "All Status" }),
-      ).toBeAttached();
-      await expect(
-        filterSelect.locator("option").filter({ hasText: "Unused" }),
-      ).toBeAttached();
-      await expect(
-        filterSelect.locator("option").filter({ hasText: "Used" }),
-      ).toBeAttached();
-      await expect(
-        filterSelect.locator("option").filter({ hasText: "Expired" }),
-      ).toBeAttached();
-    });
-
-    test("shows pagination controls", async ({ page }) => {
-      await expect(page.locator("#prev-page")).toBeVisible();
-      await expect(page.locator("#next-page")).toBeVisible();
-      await expect(page.getByText("Showing")).toBeVisible();
+      // Should have codes in the table
+      const rows = page.locator("#codes-tbody tr");
+      await expect(rows.first()).toBeVisible();
     });
 
     test("shows logout button", async ({ page }) => {
-      const logoutBtn = page.locator("#logout-btn");
-      await expect(logoutBtn).toBeVisible();
-      await expect(logoutBtn).toContainText("Logout");
+      await expect(page.locator("#logout-btn")).toBeVisible();
     });
 
-    test("clicking logout returns to login form", async ({ page }) => {
-      await page.locator("#logout-btn").click();
-      await expect(page.locator("#login-section")).toBeVisible();
-      await expect(page.locator("#dashboard-section")).toBeHidden();
-    });
-
-    test("codes table shows status badges", async ({ page }) => {
-      // Should show used and unused badges
-      await expect(page.getByText("Used").first()).toBeVisible();
-      await expect(page.getByText("Unused").first()).toBeVisible();
-    });
-
-    test("codes table shows revoke buttons", async ({ page }) => {
-      const revokeButtons = page
-        .locator("#codes-tbody button")
-        .filter({ hasText: "Revoke" });
-      const count = await revokeButtons.count();
-      expect(count).toBeGreaterThan(0);
+    test("shows link to dashboard", async ({ page }) => {
+      const dashboardLink = page.locator('a[href="/dashboard"]');
+      await expect(dashboardLink).toBeVisible();
     });
   });
 
-  test.describe("Code creation flow", () => {
+  test.describe("Code generation", () => {
     test.beforeEach(async ({ page }) => {
-      // Mock admin login
-      await page.route("**/api/admin/login", async (route) => {
+      // Mock auth as admin
+      await page.route("**/api/auth/me", async (route) => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            success: true,
-            sessionId: "test-session-123",
-            expires: new Date(Date.now() + 3600000).toISOString(),
+            userId: "admin-001",
+            email: "admin@bluebeltdojo.ai",
+            displayName: "Admin",
+            belt: "black",
+            role: "admin",
           }),
         });
       });
 
       // Mock admin codes API
       await page.route("**/api/admin/codes*", async (route) => {
-        if (route.request().method() === "GET") {
+        if (route.request().method() === "POST") {
+          // Create codes
+          const body = route.request().postData();
+          const data = JSON.parse(body || "{}");
+          const count = data.count || 1;
+          const codes = Array.from(
+            { length: count },
+            (_, i) => `BBD-NEW${String(i + 1).padStart(4, "0")}-CODE`,
+          );
           await route.fulfill({
-            status: 200,
+            status: 201,
             contentType: "application/json",
-            body: JSON.stringify({
-              codes: [],
-              pagination: { page: 1, limit: 20, total: 0, pages: 0 },
-            }),
+            body: JSON.stringify({ created: codes, count: codes.length }),
           });
-        } else if (route.request().method() === "POST") {
+        } else {
+          // List codes
           await route.fulfill({
             status: 200,
             contentType: "application/json",
-            body: JSON.stringify({
-              created: ["NEW-CODE-001", "NEW-CODE-002"],
-            }),
+            body: JSON.stringify({ codes: [], pagination: { total: 0 } }),
           });
         }
       });
 
       await page.goto("/admin");
-      await page.fill("#password", "testpassword");
-      await page.click("#login-btn");
-      await expect(page.locator("#dashboard-section")).toBeVisible();
+      await page.evaluate(() => {
+        localStorage.setItem("bbd_token", "mock-admin-token");
+      });
+      await page.reload();
     });
 
-    test("can fill create codes form", async ({ page }) => {
-      await page.selectOption("#plan", "premium");
-      await page.fill("#count", "5");
-      await page.fill("#batch", "test-batch");
-      await page.fill("#notes", "Test notes");
-
-      await expect(page.locator("#plan")).toHaveValue("premium");
-      await expect(page.locator("#count")).toHaveValue("5");
-      await expect(page.locator("#batch")).toHaveValue("test-batch");
-      await expect(page.locator("#notes")).toHaveValue("Test notes");
-    });
-
-    test("shows created codes after generation", async ({ page }) => {
-      await page.fill("#count", "2");
+    test("can generate codes", async ({ page }) => {
+      await page.selectOption("#plan", "workshop-2025");
+      await page.fill("#count", "3");
       await page.click("#create-btn");
 
       const createdCodes = page.locator("#created-codes");
-      await expect(createdCodes).toBeVisible();
-      await expect(
-        createdCodes.getByText("Codes Created Successfully"),
-      ).toBeVisible();
-      await expect(page.locator("#codes-list")).toContainText("NEW-CODE-001");
-      await expect(page.locator("#codes-list")).toContainText("NEW-CODE-002");
-    });
-
-    test("copy codes button is visible after creation", async ({ page }) => {
-      await page.fill("#count", "1");
-      await page.click("#create-btn");
-
-      await expect(page.locator("#copy-codes-btn")).toBeVisible();
+      await expect(createdCodes).toBeVisible({ timeout: 5000 });
+      await expect(createdCodes.getByText("Codes Created Successfully")).toBeVisible();
     });
   });
 });

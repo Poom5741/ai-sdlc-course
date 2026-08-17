@@ -55,7 +55,7 @@ test.describe('Login page', () => {
     await expect(errorDiv).toContainText('Network error');
   });
 
-  test('successful login redirects to dashboard', async ({ page }) => {
+  test('successful login redirects to dashboard for regular users', async ({ page }) => {
     await page.route('**/api/auth/login', async (route) => {
       await route.fulfill({
         status: 200,
@@ -66,6 +66,7 @@ test.describe('Login page', () => {
           email: 'test@example.com',
           displayName: 'Test User',
           belt: 'white',
+          role: 'user',
         }),
       });
     });
@@ -75,6 +76,29 @@ test.describe('Login page', () => {
     await page.click('#login-form button[type="submit"]');
 
     await expect(page).toHaveURL(/\/dashboard/);
+  });
+
+  test('successful login redirects to admin for admin users', async ({ page }) => {
+    await page.route('**/api/auth/login', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          token: 'mock-admin-token',
+          userId: 'admin-001',
+          email: 'admin@bluebeltdojo.ai',
+          displayName: 'Admin',
+          belt: 'black',
+          role: 'admin',
+        }),
+      });
+    });
+
+    await page.fill('#email', 'admin@bluebeltdojo.ai');
+    await page.fill('#password', 'bluebeltdojo2024');
+    await page.click('#login-form button[type="submit"]');
+
+    await expect(page).toHaveURL(/\/admin/);
   });
 
   test('submit button shows loading state during request', async ({ page }) => {
@@ -103,7 +127,7 @@ test.describe('Login page', () => {
     await expect(submitBtn).toBeDisabled();
   });
 
-  test('redirects to dashboard if already logged in', async ({ page }) => {
+  test('redirects to dashboard if already logged in as regular user', async ({ page }) => {
     await page.goto('/login');
     // Set token before navigation
     await page.evaluate(() => {

@@ -1,17 +1,7 @@
 // Regression test: after a successful inline login on /dashboard, the login form
-// must be hidden and ONLY the dashboard content shown (previously the dashboard
-// appended below the still-visible sign-in form).
-//
-// Run it by first building and previewing the static site, then serving dist:
-//   npm run build
-//   cd dist && python3 -m http.server 8222
-//   npx playwright test e2e/login-repro.spec.ts
-//
-// API calls are mocked (no Cloudflare KV/D1 backend needed).
+// must be hidden and ONLY the dashboard content shown.
 
 import { test, expect } from "@playwright/test";
-
-const BASE = process.env.BASE_URL || "http://localhost:8222";
 
 test("dashboard does NOT stack on top of the sign-in form after login", async ({
     page,
@@ -27,8 +17,31 @@ test("dashboard does NOT stack on top of the sign-in form after login", async ({
                 email: "a@b.com",
                 displayName: "Tester",
                 belt: "white",
+                role: "user",
             }),
         });
+    });
+    await page.route("**/api/auth/me", async (route) => {
+        const auth = route.request().headers()["authorization"];
+        if (auth && auth.includes("mock-token")) {
+            await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    id: 1,
+                    email: "a@b.com",
+                    displayName: "Tester",
+                    belt: "white",
+                    role: "user",
+                }),
+            });
+        } else {
+            await route.fulfill({
+                status: 401,
+                contentType: "application/json",
+                body: JSON.stringify({ error: "Unauthorized" }),
+            });
+        }
     });
     await page.route("**/api/progress", async (route) => {
         await route.fulfill({
@@ -45,27 +58,21 @@ test("dashboard does NOT stack on top of the sign-in form after login", async ({
         });
     });
 
-    await page.goto(`${BASE}/dashboard/`);
+    await page.goto("/dashboard/");
     // Ensure no stale token.
     await page.evaluate(() => localStorage.removeItem("bbd_token"));
 
     // Wait for the login section to become visible (auth check with no token).
     const loginSection = page.locator("#login-section");
-    await expect(loginSection).toBeVisible();
+    await expect(loginSection).toBeVisible({ timeout: 10000 });
 
     await page.fill("#email", "tester@example.com");
     await page.fill("#password", "password123");
     await page.click('#login-form button[type="submit"]');
 
     // Wait for the dashboard content to render.
-    const dashboard = page.locator("#dashboard");
-    await expect(page.locator("#user-name")).toHaveText("Tester");
+    await expect(page.locator("#user-name")).toHaveText("Tester", { timeout: 10000 });
 
     // THE BUG: the login section must be hidden once login succeeds.
-    const loginVisible = await loginSection.isVisible();
-    const dashVisible = await dashboard.isVisible();
-    console.log(
-        `login-section visible: ${loginVisible}, dashboard visible: ${dashVisible}`,
-    );
     await expect(loginSection).toBeHidden();
 });
