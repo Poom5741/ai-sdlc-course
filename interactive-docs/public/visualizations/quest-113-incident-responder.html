@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Response Flow</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.9rem}
+.timeline{max-width:900px;margin:0 auto;position:relative}
+.timeline::before{content:'';position:absolute;left:30px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#4f2bdf,#00c864);border-radius:2px}
+.phase{position:relative;margin-bottom:30px;padding-left:70px;cursor:pointer}
+.phase-marker{position:absolute;left:18px;width:28px;height:28px;border-radius:50%;background:#16213e;border:3px solid #4f2bdf;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .5s;z-index:1}
+.phase.active .phase-marker{background:#4f2bdf;border-color:#4f2bdf;transform:scale(1.2);box-shadow:0 0 20px rgba(79,43,223,.5)}
+.phase.completed .phase-marker{background:#00c864;border-color:#00c864}
+.phase-card{background:#16213e;border-radius:12px;padding:20px;transition:all .3s;border:2px solid transparent}
+.phase.active .phase-card{border-color:#4f2bdf;box-shadow:0 0 30px rgba(79,43,223,.15)}
+.phase.completed .phase-card{border-color:#00c86433}
+.phase-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.phase-name{font-weight:700;font-size:1.1rem}
+.phase-time{font-size:.75rem;color:#888;background:#0d1b3e;padding:3px 10px;border-radius:10px}
+.phase-desc{font-size:.85rem;color:#aaa;margin-bottom:12px}
+.actions{display:none}
+.phase.active .actions{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.action-card{background:#0d1b3e;border-radius:8px;padding:12px;margin:8px 0;display:flex;align-items:center;gap:12px;transition:all .2s;border:1px solid transparent}
+.action-card:hover{border-color:#4f2bdf}
+.action-card.done{border-color:#00c864;background:#0d2818}
+.action-check{width:22px;height:22px;border-radius:50%;border:2px solid #4f2bdf;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.action-check.checked{background:#00c864;border-color:#00c864}
+.action-text{font-size:.85rem;flex:1}
+.action-assignee{font-size:.7rem;color:#888;background:#16213e;padding:2px 8px;border-radius:8px}
+.severity-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.72rem;font-weight:600;margin-left:8px}
+.severity-badge.p1{background:#ff475733;color:#ff4757}
+.severity-badge.p2{background:#f5a62333;color:#f5a623}
+.severity-badge.p3{background:#4f2bdf33;color:#4f2bdf}
+.controls{max-width:900px;margin:0 auto 20px;text-align:center}
+.controls button{background:#4f2bdf;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:.85rem;margin:0 6px;transition:background .2s}
+.controls button:hover{background:#6b45e0}
+.controls button.secondary{background:#16213e;border:1px solid #4f2bdf}
+.sla-bar{max-width:900px;margin:0 auto 20px;background:#16213e;border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:16px}
+.sla-label{font-size:.82rem;color:#aaa}
+.sla-time{font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums}
+.sla-time.ok{color:#00c864}
+.sla-time.warn{color:#f5a623}
+.sla-time.danger{color:#ff4757}
+.sla-progress{flex:1;height:6px;background:#0d1b3e;border-radius:3px;overflow:hidden}
+.sla-fill{height:100%;border-radius:3px;transition:width 1s,background 1s}
+.stats-row{max-width:900px;margin:0 auto 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}}
+.stat-card{background:#16213e;border-radius:10px;padding:14px;text-align:center}
+.stat-num{font-size:1.6rem;font-weight:700}
+.stat-label{font-size:.75rem;color:#888;margin-top:4px}
+</style>
+</head>
+<body>
+<h1>🚨 Incident Response Flow</h1>
+<p class="subtitle">Click phases to expand actions. Check off items as you complete them.</p>
+<div class="controls">
+<button onclick="startIncident()">🔥 Simulate Incident</button>
+<button class="secondary" onclick="resetIncident()">↻ Reset</button>
+</div>
+<div class="sla-bar">
+<span class="sla-label">⏱ SLA Remaining:</span>
+<span class="sla-time ok" id="slaTimer">4:00:00</span>
+<div class="sla-progress"><div class="sla-fill" id="slaFill" style="width:0;background:#00c864"></div></div>
+<span class="sla-label" id="slaStatus">Within SLA</span>
+</div>
+<div class="stats-row">
+<div class="stat-card"><div class="stat-num" style="color:#ff4757" id="statActive">1</div><div class="stat-label">Active Incident</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#f5a623" id="statActions">0</div><div class="stat-label">Actions Completed</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#00c864" id="statTime">0m</div><div class="stat-label">Time Elapsed</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#4f2bdf" id="statTeam">4</div><div class="stat-label">Team Members</div></div>
+</div>
+<div class="timeline" id="timeline"></div>
+
+<script>
+const phases=[
+{id:'detect',name:'1. Detect & Alert',icon:'🔔',time:'Target: < 5 min',severity:'p1',
+desc:'Identify the incident through monitoring, alerts, or user reports. Establish severity and impact scope.',
+actions:[
+{text:'Acknowledge alert in PagerDuty',assignee:'On-call'},
+{text:'Verify alert is not a false positive',assignee:'SRE'},
+{text:'Determine severity level (P1-P4)',assignee:'Incident Commander'},
+{text:'Open incident channel (#inc-YYYY-MM-DD)',assignee:'IC'},
+{text:'Notify stakeholders per escalation matrix',assignee:'IC'},
+{text:'Create incident ticket in tracker',assignee:'IC'}
+]},
+{id:'triage',name:'2. Triage & Assess',icon:'🔍',time:'Target: < 15 min',severity:'p1',
+desc:'Understand the scope, impact, and root cause. Assemble the right team and begin diagnosis.',
+actions:[
+{text:'Assess user impact (how many affected?)',assignee:'SRE'},
+{text:'Check dashboards for anomalies',assignee:'SRE'},
+{text:'Review recent deployments/changes',assignee:'Dev'},
+{text:'Identify affected services/components',assignee:'Dev'},
+{text:'Establish communication cadence (15min updates)',assignee:'IC'},
+{text:'Assign subject-matter experts',assignee:'IC'}
+]},
+{id:'resolve',name:'3. Mitigate & Resolve',icon:'🛠️',time:'Target: < 60 min',severity:'p2',
+desc:'Implement fix or workaround. Prioritize restoring service over finding root cause.',
+actions:[
+{text:'Implement mitigation (rollback/fix/feature flag)',assignee:'Dev'},
+{text:'Verify mitigation resolves the issue',assignee:'QA'},
+{text:'Monitor metrics for stabilization',assignee:'SRE'},
+{text:'Update status page for users',assignee:'Comms'},
+{text:'Confirm all affected systems recovered',assignee:'SRE'},
+{text:'Close incident channel (declare resolved)',assignee:'IC'}
+]},
+{id:'postmortem',name:'4. Post-Mortem',icon:'📝',time:'Target: < 48 hours',severity:'p3',
+desc:'Document what happened, why, and how to prevent recurrence. Blameless analysis.',
+actions:[
+{text:'Write timeline of events',assignee:'IC'},
+{text:'Identify root cause and contributing factors',assignee:'Dev'},
+{text:'Document action items with owners and due dates',assignee:'IC'},
+{text:'Schedule post-mortem review meeting',assignee:'IC'},
+{text:'Share learnings with broader team',assignee:'EM'},
+{text:'Track action items to completion',assignee:'PM'}
+]}
+];
+
+let activePhase=null;
+let completedPhases=new Set();
+let checkedActions=new Set();
+let startTime=null;
+let slaInterval=null;
+
+function renderTimeline(){
+const tl=document.getElementById('timeline');
+tl.innerHTML=phases.map((p,i)=>{
+const isActive=activePhase===p.id;
+const isCompleted=completedPhases.has(p.id);
+return`<div class="phase ${isActive?'active':''} ${isCompleted?'completed':''}" onclick="expandPhase('${p.id}')">
+<div class="phase-marker">${isCompleted?'✓':p.icon}</div>
+<div class="phase-card">
+<div class="phase-header">
+<div><span class="phase-name">${p.name}</span><span class="severity-badge ${p.severity}">${p.severity.toUpperCase()}</span></div>
+<span class="phase-time">${p.time}</span>
+</div>
+<div class="phase-desc">${p.desc}</div>
+<div class="actions">
+${p.actions.map((a,j)=>{
+const key=p.id+'-'+j;
+const done=checkedActions.has(key);
+return`<div class="action-card ${done?'done':''}">
+<div class="action-check ${done?'checked':''}" onclick="event.stopPropagation();toggleAction('${key}')">${done?'✓':''}</div>
+<span class="action-text">${a.text}</span>
+<span class="action-assignee">${a.assignee}</span>
+</div>`}).join('')}
+${isCompleted?'<div style="text-align:center;color:#00c864;font-size:.85rem;margin-top:10px">✅ Phase Complete</div>':''}
+${!isCompleted&&isActive?`<button onclick="event.stopPropagation();completePhase('${p.id}')" style="display:block;margin:12px auto 0;background:#00c864;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:.78rem">Mark Phase Complete →</button>`:''}
+</div>
+</div>
+</div>`}).join('');
+}
+
+function expandPhase(id){
+activePhase=activePhase===id?null:id;
+renderTimeline();
+const el=document.querySelector(`.phase[onclick*="${id}"]`);
+if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function toggleAction(key){
+if(checkedActions.has(key))checkedActions.delete(key);
+else checkedActions.add(key);
+updateStats();
+renderTimeline();
+}
+
+function completePhase(id){
+completedPhases.add(id);
+const idx=phases.findIndex(p=>p.id===id);
+if(idx<phases.length-1){
+activePhase=phases[idx+1].id;
+expandPhase(phases[idx+1].id);
+}else{
+activePhase=null;
+}
+renderTimeline();updateStats();
+}
+
+function startIncident(){
+resetIncident();
+startTime=Date.now();
+activePhase='detect';
+renderTimeline();
+slaInterval=setInterval(updateSLA,1000);
+expandPhase('detect');
+}
+
+function updateSLA(){
+if(!startTime)return;
+const elapsed=Math.floor((Date.now()-startTime)/1000);
+const total=4*3600;
+const remaining=Math.max(0,total-elapsed);
+const h=Math.floor(remaining/3600);
+const m=Math.floor((remaining%3600)/60);
+const s=remaining%60;
+const timer=document.getElementById('slaTimer');
+timer.textContent=`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+const pct=((total-remaining)/total)*100;
+const fill=document.getElementById('slaFill');
+fill.style.width=pct+'%';
+if(remaining>3600){timer.className='sla-time ok';fill.style.background='#00c864';document.getElementById('slaStatus').textContent='Within SLA'}
+else if(remaining>1800){timer.className='sla-time warn';fill.style.background='#f5a623';document.getElementById('slaStatus').textContent='Approaching SLA'}
+else{timer.className='sla-time danger';fill.style.background='#ff4757';document.getElementById('slaStatus').textContent='SLA BREACH IMMINENT'}
+document.getElementById('statTime').textContent=`${Math.floor(elapsed/60)}m`;
+}
+
+function updateStats(){
+document.getElementById('statActions').textContent=checkedActions.size;
+document.getElementById('statActive').textContent=completedPhases.size===4?0:1;
+}
+
+function resetIncident(){
+clearInterval(slaInterval);
+activePhase=null;completedPhases=new Set();checkedActions=new Set();startTime=null;
+document.getElementById('slaTimer').textContent='4:00:00';
+document.getElementById('slaTimer').className='sla-time ok';
+document.getElementById('slaFill').style.width='0';
+document.getElementById('slaStatus').textContent='Within SLA';
+document.getElementById('statActive').textContent='1';
+document.getElementById('statActions').textContent='0';
+document.getElementById('statTime').textContent='0m';
+renderTimeline();
+}
+
+renderTimeline();
+</script>
+</body>
+</html>

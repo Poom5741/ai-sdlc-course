@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rebase Simulator — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
+.container{max-width:1100px;margin:0 auto}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:800px){.comparison{grid-template-columns:1fr}}
+.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
+.panel:hover{border-color:#4f2bdf}
+.panel h2{font-size:1rem;margin-bottom:.8rem;text-align:center}
+.panel h2 span{color:#4f2bdf}
+.merge-panel h2 span{color:#00c864}
+svg{width:100%;height:250px}
+.branch-label{font-size:10px;font-family:system-ui,sans-serif}
+.commit-circle{r:8;stroke-width:2;stroke:#1a1a2e;transition:all .4s ease}
+.commit-label{font-size:9px;font-family:'SF Mono',monospace;fill:#aaa;text-anchor:middle}
+.narration{margin-top:.6rem;font-size:.8rem;color:#888;text-align:center;min-height:2em;transition:opacity .3s}
+.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
+button:hover{background:#6143e8}
+.btn-green{background:#00c864;color:#1a1a2e}
+.btn-green:hover{background:#00dd70}
+.diff-note{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.8rem;margin-top:.8rem;font-size:.8rem;line-height:1.6}
+.diff-note code{background:#1a1a2e;padding:2px 5px;border-radius:3px;color:#e8a020;font-family:monospace;font-size:.78rem}
+.info-box{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;margin-top:1.5rem}
+.info-box h3{color:#4f2bdf;margin-bottom:.6rem;font-size:.95rem}
+.info-box p{font-size:.82rem;color:#aaa;line-height:1.6}
+.info-box ul{font-size:.82rem;color:#aaa;line-height:1.8;margin-left:1.2rem}
+</style>
+</head>
+<body>
+<h1>Rebase Simulator</h1>
+<p class="sub">Watch merge vs rebase step-by-step — click Animate to compare</p>
+
+<div class="container">
+  <div class="comparison">
+    <!-- Merge Panel -->
+    <div class="panel merge-panel">
+      <h2>🔀 <span>Merge</span></h2>
+      <svg id="mergeSvg" viewBox="0 0 480 250">
+        <defs>
+          <marker id="arrow-m" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555"/></marker>
+        </defs>
+      </svg>
+      <div class="narration" id="mergeNarr">Click Animate to see merge in action</div>
+    </div>
+
+    <!-- Rebase Panel -->
+    <div class="panel">
+      <h2>🔄 <span style="color:#e8a020">Rebase</span></h2>
+      <svg id="rebaseSvg" viewBox="0 0 480 250">
+        <defs>
+          <marker id="arrow-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555"/></marker>
+        </defs>
+      </svg>
+      <div class="narration" id="rebaseNarr">Click Animate to see rebase in action</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-green" id="playBtn" onclick="runAnimation()">▶ Animate</button>
+    <button onclick="resetSim()">↺ Reset</button>
+  </div>
+
+  <div class="diff-note" id="diffNote" style="display:none">
+    <strong style="color:#4f2bdf">Key Difference:</strong><br>
+    <strong>Merge:</strong> Creates a merge commit (<code>merge-abc</code>) with TWO parents. History is preserved exactly as it happened.<br>
+    <strong>Rebase:</strong> Replays feature commits ON TOP of main. History is rewritten to look linear. New commit hashes are generated.
+  </div>
+
+  <div class="info-box">
+    <h3>When to Use Each</h3>
+    <ul>
+      <li><strong style="color:#00c864">Merge</strong> — Safe for shared branches, preserves full history, default on GitHub PRs</li>
+      <li><strong style="color:#e8a020">Rebase</strong> — Clean linear history, good for local branches before sharing, <em>never rebase pushed commits</em></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function el(tag, attrs) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function drawLine(svg, x1, y1, x2, y2, color, cls) {
+  const line = el('line', {x1,y1,x2,y2,stroke:color,'stroke-width':3,stroke_linecap:'round',class:cls||''});
+  svg.appendChild(line);
+  return line;
+}
+
+function drawPath(svg, d, color, cls) {
+  const path = el('path', {d,stroke:color,'stroke-width':3,fill:'none','stroke-linecap':'round',class:cls||''});
+  svg.appendChild(path);
+  return path;
+}
+
+function drawDot(svg, cx, cy, fill, label, id) {
+  const c = el('circle', {cx,cy,r:8,fill,stroke:'#1a1a2e','stroke-width':2,class:'commit-circle',id:id||''});
+  svg.appendChild(c);
+  if (label) {
+    const t = el('text', {x:cx,y:cy-14,text_anchor:'middle',class:'commit-label'});
+    t.textContent = label;
+    svg.appendChild(t);
+  }
+  return c;
+}
+
+function addLabel(svg, x, y, text, color) {
+  const t = el('text', {x,y,fill:color,'font-size':11,'font-family':'system-ui,sans-serif'});
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+function clearSvg(svg) {
+  const defs = svg.querySelector('defs');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  if (defs) svg.appendChild(defs);
+}
+
+function animateDot(dot, fromCx, fromCy, toCx, toCy, dur) {
+  return new Promise(resolve => {
+    dot.style.transition = `cx ${dur}ms ease, cy ${dur}ms ease`;
+    dot.setAttribute('cx', toCx);
+    dot.setAttribute('cy', toCy);
+    setTimeout(resolve, dur);
+  });
+}
+
+function flashDot(dot, color) {
+  dot.setAttribute('fill', color);
+  setTimeout(() => dot.setAttribute('fill', '#00c864'), 300);
+}
+
+// --- MERGE ANIMATION ---
+async function animateMerge() {
+  const svg = document.getElementById('mergeSvg');
+  const narr = document.getElementById('mergeNarr');
+  clearSvg(svg);
+
+  // Initial state: main with 2 commits, feature with 2 commits
+  // main: y=60, feature: y=150
+  addLabel(svg, 10, 63, 'main', '#00c864');
+  addLabel(svg, 10, 153, 'feature', '#4f2bdf');
+
+  // main commits
+  const m1 = drawDot(svg, 80, 60, '#00c864', 'm1');
+  drawLine(svg, 80, 60, 160, 60, '#00c864');
+  const m2 = drawDot(svg, 160, 60, '#00c864', 'm2');
+  drawLine(svg, 160, 60, 240, 60, '#00c864');
+  const m3 = drawDot(svg, 240, 60, '#00c864', 'm3');
+
+  // feature branch from m1
+  drawPath(svg, 'M 80 60 L 80 150', '#4f2bdf');
+  drawLine(svg, 80, 150, 160, 150, '#4f2bdf');
+  const f1 = drawDot(svg, 160, 150, '#4f2bdf', 'f1');
+  drawLine(svg, 160, 150, 240, 150, '#4f2bdf');
+  const f2 = drawDot(svg, 240, 150, '#4f2bdf', 'f2');
+
+  narr.textContent = 'Step 1: Feature branch has 2 commits (f1, f2) branched from m1';
+  await sleep(1500);
+
+  narr.textContent = 'Step 2: Main has moved ahead with commits m2, m3';
+  flashDot(m2, '#00dd70');
+  flashDot(m3, '#00dd70');
+  await sleep(1500);
+
+  narr.textContent = 'Step 3: Merge creates a NEW commit connecting both branches...';
+  await sleep(1000);
+
+  // Draw merge commit
+  const mcLine = drawPath(svg, 'M 240 150 L 340 100', '#ff6b9d');
+  const mcLine2 = drawPath(svg, 'M 240 60 L 340 100', '#ff6b9d');
+  const mc = drawDot(svg, 340, 100, '#ff6b9d', 'merge');
+
+  narr.textContent = 'Step 4: Merge commit has TWO parents (m3 + f2) — history preserved!';
+  flashDot(mc, '#ff9dbe');
+  await sleep(1500);
+
+  narr.textContent = '✅ Done! History shows exactly what happened.';
+  document.getElementById('diffNote').style.display = 'block';
+}
+
+// --- REBASE ANIMATION ---
+async function animateRebase() {
+  const svg = document.getElementById('rebaseSvg');
+  const narr = document.getElementById('rebaseNarr');
+  clearSvg(svg);
+
+  addLabel(svg, 10, 63, 'main', '#00c864');
+  addLabel(svg, 10, 153, 'feature', '#4f2bdf');
+
+  // main commits
+  drawDot(svg, 80, 60, '#00c864', 'm1');
+  drawLine(svg, 80, 60, 160, 60, '#00c864');
+  drawDot(svg, 160, 60, '#00c864', 'm2');
+  drawLine(svg, 160, 60, 240, 60, '#00c864');
+  drawDot(svg, 240, 60, '#00c864', 'm3');
+
+  // feature commits (old positions — ghosted)
+  drawPath(svg, 'M 80 60 L 80 150', '#4f2bdf');
+  drawLine(svg, 80, 150, 160, 150, '#4f2bdf');
+  const f1old = drawDot(svg, 160, 150, '#4f2bdf', 'f1');
+  drawLine(svg, 160, 150, 240, 150, '#4f2bdf');
+  const f2old = drawDot(svg, 240, 150, '#4f2bdf', 'f2');
+
+  narr.textContent = 'Step 1: Feature has commits f1, f2 based on m1';
+  await sleep(1500);
+
+  narr.textContent = 'Step 2: Rebase lifts feature commits off the branch...';
+  await sleep(800);
+
+  // Animate f1 lifting up
+  f1old.setAttribute('opacity', '0.3');
+  const f1new = drawDot(svg, 160, 150, '#e8a020', 'f1\'');
+  await animateDot(f1new, 160, 150, 320, 150, 800);
+  f1new.setAttribute('cy', 60);
+  await animateDot(f1new, 320, 150, 320, 60, 600);
+
+  narr.textContent = 'Step 3: f1 is replayed on top of m3 as f1\' (new hash!)';
+  await sleep(1200);
+
+  // Animate f2
+  f2old.setAttribute('opacity', '0.3');
+  const f2new = drawDot(svg, 240, 150, '#e8a020', 'f2\'');
+  await animateDot(f2new, 240, 150, 320, 150, 400);
+  f2new.setAttribute('cy', 60);
+  await animateDot(f2new, 320, 150, 400, 60, 600);
+
+  narr.textContent = 'Step 4: f2 is replayed as f2\' — linear history!';
+  drawLine(svg, 320, 60, 400, 60, '#e8a020');
+  flashDot(f1new, '#00dd70');
+  flashDot(f2new, '#00dd70');
+  await sleep(1200);
+
+  narr.textContent = '✅ Done! History looks like a straight line — no merge commit.';
+  document.getElementById('diffNote').style.display = 'block';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+let running = false;
+async function runAnimation() {
+  if (running) return;
+  running = true;
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('diffNote').style.display = 'none';
+
+  // Run both in parallel
+  await Promise.all([animateMerge(), animateRebase()]);
+
+  running = false;
+  document.getElementById('playBtn').disabled = false;
+}
+
+function resetSim() {
+  running = false;
+  document.getElementById('playBtn').disabled = false;
+  clearSvg(document.getElementById('mergeSvg'));
+  clearSvg(document.getElementById('rebaseSvg'));
+  document.getElementById('mergeNarr').textContent = 'Click Animate to see merge in action';
+  document.getElementById('rebaseNarr').textContent = 'Click Animate to see rebase in action';
+  document.getElementById('diffNote').style.display = 'none';
+}
+</script>
+</body>
+</html>

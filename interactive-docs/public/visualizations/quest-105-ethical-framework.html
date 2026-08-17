@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethics Decision Tree</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.9rem}
+.tree-container{max-width:900px;margin:0 auto;position:relative}
+.node{background:#16213e;border-radius:12px;padding:16px 20px;cursor:pointer;transition:all .3s;border:2px solid transparent;position:relative}
+.node:hover{border-color:#4f2bdf;transform:scale(1.02)}
+.node.active{border-color:#00c864;box-shadow:0 0 20px rgba(0,200,100,.2)}
+.node.decision{border-left:4px solid #f5a623}
+.node.outcome-good{border-left:4px solid #00c864;background:#0d2818}
+.node.outcome-warn{border-left:4px solid #f5a623;background:#2d2006}
+.node.outcome-bad{border-left:4px solid #ff4757;background:#2d0a0e}
+.node-icon{font-size:1.3rem;margin-right:8px}
+.node-title{font-weight:600;font-size:1rem}
+.node-desc{font-size:.82rem;color:#aaa;margin-top:6px;display:none}
+.node.active .node-desc{display:block;animation:fadeIn .3s}
+.choices{display:none;margin-top:12px}
+.node.active .choices{display:flex;gap:10px;animation:fadeIn .3s}
+.choice-btn{background:#0d1b3e;border:1px solid #4f2bdf;color:#ccc;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s;flex:1}
+.choice-btn:hover{background:#4f2bdf;color:#fff}
+.choice-btn.yes{border-color:#00c864}
+.choice-btn.yes:hover{background:#00c864}
+.choice-btn.no{border-color:#ff4757}
+.choice-btn.no:hover{background:#ff4757}
+.children{margin-left:30px;border-left:2px solid #2a2a4a;padding-left:20px;margin-top:12px;display:none}
+.children.visible{display:block;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.breadcrumb{max-width:900px;margin:0 auto 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.breadcrumb span{font-size:.78rem;color:#666}
+.breadcrumb .crumb{background:#16213e;padding:4px 12px;border-radius:20px;color:#4f2bdf;font-size:.75rem;cursor:pointer;transition:background .2s}
+.breadcrumb .crumb:hover{background:#4f2bdf;color:#fff}
+.reset-btn{display:block;margin:30px auto 0;background:#4f2bdf;color:#fff;border:none;padding:10px 28px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:background .2s}
+.reset-btn:hover{background:#6b45e0}
+.rationale{background:#0d1b3e;border-radius:8px;padding:12px;margin-top:10px;font-size:.8rem;color:#aaa;line-height:1.6;border-left:3px solid #4f2bdf}
+.framework-badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.badge{background:#4f2bdf33;color:#4f2bdf;padding:2px 10px;border-radius:12px;font-size:.7rem}
+.badge.util{background:#00c86422;color:#00c864}
+.badge.deont{background:#f5a62322;color:#f5a623}
+.badge.virtue{background:#e040fb22;color:#e040fb}
+</style>
+</head>
+<body>
+<h1>🌳 Ethics Decision Tree</h1>
+<p class="subtitle">Navigate ethical dilemmas in AI development. Click nodes to explore reasoning and frameworks.</p>
+<div class="breadcrumb" id="breadcrumb"><span>Start at the root question ↓</span></div>
+<div class="tree-container" id="tree"></div>
+<button class="reset-btn" onclick="resetTree()">↻ Start Over</button>
+
+<script>
+const tree={
+id:'root',icon:'🤔',title:'Does the AI system make decisions affecting people\'s lives?',
+desc:'Consider: hiring, lending, healthcare, criminal justice, content moderation — any system where outputs have real consequences for individuals or groups.',
+frameworks:['Utilitarianism','Deontology'],
+children:[
+{id:'q1a',answer:'Yes — Direct impact on individuals',
+icon:'⚡',title:'Are the affected individuals aware the AI is being used?',
+desc:'Transparency is a core ethical principle. People have a right to know when AI influences decisions about them.',
+frameworks:['Transparency','Informed Consent'],
+children:[
+{id:'q1a1',answer:'Yes — They know',
+icon:'🔍',title:'Is there a human-in-the-loop for appeals?',
+desc:'Even transparent systems need recourse. If the AI makes a wrong decision, can someone challenge it?',
+frameworks:['Accountability','Due Process'],
+children:[
+{id:'q1a1a',answer:'Yes — Appeals process exists',
+icon:'✅',title:'Is the system regularly audited for bias?',
+desc:'Regular audits ensure fairness over time. Demographics and data patterns shift; the system must adapt.',
+frameworks:['Fairness','Justice'],
+outcome:'good',
+finalText:'✅ Ethical framework is strong. Document your practices, maintain audit schedules, and ensure the appeals process remains accessible. Consider publishing transparency reports.',
+recommendations:['Publish quarterly bias audit results','Maintain human review for edge cases','Create accessible appeal channels','Document decision criteria publicly']
+},
+{id:'q1a1b',answer:'No — No appeals process',
+icon:'🚨',title:'⚠️ Critical Gap: No Recourse Mechanism',
+desc:'Without appeals, errors become permanent injustices. This is a blocking ethical issue.',
+frameworks:['Accountability','Justice'],
+outcome:'bad',
+finalText:'❌ BLOCK: Implement an appeals/review process before deployment. Every affected individual must have a path to challenge AI decisions. This is non-negotiable.',
+recommendations:['Design human review workflow','Set SLA for appeal response (<48h)','Notify affected parties of appeal rights','Log all decisions for audit trail']
+}
+]},
+{id:'q1a2',answer:'No — They don\'t know',
+icon:'⚠️',title:'Is there a legitimate reason for non-disclosure?',
+desc:'Some cases (fraud detection, security) may justify limited disclosure, but most should prioritize transparency.',
+frameworks:['Transparency','Trust'],
+children:[
+{id:'q1a2a',answer:'Security/safety concern',
+icon:'🛡️',title:'Is oversight committee aware even if individuals aren\'t?',
+desc:'If individuals can\'t be told, an independent oversight body must monitor the system.',
+frameworks:['Accountability','Governance'],
+outcome:'warn',
+finalText:'⚠️ Conditional: Maintain oversight committee review, document rationale for non-disclosure, set periodic review dates to reassess. Minimize duration of secrecy.',
+recommendations:['Establish independent oversight board','Document why disclosure is harmful','Set 90-day review window','Ensure data minimization principles']
+},
+{id:'q1a2b',answer:'No legitimate reason',
+icon:'❌',title:'Transparency Violation',
+desc:'Using AI on people without their knowledge, without justification, violates fundamental ethical principles.',
+frameworks:['Autonomy','Dignity'],
+outcome:'bad',
+finalText:'❌ BLOCK: Individuals must be informed when AI affects their decisions. Implement disclosure mechanisms. Ethical AI requires informed consent as a baseline.',
+recommendations:['Add AI disclosure to all touchpoints','Update privacy policy','Train staff on AI transparency','Implement opt-out where possible']
+}
+]},
+{id:'q1b',answer:'No — No direct human impact',
+icon:'📋',title:'Does it process personal data (PII)?',
+desc:'Even systems without direct decisions can cause harm through data handling — privacy violations, data breaches, unauthorized sharing.',
+frameworks:['Privacy','Data Protection'],
+children:[
+{id:'q1b1',answer:'Yes — Processes PII',
+icon:'🔐',title:'Is data handling compliant with regulations (GDPR, CCPA)?',
+desc:'Legal compliance is the floor, not the ceiling. Ethics may require going beyond minimum legal requirements.',
+frameworks:['Privacy','Legal Compliance'],
+outcome:'warn',
+finalText:'⚠️ Ensure full regulatory compliance plus ethical best practices: data minimization, purpose limitation, retention schedules, and breach notification procedures.',
+recommendations:['Conduct DPIA (Data Protection Impact Assessment)','Implement data minimization','Set retention and deletion schedules','Test breach notification pipeline']
+},
+{id:'q1b2',answer:'No — No personal data',
+icon:'✅',title:'Does the output get used by humans in consequential decisions?',
+desc:'Indirect impact matters too. An AI that recommends products is low-stakes; one that recommends medical treatments is high-stakes.',
+frameworks:['Responsibility','Proportionality'],
+outcome:'good',
+finalText:'✅ Lower risk profile. Maintain basic AI ethics practices: model documentation, version control, performance monitoring. Reassess if scope changes.',
+recommendations:['Document model cards','Version all model artifacts','Monitor for performance drift','Establish scope-change review process']
+}
+]}
+]};
+
+let path=[];
+
+function renderTree(node,container,depth=0){
+const div=document.createElement('div');
+div.className='node '+(node.outcome?`outcome-${node.outcome}`:'')+(node.id==='root'?' active':'');
+div.id='node-'+node.id;
+const hdr=document.createElement('div'); hdr.style.cssText='display:flex;align-items:center;gap:8px';
+const iconSpan=document.createElement('span'); iconSpan.className='node-icon'; iconSpan.textContent=node.icon; hdr.appendChild(iconSpan);
+const titleSpan=document.createElement('span'); titleSpan.className='node-title'; titleSpan.textContent=node.title; hdr.appendChild(titleSpan);
+div.appendChild(hdr);
+const descDiv=document.createElement('div'); descDiv.className='node-desc';
+if(node.desc){descDiv.appendChild(document.createTextNode(node.desc));}
+if(node.frameworks){const badges=document.createElement('div'); badges.className='framework-badges';
+node.frameworks.forEach(f=>{const b=document.createElement('span'); const lc=f.toLowerCase(); b.className='badge '+(lc.includes('util')?'util':lc.includes('deont')?'deont':lc.includes('virtue')?'virtue':''); b.textContent=f; badges.appendChild(b);});
+descDiv.appendChild(badges);}
+if(node.outcome){const rat=document.createElement('div'); rat.className='rationale';
+const strong=document.createElement('strong'); strong.textContent=node.finalText; rat.appendChild(strong);
+const h4=document.createElement('h4'); h4.style.cssText='margin:10px 0 6px;font-size:.82rem'; h4.textContent='📋 Recommendations:'; rat.appendChild(h4);
+const recUl=document.createElement('ul'); recUl.style.cssText='padding-left:16px;margin:0';
+node.recommendations.forEach(r=>{const li=document.createElement('li'); li.textContent=r; recUl.appendChild(li);});
+rat.appendChild(recUl); descDiv.appendChild(rat);}
+div.appendChild(descDiv);
+if(node.children){const choices=document.createElement('div'); choices.className='choices';
+node.children.forEach(c=>{const btn=document.createElement('button'); btn.className='choice-btn '+(c.answer.includes('Yes')||c.answer.includes('exists')?'yes':'no'); btn.textContent=c.answer; btn.onclick=()=>choose(node.id,c.id); choices.appendChild(btn);});
+div.appendChild(choices);}
+container.appendChild(div);
+if(node.children){
+const childContainer=document.createElement('div');
+childContainer.className='children'+(depth<2?' visible':'');
+childContainer.id='children-'+node.id;
+node.children.forEach(c=>renderTree(c,childContainer,depth+1));
+container.appendChild(childContainer);
+}
+}
+
+function choose(parentId,childId){
+const parent=document.getElementById('node-'+parentId);
+parent.classList.remove('active');
+const child=document.getElementById('node-'+childId);
+child.classList.add('active');
+const childCont=document.getElementById('children-'+childId);
+if(childCont)childCont.classList.add('visible');
+path.push({id:parentId});
+updateBreadcrumb();
+child.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function updateBreadcrumb(){
+const bc=document.getElementById('breadcrumb');
+while(bc.firstChild)bc.removeChild(bc.firstChild);
+path.forEach((p,i)=>{const node=findNode(tree,p.id);
+const crumb=document.createElement('span'); crumb.className='crumb'; crumb.textContent=node.icon+' '+node.title.slice(0,30)+'...'; crumb.onclick=()=>jumpTo(p.id); bc.appendChild(crumb);
+if(i<path.length-1){const arrow=document.createElement('span'); arrow.textContent='→'; bc.appendChild(arrow);}});
+const arrow2=document.createElement('span'); arrow2.textContent='→'; bc.appendChild(arrow2);
+const cur=document.createElement('span'); cur.className='crumb'; cur.style.background='#4f2bdf33'; cur.textContent='current'; bc.appendChild(cur);
+}
+
+function findNode(node,id){
+if(node.id===id)return node;
+if(node.children){for(const c of node.children){const r=findNode(c,id);if(r)return r;}}
+return null;
+}
+
+function jumpTo(id){
+// Reset everything after this node
+const node=document.getElementById('node-'+id);
+document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
+node.classList.add('active');
+// Hide children after this node in path
+const idx=path.findIndex(p=>p.id===id);
+path=path.slice(0,idx+1);
+updateBreadcrumb();
+}
+
+function resetTree(){
+path=[];
+document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
+document.querySelectorAll('.children').forEach(c=>c.classList.remove('visible'));
+document.getElementById('node-root').classList.add('active');
+document.getElementById('children-root').classList.add('visible');
+const bcEl=document.getElementById('breadcrumb'); while(bcEl.firstChild)bcEl.removeChild(bcEl.firstChild); const startMsg=document.createElement('span'); startMsg.textContent='Start at the root question ↓'; bcEl.appendChild(startMsg);
+document.getElementById('node-root').scrollIntoView({behavior:'smooth'});
+}
+
+renderTree(tree,document.getElementById('tree'));
+</script>
+</body>
+</html>

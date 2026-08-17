@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GitHub Actions Pipeline — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
+.container{max-width:1200px;margin:0 auto}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
+.panel:hover{border-color:#4f2bdf}
+.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem}
+.triggers{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.trigger{display:flex;align-items:center;gap:.4rem;background:#0d1117;border:1px solid #333;border-radius:6px;padding:.35rem .6rem;font-size:.78rem;cursor:pointer;transition:all .2s;user-select:none}
+.trigger:hover{border-color:#4f2bdf}
+.trigger.on{border-color:#00c864;color:#00c864;background:#00c86410}
+.trigger .dot{width:10px;height:10px;border-radius:50%;background:#333;transition:all .2s}
+.trigger.on .dot{background:#00c864}
+.stage-pool{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.stage-chip{background:#0d1117;border:2px solid #333;border-radius:8px;padding:.35rem .7rem;font-size:.78rem;cursor:grab;transition:all .2s;user-select:none;display:flex;align-items:center;gap:.3rem}
+.stage-chip:hover{border-color:#4f2bdf}
+.stage-chip:active{cursor:grabbing}
+.stage-chip .emoji{font-size:.9rem}
+.pipeline-flow{display:flex;flex-wrap:wrap;gap:.3rem;min-height:48px;padding:.5rem;background:#0d1117;border:1px dashed #444;border-radius:8px;margin-bottom:1rem;align-items:center}
+.pipeline-stage{background:#1a1a2e;border:2px solid #333;border-radius:8px;padding:.3rem .6rem;font-size:.78rem;display:flex;align-items:center;gap:.3rem;transition:all .2s;cursor:pointer;position:relative}
+.pipeline-stage:hover{border-color:#4f2bdf}
+.pipeline-stage.running{border-color:#e8a020;animation:pulse 1s infinite}
+.pipeline-stage.pass{border-color:#00c864}
+.pipeline-stage.fail{border-color:#ff4466}
+.pipeline-stage .remove{position:absolute;top:-6px;right:-6px;background:#ff4466;color:#fff;width:14px;height:14px;border-radius:50%;font-size:.6rem;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+.pipeline-stage:hover .remove{display:flex}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.connector{color:#555;font-size:.8rem}
+.yaml-box{background:#0d1117;border:1px solid #333;border-radius:8px;padding:1rem;font-family:'SF Mono',monospace;font-size:.75rem;white-space:pre;overflow-x:auto;max-height:350px;overflow-y:auto;line-height:1.5}
+.yaml-box .yk{color:#4f2bdf}
+.yaml-box .yv{color:#00c864}
+.yaml-box .ys{color:#e8a020}
+.yaml-box .yc{color:#555}
+.yaml-box .yn{color:#ff6b9d}
+.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
+button:hover{background:#6143e8}
+.btn-green{background:#00c864;color:#1a1a2e}
+.btn-green:hover{background:#00dd70}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#00c864;color:#1a1a2e;padding:.6rem 1.5rem;border-radius:8px;font-size:.85rem;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<h1>GitHub Actions Pipeline</h1>
+<p class="sub">Drag stages to build your workflow — see the YAML update live</p>
+
+<div class="container">
+  <div class="main-grid">
+    <!-- Builder Panel -->
+    <div class="panel">
+      <h2>🔧 Pipeline Builder</h2>
+
+      <div class="section-label" style="font-size:.82rem;color:#888;margin-bottom:.4rem">Triggers</div>
+      <div class="triggers" id="triggerList"></div>
+
+      <div class="section-label" style="font-size:.82rem;color:#888;margin-bottom:.4rem">Available Stages (drag to pipeline)</div>
+      <div class="stage-pool" id="stagePool"></div>
+
+      <div class="section-label" style="font-size:.82rem;color:#888;margin-bottom:.4rem">Your Pipeline (click to configure)</div>
+      <div class="pipeline-flow" id="pipelineFlow"></div>
+
+      <div id="stageConfig" style="display:none;background:#0d1117;border-radius:8px;padding:.8rem;margin-top:.5rem">
+        <div style="font-size:.82rem;color:#4f2bdf;margin-bottom:.5rem" id="configTitle"></div>
+        <input class="form-input" id="configCmd" placeholder="Command" style="width:100%;background:#1a1a2e;border:1px solid #333;border-radius:6px;padding:.3rem .5rem;color:#e0e0e0;font-size:.78rem;font-family:monospace;margin-bottom:.3rem">
+        <input class="form-input" id="configCondition" placeholder="if: condition (optional)" style="width:100%;background:#1a1a2e;border:1px solid #333;border-radius:6px;padding:.3rem .5rem;color:#e0e0e0;font-size:.78rem;font-family:monospace">
+      </div>
+    </div>
+
+    <!-- YAML Preview -->
+    <div class="panel">
+      <h2>📄 Generated YAML</h2>
+      <div class="yaml-box" id="yamlBox"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-green" onclick="runPipeline()">▶ Simulate Run</button>
+    <button onclick="resetPipeline()">↺ Reset</button>
+    <button onclick="copyYaml()">📋 Copy YAML</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const stageDefinitions = [
+  {id:'checkout', name:'Checkout', emoji:'📦', cmd:'actions/checkout@v4'},
+  {id:'install', name:'Install', emoji:'📥', cmd:'npm ci'},
+  {id:'lint', name:'Lint', emoji:'🔍', cmd:'npm run lint'},
+  {id:'test', name:'Test', emoji:'🧪', cmd:'npm test'},
+  {id:'build', name:'Build', emoji:'🔨', cmd:'npm run build'},
+  {id:'security', name:'Security Scan', emoji:'🛡️', cmd:'npm audit --audit-level=high'},
+  {id:'deploy-preview', name:'Deploy Preview', emoji:'👀', cmd:'npx wrangler pages deploy ./dist'},
+  {id:'deploy-prod', name:'Deploy Production', emoji:'🚀', cmd:'npx wrangler pages deploy ./dist --branch=main'},
+  {id:'notify', name:'Notify', emoji:'🔔', cmd:'echo "Pipeline complete!"'}
+];
+
+const triggerDefs = [
+  {id:'push-main', label:'push → main', on:true},
+  {id:'push-branches', label:'push → branches', on:false},
+  {id:'pull_request', label:'pull_request', on:true},
+  {id:'schedule', label:'schedule (cron)', on:false},
+  {id:'workflow_dispatch', label:'workflow_dispatch', on:false}
+];
+
+let pipelineStages = ['checkout', 'install', 'test', 'build'];
+let selectedStageIdx = -1;
+let running = false;
+
+// Render triggers
+const trigContainer = document.getElementById('triggerList');
+triggerDefs.forEach(t => {
+  const div = document.createElement('div');
+  div.className = 'trigger' + (t.on ? ' on' : '');
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+  const label = document.createElement('span');
+  label.textContent = t.label;
+  div.appendChild(dot);
+  div.appendChild(label);
+  div.onclick = () => { t.on = !t.on; div.classList.toggle('on'); updateYaml(); };
+  trigContainer.appendChild(div);
+});
+
+// Render stage pool
+const poolContainer = document.getElementById('stagePool');
+stageDefinitions.forEach(s => {
+  const chip = document.createElement('div');
+  chip.className = 'stage-chip';
+  chip.draggable = true;
+  chip.dataset.id = s.id;
+  const emoji = document.createElement('span');
+  emoji.className = 'emoji';
+  emoji.textContent = s.emoji;
+  const name = document.createElement('span');
+  name.textContent = s.name;
+  chip.appendChild(emoji);
+  chip.appendChild(name);
+  chip.ondragstart = (e) => { e.dataTransfer.setData('text/plain', s.id); };
+  chip.onclick = () => {
+    if (!pipelineStages.includes(s.id)) {
+      pipelineStages.push(s.id);
+      renderPipeline();
+      updateYaml();
+    }
+  };
+  poolContainer.appendChild(chip);
+});
+
+// Pipeline flow drop zone
+const flowContainer = document.getElementById('pipelineFlow');
+flowContainer.ondragover = (e) => { e.preventDefault(); };
+flowContainer.ondrop = (e) => {
+  e.preventDefault();
+  const id = e.dataTransfer.getData('text/plain');
+  if (id && !pipelineStages.includes(id)) {
+    pipelineStages.push(id);
+    renderPipeline();
+    updateYaml();
+  }
+};
+
+function renderPipeline() {
+  while (flowContainer.firstChild) flowContainer.removeChild(flowContainer.firstChild);
+  if (pipelineStages.length === 0) {
+    const hint = document.createElement('span');
+    hint.style.color = '#555';
+    hint.style.fontSize = '.78rem';
+    hint.textContent = 'Drag stages here or click from pool above...';
+    flowContainer.appendChild(hint);
+    return;
+  }
+  pipelineStages.forEach((id, i) => {
+    if (i > 0) {
+      const arrow = document.createElement('span');
+      arrow.className = 'connector';
+      arrow.textContent = '→';
+      flowContainer.appendChild(arrow);
+    }
+    const def = stageDefinitions.find(s => s.id === id);
+    const stage = document.createElement('div');
+    stage.className = 'pipeline-stage';
+    if (i === selectedStageIdx) stage.style.borderColor = '#4f2bdf';
+    stage.dataset.idx = i;
+    const emoji = document.createElement('span');
+    emoji.textContent = def ? def.emoji : '?';
+    const name = document.createElement('span');
+    name.textContent = def ? def.name : id;
+    const remove = document.createElement('span');
+    remove.className = 'remove';
+    remove.textContent = '✕';
+    remove.onclick = (e) => { e.stopPropagation(); pipelineStages.splice(i, 1); if (selectedStageIdx >= pipelineStages.length) selectedStageIdx = -1; renderPipeline(); updateYaml(); };
+    stage.appendChild(emoji);
+    stage.appendChild(name);
+    stage.appendChild(remove);
+    stage.onclick = () => { selectedStageIdx = i; showConfig(id); renderPipeline(); };
+    flowContainer.appendChild(stage);
+  });
+}
+
+function showConfig(id) {
+  const def = stageDefinitions.find(s => s.id === id);
+  const configDiv = document.getElementById('stageConfig');
+  configDiv.style.display = 'block';
+  document.getElementById('configTitle').textContent = '⚙️ Configure: ' + (def ? def.name : id);
+  document.getElementById('configCmd').value = def ? def.cmd : '';
+}
+
+function generateYaml() {
+  let lines = [];
+  lines.push('<span class="yk">name:</span> <span class="yv">CI Pipeline</span>');
+  lines.push('');
+  lines.push('<span class="yk">on:</span>');
+  const activeTriggers = triggerDefs.filter(t => t.on);
+  if (activeTriggers.length === 0) {
+    lines.push('  <span class="yc"># No triggers configured</span>');
+  }
+  activeTriggers.forEach(t => {
+    if (t.id === 'push-main') lines.push('  <span class="yk">push:</span>');
+    else if (t.id === 'push-branches') lines.push('    <span class="yk">branches:</span> [<span class="ys">\'**\'</span>]');
+    else if (t.id === 'pull_request') lines.push('  <span class="yk">pull_request:</span>');
+    else if (t.id === 'schedule') lines.push('  <span class="yk">schedule:</span>\n    - <span class="yk">cron:</span> <span class="ys">\'0 0 * * *\'</span>');
+    else if (t.id === 'workflow_dispatch') lines.push('  <span class="yk">workflow_dispatch:</span>');
+  });
+
+  // Fix push structure
+  if (activeTriggers.some(t => t.id === 'push-main') && !activeTriggers.some(t => t.id === 'push-branches')) {
+    lines = lines.map(l => l === '  <span class="yk">push:</span>' ? '  <span class="yk">push:</span>\n    <span class="yk">branches:</span> [<span class="ys">\'main\'</span>]' : l);
+  }
+
+  lines.push('');
+  lines.push('<span class="yk">jobs:</span>');
+  lines.push('  <span class="yk">pipeline:</span>');
+  lines.push('    <span class="yk">runs-on:</span> <span class="yv">ubuntu-latest</span>');
+  lines.push('    <span class="yk">steps:</span>');
+
+  if (pipelineStages.length === 0) {
+    lines.push('      <span class="yc"># No stages configured</span>');
+  }
+  pipelineStages.forEach(id => {
+    const def = stageDefinitions.find(s => s.id === id);
+    if (def) {
+      if (def.id === 'checkout' || def.id === 'security') {
+        lines.push('      - <span class="yk">uses:</span> <span class="ys">' + def.cmd + '</span>');
+      } else {
+        lines.push('      - <span class="yk">name:</span> <span class="yv">' + def.name + '</span>');
+        lines.push('        <span class="yk">run:</span> <span class="ys">' + def.cmd + '</span>');
+      }
+    }
+  });
+
+  return lines.join('\n');
+}
+
+function updateYaml() {
+  document.getElementById('yamlBox').textContent = generateYaml();
+  // Re-parse as text
+  const yamlBox = document.getElementById('yamlBox');
+  const raw = generateYaml();
+  while (yamlBox.firstChild) yamlBox.removeChild(yamlBox.firstChild);
+  const lines = raw.split('\n');
+  lines.forEach(line => {
+    const div = document.createElement('div');
+    // Parse HTML tags for syntax highlighting
+    const tagRe = /<span class="([^"]+)">([^<]*)<\/span>/g;
+    let lastIdx = 0;
+    let m;
+    while ((m = tagRe.exec(line)) !== null) {
+      if (m.index > lastIdx) div.appendChild(document.createTextNode(line.slice(lastIdx, m.index)));
+      const span = document.createElement('span');
+      span.className = m[1];
+      span.textContent = m[2];
+      div.appendChild(span);
+      lastIdx = tagRe.lastIndex;
+    }
+    if (lastIdx < line.length) div.appendChild(document.createTextNode(line.slice(lastIdx)));
+    yamlBox.appendChild(div);
+  });
+}
+
+async function runPipeline() {
+  if (running || pipelineStages.length === 0) return;
+  running = true;
+  const stages = document.querySelectorAll('.pipeline-stage');
+  for (let i = 0; i < stages.length; i++) {
+    stages[i].classList.remove('pass', 'fail');
+    stages[i].classList.add('running');
+    await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+    stages[i].classList.remove('running');
+    const fail = Math.random() < 0.15;
+    stages[i].classList.add(fail ? 'fail' : 'pass');
+    if (fail) { running = false; return; }
+  }
+  running = false;
+}
+
+function resetPipeline() {
+  running = false;
+  selectedStageIdx = -1;
+  pipelineStages = ['checkout', 'install', 'test', 'build'];
+  document.querySelectorAll('.pipeline-stage').forEach(s => s.classList.remove('pass', 'fail', 'running'));
+  document.getElementById('stageConfig').style.display = 'none';
+  renderPipeline();
+  updateYaml();
+}
+
+function copyYaml() {
+  const raw = pipelineStages.map(id => {
+    const def = stageDefinitions.find(s => s.id === id);
+    if (!def) return '';
+    if (def.id === 'checkout' || def.id === 'security') return '      - uses: ' + def.cmd;
+    return '      - name: ' + def.name + '\n        run: ' + def.cmd;
+  }).join('\n');
+  navigator.clipboard.writeText(raw).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+renderPipeline();
+updateYaml();
+</script>
+</body>
+</html>

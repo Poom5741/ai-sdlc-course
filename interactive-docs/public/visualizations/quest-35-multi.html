@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Orchestrator — Quest 35</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
+  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
+  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
+  .controls{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;justify-content:center}
+  .mode-btn{padding:.6rem 1.4rem;border-radius:8px;border:2px solid #2a2a4a;background:#0f1629;color:#e0e0e0;font-size:.9rem;cursor:pointer;font-weight:600;transition:all .2s}
+  .mode-btn:hover{border-color:#4f2bdf}
+  .mode-btn.active{background:#4f2bdf;border-color:#4f2bdf;color:#fff}
+  .canvas-wrap{background:#16213e;border-radius:12px;padding:2rem;border:1px solid #2a2a4a;width:100%;max-width:900px}
+  svg{width:100%;height:auto}
+  .info-bar{margin-top:1.5rem;background:#0f1629;border-radius:8px;padding:1rem;font-size:.85rem;line-height:1.6}
+  .info-bar strong{color:#4f2bdf}
+  .node-label{font-size:13px;fill:#e0e0e0;font-weight:600}
+  .edge{stroke-width:2;fill:none}
+  @keyframes dashFlow{to{stroke-dashoffset:-20}}
+  .flow-line{stroke-dasharray:10 10;animation:dashFlow .8s linear infinite}
+  @keyframes pulseRing{0%,100%{r:24;opacity:.3}50%{r:30;opacity:0}}
+  @keyframes agentPulse{0%,100%{opacity:.6}50%{opacity:1}}
+</style>
+</head>
+<body>
+<h1>🤖 Multi-Agent Orchestrator</h1>
+<p class="subtitle">Quest 35 · Explore sequential, parallel, and conditional orchestration patterns</p>
+<div class="controls">
+  <button class="mode-btn active" data-mode="sequential">▶ Sequential</button>
+  <button class="mode-btn" data-mode="parallel">⫶ Parallel</button>
+  <button class="mode-btn" data-mode="conditional">❓ Conditional</button>
+</div>
+<div class="canvas-wrap">
+  <svg id="diagram" viewBox="0 0 800 400"></svg>
+  <div class="info-bar" id="infoBar"></div>
+</div>
+
+<script>
+var svg = document.getElementById('diagram');
+var infoBar = document.getElementById('infoBar');
+var currentMode = 'sequential';
+
+var colors = {
+  planner: '#4f2bdf',
+  worker: '#00c864',
+  reviewer: '#f0c040',
+  output: '#e040fb',
+  start: '#61afef',
+  error: '#ff4757'
+};
+
+function clearSVG() { svg.textContent = ''; }
+
+function makeNode(x, y, label, color, id) {
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('class', 'agent-node');
+  g.setAttribute('data-id', id);
+
+  var ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ring.setAttribute('cx', x); ring.setAttribute('cy', y); ring.setAttribute('r', '24');
+  ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', color); ring.setAttribute('stroke-width', '2');
+  ring.setAttribute('opacity', '.3');
+  g.appendChild(ring);
+
+  var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', '22');
+  c.setAttribute('fill', color); c.setAttribute('opacity', '.15');
+  g.appendChild(c);
+
+  var c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c2.setAttribute('cx', x); c2.setAttribute('cy', y); c2.setAttribute('r', '18');
+  c2.setAttribute('fill', color); c2.setAttribute('opacity', '.3');
+  g.appendChild(c2);
+
+  var txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  txt.setAttribute('x', x); txt.setAttribute('y', y + 1);
+  txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('dominant-baseline', 'middle');
+  txt.setAttribute('class', 'node-label');
+  txt.textContent = label;
+  g.appendChild(txt);
+
+  svg.appendChild(g);
+  return g;
+}
+
+function makeArrow(x1, y1, x2, y2, color, animated) {
+  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', color || '#4a4a6a');
+  line.setAttribute('class', 'edge' + (animated ? ' flow-line' : ''));
+  svg.appendChild(line);
+
+  // arrowhead
+  var angle = Math.atan2(y2 - y1, x2 - x1);
+  var ax = x2 - 10 * Math.cos(angle - 0.3);
+  var ay = y2 - 10 * Math.sin(angle - 0.3);
+  var bx = x2 - 10 * Math.cos(angle + 0.3);
+  var by = y2 - 10 * Math.sin(angle + 0.3);
+  var tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  tri.setAttribute('points', x2+','+y2+' '+ax+','+ay+' '+bx+','+by);
+  tri.setAttribute('fill', color || '#4a4a6a');
+  svg.appendChild(tri);
+}
+
+function makeDiamond(x, y, w, h, color) {
+  var pts = x+','+(y-h/2)+' '+(x+w/2)+','+y+' '+x+','+(y+h/2)+' '+(x-w/2)+','+y;
+  var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', pts);
+  poly.setAttribute('fill', color);
+  poly.setAttribute('opacity', '.2');
+  poly.setAttribute('stroke', color);
+  poly.setAttribute('stroke-width', '2');
+  svg.appendChild(poly);
+}
+
+function makeLabel(x, y, text, color) {
+  var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '11');
+  t.setAttribute('fill', color || '#888');
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+function drawSequential() {
+  var nodes = [
+    { x: 100, y: 200, label: 'Input', color: colors.start },
+    { x: 260, y: 200, label: 'Planner', color: colors.planner },
+    { x: 420, y: 200, label: 'Worker', color: colors.worker },
+    { x: 580, y: 200, label: 'Reviewer', color: colors.reviewer },
+    { x: 720, y: 200, label: 'Output', color: colors.output }
+  ];
+  nodes.forEach(function(n, i) {
+    makeNode(n.x, n.y, n.label, n.color, n.label);
+    if (i > 0) makeArrow(nodes[i-1].x + 24, nodes[i-1].y, n.x - 24, n.y, n.color, true);
+  });
+  makeLabel(180, 175, 'task');
+  makeLabel(340, 175, 'plan');
+  makeLabel(500, 175, 'result');
+  makeLabel(650, 175, 'approved');
+  infoBar.textContent = '';
+  var s1 = document.createElement('strong');
+  s1.textContent = 'Sequential Pattern: ';
+  infoBar.appendChild(s1);
+  infoBar.appendChild(document.createTextNode('Agents execute in fixed order. Each agent receives the output of the previous one. Simple but slow — no concurrency. Best for linear pipelines like code review or document processing.'));
+}
+
+function drawParallel() {
+  var input = { x: 100, y: 200, label: 'Input', color: colors.start };
+  var workers = [
+    { x: 350, y: 100, label: 'Worker A', color: colors.worker },
+    { x: 350, y: 200, label: 'Worker B', color: colors.worker },
+    { x: 350, y: 300, label: 'Worker C', color: colors.worker }
+  ];
+  var aggregator = { x: 600, y: 200, label: 'Aggregator', color: colors.reviewer };
+  var output = { x: 740, y: 200, label: 'Output', color: colors.output };
+
+  makeNode(input.x, input.y, input.label, input.color, 'input');
+  workers.forEach(function(w) {
+    makeNode(w.x, w.y, w.label, w.color, w.label);
+    makeArrow(input.x + 24, input.y, w.x - 24, w.y, w.color, true);
+  });
+  makeNode(aggregator.x, aggregator.y, aggregator.label, aggregator.color, 'aggregator');
+  workers.forEach(function(w) {
+    makeArrow(w.x + 24, w.y, aggregator.x - 24, aggregator.y, w.color, true);
+  });
+  makeNode(output.x, output.y, output.label, output.color, 'output');
+  makeArrow(aggregator.x + 24, aggregator.y, output.x - 24, output.y, output.color, true);
+
+  makeLabel(220, 80, 'subtask 1');
+  makeLabel(220, 220, 'subtask 2');
+  makeLabel(220, 320, 'subtask 3');
+
+  infoBar.textContent = '';
+  var s1 = document.createElement('strong');
+  s1.textContent = 'Parallel Pattern: ';
+  infoBar.appendChild(s1);
+  infoBar.appendChild(document.createTextNode('Multiple agents work simultaneously on independent subtasks. Results are merged by an aggregator. Maximizes throughput when tasks have no dependencies. Ideal for research, multi-file edits, or batch processing.'));
+}
+
+function drawConditional() {
+  var input = { x: 80, y: 200, label: 'Input', color: colors.start };
+  var planner = { x: 220, y: 200, label: 'Router', color: colors.planner };
+  var simple = { x: 460, y: 100, label: 'Simple', color: colors.worker };
+  var complex = { x: 460, y: 200, label: 'Complex', color: colors.reviewer };
+  var escalate = { x: 460, y: 300, label: 'Escalate', color: colors.error };
+  var merge = { x: 660, y: 200, label: 'Merge', color: colors.output };
+
+  makeNode(input.x, input.y, input.label, input.color, 'input');
+  makeNode(planner.x, planner.y, planner.label, planner.color, 'router');
+  makeArrow(input.x + 24, input.y, planner.x - 24, planner.y, planner.color, true);
+
+  makeDiamond(350, 200, 60, 50, '#f0c040');
+  makeLabel(350, 230, 'classify');
+
+  makeNode(simple.x, simple.y, simple.label, simple.color, 'simple');
+  makeNode(complex.x, complex.y, complex.label, complex.color, 'complex');
+  makeNode(escalate.x, escalate.y, escalate.label, escalate.color, 'escalate');
+
+  makeArrow(380, 195, simple.x - 24, simple.y, simple.color, true);
+  makeArrow(380, 200, complex.x - 24, complex.y, complex.color, true);
+  makeArrow(380, 205, escalate.x - 24, escalate.y, escalate.color, true);
+
+  makeLabel(395, 140, 'easy');
+  makeLabel(395, 195, 'medium');
+  makeLabel(395, 270, 'hard');
+
+  makeNode(merge.x, merge.y, merge.label, merge.color, 'merge');
+  makeArrow(simple.x + 24, simple.y, merge.x - 24, merge.y, simple.color, true);
+  makeArrow(complex.x + 24, complex.y, merge.x - 24, merge.y, complex.color, true);
+  makeArrow(escalate.x + 24, escalate.y, merge.x - 24, merge.y, escalate.color, true);
+
+  infoBar.textContent = '';
+  var s1 = document.createElement('strong');
+  s1.textContent = 'Conditional Pattern: ';
+  infoBar.appendChild(s1);
+  infoBar.appendChild(document.createTextNode('A router agent classifies the input and dispatches to specialized agents based on complexity. Different paths handle different difficulty levels. Optimizes cost by using simpler agents for easy tasks and reserving expensive models for hard ones.'));
+}
+
+function draw(mode) {
+  currentMode = mode;
+  clearSVG();
+  if (mode === 'sequential') drawSequential();
+  else if (mode === 'parallel') drawParallel();
+  else if (mode === 'conditional') drawConditional();
+
+  document.querySelectorAll('.mode-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+  });
+}
+
+document.querySelectorAll('.mode-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() { draw(this.getAttribute('data-mode')); });
+});
+
+draw('sequential');
+</script>
+</body>
+</html>

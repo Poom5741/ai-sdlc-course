@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Code Completion Flow</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:24px;font-size:1.5rem}
+.ctn{max-width:900px;margin:0 auto}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+@media(max-width:640px){.cmp{grid-template-columns:1fr}}
+.pn{background:#16213e;border-radius:12px;padding:16px;border:2px solid #333}
+.pn.nv{border-color:#e74c3c}.pn.cr{border-color:#00c864}
+.pn h2{font-size:1rem;margin-bottom:12px}
+.pn.nv h2{color:#e74c3c}.pn.cr h2{color:#00c864}
+.st{padding:10px;border-radius:8px;background:#1a1a2e;display:flex;align-items:center;gap:10px;font-size:.85rem;opacity:0;transform:translateX(-20px);transition:all .4s}
+.st.a{opacity:1;transform:translateX(0)}
+.bg{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:.75rem;flex-shrink:0}
+.nv .bg{background:#e74c3c33;color:#e74c3c}.cr .bg{background:#00c86433;color:#00c864}
+.aw{text-align:center;color:#4f2bdf;opacity:0;transition:opacity .3s}.aw.a{opacity:1}
+.cb{background:#16213e;border-radius:12px;padding:16px;text-align:center;border:2px solid #4f2bdf}
+.cb h2{color:#4f2bdf;margin-bottom:12px;font-size:1rem}
+.cy{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ch{padding:8px 14px;border-radius:20px;background:#1a1a2e;font-size:.8rem;border:1px solid #4f2bdf;color:#ccc;cursor:pointer;transition:all .3s}
+.ch:hover,.ch.a{background:#4f2bdf;color:#fff;transform:scale(1.05)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{text-align:left;padding:8px;color:#4f2bdf;border-bottom:1px solid #333}
+td{padding:8px;border-bottom:1px solid #222}
+.btn{display:block;margin:20px auto 0;padding:10px 24px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>⚡ AI Code Completion Flow</h1>
+<div class="ctn">
+<div class="cmp">
+<div class="pn nv"><h2>❌ Naive Approach</h2>
+<div id="nf" class="fl">
+<div class="st" data-i="0"><span class="bg">1</span>Write vague comment</div>
+<div class="aw" data-i="0">↓</div>
+<div class="st" data-i="1"><span class="bg">2</span>AI guesses wrong</div>
+<div class="aw" data-i="1">↓</div>
+<div class="st" data-i="2"><span class="bg">3</span>Copy-paste blindly</div>
+<div class="aw" data-i="2">↓</div>
+<div class="st" data-i="3"><span class="bg">4</span>Runtime error 💥</div>
+<div class="aw" data-i="3">↓</div>
+<div class="st" data-i="4"><span class="bg">5</span>Debug for 2 hours</div>
+</div></div>
+<div class="pn cr"><h2>✅ Correct Approach</h2>
+<div id="cf" class="fl">
+<div class="st" data-i="0"><span class="bg">1</span>Write specific prompt</div>
+<div class="aw" data-i="0">↓</div>
+<div class="st" data-i="1"><span class="bg">2</span>AI suggests code</div>
+<div class="aw" data-i="1">↓</div>
+<div class="st" data-i="2"><span class="bg">3</span>Review &amp; understand</div>
+<div class="aw" data-i="2">↓</div>
+<div class="st" data-i="3"><span class="bg">4</span>Write test first</div>
+<div class="aw" data-i="3">↓</div>
+<div class="st" data-i="4"><span class="bg">5</span>Run, fix, iterate ✨</div>
+</div></div>
+</div>
+<div class="cb"><h2>🔄 The Correct Cycle</h2>
+<div class="cy" id="cy">
+<span class="ch" data-i="0">Write Prompt</span>
+<span class="ch" data-i="1">AI Suggests</span>
+<span class="ch" data-i="2">Review</span>
+<span class="ch" data-i="3">Test</span>
+<span class="ch" data-i="4">Fix</span>
+</div>
+<table><thead><tr><th>Aspect</th><th>Naive</th><th>Correct</th></tr></thead><tbody>
+<tr><td>Prompt quality</td><td>Vague</td><td>Specific &amp; detailed</td></tr>
+<tr><td>Code review</td><td>Skip</td><td>Always review</td></tr>
+<tr><td>Testing</td><td>None</td><td>Test-driven</td></tr>
+<tr><td>Time to debug</td><td>Hours</td><td>Minutes</td></tr>
+<tr><td>Learning</td><td>Zero</td><td>Deep understanding</td></tr>
+</tbody></table></div>
+<button class="btn" onclick="replay()">▶ Replay Animation</button>
+</div>
+<script>
+function ap(id){const s=document.querySelectorAll('#'+id+' .st'),a=document.querySelectorAll('#'+id+' .aw');let i=0;const iv=setInterval(()=>{if(i>=5)return clearInterval(iv);s[i].classList.add('a');if(a[i])a[i].classList.add('a');i++},500)}
+function replay(){document.querySelectorAll('.st,.aw,.ch').forEach(e=>e.classList.remove('a'));ap('nf');ap('cf');cy()}
+let ci=0,ct;
+function cy(){ci=0;clearInterval(ct);const cs=document.querySelectorAll('#cy .ch');ct=setInterval(()=>{if(ci>=cs.length)ci=0;cs.forEach(c=>c.classList.remove('a'));cs[ci].classList.add('a');ci++},800)}
+document.querySelectorAll('#cy .ch').forEach(c=>{c.addEventListener('click',()=>{document.querySelectorAll('#cy .ch').forEach(x=>x.classList.remove('a'));c.classList.add('a')})});
+addEventListener('DOMContentLoaded',replay);
+</script>
+</body></html>

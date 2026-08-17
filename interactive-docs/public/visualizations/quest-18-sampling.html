@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sampling Strategies</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:700px;margin:0 auto}
+.ctrls{background:#16213e;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #333}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.row label{font-size:.8rem;color:#aaa;min-width:90px}
+.row input[type=range]{flex:1;accent-color:#4f2bdf}
+.row .val{font-size:.85rem;color:#00c864;min-width:40px;text-align:right;font-weight:bold}
+.chart{background:#16213e;border-radius:12px;padding:20px;border:1px solid #333;margin-bottom:16px}
+.bar-area{display:flex;align-items:flex-end;gap:4px;height:200px;padding-top:10px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s cubic-bezier(.4,0,.2,1),background .4s;min-height:2px}
+.bar-label{font-size:.6rem;color:#888;text-align:center;word-break:break-all;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-pct{font-size:.65rem;color:#ccc;text-align:center;margin-bottom:2px}
+.tokens-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.tok{padding:4px 10px;border-radius:12px;font-size:.7rem;border:1px solid #333;background:#1a1a2e;color:#888;transition:all .3s}
+.tok.sel{background:#4f2bdf;color:#fff;border-color:#4f2bdf}
+.tok.rej{background:#e74c3c33;color:#e74c3c;border-color:#e74c3c;text-decoration:line-through}
+.info{background:#16213e;border-radius:10px;padding:14px;font-size:.8rem;line-height:1.6;border:1px solid #333;color:#aaa}
+.info .hi{color:#00c864}
+.preset-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.pre{padding:5px 12px;border-radius:14px;background:#1a1a2e;border:1px solid #333;color:#aaa;font-size:.7rem;cursor:pointer;transition:all .3s}
+.pre:hover{border-color:#4f2bdf;color:#fff}
+</style>
+</head>
+<body>
+<h1>🎲 Sampling Strategies</h1>
+<div class="ctn">
+<div class="preset-row">
+<span class="pre" onclick="preset('greedy')">Greedy</span>
+<span class="pre" onclick="preset('creative')">Creative</span>
+<span class="pre" onclick="preset('focused')">Focused</span>
+<span class="pre" onclick="preset('random')">Full Random</span>
+</div>
+<div class="ctrls">
+<div class="row"><label>Temperature</label><input type="range" id="temp" min="0" max="200" value="100" oninput="draw()"><span class="val" id="tempV">1.0</span></div>
+<div class="row"><label>Top-K</label><input type="range" id="topk" min="1" max="10" value="10" oninput="draw()"><span class="val" id="topkV">10</span></div>
+<div class="row"><label>Top-P</label><input type="range" id="topp" min="10" max="100" value="100" oninput="draw()"><span class="val" id="toppV">1.0</span></div>
+</div>
+<div class="chart"><div class="bar-area" id="bars"></div></div>
+<div class="tokens-row" id="toks"></div>
+<div class="info" id="desc">
+<strong>Temperature</strong> controls randomness: <span class="hi">0 = greedy</span> (always pick best), <span class="hi">2 = very random</span>. <br>
+<strong>Top-K</strong> limits sampling to the K most likely tokens. <br>
+<strong>Top-P (nucleus)</strong> samples from the smallest set of tokens whose cumulative probability ≥ P.
+</div>
+</div>
+</script>
+<script>
+const vocab=[
+{t:'the',p:.25},{t:'a',p:.15},{t:'is',p:.12},{t:'was',p:.08},{t:'are',p:.07},
+{t:'has',p:.06},{t:'have',p:.05},{t:'be',p:.04},{t:'not',p:.035},{t:'will',p:.03},
+{t:'can',p:.025},{t:'may',p:.02},{t:'could',p:.018},{t:'should',p:.015},{t:'might',p:.012}
+];
+const colors=['#4f2bdf','#6b4fff','#8b6fff','#00c864','#00e676','#f1c40f','#e74c3c','#ff6b35','#9b59b6','#e056a0','#00bcd4','#ff9800','#795548','#607d8b','#3f51b5'];
+function softmax(arr,t){const mx=Math.max(...arr);const scaled=arr.map(x=>Math.exp((x-mx)/Math.max(t,.01)));const s=scaled.reduce((a,b)=>a+b);return scaled.map(x=>x/s)}
+function draw(){
+const temp=+document.getElementById('temp').value/100;
+const topk=+document.getElementById('topk').value;
+const topp=+document.getElementById('topp').value/100;
+document.getElementById('tempV').textContent=temp.toFixed(1);
+document.getElementById('topkV').textContent=topk;
+document.getElementById('toppV').textContent=topp.toFixed(2);
+const logs=vocab.map(v=>Math.log(v.p+.001));
+const probs=softmax(logs,temp);
+const indexed=probs.map((p,i)=>({p,i,...vocab[i]}));
+indexed.sort((a,b)=>b.p-a.p);
+let cumulative=0;const np=indexed.map(v=>{const inc=cumulative<topp;cumulative+=v.p;return{...v,active:false}});
+let activeCount=0;
+for(const v of np){if(activeCount>=topk||!v.active&&cumulative>topp)break;v.active=true;activeCount++}
+let cum2=0;const final=np.map(v=>{cum2+=v.p;return{...v,active:activeCount>0?cum2<=topp||v===np.find(x=>x.p===Math.max(...np.filter(y=>y.active).map(y=>y.p))):v.active}});
+const barsEl=document.getElementById('bars');while(barsEl.firstChild)barsEl.removeChild(barsEl.firstChild);
+const maxP=Math.max(...np.map(v=>v.p),.01);
+np.forEach((v,i)=>{
+const col=document.createElement('div');col.className='bar-col';
+const pct=document.createElement('div');pct.className='bar-pct';pct.textContent=v.active?(v.p*100).toFixed(1)+'%':'';
+const bar=document.createElement('div');bar.className='bar';
+const h=Math.max(2,(v.p/maxP)*190);
+bar.style.height=h+'px';
+bar.style.background=v.active?colors[i%colors.length]:'#333';
+const lbl=document.createElement('div');lbl.className='bar-label';lbl.textContent=v.t;
+col.append(pct,bar,lbl);barsEl.appendChild(col);
+});
+const toksEl=document.getElementById('toks');while(toksEl.firstChild)toksEl.removeChild(toksEl.firstChild);
+np.forEach((v,i)=>{
+const s=document.createElement('span');s.className='tok';
+s.textContent=v.t+(v.active?' ('+(v.p*100).toFixed(1)+'%)':'');
+if(v.active)s.classList.add('sel');else s.classList.add('rej');
+toksEl.appendChild(s);
+});
+}
+function preset(name){
+const p={greedy:{t:0,k:1,p:1},creative:{t:1.5,k:10,p:.9},focused:{t:.5,k:3,p:.8},random:{t:2,k:10,p:1}};
+const s=p[name]||p.greedy;
+document.getElementById('temp').value=s.t*100;
+document.getElementById('topk').value=s.k;
+document.getElementById('topp').value=s.p*100;
+draw();
+}
+draw();
+</script>
+</body></html>

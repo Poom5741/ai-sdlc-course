@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Position Encoding</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:700px;margin:0 auto}
+svg{width:100%;height:auto;display:block;background:#16213e;border-radius:12px;border:1px solid #333}
+.ctrl{background:#16213e;border-radius:12px;padding:16px;margin-top:16px;border:1px solid #333}
+.row{display:flex;align-items:center;gap:12px;margin:8px 0}
+.row label{font-size:.8rem;color:#aaa;min-width:70px}
+.row input[type=range]{flex:1;accent-color:#4f2bdf}
+.row .val{font-size:.85rem;color:#00c864;min-width:40px;text-align:right}
+.legend{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:.75rem;color:#888}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.info{background:#16213e;border-radius:10px;padding:14px;font-size:.8rem;line-height:1.6;margin-top:16px;border:1px solid #333;color:#aaa}
+.info .hi{color:#00c864}
+</style>
+</head>
+<body>
+<h1>📐 Position Encoding</h1>
+<div class="ctn">
+<svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+<line x1="30" y1="140" x2="570" y2="140" stroke="#333" stroke-width="1"/>
+<text x="15" y="145" fill="#666" font-size="10" font-family="system-ui">0</text>
+<text x="560" y="145" fill="#666" font-size="10" font-family="system-ui">pos</text>
+<path id="sin1" fill="none" stroke="#4f2bdf" stroke-width="2" opacity="0.9"/>
+<path id="cos1" fill="none" stroke="#00c864" stroke-width="2" opacity="0.9"/>
+<path id="sin2" fill="none" stroke="#e74c3c" stroke-width="1.5" opacity="0.6"/>
+<path id="cos2" fill="none" stroke="#f1c40f" stroke-width="1.5" opacity="0.6"/>
+<text x="50" y="30" fill="#4f2bdf" font-size="11" font-family="system-ui">sin(pos/10000^(2i/d))</text>
+<text x="50" y="48" fill="#00c864" font-size="11" font-family="system-ui">cos(pos/10000^(2i/d))</text>
+<!-- position markers -->
+<g id="posmarkers"></g>
+</svg>
+<div class="ctrl">
+<div class="row">
+<label>Position</label>
+<input type="range" id="pos" min="0" max="49" value="0" oninput="draw()">
+<span class="val" id="posV">0</span>
+</div>
+<div class="row">
+<label>Dimension</label>
+<input type="range" id="dim" min="0" max="3" value="0" oninput="draw()">
+<span class="val" id="dimV">d=0,1</span>
+</div>
+<div class="row">
+<label>Speed</label>
+<input type="range" id="spd" min="1" max="5" value="2" oninput="draw()">
+<span class="val" id="spdV">2x</span>
+</div>
+<div class="legend">
+<span><span class="dot" style="background:#4f2bdf"></span>Sin</span>
+<span><span class="dot" style="background:#00c864"></span>Cos</span>
+<span><span class="dot" style="background:#e74c3c"></span>Sin (faster)</span>
+<span><span class="dot" style="background:#f1c40f"></span>Cos (faster)</span>
+</div>
+</div>
+<div class="info">
+<strong>How it works:</strong> Each position gets a unique vector of <span class="hi">sin/cos pairs</span> at different frequencies.
+This lets the model learn <span class="hi">relative distances</span> between tokens — a dot product of
+PE(pos) and PE(pos+k) depends only on k, not on absolute position.
+Move the <span class="hi">position slider</span> to see how the vertical line scans through the wave.
+</div>
+</div>
+<script>
+function draw(){
+const pos=+document.getElementById('pos').value;
+const dim=+document.getElementById('dim').value;
+const spd=+document.getElementById('spd').value;
+document.getElementById('posV').textContent=pos;
+document.getElementById('dimV').textContent='d='+dim;
+document.getElementById('spdV').textContent=spd+'x';
+const W=540,H=260,ox=40,oy=140;
+const freqs=[
+{i:0,si:'#4f2bdf',ci:'#00c864'},
+{i:1,si:'#e74c3c',ci:'#f1c40f'}
+];
+let paths={};
+['sin1','cos1','sin2','cos2'].forEach(id=>{paths[id]=''});
+for(let x=0;x<=W;x++){
+const p=(x/W)*50;
+const f1=1/Math.pow(10000,2*freqs[0].i/8);
+const f2=1/Math.pow(10000,2*freqs[1].i/8);
+const s1=spd*Math.sin(p*f1),c1=spd*Math.cos(p*f1);
+const s2=spd*Math.sin(p*f2),c2=spd*Math.cos(p*f2);
+const cmd=(x===0?'M':'L');
+paths.sin1+=`${cmd}${ox+x} ${oy-s1*35} `;
+paths.cos1+=`${cmd}${ox+x} ${oy-c1*35} `;
+paths.sin2+=`${cmd}${ox+x} ${oy-s2*35} `;
+paths.cos2+=`${cmd}${ox+x} ${oy-c2*35} `;
+}
+document.getElementById('sin1').setAttribute('d',paths.sin1);
+document.getElementById('cos1').setAttribute('d',paths.cos1);
+document.getElementById('sin2').setAttribute('d',paths.sin2);
+document.getElementById('cos2').setAttribute('d',paths.cos2);
+const mx=ox+(pos/49)*W;
+const markers=document.getElementById('posmarkers');
+while(markers.firstChild)markers.removeChild(markers.firstChild);
+const ns='http://www.w3.org/2000/svg';
+const line=document.createElementNS(ns,'line');line.setAttribute('x1',mx);line.setAttribute('y1','10');line.setAttribute('x2',mx);line.setAttribute('y2','270');line.setAttribute('stroke','#fff');line.setAttribute('stroke-width','1');line.setAttribute('stroke-dasharray','4');line.setAttribute('opacity','0.5');markers.appendChild(line);
+const f1=1/Math.pow(10000,2*freqs[0].i/8);
+const f2=1/Math.pow(10000,2*freqs[1].i/8);
+const s1v=spd*Math.sin(pos*f1),c1v=spd*Math.cos(pos*f1);
+const s2v=spd*Math.sin(pos*f2),c2v=spd*Math.cos(pos*f2);
+const dots=[['#4f2bdf',5,oy-s1v*35],['#00c864',5,oy-c1v*35],['#e74c3c',4,oy-s2v*35],['#f1c40f',4,oy-c2v*35]];
+dots.forEach(([c,r,cy])=>{const ci=document.createElementNS(ns,'circle');ci.setAttribute('cx',mx);ci.setAttribute('cy',cy);ci.setAttribute('r',r);ci.setAttribute('fill',c);markers.appendChild(ci)});
+const t1=document.createElementNS(ns,'text');t1.setAttribute('x',mx+6);t1.setAttribute('y','14');t1.setAttribute('fill','#aaa');t1.setAttribute('font-size','10');t1.textContent='pos='+pos;markers.appendChild(t1);
+const t2=document.createElementNS(ns,'text');t2.setAttribute('x',mx+6);t2.setAttribute('y','270');t2.setAttribute('fill','#aaa');t2.setAttribute('font-size','10');t2.textContent='sin='+s1v.toFixed(2)+' cos='+c1v.toFixed(2);markers.appendChild(t2);
+}
+draw();
+</script>
+</body></html>

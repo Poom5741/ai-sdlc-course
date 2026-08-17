@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI Pipeline Builder — Quest 41</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
+  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
+  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
+  .container{display:flex;gap:2rem;width:100%;max-width:1100px;flex-wrap:wrap}
+  .builder{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
+  .preview{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
+  .panel-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:#4f2bdf}
+  .stage-list{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1rem}
+  .stage-item{background:#0f1629;border-radius:8px;padding:.8rem 1rem;display:flex;align-items:center;gap:.8rem;border-left:3px solid #4f2bdf;cursor:grab;transition:transform .15s}
+  .stage-item:hover{transform:translateX(4px)}
+  .stage-item .drag-handle{color:#555;cursor:grab}
+  .stage-item select{background:#1a1a2e;color:#e0e0e0;border:1px solid #2a2a4a;border-radius:4px;padding:.3rem .5rem;font-size:.8rem}
+  .stage-item .remove-btn{background:none;border:none;color:#ff4757;cursor:pointer;font-size:1.1rem;padding:0 .3rem}
+  .add-stage{background:#4f2bdf;color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-size:.85rem;cursor:pointer;font-weight:600;transition:background .2s}
+  .add-stage:hover{background:#6141e0}
+  .trigger-section{margin-top:1.5rem;padding-top:1rem;border-top:1px solid #2a2a4a}
+  .trigger-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.5rem}
+  .trigger-chip{padding:.35rem .7rem;border-radius:16px;font-size:.8rem;cursor:pointer;border:1px solid #2a2a4a;background:#0f1629;transition:all .2s}
+  .trigger-chip:hover{border-color:#4f2bdf}
+  .trigger-chip.active{background:#4f2bdf;border-color:#4f2bdf;color:#fff}
+  .pipeline-viz{margin-top:1rem}
+  .pipe-stage{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;animation:slideIn .3s}
+  .pipe-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+  .pipe-line{width:2px;height:16px;background:#2a2a4a;margin-left:5px}
+  .pipe-label{font-size:.85rem;color:#ccc}
+  .pipe-sublabel{font-size:.7rem;color:#666;margin-left:1.5rem}
+  .yaml-preview{background:#0f1629;border-radius:8px;padding:1rem;font-family:'Fira Code',monospace;font-size:.75rem;line-height:1.5;overflow-x:auto;margin-top:1rem;white-space:pre;color:#aaa;max-height:400px;overflow-y:auto}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<h1>⚙️ CI Pipeline Builder</h1>
+<p class="subtitle">Quest 41 · Configure your CI/CD pipeline stages and triggers</p>
+<div class="container">
+  <div class="builder">
+    <div class="panel-title">🔧 Pipeline Stages</div>
+    <div class="stage-list" id="stageList"></div>
+    <button class="add-stage" id="addStage">+ Add Stage</button>
+    <div class="trigger-section">
+      <div class="panel-title" style="margin-bottom:.3rem">🎯 Triggers</div>
+      <div class="trigger-row" id="triggerRow"></div>
+    </div>
+  </div>
+  <div class="preview">
+    <div class="panel-title">👁 Pipeline Visualization</div>
+    <div class="pipeline-viz" id="pipelineViz"></div>
+    <div class="panel-title" style="margin-top:1.5rem">📄 Generated YAML</div>
+    <div class="yaml-preview" id="yamlPreview"></div>
+  </div>
+</div>
+<script>
+var stageTypes = [
+  { name: 'Checkout', color: '#61afef', icon: '📦' },
+  { name: 'Install', color: '#4f2bdf', icon: '📥' },
+  { name: 'Lint', color: '#e040fb', icon: '🔍' },
+  { name: 'Test', color: '#00c864', icon: '🧪' },
+  { name: 'Build', color: '#f0c040', icon: '🏗' },
+  { name: 'Security Scan', color: '#ff4757', icon: '🛡' },
+  { name: 'Deploy Staging', color: '#ff9f43', icon: '🚀' },
+  { name: 'Deploy Production', color: '#00c864', icon: '✅' }
+];
+
+var triggers = ['Push to main', 'Push to dev', 'Pull request', 'Manual', 'Schedule (cron)', 'Tag release'];
+var activeTriggers = new Set([0, 2]);
+
+var stages = [
+  { type: 0, config: 'depth: 0' },
+  { type: 2, config: 'biome, eslint' },
+  { type: 3, config: 'vitest --coverage' },
+  { type: 4, config: 'vite build' }
+];
+
+function renderTriggers() {
+  var row = document.getElementById('triggerRow');
+  row.textContent = '';
+  triggers.forEach(function(t, i) {
+    var chip = document.createElement('span');
+    chip.className = 'trigger-chip' + (activeTriggers.has(i) ? ' active' : '');
+    chip.textContent = t;
+    chip.addEventListener('click', function() {
+      if (activeTriggers.has(i)) activeTriggers.delete(i); else activeTriggers.add(i);
+      renderTriggers();
+      updatePreview();
+    });
+    row.appendChild(chip);
+  });
+}
+
+function renderStages() {
+  var list = document.getElementById('stageList');
+  list.textContent = '';
+  stages.forEach(function(s, i) {
+    var item = document.createElement('div');
+    item.className = 'stage-item';
+    item.style.borderLeftColor = stageTypes[s.type].color;
+
+    var handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.textContent = '⠿';
+
+    var icon = document.createElement('span');
+    icon.textContent = stageTypes[s.type].icon;
+
+    var sel = document.createElement('select');
+    stageTypes.forEach(function(st, si) {
+      var opt = document.createElement('option');
+      opt.value = si;
+      opt.textContent = st.name;
+      if (si === s.type) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function() {
+      s.type = parseInt(this.value);
+      renderStages();
+      renderViz();
+      updatePreview();
+    });
+
+    var config = document.createElement('input');
+    config.type = 'text';
+    config.value = s.config;
+    config.style.cssText = 'flex:1;background:#1a1a2e;color:#ccc;border:1px solid #2a2a4a;border-radius:4px;padding:.3rem .5rem;font-size:.8rem';
+    config.placeholder = 'config...';
+    config.addEventListener('input', function() {
+      s.config = this.value;
+      updatePreview();
+    });
+
+    var removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', function() {
+      stages.splice(i, 1);
+      renderStages();
+      renderViz();
+      updatePreview();
+    });
+
+    item.appendChild(handle);
+    item.appendChild(icon);
+    item.appendChild(sel);
+    item.appendChild(config);
+    item.appendChild(removeBtn);
+    list.appendChild(item);
+  });
+}
+
+function renderViz() {
+  var viz = document.getElementById('pipelineViz');
+  viz.textContent = '';
+  stages.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'pipe-stage';
+
+    var dot = document.createElement('div');
+    dot.className = 'pipe-dot';
+    dot.style.background = stageTypes[s.type].color;
+
+    var label = document.createElement('span');
+    label.className = 'pipe-label';
+    label.textContent = stageTypes[s.type].icon + ' ' + stageTypes[s.type].name;
+
+    row.appendChild(dot);
+    row.appendChild(label);
+    viz.appendChild(row);
+
+    if (i < stages.length - 1) {
+      var line = document.createElement('div');
+      line.className = 'pipe-line';
+      viz.appendChild(line);
+    }
+  });
+
+  if (!stages.length) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'color:#555;font-style:italic;font-size:.85rem;padding:1rem 0';
+    empty.textContent = 'Add stages to build your pipeline...';
+    viz.appendChild(empty);
+  }
+}
+
+function updatePreview() {
+  var yaml = 'name: CI Pipeline\n\non:\n';
+  var triggerLines = [];
+  activeTriggers.forEach(function(idx) {
+    if (idx === 0) triggerLines.push('  push:\n    branches: [main]');
+    else if (idx === 1) triggerLines.push('  push:\n    branches: [dev]');
+    else if (idx === 2) triggerLines.push('  pull_request:');
+    else if (idx === 3) triggerLines.push('  workflow_dispatch:');
+    else if (idx === 4) triggerLines.push('  schedule:\n    - cron: "0 2 * * 1"');
+    else if (idx === 5) triggerLines.push('  push:\n    tags: ["v*"]');
+  });
+  yaml += triggerLines.join('\n') + '\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n';
+  stages.forEach(function(s) {
+    yaml += '      - name: ' + stageTypes[s.type].name + '\n';
+    yaml += '        run: ' + s.config + '\n';
+  });
+
+  var el = document.getElementById('yamlPreview');
+  el.textContent = yaml;
+}
+
+document.getElementById('addStage').addEventListener('click', function() {
+  stages.push({ type: 3, config: '' });
+  renderStages();
+  renderViz();
+  updatePreview();
+});
+
+renderTriggers();
+renderStages();
+renderViz();
+updatePreview();
+</script>
+</body>
+</html>

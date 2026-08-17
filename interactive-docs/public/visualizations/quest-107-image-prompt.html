@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Prompt Builder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:24px;font-size:.9rem}
+.container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr;gap:20px}
+@media(max-width:768px){.container{grid-template-columns:1fr}}
+.prompt-output{background:#0d1117;border-radius:12px;padding:20px;min-height:120px;margin-bottom:20px;border:2px solid #21262d;position:relative}
+.prompt-output.has-content{border-color:#4f2bdf}
+.prompt-label{font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.prompt-text{font-size:1rem;line-height:1.6;color:#c9d1d9;min-height:60px;word-wrap:break-word}
+.prompt-text .tag{display:inline-block;background:#4f2bdf33;color:#a78bfa;padding:2px 8px;border-radius:6px;margin:2px;font-size:.85rem;cursor:pointer;transition:all .2s;animation:popIn .3s}
+.prompt-text .tag:hover{background:#ff475733;color:#ff6b7a;text-decoration:line-through}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.prompt-actions{display:flex;gap:8px;margin-top:12px}
+.prompt-actions button{background:#16213e;border:1px solid #4f2bdf;color:#ccc;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:.78rem;transition:all .2s}
+.prompt-actions button:hover{background:#4f2bdf;color:#fff}
+.category{margin-bottom:16px}
+.category-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;padding:8px 12px;background:#16213e;border-radius:8px;transition:background .2s}
+.category-header:hover{background:#1e2a4a}
+.category-icon{font-size:1.1rem}
+.category-name{font-weight:600;font-size:.9rem}
+.category-count{margin-left:auto;background:#4f2bdf;padding:2px 8px;border-radius:10px;font-size:.7rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding-left:12px}
+.tag-btn{background:#0d1b3e;border:1px solid #2a2a4a;color:#ccc;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:.78rem;transition:all .2s}
+.tag-btn:hover{border-color:#4f2bdf;background:#4f2bdf22}
+.tag-btn.selected{background:#4f2bdf;color:#fff;border-color:#4f2bdf}
+.sidebar{position:sticky;top:20px;align-self:start}
+.template-card{background:#16213e;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;border:2px solid transparent;transition:all .3s}
+.template-card:hover{border-color:#4f2bdf}
+.template-card.active{border-color:#00c864;background:#0d2818}
+.template-name{font-weight:600;font-size:.88rem;margin-bottom:4px}
+.template-desc{font-size:.78rem;color:#888}
+.tips{background:#16213e;border-radius:12px;padding:16px}
+.tips h3{font-size:.88rem;color:#4f2bdf;margin-bottom:8px}
+.tips li{font-size:.78rem;color:#aaa;margin:6px 0;line-height:1.5}
+.counter{text-align:center;margin:12px 0;font-size:.82rem;color:#888}
+.counter span{color:#4f2bdf;font-weight:700;font-size:1.1rem}
+</style>
+</head>
+<body>
+<h1>🎨 Image Prompt Builder</h1>
+<p class="subtitle">Click tags to build prompts. Click tags in the output to remove them.</p>
+<div class="container">
+<div class="left">
+<div class="prompt-output" id="promptOutput">
+<div class="prompt-label">Your Prompt</div>
+<div class="prompt-text" id="promptText"><span style="color:#666">Click tags below to build your prompt...</span></div>
+<div class="counter">Tags: <span id="tagCount">0</span> · Words: <span id="wordCount">0</span></div>
+<div class="prompt-actions">
+<button onclick="copyPrompt()">📋 Copy</button>
+<button onclick="randomPrompt()">🎲 Random</button>
+<button onclick="clearPrompt()">✕ Clear</button>
+</div>
+</div>
+<div id="categories"></div>
+</div>
+<div class="sidebar">
+<h3 style="color:#4f2bdf;margin-bottom:12px">📌 Quick Templates</h3>
+<div id="templates"></div>
+<div class="tips">
+<h3>💡 Prompt Tips</h3>
+<ul>
+<li>Start with subject, then add style modifiers</li>
+<li>Be specific: "golden hour lighting" > "nice lighting"</li>
+<li>Use photographer/artistic references for style</li>
+<li>Add quality keywords: "8k, detailed, sharp focus"</li>
+<li>Negative prompts: "no blur, no watermark"</li>
+</ul>
+</div>
+</div>
+</div>
+
+<script>
+const categories=[
+{name:'Subject',icon:'🎯',tags:['portrait of a woman','cityscape at night','fantasy dragon','robot in a garden','underwater temple','astronaut on Mars','ancient library','cyberpunk street','misty forest path','solarpunk village']},
+{name:'Style',icon:'🎨',tags:['photorealistic','oil painting','watercolor','digital art','anime style','pixel art','art nouveau','impressionist','surrealist','minimalist','vaporwave','steampunk']},
+{name:'Lighting',icon:'💡',tags:['golden hour','dramatic lighting','soft diffused light','neon glow','moonlight','backlit silhouette','studio lighting','volumetric rays','chiaroscuro','bioluminescent']},
+{name:'Mood',icon:'🌙',tags:['serene','mysterious','epic','whimsical','melancholic','ethereal','dystopian','nostalgic','vibrant','dark and moody','hopeful','eerie']},
+{name:'Color',icon:'🌈',tags:['warm tones','cool palette','pastel colors','monochrome','complementary colors','teal and orange','desaturated','high contrast','rainbow','earth tones']},
+{name:'Quality',icon:'⭐',tags:['8k resolution','highly detailed','sharp focus','professional','award-winning','trending on artstation','masterpiece','ultra-realistic','photographic','HDR']},
+{name:'Camera',icon:'📷',tags:['wide angle lens','macro photography','portrait lens f/1.8','drone aerial view','fisheye','tilt-shift','long exposure','bokeh background','rule of thirds','bird\'s eye view']},
+{name:'Artist Ref',icon:'🖼️',tags:['by Greg Rutkowski','by Studio Ghibli','by Moebius','by Syd Mead','by Hayao Miyazaki','by HR Giger','by Van Gogh','by Mucha','by Beksinski','by Ash Thorp']},
+];
+
+const templates=[
+{name:'Photorealistic Portrait',desc:'Lifelike character photography',tags:['portrait of a person','photorealistic','studio lighting','sharp focus','8k resolution','shallow depth of field','professional','by Annie Leibovitz']},
+{name:'Fantasy Landscape',desc:'Epic fantasy world scene',tags:['fantasy landscape','epic','golden hour','highly detailed','oil painting','dramatic lighting','by Greg Rutkowski','masterpiece','volumetric rays']},
+{name:'Sci-Fi Concept',desc:'Futuristic sci-fi artwork',tags:['cyberpunk cityscape','neon glow','sci-fi','digital art','highly detailed','dramatic lighting','vaporwave','by Syd Mead','8k resolution']},
+{name:'Anime Character',desc:'Japanese anime style art',tags:['portrait of a character','anime style','vibrant colors','detailed face','Studio Ghibli','soft diffused light','masterpiece','trending on artstation']},
+];
+
+let selectedTags=new Set();
+let activeCategory=null;
+
+function renderCategories(){
+const container=document.getElementById('categories');
+container.innerHTML=categories.map((cat,i)=>{
+const count=cat.tags.filter(t=>selectedTags.has(t)).length;
+return`<div class="category">
+<div class="category-header" onclick="toggleCategory(${i})">
+<span class="category-icon">${cat.icon}</span>
+<span class="category-name">${cat.name}</span>
+${count?`<span class="category-count">${count}</span>`:''}
+</div>
+<div class="tags" id="cat-${i}" style="display:${activeCategory===i||activeCategory!==null?'flex':'none'}">
+${cat.tags.map(t=>`<button class="tag-btn ${selectedTags.has(t)?'selected':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">${t}</button>`).join('')}
+</div></div>`;
+}).join('');
+}
+
+function toggleCategory(i){
+activeCategory=activeCategory===i?null:i;
+renderCategories();
+}
+
+function toggleTag(tag){
+if(selectedTags.has(tag))selectedTags.delete(tag);
+else selectedTags.add(tag);
+updatePrompt();
+renderCategories();
+}
+
+function updatePrompt(){
+const text=document.getElementById('promptText');
+const count=document.getElementById('tagCount');
+const words=document.getElementById('wordCount');
+const output=document.getElementById('promptOutput');
+if(selectedTags.size===0){
+text.innerHTML='<span style="color:#666">Click tags below to build your prompt...</span>';
+output.classList.remove('has-content');
+}else{
+const promptStr=[...selectedTags].join(', ');
+text.innerHTML=[...selectedTags].map(t=>`<span class="tag" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">${t}</span>`).join(' ');
+output.classList.add('has-content');
+}
+count.textContent=selectedTags.size;
+words.textContent=[...selectedTags].join(' ').split(/\s+/).length;
+}
+
+function copyPrompt(){
+const prompt=[...selectedTags].join(', ');
+if(!prompt)return;
+navigator.clipboard.writeText(prompt).then(()=>{
+const btn=document.querySelector('.prompt-actions button');
+btn.textContent='✓ Copied!';
+setTimeout(()=>btn.textContent='📋 Copy',1500);
+});
+}
+
+function randomPrompt(){
+selectedTags.clear();
+categories.forEach(cat=>{
+const count=Math.floor(Math.random()*2)+1;
+const shuffled=[...cat.tags].sort(()=>Math.random()-.5);
+for(let i=0;i<count&&i<shuffled.length;i++)selectedTags.add(shuffled[i]);
+});
+updatePrompt();renderCategories();
+}
+
+function clearPrompt(){selectedTags.clear();updatePrompt();renderCategories();}
+
+function renderTemplates(){
+document.getElementById('templates').innerHTML=templates.map(t=>`
+<div class="template-card" onclick="applyTemplate(${JSON.stringify(t.tags).replace(/"/g,'&quot;')})">
+<div class="template-name">${t.name}</div>
+<div class="template-desc">${t.desc}</div>
+</div>`).join('');
+}
+
+function applyTemplate(tags){
+selectedTags=new Set(tags);
+updatePrompt();renderCategories();
+}
+
+renderCategories();renderTemplates();
+</script>
+</body>
+</html>

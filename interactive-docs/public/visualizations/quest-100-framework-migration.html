@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Framework Comparison — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
+.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
+.ctn{max-width:960px;margin:0 auto}
+/* Framework selector */
+.fw-row{display:flex;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.fw-btn{padding:10px 20px;border-radius:10px;background:#16213e;border:2px solid #333;color:#aaa;font-size:.85rem;cursor:pointer;transition:all .3s;text-align:center;min-width:100px}
+.fw-btn:hover{border-color:#4f2bdf}
+.fw-btn.sel{border-color:#4f2bdf;background:#4f2bdf22;color:#fff}
+.fw-btn .icon{font-size:1.4rem;display:block;margin-bottom:2px}
+/* Comparison table */
+.table-wrap{background:#16213e;border-radius:12px;border:1px solid #333;overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{padding:10px 14px;text-align:left;background:#0d1117;color:#4f2bdf;border-bottom:2px solid #333;font-weight:600}
+td{padding:10px 14px;border-bottom:1px solid #222;vertical-align:top}
+tr:hover td{background:#4f2bdf08}
+.cat-header td{background:#16213e;color:#4f2bdf;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;padding:8px 14px}
+.score-cell{font-weight:700}
+.score-high{color:#00c864}.score-mid{color:#ffb347}.score-low{color:#ff4466}
+.highlight{animation:hlPulse 1s ease}
+@keyframes hlPulse{0%{background:#4f2bdf33}100%{background:transparent}}
+/* Radar chart */
+.radar-area{background:#16213e;border-radius:12px;padding:20px;border:1px solid #333;margin-bottom:20px;text-align:center}
+.radar-area h2{font-size:.9rem;color:#4f2bdf;margin-bottom:12px}
+.radar-wrap{display:inline-block;position:relative}
+/* Summary cards */
+.sum-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.sum-card{background:#0d1117;border-radius:10px;padding:14px;border:1px solid #333;transition:border-color .3s;cursor:default}
+.sum-card:hover{border-color:#4f2bdf}
+.sum-card .sc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sum-card .sc-icon{font-size:1.3rem}
+.sum-card .sc-name{font-weight:600;font-size:.9rem}
+.sum-card .sc-score{margin-left:auto;font-size:1.1rem;font-weight:700}
+.sum-card .sc-bar{height:6px;background:#1a1a2e;border-radius:99px;overflow:hidden;margin-bottom:6px}
+.sum-card .sc-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.sum-card .sc-verdict{font-size:.7rem;color:#888}
+.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
+.btn:hover{background:#6143e8}
+</style>
+</head>
+<body>
+<h1>⚖️ Framework Comparison</h1>
+<p class="sub">Side-by-side comparison — toggle frameworks and click rows for highlights</p>
+<div class="ctn">
+<div class="fw-row" id="fwRow"></div>
+<div class="sum-row" id="sumRow"></div>
+<div class="table-wrap">
+<table>
+  <thead><tr id="tHead"></tr></thead>
+  <tbody id="tBody"></tbody>
+</table>
+</div>
+<div class="radar-area">
+  <h2>Overall Score Comparison</h2>
+  <canvas id="radarCanvas" width="360" height="360"></canvas>
+</div>
+<button class="btn" onclick="animateAll()">▶ Replay Animation</button>
+</div>
+
+<script>
+const frameworks={
+  React:{icon:'⚛️',color:'#61dafb',scores:{perf:8,learning:7,ecosystem:10,types:9,maint:8,ssr:8}},
+  Vue:{icon:'💚',color:'#42b883',scores:{perf:8,learning:9,ecosystem:7,types:8,maint:8,ssr:8}},
+  Svelte:{icon:'🔥',color:'#ff3e00',scores:{perf:10,learning:8,ecosystem:5,types:7,maint:7,ssr:7}},
+  Angular:{icon:'🅰️',color:'#dd1b16',scores:{perf:7,learning:5,ecosystem:8,types:10,maint:9,ssr:9}},
+};
+const categories=[
+  {key:'perf',label:'Performance'},
+  {key:'learning',label:'Learning Curve'},
+  {key:'ecosystem',label:'Ecosystem'},
+  {key:'types',label:'TypeScript'},
+  {key:'maint',label:'Maintainability'},
+  {key:'ssr',label:'SSR / Full-Stack'},
+];
+const details={
+  React:{perf:'Virtual DOM diffing, good with memo/useMemo',learning:'JSX + hooks learning curve',ecosystem:'npm largest ecosystem, massive community',types:'Excellent @types support, strong inference',maint:'Flexible but can drift without conventions',ssr:'Next.js is industry-leading'},
+  Vue:{perf:'Reactive proxies, fine-grained updates',learning:'Template syntax very approachable',ecosystem:'Growing fast, Vite ecosystem',types:'Volar gives excellent DX',maint:'Convention over config, very consistent',ssr:'Nuxt 3 is mature and capable'},
+  Svelte:{perf:'Compile-time, no runtime overhead',learning:'Template-like syntax, very intuitive',ecosystem:'Smaller but growing rapidly',types:'Improving but less mature',maint:'SvelteKit provides structure',ssr:'SvelteKit handles SSR natively'},
+  Angular:{perf:'Zone.js overhead, but optimized with signals',learning:'Steep curve: DI, decorators, RxJS',ecosystem:'Enterprise-grade, Google-backed',types:'First-class TS, strict by default',maint:'Opinionated structure scales well',ssr:'Angular Universal, hydration in v17+'},
+};
+let selected=new Set(['React','Vue']);
+let highlightedCat=null;
+
+function renderToggles(){
+  const $r=document.getElementById('fwRow');$r.innerHTML='';
+  Object.entries(frameworks).forEach(([k,v])=>{
+    const b=document.createElement('div');b.className='fw-btn'+(selected.has(k)?' sel':'');
+    b.innerHTML=`<span class="icon">${v.icon}</span>${k}`;
+    b.onclick=()=>{selected.has(k)?selected.delete(k):selected.add(k);if(selected.size<2)selected.add(k);renderAll();};
+    $r.appendChild(b);
+  });
+}
+
+function scoreClass(s){return s>=8?'score-high':s>=6?'score-mid':'score-low';}
+
+function renderTable(){
+  const sel=[...selected];const $h=document.getElementById('tHead');const $b=document.getElementById('tBody');
+  $h.innerHTML='<th>Category</th>'+sel.map(k=>`<th style="color:${frameworks[k].color}">${frameworks[k].icon} ${k}</th>`).join('');
+  $b.innerHTML='';
+  categories.forEach(cat=>{
+    const maxScore=Math.max(...sel.map(k=>frameworks[k].scores[cat.key]));
+    const tr=document.createElement('tr');
+    if(highlightedCat===cat.key)tr.className='highlight';
+    tr.style.cursor='pointer';
+    tr.onclick=()=>{highlightedCat=cat.key;renderTable();};
+    let cells=`<td><strong>${cat.label}</strong><br><span style="font-size:.7rem;color:#888">${details[sel[0]][cat.key]}</span></td>`;
+    sel.forEach(k=>{
+      const s=frameworks[k].scores[cat.key];
+      const isBest=s===maxScore;
+      cells+=`<td class="score-cell ${scoreClass(s)}" style="${isBest?'text-decoration:underline':''}">${'★'.repeat(s)}${'☆'.repeat(10-s)} <span style="color:#888">${s}/10</span></td>`;
+    });
+    tr.innerHTML=cells;$b.appendChild(tr);
+  });
+  // Totals
+  const totalTr=document.createElement('tr');
+  totalTr.innerHTML='<td style="background:#0d1117"><strong>Total</strong></td>'+sel.map(k=>{
+    const total=categories.reduce((s,c)=>s+frameworks[k].scores[c.key],0);
+    return `<td style="background:#0d1117" class="score-cell ${scoreClass(total/6)}"><strong>${total}/60</strong></td>`;
+  }).join('');
+  $b.appendChild(totalTr);
+}
+
+function renderSummary(){
+  const $s=document.getElementById('sumRow');$s.innerHTML='';
+  selected.forEach(k=>{
+    const fw=frameworks[k];
+    const total=categories.reduce((s,c)=>s+fw.scores[c.key],0);
+    const pct=Math.round(total/60*100);
+    const verdict=pct>=80?'Excellent choice':pct>=65?'Strong contender':'Consider trade-offs';
+    $s.innerHTML+=`<div class="sum-card">
+      <div class="sc-head"><span class="sc-icon">${fw.icon}</span><span class="sc-name">${k}</span><span class="sc-score" style="color:${fw.color}">${total}/60</span></div>
+      <div class="sc-bar"><div class="sc-fill" style="width:0%;background:${fw.color}" data-w="${pct}"></div></div>
+      <div class="sc-verdict">${verdict}</div>
+    </div>`;
+  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    $s.querySelectorAll('.sc-fill').forEach(f=>{f.style.width=f.dataset.w+'%';});
+  }));
+}
+
+// Radar chart
+function drawRadar(){
+  const canvas=document.getElementById('radarCanvas');
+  const ctx=canvas.getContext('2d');
+  const cx=180,cy=180,r=140;
+  const n=categories.length;
+  ctx.clearRect(0,0,360,360);
+  // Grid
+  for(let level=1;level<=10;level+=2){
+    ctx.beginPath();
+    for(let i=0;i<=n;i++){
+      const angle=Math.PI*2*((i%n)/n)-Math.PI/2;
+      const rr=r*(level/10);
+      const x=cx+rr*Math.cos(angle);const y=cy+rr*Math.sin(angle);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='#333';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Axes
+  for(let i=0;i<n;i++){
+    const angle=Math.PI*2*(i/n)-Math.PI/2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+r*Math.cos(angle),cy+r*Math.sin(angle));
+    ctx.strokeStyle='#444';ctx.lineWidth=1;ctx.stroke();
+    // Label
+    const lx=cx+(r+18)*Math.cos(angle);const ly=cy+(r+18)*Math.sin(angle);
+    ctx.fillStyle='#888';ctx.font='11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(categories[i].label,lx,ly);
+  }
+  // Data
+  selected.forEach(k=>{
+    const fw=frameworks[k];
+    ctx.beginPath();
+    categories.forEach((cat,i)=>{
+      const angle=Math.PI*2*(i/n)-Math.PI/2;
+      const val=fw.scores[cat.key]/10;
+      const x=cx+r*val*Math.cos(angle);const y=cy+r*val*Math.sin(angle);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.closePath();ctx.fillStyle=fw.color+'22';ctx.fill();ctx.strokeStyle=fw.color;ctx.lineWidth=2;ctx.stroke();
+    // Dots
+    categories.forEach((cat,i)=>{
+      const angle=Math.PI*2*(i/n)-Math.PI/2;
+      const val=fw.scores[cat.key]/10;
+      const x=cx+r*val*Math.cos(angle);const y=cy+r*val*Math.sin(angle);
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=fw.color;ctx.fill();
+    });
+  });
+}
+
+function renderAll(){renderToggles();renderSummary();renderTable();drawRadar();}
+function animateAll(){renderAll();}
+renderAll();
+</script>
+</body>
+</html>

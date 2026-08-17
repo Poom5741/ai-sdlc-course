@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commit Message Format — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1100px;margin:0 auto}
+@media(max-width:800px){.panels{grid-template-columns:1fr}}
+.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
+.panel:hover{border-color:#4f2bdf}
+.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem}
+.type-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+.pill{background:#0d1117;border:2px solid #333;border-radius:6px;padding:.3rem .6rem;font-size:.78rem;cursor:pointer;transition:all .2s}
+.pill:hover{border-color:#4f2bdf}
+.pill.selected{border-color:#00c864;background:#00c86415;color:#00c864}
+.scope-input{width:100%;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;margin-bottom:.8rem;transition:border-color .2s;font-family:monospace}
+.scope-input:focus{outline:none;border-color:#4f2bdf}
+.scope-input::placeholder{color:#555}
+.msg-input{width:100%;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.6rem .7rem;color:#e0e0e0;font-size:.85rem;margin-bottom:.8rem;transition:border-color .2s;font-family:monospace;min-height:60px;resize:vertical}
+.msg-input:focus{outline:none;border-color:#4f2bdf}
+.msg-input::placeholder{color:#555}
+.validations{display:flex;flex-direction:column;gap:.3rem;margin-bottom:1rem}
+.validation{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:#555;transition:color .3s}
+.validation.pass{color:#00c864}
+.validation.fail{color:#ff4466}
+.v-icon{width:18px;text-align:center;font-size:.85rem;flex-shrink:0}
+.preview-box{background:#0d1117;border-radius:8px;padding:.8rem;font-family:'SF Mono',monospace;font-size:.82rem;border:1px solid #333;min-height:60px;white-space:pre-wrap;word-break:break-all}
+.preview-type{color:#00c864;font-weight:700}
+.preview-scope{color:#4f2bdf}
+.preview-desc{color:#e0e0e0}
+.git-log{background:#0d1117;border-radius:8px;padding:.8rem;font-family:'SF Mono',monospace;font-size:.78rem;border:1px solid #333;margin-top:.8rem;color:#555}
+.git-log .hash{color:#e8a020}
+.git-log .branch{color:#4f2bdf}
+.mistakes{font-size:.8rem}
+.mistake{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.6rem;margin-bottom:.5rem;cursor:pointer;transition:all .2s}
+.mistake:hover{border-color:#ff4466}
+.mistake .bad{color:#ff4466;text-decoration:line-through;margin-bottom:.2rem}
+.mistake .good{color:#00c864}
+.mistake-label{font-size:.68rem;color:#888;margin-bottom:.2rem}
+.score-bar{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-top:.5rem}
+.score-fill{height:100%;background:linear-gradient(90deg,#ff4466,#e8a020,#00c864);border-radius:4px;transition:width .4s ease;width:0}
+.score-label{font-size:.75rem;color:#888;margin-top:.3rem}
+.full-width{grid-column:1/-1}
+.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
+button:hover{background:#6143e8}
+.btn-green{background:#00c864;color:#1a1a2e}
+.btn-green:hover{background:#00dd70}
+</style>
+</head>
+<body>
+<h1>Commit Message Format</h1>
+<p class="sub">Build & validate conventional commit messages in real time</p>
+
+<div class="panels">
+  <!-- Builder Panel -->
+  <div class="panel">
+    <h2>✏️ Message Builder</h2>
+    <div class="type-pills" id="typePills"></div>
+    <input class="scope-input" id="scopeInput" placeholder="scope (optional) e.g. auth, api, ui">
+    <textarea class="msg-input" id="msgInput" placeholder="Write a short, imperative description..."></textarea>
+
+    <div class="validations" id="validations"></div>
+
+    <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+    <div class="score-label" id="scoreLabel">Score: 0/100</div>
+  </div>
+
+  <!-- Preview Panel -->
+  <div class="panel">
+    <h2>👁️ Live Preview</h2>
+    <div class="preview-box" id="previewBox">
+      <span style="color:#555">Type a message to see preview...</span>
+    </div>
+    <div class="git-log" id="gitLog">
+      <span class="hash">a1b2c3d</span> <span class="branch">(main)</span> <span style="color:#555">Waiting for input...</span>
+    </div>
+
+    <h2 style="margin-top:1.5rem">⚠️ Common Mistakes</h2>
+    <div class="mistakes" id="mistakes"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn-green" onclick="useExample()">💡 Try Example</button>
+  <button onclick="clearAll()">↺ Clear</button>
+</div>
+
+<script>
+const types = [
+  {label:'feat',desc:'New feature'},{label:'fix',desc:'Bug fix'},{label:'docs',desc:'Documentation'},
+  {label:'style',desc:'Formatting'},{label:'refactor',desc:'Code restructure'},
+  {label:'test',desc:'Add tests'},{label:'chore',desc:'Maintenance'},
+  {label:'perf',desc:'Performance'},{label:'ci',desc:'CI config'},{label:'build',desc:'Build system'}
+];
+
+const mistakes = [
+  {bad:'Fixed bug', good:'fix: resolve null pointer in user login', label:'Use imperative mood'},
+  {bad:'feat: Added new button.', good:'feat: add new button', label:'No period, lowercase'},
+  {bad:'update stuff', good:'fix(api): handle empty response body', label:'Add type prefix'},
+  {bad:'fix: Fixed the thing that was broken in multiple places', good:'fix(auth): validate token expiry', label:'Keep subject ≤50 chars'},
+];
+
+const validations = [
+  {id:'type',label:'Type prefix (feat, fix, etc.)',check: t => /^[a-z]+/.test(t)},
+  {id:'colon',label:'Colon after type',check: t => /^[a-z]+:/.test(t)},
+  {id:'scope',label:'Scope format (lowercase)',check: t => !t.includes('(') || /^[a-z]+\([a-z0-9_]+\):/.test(t)},
+  {id:'space',label:'Space after colon',check: t => /^[a-z]+(\([^)]+\))?: /.test(t)},
+  {id:'desc',label:'Description present',check: t => /^[a-z]+(\([^)]+\))?: .+/.test(t)},
+  {id:'short',label:'Subject line ≤50 chars',check: t => t.split('\n')[0].length <= 50},
+  {id:'noperiod',label:'No period at end',check: t => { const s = t.split('\n')[0]; return s.length === 0 || !s.endsWith('.'); }},
+  {id:'imperative',label:'Starts with lowercase verb',check: t => { const m = t.match(/: ([a-z])/); return m ? true : t.length === 0; }}
+];
+
+let selectedType = '';
+
+// Render type pills
+const pillsContainer = document.getElementById('typePills');
+types.forEach(t => {
+  const pill = document.createElement('div');
+  pill.className = 'pill';
+  pill.textContent = t.label;
+  pill.title = t.desc;
+  pill.onclick = () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    selectedType = t.label;
+    updateAll();
+  };
+  pillsContainer.appendChild(pill);
+});
+
+// Render validations
+const valContainer = document.getElementById('validations');
+validations.forEach(v => {
+  const div = document.createElement('div');
+  div.className = 'validation';
+  div.id = 'val-' + v.id;
+  const icon = document.createElement('span');
+  icon.className = 'v-icon';
+  icon.textContent = '○';
+  const text = document.createElement('span');
+  text.textContent = v.label;
+  div.appendChild(icon);
+  div.appendChild(text);
+  valContainer.appendChild(div);
+});
+
+// Render mistakes
+const mistakeContainer = document.getElementById('mistakes');
+mistakes.forEach(m => {
+  const div = document.createElement('div');
+  div.className = 'mistake';
+  const label = document.createElement('div');
+  label.className = 'mistake-label';
+  label.textContent = m.label;
+  const bad = document.createElement('div');
+  bad.className = 'bad';
+  bad.textContent = '✗ ' + m.bad;
+  const good = document.createElement('div');
+  good.className = 'good';
+  good.textContent = '✓ ' + m.good;
+  div.appendChild(label);
+  div.appendChild(bad);
+  div.appendChild(good);
+  div.onclick = () => {
+    const parts = m.good.split(': ');
+    const typePart = parts[0];
+    if (typePart.includes('(')) {
+      const [t, s] = typePart.split('(');
+      selectedType = t;
+      document.getElementById('scopeInput').value = s.replace(')', '');
+    } else {
+      selectedType = typePart;
+      document.getElementById('scopeInput').value = '';
+    }
+    document.querySelectorAll('.pill').forEach(p => {
+      p.classList.toggle('selected', p.textContent === selectedType);
+    });
+    document.getElementById('msgInput').value = parts.slice(1).join(': ');
+    updateAll();
+  };
+  mistakeContainer.appendChild(div);
+});
+
+const msgInput = document.getElementById('msgInput');
+const scopeInput = document.getElementById('scopeInput');
+msgInput.addEventListener('input', updateAll);
+scopeInput.addEventListener('input', updateAll);
+
+function buildFullMsg() {
+  const scope = scopeInput.value.trim();
+  const desc = msgInput.value;
+  if (!selectedType && !desc) return '';
+  const scopePart = scope ? '(' + scope + ')' : '';
+  return selectedType + scopePart + (desc ? ': ' + desc : '');
+}
+
+function updateAll() {
+  const msg = buildFullMsg();
+  let score = 0;
+
+  // Update validations
+  validations.forEach(v => {
+    const el = document.getElementById('val-' + v.id);
+    const pass = v.check(msg);
+    el.className = 'validation ' + (pass ? 'pass' : 'fail');
+    el.querySelector('.v-icon').textContent = pass ? '✓' : '✗';
+    if (pass) score += 12.5;
+  });
+
+  // Update score
+  score = Math.min(100, Math.round(score));
+  document.getElementById('scoreFill').style.width = score + '%';
+  document.getElementById('scoreLabel').textContent = 'Score: ' + score + '/100';
+
+  // Update preview
+  const preview = document.getElementById('previewBox');
+  while (preview.firstChild) preview.removeChild(preview.firstChild);
+  if (!msg) {
+    preview.textContent = 'Type a message to see preview...';
+    preview.style.color = '#555';
+  } else {
+    preview.style.color = '';
+    const typeSpan = document.createElement('span');
+    typeSpan.className = 'preview-type';
+    typeSpan.textContent = selectedType;
+    const scopeSpan = document.createElement('span');
+    scopeSpan.className = 'preview-scope';
+    scopeSpan.textContent = scopeInput.value ? '(' + scopeInput.value + ')' : '';
+    const rest = document.createElement('span');
+    rest.className = 'preview-desc';
+    rest.textContent = msgInput.value ? ': ' + msgInput.value : '';
+    preview.appendChild(typeSpan);
+    preview.appendChild(scopeSpan);
+    preview.appendChild(rest);
+  }
+
+  // Update git log
+  const gitLog = document.getElementById('gitLog');
+  while (gitLog.firstChild) gitLog.removeChild(gitLog.firstChild);
+  const hash = document.createElement('span');
+  hash.className = 'hash';
+  hash.textContent = 'a1b2c3d';
+  const branch = document.createElement('span');
+  branch.className = 'branch';
+  branch.textContent = ' (main) ';
+  const msgSpan = document.createElement('span');
+  msgSpan.textContent = msg || 'Waiting for input...';
+  if (!msg) msgSpan.style.color = '#555';
+  gitLog.appendChild(hash);
+  gitLog.appendChild(branch);
+  gitLog.appendChild(msgSpan);
+}
+
+function useExample() {
+  selectedType = 'feat';
+  scopeInput.value = 'auth';
+  msgInput.value = 'add JWT token validation';
+  document.querySelectorAll('.pill').forEach(p => {
+    p.classList.toggle('selected', p.textContent === 'feat');
+  });
+  updateAll();
+}
+
+function clearAll() {
+  selectedType = '';
+  scopeInput.value = '';
+  msgInput.value = '';
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+  updateAll();
+}
+
+updateAll();
+</script>
+</body>
+</html>

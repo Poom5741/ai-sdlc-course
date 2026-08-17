@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL Injection Detection — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;width:100%;max-width:800px}
+@media(max-width:600px){.panels{grid-template-columns:1fr}}
+.panel{background:#16213e;border-radius:10px;overflow:hidden;border:1px solid #4f2bdf33}
+.panel .header{padding:.6rem 1rem;background:#4f2bdf22;font-weight:700;font-size:.85rem;display:flex;justify-content:space-between}
+.header .status{font-size:.75rem;padding:2px 8px;border-radius:99px}
+.status.danger{background:#ff446644;color:#ff4466}
+.status.safe{background:#00c86444;color:#00c864}
+textarea{width:100%;min-height:140px;background:#0d1117;border:none;color:#e0e0e0;font-family:'Courier New',monospace;font-size:.8rem;padding:1rem;resize:vertical;outline:none}
+.output{padding:.6rem 1rem;font-family:'Courier New',monospace;font-size:.78rem;min-height:60px;line-height:1.5}
+.finding{padding:2px 6px;border-radius:3px;margin:1px 0}
+.finding.vuln{background:#ff446633;color:#ff4466}
+.finding.ok{background:#00c86433;color:#00c864}
+.btn-row{display:flex;gap:.8rem;margin-top:1.5rem;width:100%;max-width:800px}
+button{flex:1;padding:.6rem;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.btn-scan{background:#4f2bdf;color:#fff}
+.btn-scan:hover{background:#6143e8}
+.btn-safe{background:#00c864;color:#1a1a2e}
+.btn-safe:hover{background:#00dd70}
+.tip{margin-top:1.2rem;font-size:.78rem;color:#888;text-align:center;max-width:600px;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>SQL Injection Detection</h1>
+<p class="sub">Paste code to scan for vulnerabilities — or try the safe version</p>
+<div class="panels">
+  <div class="panel">
+    <div class="header">Input Code <span class="status danger" id="status1">Vulnerable</span></div>
+    <textarea id="codeIn">query = "SELECT * FROM users WHERE name = '" + user_input + "'"</textarea>
+  </div>
+  <div class="panel">
+    <div class="header">Scan Results <span class="status safe" id="status2">—</span></div>
+    <div class="output" id="results">Click "Scan" to analyze</div>
+  </div>
+</div>
+<div class="btn-row">
+  <button class="btn-scan" id="scanBtn">🔍 Scan for Injection</button>
+  <button class="btn-safe" id="safeBtn">✅ Show Safe Version</button>
+</div>
+<p class="tip">SQL injection occurs when user input is concatenated directly into queries. Use parameterized queries or ORM methods instead.</p>
+<script>
+const vulnPatterns=[
+  {re:/"[^"]*\+\s*\w+[^"]*"/g, label:'String concatenation in query', severity:'high'},
+  {re:/SELECT.*FROM/i, label:'SELECT statement detected', severity:'info'},
+  {re:/(?:UNION|OR\s+1\s*=\s*1|DROP|DELETE|INSERT|--)/gi, label:'Suspicious SQL keyword', severity:'critical'}
+];
+const safeExample='query = "SELECT * FROM users WHERE name = $1"\ncursor.execute(query, (user_input,))';
+document.getElementById('scanBtn').onclick=()=>{
+  const code=document.getElementById('codeIn').value;
+  const el=document.getElementById('results');el.textContent='';
+  let vulnCount=0;
+  vulnPatterns.forEach(p=>{
+    const matches=[...code.matchAll(p.re)];
+    if(matches.length){
+      vulnCount++;
+      const f=document.createElement('div');f.className='finding vuln';
+      const sv=p.severity==='critical'?'🔴':p.severity==='high'?'🟠':'ℹ️';
+      f.textContent=sv+' '+p.label+' ('+matches.length+')';
+      el.appendChild(f);
+    }
+  });
+  if(!vulnCount){const f=document.createElement('div');f.className='finding ok';f.textContent='✅ No injection patterns found';el.appendChild(f)}
+  const st=document.getElementById('status1');
+  st.textContent=vulnCount?'Vulnerable':'Clean';
+  st.className='status '+(vulnCount?'danger':'safe');
+  const s2=document.getElementById('status2');
+  s2.textContent=vulnCount?'Found '+vulnCount+' issue(s)':'All clear';
+  s2.className='status '+(vulnCount?'danger':'safe');
+};
+document.getElementById('safeBtn').onclick=()=>{
+  document.getElementById('codeIn').value=safeExample;
+  document.getElementById('scanBtn').click();
+};
+</script>
+</body>
+</html>

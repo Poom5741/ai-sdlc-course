@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feature Flag Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:24px;font-size:.9rem}
+.stats-row{max-width:1000px;margin:0 auto 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}}
+.stat-card{background:#16213e;border-radius:10px;padding:16px;text-align:center;transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-num{font-size:1.8rem;font-weight:700}
+.stat-label{font-size:.75rem;color:#888;margin-top:4px}
+.controls{max-width:1000px;margin:0 auto 20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.controls button{background:#4f2bdf;color:#fff;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.82rem;transition:background .2s}
+.controls button:hover{background:#6b45e0}
+.controls button.secondary{background:#16213e;border:1px solid #4f2bdf}
+.controls input{background:#16213e;border:1px solid #2a2a4a;color:#ccc;padding:8px 14px;border-radius:8px;font-size:.82rem;width:200px}
+.flag-list{max-width:1000px;margin:0 auto}
+.flag-card{background:#16213e;border-radius:12px;padding:16px 20px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;transition:all .3s;border:2px solid transparent}
+.flag-card:hover{border-color:#4f2bdf33}
+.flag-card.disabled{opacity:.5}
+.toggle{width:48px;height:26px;border-radius:13px;background:#2a2a4a;cursor:pointer;position:relative;transition:background .3s}
+.toggle.on{background:#00c864}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .3s}
+.toggle.on::after{transform:translateX(22px)}
+.flag-info{min-width:0}
+.flag-name{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.flag-key{font-family:'Fira Code',monospace;font-size:.75rem;color:#888;background:#0d1b3e;padding:2px 8px;border-radius:4px}
+.flag-desc{font-size:.8rem;color:#888;margin-top:4px}
+.flag-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.flag-tag{font-size:.68rem;padding:2px 8px;border-radius:8px;background:#0d1b3e;color:#aaa}
+.flag-tag.release{background:#4f2bdf33;color:#a78bfa}
+.flag-tag.experiment{background:#00c86422;color:#00c864}
+.flag-tag.kill{background:#ff475733;color:#ff4757}
+.rollout{display:flex;flex-direction:column;align-items:center;min-width:120px}
+.rollout-label{font-size:.7rem;color:#888;margin-bottom:4px}
+.rollout-bar{width:100%;height:8px;background:#0d1b3e;border-radius:4px;overflow:hidden;position:relative}
+.rollout-fill{height:100%;background:linear-gradient(90deg,#00c864,#4f2bdf);border-radius:4px;transition:width .5s}
+.rollout-pct{font-size:1.1rem;font-weight:700;margin-top:4px}
+.rollout-slider{width:100%;margin-top:6px;accent-color:#4f2bdf}
+.flag-actions{display:flex;flex-direction:column;gap:4px}
+.flag-actions button{background:#0d1b3e;border:1px solid #2a2a4a;color:#aaa;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.72rem;transition:all .2s}
+.flag-actions button:hover{border-color:#4f2bdf;color:#fff}
+.detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#000a;z-index:100;justify-content:center;align-items:center}
+.detail-modal.visible{display:flex}
+.detail-content{background:#16213e;border-radius:16px;padding:30px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;position:relative;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.detail-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer}
+.detail-title{font-size:1.2rem;font-weight:700;margin-bottom:12px}
+.detail-section{margin:12px 0}
+.detail-section h4{font-size:.85rem;color:#4f2bdf;margin-bottom:6px}
+.detail-section p,.detail-section li{font-size:.82rem;color:#aaa;line-height:1.6}
+.detail-section code{background:#0d1b3e;padding:2px 6px;border-radius:4px;font-size:.78rem;color:#a78bfa}
+.users-affected{display:flex;gap:8px;margin-top:8px}
+.user-segment{background:#0d1b3e;padding:6px 12px;border-radius:8px;text-align:center;flex:1}
+.user-segment .num{font-size:1.1rem;font-weight:700}
+.user-segment .label{font-size:.68rem;color:#888}
+</style>
+</head>
+<body>
+<h1>🚩 Feature Flag Dashboard</h1>
+<p class="subtitle">Toggle flags, adjust rollout percentages, and manage feature lifecycle.</p>
+<div class="stats-row" id="statsRow"></div>
+<div class="controls">
+<button onclick="addFlag()">+ New Flag</button>
+<button class="secondary" onclick="showAll()">All</button>
+<button class="secondary" onclick="filterBy('release')">Release</button>
+<button class="secondary" onclick="filterBy('experiment')">Experiment</button>
+<button class="secondary" onclick="filterBy('kill')">Kill Switch</button>
+<input type="text" placeholder="🔍 Search flags..." oninput="searchFlags(this.value)">
+</div>
+<div class="flag-list" id="flagList"></div>
+<div class="detail-modal" id="detailModal" onclick="if(event.target===this)closeModal()">
+<div class="detail-content" id="detailContent"></div>
+</div>
+
+<script>
+let flags=[
+{id:1,name:'New Dashboard UI',key:'release.dashboard-v2',desc:'Redesigned dashboard with new analytics widgets',enabled:true,rollout:45,type:'release',env:'production',owner:'frontend-team',created:'2024-01-15',users:{total:12000,affected:5400}},
+{id:2,name:'AI Search',key:'release.ai-search',desc:'ML-powered search with semantic understanding',enabled:true,rollout:20,type:'release',env:'production',owner:'search-team',created:'2024-02-01',users:{total:12000,affected:2400}},
+{id:3,name:'New Pricing',key:'experiment.pricing-v3',desc:'A/B test new pricing tiers with conversion tracking',enabled:true,rollout:10,type:'experiment',env:'production',owner:'growth-team',created:'2024-02-10',users:{total:12000,affected:1200}},
+{id:4,name:'Legacy API v1',key:'kill.api-v1',desc:'Legacy API removal — kill switch for v1 endpoints',enabled:true,rollout:100,type:'kill',env:'production',owner:'platform-team',created:'2023-06-01',users:{total:12000,affected:12000}},
+{id:5,name:'Dark Mode',key:'release.dark-mode',desc:'System-level dark theme support',enabled:false,rollout:0,type:'release',env:'staging',owner:'design-team',created:'2024-02-15',users:{total:12000,affected:0}},
+{id:6,name:'Webhook Retry',key:'release.webhook-retry',desc:'Automatic retry with exponential backoff for failed webhooks',enabled:true,rollout:80,type:'release',env:'production',owner:'platform-team',created:'2024-01-20',users:{total:12000,affected:9600}},
+{id:7,name:'New Onboarding',key:'experiment.onboarding-v2',desc:'Interactive tutorial replacing static docs',enabled:true,rollout:5,type:'experiment',env:'production',owner:'product-team',created:'2024-02-20',users:{total:12000,affected:600}},
+{id:8,name:'Rate Limiter',key:'kill.rate-limit',desc:'Emergency kill switch for API rate limiting',enabled:false,rollout:0,type:'kill',env:'production',owner:'sre-team',created:'2023-12-01',users:{total:12000,affected:0}},
+];
+
+let filter=null;
+let searchQuery='';
+
+function renderStats(){
+const on=flags.filter(f=>f.enabled).length;
+const off=flags.length-on;
+const exp=flags.filter(f=>f.type==='experiment').length;
+const totalUsers=flags.reduce((s,f)=>s+f.users.affected,0);
+document.getElementById('statsRow').innerHTML=`
+<div class="stat-card"><div class="stat-num" style="color:#00c864">${on}</div><div class="stat-label">Active Flags</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#888">${off}</div><div class="stat-label">Disabled</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#f5a623">${exp}</div><div class="stat-label">Experiments</div></div>
+<div class="stat-card"><div class="stat-num" style="color:#4f2bdf">${(totalUsers/1000).toFixed(1)}k</div><div class="stat-label">Users Affected</div></div>`;
+}
+
+function renderFlags(){
+let filtered=flags;
+if(filter)filtered=filtered.filter(f=>f.type===filter);
+if(searchQuery)filtered=filtered.filter(f=>f.name.toLowerCase().includes(searchQuery)||f.key.toLowerCase().includes(searchQuery));
+document.getElementById('flagList').innerHTML=filtered.map(f=>`
+<div class="flag-card ${f.enabled?'':'disabled'}" id="flag-${f.id}">
+<div class="toggle ${f.enabled?'on':''}" onclick="toggleFlag(${f.id})"></div>
+<div class="flag-info" onclick="showDetail(${f.id})" style="cursor:pointer">
+<div class="flag-name">${f.name} <span class="flag-key">${f.key}</span></div>
+<div class="flag-desc">${f.desc}</div>
+<div class="flag-meta">
+<span class="flag-tag ${f.type}">${f.type}</span>
+<span class="flag-tag">${f.env}</span>
+<span class="flag-tag">Owner: ${f.owner}</span>
+<span class="flag-tag">Created: ${f.created}</span>
+</div>
+</div>
+<div class="rollout">
+<span class="rollout-label">Rollout</span>
+<div class="rollout-bar"><div class="rollout-fill" style="width:${f.rollout}%"></div></div>
+<span class="rollout-pct" style="color:${f.rollout>=80?'#00c864':f.rollout>=30?'#f5a623':'#aaa'}">${f.rollout}%</span>
+<input type="range" class="rollout-slider" min="0" max="100" value="${f.rollout}" onclick="event.stopPropagation()" oninput="setRollout(${f.id},this.value)">
+</div>
+<div class="flag-actions">
+<button onclick="showDetail(${f.id})">📊 Details</button>
+<button onclick="duplicateFlag(${f.id})">📋 Duplicate</button>
+<button onclick="archiveFlag(${f.id})" style="color:#ff4757;border-color:#ff475744">🗑 Archive</button>
+</div>
+</div>`).join('');
+renderStats();
+}
+
+function toggleFlag(id){
+const f=flags.find(x=>x.id===id);
+f.enabled=!f.enabled;
+if(!f.enabled)f.rollout=0;
+else if(f.rollout===0)f.rollout=10;
+renderFlags();
+}
+
+function setRollout(id,val){
+const f=flags.find(x=>x.id===id);
+f.rollout=parseInt(val);
+f.users.affected=Math.round(f.users.total*val/100);
+renderFlags();
+}
+
+function filterBy(type){filter=filter===type?null:type;renderFlags()}
+function searchFlags(q){searchQuery=q.toLowerCase();renderFlags()}
+
+function showDetail(id){
+const f=flags.find(x=>x.id===id);
+document.getElementById('detailContent').innerHTML=`
+<button class="detail-close" onclick="closeModal()">✕</button>
+<div class="detail-title">${f.name} <span class="flag-key">${f.key}</span></div>
+<div class="detail-section">
+<h4>📊 Rollout Status</h4>
+<div class="users-affected">
+<div class="user-segment"><div class="num" style="color:#00c864">${f.users.affected.toLocaleString()}</div><div class="label">Users Exposed</div></div>
+<div class="user-segment"><div class="num">${(f.users.total-f.users.affected).toLocaleString()}</div><div class="label">Control Group</div></div>
+<div class="user-segment"><div class="num">${f.users.total.toLocaleString()}</div><div class="label">Total Users</div></div>
+</div>
+<div style="margin-top:12px">
+<div style="height:24px;background:#0d1b3e;border-radius:6px;overflow:hidden;display:flex">
+<div style="width:${f.rollout}%;background:#00c864;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600">${f.rollout}% treatment</div>
+<div style="width:${100-f.rollout}%;background:#2a2a4a;display:flex;align-items:center;justify-content:center;font-size:.75rem">${100-f.rollout}% control</div>
+</div>
+</div></div>
+<div class="detail-section">
+<h4>⚙️ Configuration</h4>
+<p><strong>Environment:</strong> <code>${f.env}</code></p>
+<p><strong>Type:</strong> <code>${f.type}</code></p>
+<p><strong>Owner:</strong> ${f.owner}</p>
+<p><strong>Created:</strong> ${f.created}</p>
+<p><strong>Status:</strong> ${f.enabled?'<span style="color:#00c864">Active</span>':'<span style="color:#888">Disabled</span>'}</p>
+</div>
+<div class="detail-section">
+<h4>🔧 Code Reference</h4>
+<code style="display:block;padding:10px;background:#0d1117;border-radius:8px;line-height:1.6;white-space:pre">// Usage example\nif (flags.isEnabled('${f.key}')) {\n  // New ${f.name.toLowerCase()} logic\n  showNewFeature();\n}</code>
+</div>`;
+document.getElementById('detailModal').classList.add('visible');
+}
+
+function closeModal(){document.getElementById('detailModal').classList.remove('visible')}
+
+function addFlag(){
+const name=prompt('Flag name:');
+if(!name)return;
+flags.push({id:Date.now(),name,key:'custom.'+name.toLowerCase().replace(/\s+/g,'-'),desc:'New feature flag',enabled:false,rollout:0,type:'release',env:'staging',owner:'you',created:new Date().toISOString().split('T')[0],users:{total:12000,affected:0}});
+renderFlags();
+}
+
+function duplicateFlag(id){
+const f=flags.find(x=>x.id===id);
+flags.push({...f,id:Date.now(),name:f.name+' (copy)',key:f.key+'-copy',rollout:0,enabled:false});
+renderFlags();
+}
+
+function archiveFlag(id){flags=flags.filter(f=>f.id!==id);renderFlags()}
+
+renderFlags();
+</script>
+</body>
+</html>

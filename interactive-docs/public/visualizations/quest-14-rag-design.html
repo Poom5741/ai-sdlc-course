@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RAG Pipeline Flow</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:800px;margin:0 auto}
+svg{width:100%;height:auto;display:block}
+.step{cursor:pointer;transition:transform .2s}
+.step:hover{transform:scale(1.08)}
+.step rect{transition:all .3s}
+.step.active rect{filter:drop-shadow(0 0 10px #4f2bdf)}
+.arrow{fill:none;stroke:#4f2bdf;stroke-width:2;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .6s}
+.arrow.a{stroke-dashoffset:0}
+.particle{fill:#4f2bdf;opacity:0}
+.particle.a{opacity:1;animation:flow 1.5s linear infinite}
+@keyframes flow{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+.info{background:#16213e;border-radius:10px;padding:16px;margin-top:16px;border:1px solid #333;min-height:80px}
+.info h3{color:#4f2bdf;margin-bottom:6px}
+.info p{font-size:.8rem;line-height:1.6;color:#aaa}
+.info .hi{color:#00c864}
+.steps-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:16px 0}
+.sbtn{padding:6px 12px;border-radius:16px;background:#1a1a2e;border:1px solid #333;color:#aaa;font-size:.7rem;cursor:pointer;transition:all .3s}
+.sbtn:hover,.sbtn.a{border-color:#4f2bdf;color:#fff;background:#4f2bdf}
+</style>
+</head>
+<body>
+<h1>📚 RAG Pipeline Flow</h1>
+<div class="ctn">
+<div class="steps-row" id="srow">
+<button class="sbtn a" onclick="go(0)">① Document</button>
+<button class="sbtn" onclick="go(1)">② Chunk</button>
+<button class="sbtn" onclick="go(2)">③ Embed</button>
+<button class="sbtn" onclick="go(3)">④ Store</button>
+<button class="sbtn" onclick="go(4)">⑤ Query</button>
+<button class="sbtn" onclick="go(5)">⑥ Retrieve</button>
+<button class="sbtn" onclick="go(6)">⑦ Generate</button>
+</div>
+<svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+<g class="step active" data-s="0" onclick="go(0)"><rect x="20" y="60" width="70" height="50" rx="8" fill="#16213e" stroke="#4f2bdf" stroke-width="2"/><text x="55" y="82" text-anchor="middle" font-size="18">📄</text><text x="55" y="100" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Doc</text></g>
+<line class="arrow a" id="a0" x1="95" y1="85" x2="125" y2="85"/>
+<g class="step" data-s="1" onclick="go(1)"><rect x="125" y="60" width="70" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="160" y="82" text-anchor="middle" font-size="18">✂️</text><text x="160" y="100" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Chunk</text></g>
+<line class="arrow" id="a1" x1="200" y1="85" x2="230" y2="85"/>
+<g class="step" data-s="2" onclick="go(2)"><rect x="230" y="60" width="70" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="265" y="82" text-anchor="middle" font-size="18">🔢</text><text x="265" y="100" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Embed</text></g>
+<line class="arrow" id="a2" x1="305" y1="85" x2="335" y2="85"/>
+<g class="step" data-s="3" onclick="go(3)"><rect x="335" y="60" width="70" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="370" y="82" text-anchor="middle" font-size="18">🗄️</text><text x="370" y="100" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Store</text></g>
+<circle class="particle" id="p1" cx="370" cy="85" r="3">
+<animateMotion dur="2s" repeatCount="indefinite" path="M0,0 L0,-30 L140,-30 L140,60" />
+</circle>
+<g class="step" data-s="4" onclick="go(4)"><rect x="440" y="120" width="70" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="475" y="142" text-anchor="middle" font-size="18">❓</text><text x="475" y="160" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Query</text></g>
+<line class="arrow" id="a4" x1="515" y1="145" x2="545" y2="115"/>
+<g class="step" data-s="5" onclick="go(5)"><rect x="545" y="60" width="70" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="580" y="82" text-anchor="middle" font-size="18">🔍</text><text x="580" y="100" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Retrieve</text></g>
+<line class="arrow" id="a5" x1="620" y1="85" x2="620" y2="40" transform="rotate(90,620,85)"/>
+<g class="step" data-s="6" onclick="go(6)"><rect x="480" y="10" width="80" height="50" rx="8" fill="#16213e" stroke="#333" stroke-width="2"/><text x="520" y="32" text-anchor="middle" font-size="18">✨</text><text x="520" y="50" text-anchor="middle" fill="#aaa" font-size="9" font-family="system-ui">Generate</text></g>
+</svg>
+<div class="info" id="info">
+<h3>Step 1 — Document</h3>
+<p>Raw documents (PDFs, web pages, code files) are ingested as the knowledge source. This is the foundation of your RAG system.</p>
+</div>
+</div>
+<script>
+const descs=[
+{t:'Step 1 — Document',d:'Raw documents (PDFs, web pages, code files) are ingested as the knowledge source. This is the foundation of your RAG system.'},
+{t:'Step 2 — Chunk',d:'Documents are split into smaller overlapping chunks (typically 256-1024 tokens). This ensures <span class="hi">granular retrieval</span> without losing context.'},
+{t:'Step 3 — Embed',d:'Each chunk is converted into a <span class="hi">vector embedding</span> using a model like text-embedding-3. Similar meanings produce similar vectors.'},
+{t:'Step 4 — Store',d:'Embeddings are stored in a <span class="hi">vector database</span> (Pinecone, Chroma, Weaviate) for fast similarity search at query time.'},
+{t:'Step 5 — Query',d:'User asks a question. The query is embedded using the same model, producing a search vector.'},
+{t:'Step 6 — Retrieve',d:'The vector DB finds the <span class="hi">k most similar chunks</span> using cosine similarity. These are the relevant context pieces.'},
+{t:'Step 7 — Generate',d:'The retrieved chunks are injected into the LLM prompt as context. The model generates an answer <span class="hi">grounded in your data</span>.'}
+];
+let cur=0;
+function go(n){
+cur=n;
+document.querySelectorAll('.sbtn').forEach((b,i)=>{b.classList.toggle('a',i===n)});
+document.querySelectorAll('.step').forEach((s,i)=>{s.classList.toggle('active',i===n);const r=s.querySelector('rect');if(r)r.setAttribute('stroke',i<=n?'#4f2bdf':'#333')});
+document.querySelectorAll('.arrow').forEach((a,i)=>{a.classList.toggle('a',i<n)});
+const p=document.getElementById('p1');if(p)p.classList.toggle('a',n>=3);
+const el=document.getElementById('info');el.textContent='';const h=document.createElement('h3');h.textContent=descs[n].t;el.appendChild(h);const p=document.createElement('p');p.textContent=descs[n].d;el.appendChild(p);
+}
+window.addEventListener('DOMContentLoaded',()=>go(0));
+</script>
+</body></html>

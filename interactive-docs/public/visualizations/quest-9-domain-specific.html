@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Self-Attention Mechanism</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:800px;margin:0 auto}
+svg{width:100%;height:auto;display:block;margin-bottom:16px}
+.tok{fill:#16213e;stroke:#4f2bdf;stroke-width:2}
+.tok-txt{fill:#e0e0e0;font-size:14px;font-family:system-ui;text-anchor:middle;dominant-baseline:central}
+.vec{stroke-width:1.5;opacity:0;transition:opacity .5s,stroke-dashoffset 1s;stroke-dasharray:200;stroke-dashoffset:200}
+.vec.a{opacity:1;stroke-dashoffset:0}
+.lbl{font-size:11px;font-family:system-ui;text-anchor:middle;opacity:0;transition:opacity .5s}
+.lbl.a{opacity:1}
+.ctrls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid #4f2bdf;background:#16213e;color:#ccc;font-size:.8rem;cursor:pointer;transition:all .3s}
+.btn:hover,.btn.a{background:#4f2bdf;color:#fff}
+.info{background:#16213e;border-radius:10px;padding:16px;font-size:.85rem;line-height:1.6;border:1px solid #333}
+.info h3{color:#4f2bdf;margin-bottom:8px}
+.info .hi{color:#00c864}
+</style>
+</head>
+<body>
+<h1>🧠 Self-Attention Mechanism</h1>
+<div class="ctn">
+<div class="ctrls">
+<button class="btn a" onclick="step(0,this)">① Tokens</button>
+<button class="btn" onclick="step(1,this)">② Q, K, V</button>
+<button class="btn" onclick="step(2,this)">③ Attention</button>
+<button class="btn" onclick="step(3,this)">④ Output</button>
+</div>
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg">
+<rect class="tok" x="60" y="20" width="90" height="40" rx="8"/>
+<text class="tok-txt" x="105" y="40">The</text>
+<rect class="tok" x="210" y="20" width="90" height="40" rx="8"/>
+<text class="tok-txt" x="255" y="40">cat</text>
+<rect class="tok" x="360" y="20" width="90" height="40" rx="8"/>
+<text class="tok-txt" x="405" y="40">sat</text>
+<rect class="tok" x="510" y="20" width="90" height="40" rx="8"/>
+<text class="tok-txt" x="555" y="40">down</text>
+<!-- Q K V lines -->
+<line class="vec" id="lq0" x1="105" y1="60" x2="80" y2="100" stroke="#e74c3c"/>
+<line class="vec" id="lk0" x1="105" y1="60" x2="105" y2="100" stroke="#00c864"/>
+<line class="vec" id="lv0" x1="105" y1="60" x2="130" y2="100" stroke="#3498db"/>
+<line class="vec" id="lq1" x1="255" y1="60" x2="230" y2="100" stroke="#e74c3c"/>
+<line class="vec" id="lk1" x1="255" y1="60" x2="255" y2="100" stroke="#00c864"/>
+<line class="vec" id="lv1" x1="255" y1="60" x2="280" y2="100" stroke="#3498db"/>
+<line class="vec" id="lq2" x1="405" y1="60" x2="380" y2="100" stroke="#e74c3c"/>
+<line class="vec" id="lk2" x1="405" y1="60" x2="405" y2="100" stroke="#00c864"/>
+<line class="vec" id="lv2" x1="405" y1="60" x2="430" y2="100" stroke="#3498db"/>
+<line class="vec" id="lq3" x1="555" y1="60" x2="530" y2="100" stroke="#e74c3c"/>
+<line class="vec" id="lk3" x1="555" y1="60" x2="555" y2="100" stroke="#00c864"/>
+<line class="vec" id="lv3" x1="555" y1="60" x2="580" y2="100" stroke="#3498db"/>
+<!-- Q K V labels -->
+<text class="lbl" id="tq0" x="80" y="115" fill="#e74c3c">Q</text>
+<text class="lbl" id="tk0" x="105" y="115" fill="#00c864">K</text>
+<text class="lbl" id="tv0" x="130" y="115" fill="#3498db">V</text>
+<text class="lbl" id="tq1" x="230" y="115" fill="#e74c3c">Q</text>
+<text class="lbl" id="tk1" x="255" y="115" fill="#00c864">K</text>
+<text class="lbl" id="tv1" x="280" y="115" fill="#3498db">V</text>
+<text class="lbl" id="tq2" x="380" y="115" fill="#e74c3c">Q</text>
+<text class="lbl" id="tk2" x="405" y="115" fill="#00c864">K</text>
+<text class="lbl" id="tv2" x="430" y="115" fill="#3498db">V</text>
+<text class="lbl" id="tq3" x="530" y="115" fill="#e74c3c">Q</text>
+<text class="lbl" id="tk3" x="555" y="115" fill="#00c864">K</text>
+<text class="lbl" id="tv3" x="580" y="115" fill="#3498db">V</text>
+<!-- Attention weights from "cat" -->
+<line class="vec" id="a0" x1="105" y1="130" x2="255" y2="170" stroke="#4f2bdf" stroke-width="1"/>
+<line class="vec" id="a1" x1="255" y1="130" x2="255" y2="170" stroke="#4f2bdf" stroke-width="4"/>
+<line class="vec" id="a2" x1="405" y1="130" x2="255" y2="170" stroke="#4f2bdf" stroke-width="2"/>
+<line class="vec" id="a3" x1="555" y1="130" x2="255" y2="170" stroke="#4f2bdf" stroke-width="1"/>
+<!-- weight labels -->
+<text class="lbl" id="wa0" x="160" y="145" fill="#4f2bdf">0.05</text>
+<text class="lbl" id="wa1" x="255" y="155" fill="#4f2bdf">0.70</text>
+<text class="lbl" id="wa2" x="350" y="145" fill="#4f2bdf">0.20</text>
+<text class="lbl" id="wa3" x="470" y="155" fill="#4f2bdf">0.05</text>
+<!-- output -->
+<rect class="tok" id="out" x="210" y="170" width="90" height="40" rx="8" fill="#4f2bdf" opacity="0"/>
+<text class="lbl" id="outt" x="255" y="190" fill="#fff" style="font-size:12px">Weighted Sum</text>
+</svg>
+<div class="info" id="desc">
+<h3>Step 1 — Tokens</h3>
+Each token gets three vectors: <span class="hi">Query (what am I looking for?)</span>,
+<span class="hi">Key (what do I contain?)</span>, and <span class="hi">Value (what do I give?)</span>.
+</div>
+</div>
+<script>
+const descs=[
+{h:'Step 1 — Tokens',p:'The input is split into tokens. Each token will be projected into Query, Key, and Value vectors.'},
+{h:'Step 2 — Q, K, V Vectors',p:'Query (red): what this token needs. Key (green): what this token offers. Value (blue): what this token provides.'},
+{h:'Step 3 — Attention Weights',p:'Q·K dot products → softmax → attention weights. "cat" attends most to itself (0.70) and "sat" (0.20).'},
+{h:'Step 4 — Output',p:'The output is a weighted sum of Value vectors, where weights come from attention. Stronger connections = thicker lines.'}
+];
+let cur=-1;
+function step(n,el){
+if(n===cur)return;cur=n;
+document.querySelectorAll('.btn').forEach(b=>b.classList.remove('a'));
+el.classList.add('a');
+const all=document.querySelectorAll('.vec,.lbl');
+all.forEach(e=>e.classList.remove('a'));
+const el=document.getElementById('desc');el.textContent='';const h=document.createElement('h3');h.textContent=descs[n].h;el.appendChild(h);const pp=document.createElement('p');pp.textContent=descs[n].p;el.appendChild(pp);
+const show=(ids,del)=>ids.forEach((id,i)=>setTimeout(()=>{const e=document.getElementById(id);if(e)e.classList.add('a')},del+i*100));
+if(n>=1){show(['lq0','lk0','lv0','tq0','tk0','tv0','lq1','lk1','lv1','tq1','tk1','tv1','lq2','lk2','lv2','tq2','tk2','tv2','lq3','lk3','lv3','tq3','tk3','tv3'],100)}
+if(n>=2){show(['a0','a1','a2','a3','wa0','wa1','wa2','wa3'],400)}
+if(n>=3){show([],0);setTimeout(()=>{document.getElementById('out').style.opacity='1';document.getElementById('outt').classList.add('a')},600)}
+else{document.getElementById('out').style.opacity='0';document.getElementById('outt').classList.remove('a')}
+}
+step(0,document.querySelector('.btn'));
+</script>
+</body></html>

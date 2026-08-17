@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Window Budget Calculator — Quest 5</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
+  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
+  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
+  .calculator{background:#16213e;border-radius:12px;padding:2rem;border:1px solid #2a2a4a;width:100%;max-width:800px}
+  .slider-group{margin-bottom:1.5rem}
+  .slider-label{display:flex;justify-content:space-between;margin-bottom:.5rem;font-size:.95rem}
+  .slider-label .name{font-weight:600}
+  .slider-label .value{color:#4f2bdf;font-weight:700;font-family:'Fira Code',monospace}
+  input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;cursor:pointer}
+  .sys-slider{background:linear-gradient(90deg,#2a2a4a,#4f2bdf)}
+  .sys-slider::-webkit-slider-thumb{background:#4f2bdf}
+  .usr-slider{background:linear-gradient(90deg,#2a2a4a,#00c864)}
+  .usr-slider::-webkit-slider-thumb{background:#00c864}
+  .asst-slider{background:linear-gradient(90deg,#2a2a4a,#f0c040)}
+  .asst-slider::-webkit-slider-thumb{background:#f0c040}
+  .ctx-slider{background:linear-gradient(90deg,#2a2a4a,#e040fb)}
+  .ctx-slider::-webkit-slider-thumb{background:#e040fb}
+  .bar-container{margin:2rem 0;height:40px;border-radius:8px;overflow:hidden;display:flex;background:#0f1629;position:relative}
+  .bar-segment{height:100%;transition:width .3s;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+  .bar-sys{background:#4f2bdf}
+  .bar-usr{background:#00c864}
+  .bar-asst{background:#f0c040}
+  .bar-free{background:transparent}
+  .legend{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:.85rem}
+  .legend-dot{width:12px;height:12px;border-radius:3px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-top:1.5rem}
+  .stat-card{background:#0f1629;border-radius:8px;padding:1rem;text-align:center}
+  .stat-card .label{font-size:.75rem;color:#9e9eb8;text-transform:uppercase;letter-spacing:.05em}
+  .stat-card .num{font-size:1.6rem;font-weight:700;font-family:'Fira Code',monospace;margin-top:.3rem}
+  .stat-card .num.ok{color:#00c864}
+  .stat-card .num.warn{color:#f0c040}
+  .stat-card .num.over{color:#ff4757}
+  .warning{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:8px;padding:1rem;margin-top:1.5rem;color:#ff4757;display:none;animation:fadeIn .3s}
+  .model-select{margin-bottom:1.5rem}
+  .model-select label{font-weight:600;margin-right:.5rem}
+  .model-select select{background:#0f1629;color:#e0e0e0;border:1px solid #2a2a4a;border-radius:6px;padding:.5rem 1rem;font-size:.9rem;cursor:pointer}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,.3)}50%{box-shadow:0 0 12px 4px rgba(255,71,87,.4)}}
+  .warning.show{display:block}
+  .warning.pulse{animation:fadeIn .3s,pulse 1.5s infinite}
+</style>
+</head>
+<body>
+<h1>🧮 Context Window Budget Calculator</h1>
+<p class="subtitle">Quest 5 · Plan your token allocation wisely</p>
+<div class="calculator">
+  <div class="model-select">
+    <label>Model Preset:</label>
+    <select id="modelPreset">
+      <option value="128000">Claude 3.5 Sonnet (128K)</option>
+      <option value="200000">Claude Opus (200K)</option>
+      <option value="32000">GPT-3.5 Turbo (32K)</option>
+      <option value="128000">GPT-4o (128K)</option>
+      <option value="8192">GPT-4 Turbo (8K)</option>
+    </select>
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-label"><span class="name">🔧 System Prompt</span><span class="value" id="sysVal">2,000</span></div>
+    <input type="range" class="sys-slider" id="sysSlider" min="100" max="30000" value="2000" step="100">
+  </div>
+  <div class="slider-group">
+    <div class="slider-label"><span class="name">💬 User Messages</span><span class="value" id="usrVal">5,000</span></div>
+    <input type="range" class="usr-slider" id="usrSlider" min="100" max="80000" value="5000" step="100">
+  </div>
+  <div class="slider-group">
+    <div class="slider-label"><span class="name">🤖 Assistant Reply Budget</span><span class="value" id="asstVal">4,096</span></div>
+    <input type="range" class="asst-slider" id="asstSlider" min="256" max="16384" value="4096" step="256">
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4f2bdf"></div>System</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00c864"></div>User</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f0c040"></div>Assistant</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2a2a4a"></div>Free</div>
+  </div>
+
+  <div class="bar-container" id="barContainer"></div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="label">Total Budget</div><div class="num" id="totalBudget">128K</div></div>
+    <div class="stat-card"><div class="label">Used</div><div class="num" id="totalUsed">11,096</div></div>
+    <div class="stat-card"><div class="label">Free</div><div class="num" id="totalFree">116,904</div></div>
+    <div class="stat-card"><div class="label">Usage %</div><div class="num" id="usagePct">8.7%</div></div>
+  </div>
+
+  <div class="warning" id="warning"></div>
+</div>
+
+<script>
+const sysS = document.getElementById('sysSlider');
+const usrS = document.getElementById('usrSlider');
+const asstS = document.getElementById('asstSlider');
+const sel = document.getElementById('modelPreset');
+
+function fmt(n) { return n.toLocaleString(); }
+
+function update() {
+  const budget = parseInt(sel.value);
+  const sys = parseInt(sysS.value);
+  const usr = parseInt(usrS.value);
+  const asst = parseInt(asstS.value);
+  const used = sys + usr + asst;
+  const free = budget - used;
+  const pct = ((used / budget) * 100);
+
+  document.getElementById('sysVal').textContent = fmt(sys);
+  document.getElementById('usrVal').textContent = fmt(usr);
+  document.getElementById('asstVal').textContent = fmt(asst);
+
+  const pctSys = Math.max((sys / budget) * 100, 0);
+  const pctUsr = Math.max((usr / budget) * 100, 0);
+  const pctAsst = Math.max((asst / budget) * 100, 0);
+  const pctFree = Math.max(100 - pctSys - pctUsr - pctAsst, 0);
+
+  const bar = document.getElementById('barContainer');
+  bar.textContent = '';
+  [{cls:'bar-sys',p:pctSys,l:'sys'},{cls:'bar-usr',p:pctUsr,l:'usr'},{cls:'bar-asst',p:pctAsst,l:'asst'},{cls:'bar-free',p:pctFree,l:'free'}].forEach(seg => {
+    const d = document.createElement('div');
+    d.className = 'bar-segment ' + seg.cls;
+    d.style.width = seg.p + '%';
+    if (seg.p > 5 && seg.l !== 'free') d.textContent = fmt(Math.round(budget * seg.p / 100));
+    bar.appendChild(d);
+  });
+
+  document.getElementById('totalBudget').textContent = budget >= 1000 ? (budget / 1000) + 'K' : budget;
+  document.getElementById('totalBudget').className = 'num';
+  document.getElementById('totalUsed').textContent = fmt(used);
+  document.getElementById('totalUsed').className = 'num ' + (pct > 90 ? 'over' : pct > 70 ? 'warn' : 'ok');
+  document.getElementById('totalFree').textContent = fmt(free);
+  document.getElementById('totalFree').className = 'num ' + (free < 0 ? 'over' : free < budget * 0.1 ? 'warn' : 'ok');
+  document.getElementById('usagePct').textContent = pct.toFixed(1) + '%';
+  document.getElementById('usagePct').className = 'num ' + (pct > 100 ? 'over' : pct > 80 ? 'warn' : 'ok');
+
+  const warn = document.getElementById('warning');
+  if (used > budget) {
+    warn.className = 'warning show pulse';
+    warn.textContent = `⚠️ Overflow! You need ${fmt(used - budget)} more tokens. Your requests will be truncated or rejected.`;
+  } else if (pct > 80) {
+    warn.className = 'warning show';
+    warn.textContent = `⚠️ Warning: You're using ${pct.toFixed(1)}% of your context window. Consider reducing message history.`;
+  } else {
+    warn.className = 'warning';
+  }
+
+  sysS.max = budget;
+  usrS.max = budget;
+  asstS.max = Math.min(budget, 16384);
+}
+
+sysS.addEventListener('input', update);
+usrS.addEventListener('input', update);
+asstS.addEventListener('input', update);
+sel.addEventListener('change', update);
+update();
+</script>
+</body>
+</html>

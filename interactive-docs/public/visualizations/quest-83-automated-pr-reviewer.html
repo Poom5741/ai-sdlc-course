@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PR Review Flow — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
+.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
+.ctn{max-width:960px;margin:0 auto}
+/* Flow */
+.flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.flow-step{background:#16213e;border-radius:10px;padding:10px 18px;border:2px solid #333;font-size:.8rem;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(10px);transition:all .4s}
+.flow-step.show{opacity:1;transform:translateY(0)}
+.flow-step.active{border-color:#4f2bdf;background:#4f2bdf22}
+.flow-arrow{color:#4f2bdf;font-size:1.2rem;opacity:0;transition:opacity .3s}
+.flow-arrow.show{opacity:1}
+/* Diff viewer */
+.diff-wrap{background:#0d1117;border-radius:12px;border:1px solid #333;overflow:hidden;margin-bottom:20px}
+.diff-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#16213e;border-bottom:1px solid #333}
+.diff-header .title{font-size:.85rem;font-weight:600;color:#4f2bdf}
+.diff-header .counters{display:flex;gap:12px;font-size:.75rem}
+.diff-header .cnt-err{color:#ff4466}.diff-header .cnt-warn{color:#ffb347}.diff-header .cnt-info{color:#4fc3f7}
+.diff-lines{font-family:'Courier New',monospace;font-size:.78rem;line-height:1.7}
+.diff-line{display:flex;cursor:pointer;transition:background .2s}
+.diff-line:hover{background:#4f2bdf15}
+.diff-line .ln{width:36px;text-align:right;color:#555;padding:0 8px;user-select:none;flex-shrink:0}
+.diff-line .code{padding:0 12px;white-space:pre;flex:1}
+.diff-line.added{background:#00c86412}.diff-line.added .code{color:#00c864}
+.diff-line.removed{background:#ff446612}.diff-line.removed .code{color:#ff4466}
+.diff-line .marker{width:20px;text-align:center;flex-shrink:0;color:#555}
+.diff-line.added .marker{color:#00c864}.diff-line.removed .marker{color:#ff4466}
+/* Severity badges on the line */
+.diff-line .badge{display:none;margin-left:auto;padding:1px 8px;border-radius:99px;font-size:.65rem;font-weight:700;flex-shrink:0;white-space:nowrap}
+.diff-line.has-review .badge{display:inline-block}
+.badge.err{background:#ff446633;color:#ff4466}
+.badge.warn{background:#ffb34733;color:#ffb347}
+.badge.inf{background:#4fc3f733;color:#4fc3f7}
+/* Suggestion panel */
+.suggest{background:#16213e;border:1px solid #4f2bdf33;border-radius:10px;padding:16px;margin-bottom:20px;max-height:0;overflow:hidden;opacity:0;transition:all .4s}
+.suggest.open{max-height:300px;opacity:1;margin-bottom:20px}
+.suggest h3{font-size:.85rem;color:#4f2bdf;margin-bottom:8px}
+.suggest .body{font-size:.8rem;line-height:1.6;color:#ccc}
+.suggest .fix{background:#0d1117;border-radius:8px;padding:10px 14px;margin-top:8px;font-family:'Courier New',monospace;font-size:.75rem;color:#00c864;border:1px solid #00c86433;white-space:pre}
+.suggest .dismiss{margin-top:10px;padding:4px 14px;border-radius:6px;background:#4f2bdf;color:#fff;border:none;font-size:.75rem;cursor:pointer}
+/* Severity legend */
+.legend{display:flex;gap:20px;justify-content:center;margin-bottom:20px;font-size:.75rem}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot.e{background:#ff4466}.dot.w{background:#ffb347}.dot.i{background:#4fc3f7}
+/* Score */
+.score-bar{background:#16213e;border-radius:12px;padding:16px;text-align:center;border:1px solid #333}
+.score-bar h2{font-size:.9rem;color:#4f2bdf;margin-bottom:10px}
+.meter{height:14px;background:#0d1117;border-radius:99px;overflow:hidden;margin-bottom:8px}
+.meter-fill{height:100%;width:0;background:linear-gradient(90deg,#ff4466,#ffb347,#00c864);border-radius:99px;transition:width 1.5s ease}
+.score-label{font-size:1.4rem;font-weight:700;color:#00c864;transition:color .5s}
+.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
+.btn:hover{background:#6143e8}
+</style>
+</head>
+<body>
+<h1>🔍 Automated PR Review Flow</h1>
+<p class="sub">Click diff lines to see AI review suggestions</p>
+<div class="ctn">
+<!-- Flow steps -->
+<div class="flow">
+  <div class="flow-step" id="fs0">📨 PR Opened</div><span class="flow-arrow" id="fa0">→</span>
+  <div class="flow-step" id="fs1">🤖 AI Scanner</div><span class="flow-arrow" id="fa1">→</span>
+  <div class="flow-step" id="fs2">🔎 Static Analysis</div><span class="flow-arrow" id="fa2">→</span>
+  <div class="flow-step" id="fs3">📝 Review Posted</div><span class="flow-arrow" id="fa3">→</span>
+  <div class="flow-step" id="fs4">✅ Merge Ready</div>
+</div>
+
+<!-- Severity Legend -->
+<div class="legend">
+  <span><span class="dot e"></span> Error</span>
+  <span><span class="dot w"></span> Warning</span>
+  <span><span class="dot i"></span> Info</span>
+  <span style="color:#888">Click a highlighted line for details →</span>
+</div>
+
+<!-- Diff -->
+<div class="diff-wrap" id="diffWrap">
+  <div class="diff-header">
+    <span class="title">📄 src/auth.ts — 12 changes</span>
+    <div class="counters">
+      <span class="cnt-err" id="cntErr">● 2 errors</span>
+      <span class="cnt-warn" id="cntWarn">● 3 warnings</span>
+      <span class="cnt-info" id="cntInfo">● 2 info</span>
+    </div>
+  </div>
+  <div class="diff-lines" id="diffLines"></div>
+</div>
+
+<!-- Suggestion -->
+<div class="suggest" id="suggest">
+  <h3 id="sugTitle">Suggestion</h3>
+  <div class="body" id="sugBody"></div>
+  <div class="fix" id="sugFix" style="display:none"></div>
+  <button class="dismiss" onclick="closeSuggest()">Dismiss</button>
+</div>
+
+<!-- Score -->
+<div class="score-bar">
+  <h2>PR Health Score</h2>
+  <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+  <div class="score-label" id="scoreLabel">Calculating…</div>
+</div>
+
+<button class="btn" onclick="replay()">▶ Replay Review</button>
+</div>
+
+<script>
+const diffData=[
+  {ln:10,orig:'export function login(user: string, pwd: string) {',mod:'export function login(user: string, pwd: string): Promise<User> {',cls:'removed',marker:'-',review:null},
+  {ln:10,orig:'export function login(user: string, pwd: string) {',mod:'export function login(user: string, pwd: string): Promise<User> {',cls:'added',marker:'+',review:{sev:'err',sevLabel:'Error',title:'Missing error handling',body:'The login function can throw on network errors but has no try/catch. Wrap the async call and return a Result type.',fix:'try {\n  const user = await authenticate(user, pwd);\n  return { ok: true, data: user };\n} catch (e) {\n  return { ok: false, error: e };\n}'}},
+  {ln:15,orig:'  const hash = md5(pwd);',mod:'  const hash = md5(pwd);',cls:'removed',marker:'-',review:null},
+  {ln:15,orig:'  const hash = md5(pwd);',mod:'  const hash = md5(pwd);',cls:'added',marker:'+',review:{sev:'err',sevLabel:'Error',title:'Insecure hash function',body:'MD5 is cryptographically broken for password hashing. Use bcrypt or argon2id.',fix:'import bcrypt from "bcrypt";\nconst hash = await bcrypt.hash(pwd, 12);'}},
+  {ln:22,orig:'  db.query(`SELECT * FROM users WHERE name="${user}"`);',mod:'  const users = await db.query(\n    "SELECT * FROM users WHERE name=$1", [user]);',cls:'removed',marker:'-',review:null},
+  {ln:22,orig:'  db.query(`SELECT * FROM users WHERE name="${user}"`);',mod:'  const users = await db.query(\n    "SELECT * FROM users WHERE name=$1", [user]);',cls:'added',marker:'+',review:{sev:'warn',sevLabel:'Warning',title:'SQL Injection mitigated',body:'Good — switching to parameterized queries prevents SQL injection. Consider also adding an index on the name column for performance.',fix:null}},
+  {ln:28,orig:'  console.log("login attempt:", user);',mod:'  logger.info("login attempt", { userId: user.id });',cls:'removed',marker:'-',review:null},
+  {ln:28,orig:'  console.log("login attempt:", user);',mod:'  logger.info("login attempt", { userId: user.id });',cls:'added',marker:'+',review:{sev:'info',sevLabel:'Info',title:'Good: structured logging',body:'Using a structured logger with metadata instead of console.log. Consistent with project observability standards.',fix:null}},
+  {ln:35,orig:'  return user;',mod:'  return { user, token: signJwt(user) };',cls:'removed',marker:'-',review:null},
+  {ln:35,orig:'  return user;',mod:'  return { user, token: signJwt(user) };',cls:'added',marker:'+',review:{sev:'warn',sevLabel:'Warning',title:'JWT secret not validated',body:'signJwt may use an undefined SECRET_KEY env var. Add a startup check that the secret exists and is at least 256 bits.',fix:'if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {\n  throw new Error("JWT_SECRET missing or too short");\n}'}},
+  {ln:42,orig:'function signJwt(u) { return jwt.sign(u, "secret"); }',mod:'function signJwt(u: User): string {\n  return jwt.sign({ sub: u.id }, SECRET, { expiresIn: "1h" });\n}',cls:'removed',marker:'-',review:null},
+  {ln:42,orig:'function signJwt(u) { return jwt.sign(u, "secret"); }',mod:'function signJwt(u: User): string {\n  return jwt.sign({ sub: u.id }, SECRET, { expiresIn: "1h" });\n}',cls:'added',marker:'+',review:{sev:'warn',sevLabel:'Warning',title:'Hardcoded secret removed',body:'Good — "secret" string literal replaced with env variable. Ensure JWT_SECRET is set in production and rotation is configured.',fix:null}},
+  {ln:50,orig:'const isValid = pwd.length > 0;',mod:'const isValid = pwd.length >= 12 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd);',cls:'removed',marker:'-',review:null},
+  {ln:50,orig:'const isValid = pwd.length > 0;',mod:'const isValid = pwd.length >= 12 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd);',cls:'added',marker:'+',review:{sev:'info',sevLabel:'Info',title:'Good: stronger password policy',body:'Password validation now requires minimum length, uppercase, and numeric characters. Consider also checking against common breached password lists.',fix:null}},
+];
+
+const $lines=document.getElementById('diffLines');
+const $suggest=document.getElementById('suggest');
+const $sugTitle=document.getElementById('sugTitle');
+const $sugBody=document.getElementById('sugBody');
+const $sugFix=document.getElementById('sugFix');
+const $meter=document.getElementById('meterFill');
+const $scoreLabel=document.getElementById('scoreLabel');
+
+function renderDiff(){
+  while($lines.firstChild)$lines.removeChild($lines.firstChild);
+  diffData.forEach((d,i)=>{
+    const div=document.createElement('div');
+    div.className='diff-line '+d.cls+(d.review?' has-review':'');
+    div.dataset.i=i;
+    const marker=document.createElement('span');marker.className='marker';marker.textContent=d.marker;div.appendChild(marker);
+    const ln=document.createElement('span');ln.className='ln';ln.textContent=String(d.ln);div.appendChild(ln);
+    const code=document.createElement('span');code.className='code';code.textContent=d.mod;div.appendChild(code);
+    if(d.review){const badge=document.createElement('span');badge.className='badge '+(d.review.sev==='err'?'err':d.review.sev==='warn'?'warn':'inf');badge.textContent=d.review.sevLabel;div.appendChild(badge);}
+    if(d.review) div.addEventListener('click',()=>showSuggest(d.review));
+    $lines.appendChild(div);
+  });
+}
+
+function showSuggest(r){
+  $sugTitle.textContent=r.title;
+  const sevColor=r.sev==='err'?'#ff4466':r.sev==='warn'?'#ffb347':'#4fc3f7';
+  $sugTitle.style.color=sevColor;
+  while($sugBody.firstChild)$sugBody.removeChild($sugBody.firstChild);
+  const strong=document.createElement('strong');strong.style.color=sevColor;strong.textContent='['+r.sevLabel+'] ';
+  $sugBody.appendChild(strong);
+  $sugBody.appendChild(document.createTextNode(r.body));
+  if(r.fix){$sugFix.style.display='block';$sugFix.textContent=r.fix;} else {$sugFix.style.display='none';}
+  $suggest.classList.add('open');
+}
+function closeSuggest(){$suggest.classList.remove('open');}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Score calculation
+function calcScore(){
+  let err=0,warn=0,info=0;
+  diffData.forEach(d=>{if(d.review){if(d.review.sev==='err')err++;else if(d.review.sev==='warn')warn++;else info++;}});
+  const total=err*15+warn*8+info*2;
+  const score=Math.max(0,100-total);
+  $meter.style.width=score+'%';
+  $scoreLabel.textContent=score+'/100';
+  $scoreLabel.style.color=score>=80?'#00c864':score>=50?'#ffb347':'#ff4466';
+}
+
+// Flow animation
+function animFlow(){
+  const steps=document.querySelectorAll('.flow-step');
+  const arrows=document.querySelectorAll('.flow-arrow');
+  steps.forEach(s=>s.classList.remove('show','active'));
+  arrows.forEach(a=>a.classList.remove('show'));
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i>=steps.length){clearInterval(iv);animScore();return;}
+    steps[i].classList.add('show');
+    if(i>0)steps[i-1].classList.remove('active');
+    steps[i].classList.add('active');
+    if(i<arrows.length)arrows[i].classList.add('show');
+    i++;
+  },400);
+}
+
+function animScore(){
+  $meter.style.width='0%';
+  $scoreLabel.textContent='Calculating…';
+  setTimeout(()=>calcScore(),200);
+}
+
+function replay(){
+  closeSuggest();
+  animFlow();
+}
+
+// Init
+renderDiff();
+animFlow();
+</script>
+</body>
+</html>

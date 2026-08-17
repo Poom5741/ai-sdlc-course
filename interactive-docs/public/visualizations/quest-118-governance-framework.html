@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governance Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:24px;font-size:.9rem}
+.scorecard-row{max-width:1100px;margin:0 auto 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.scorecard{background:#16213e;border-radius:14px;padding:20px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all .3s}
+.scorecard:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.3)}
+.scorecard.active{border:2px solid #4f2bdf}
+.score-ring{width:90px;height:90px;margin:0 auto 10px}
+.score-title{font-size:.82rem;color:#aaa;margin-bottom:4px}
+.score-value{font-size:1.5rem;font-weight:700}
+.score-badge{font-size:.65rem;padding:2px 8px;border-radius:10px;margin-top:6px;display:inline-block}
+.badge-good{background:#00c86422;color:#00c864}
+.badge-warn{background:#f5a62322;color:#f5a623}
+.badge-bad{background:#ff475722;color:#ff4757}
+.main-content{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.main-content{grid-template-columns:1fr}}
+.panel{background:#16213e;border-radius:14px;padding:20px}
+.panel-title{font-size:.95rem;font-weight:700;color:#4f2bdf;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.compliance-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin:6px 0;background:#0d1b3e;transition:all .2s}
+.compliance-item:hover{background:#1a2340}
+.compliance-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.compliance-icon.pass{background:#00c86422}
+.compliance-icon.fail{background:#ff475722}
+.compliance-icon.warn{background:#f5a62322}
+.compliance-info{flex:1;min-width:0}
+.compliance-name{font-size:.85rem;font-weight:600}
+.compliance-desc{font-size:.72rem;color:#888}
+.compliance-score{font-size:.9rem;font-weight:700}
+.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #0d1b3e}
+.timeline-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.timeline-info{flex:1}
+.timeline-title{font-size:.82rem;font-weight:600}
+.timeline-date{font-size:.7rem;color:#888}
+.risk-bar{margin:8px 0}
+.risk-label{display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:4px}
+.risk-track{height:10px;background:#0d1b3e;border-radius:5px;overflow:hidden}
+.risk-fill{height:100%;border-radius:5px;transition:width 1.5s cubic-bezier(.25,.8,.25,1)}
+.full-width{grid-column:1/-1}
+.chart-container{position:relative;height:200px;margin-top:12px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;padding:0 10px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height 1.5s cubic-bezier(.25,.8,.25,1);min-height:4px;position:relative}
+.bar:hover{opacity:.8}
+.bar-label{font-size:.65rem;color:#888;margin-top:6px;text-align:center}
+.controls{max-width:1100px;margin:0 auto 20px;text-align:center}
+.controls button{background:#4f2bdf;color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.82rem;margin:0 4px;transition:background .2s}
+.controls button:hover{background:#6b45e0}
+.controls button.secondary{background:#16213e;border:1px solid #4f2bdf}
+</style>
+</head>
+<body>
+<h1>🏛️ Governance Dashboard</h1>
+<p class="subtitle">AI compliance monitoring across regulatory frameworks and internal policies.</p>
+<div class="controls">
+<button onclick="runAudit()">🔍 Run Full Audit</button>
+<button class="secondary" onclick="exportReport()">📄 Export Report</button>
+<button class="secondary" onclick="resetDashboard()">↻ Reset</button>
+</div>
+<div class="scorecard-row" id="scorecards"></div>
+<div class="main-content" id="mainContent"></div>
+
+<script>
+const frameworks=[
+{id:'gdpr',name:'GDPR',score:87,icon:'🇪🇺',color:'#4f2bdf',items:[
+{name:'Data Processing Agreements',status:'pass',score:95,desc:'All vendors have signed DPAs'},
+{name:'Right to Erasure',status:'pass',score:92,desc:'Automated deletion pipeline active'},
+{name:'Data Minimization',status:'warn',score:72,desc:'Some datasets retain extra fields'},
+{name:'Consent Management',status:'pass',score:98,desc:'Consent records maintained'},
+{name:'Cross-Border Transfer',status:'pass',score:88,desc:'Standard contractual clauses in place'}
+]},
+{id:'soc2',name:'SOC 2',score:92,icon:'🔒',color:'#00c864',items:[
+{name:'Access Controls',status:'pass',score:96,desc:'RBAC with quarterly reviews'},
+{name:'Audit Logging',status:'pass',score:99,desc:'Full audit trail for 2 years'},
+{name:'Encryption at Rest',status:'pass',score:100,desc:'AES-256 all data stores'},
+{name:'Incident Response',status:'pass',score:85,desc:'Plan tested quarterly'},
+{name:'Vendor Management',status:'warn',score:78,desc:'2 vendors pending review'}
+]},
+{id:'fairness',name:'AI Fairness',score:74,icon:'⚖️',color:'#f5a623',items:[
+{name:'Bias Testing',status:'pass',score:82,desc:'Monthly automated bias scans'},
+{name:'Disparate Impact',status:'warn',score:68,desc:'Gender disparity detected in hiring model'},
+{name:'Explainability',status:'pass',score:88,desc:'SHAP values for all models'},
+{name:'Human Oversight',status:'pass',score:91,desc:'Human review for all consequential decisions'},
+{name:'Model Cards',status:'warn',score:65,desc:'3 models missing updated documentation'}
+]},
+{id:'privacy',name:'Privacy',score:81,icon:'🛡️',color:'#a78bfa',items:[
+{name:'PII Detection',status:'pass',score:94,desc:'Automated scanning in CI/CD'},
+{name:'Data Retention',status:'pass',score:88,desc:'Auto-deletion after policy period'},
+{name:'Anonymization',status:'warn',score:72,desc:'Some logs contain partial PII'},
+{name:'Privacy Impact Assessment',status:'pass',score:86,desc:'Completed for all new features'},
+{name:'Cookie Compliance',status:'pass',score:90,desc:'Consent-based tracking only'}
+]},
+{id:'security',name:'Security',score:95,icon:'🔐',color:'#00c864',items:[
+{name:'Vulnerability Scanning',status:'pass',score:98,desc:'Daily automated scans'},
+{name:'Dependency Updates',status:'pass',score:92,desc:'Auto-merge for patch updates'},
+{name:'Penetration Testing',status:'pass',score:100,desc:'Annual pentest completed'},
+{name:'Secret Management',status:'pass',score:96,desc:'Vault for all secrets'},
+{name:'Network Security',status:'pass',score:89,desc:'Zero-trust architecture'}
+]},
+{id:'operations',name:'Operations',score:79,icon:'⚙️',color:'#f5a623',items:[
+{name:'SLA Compliance',status:'pass',score:94,desc:'99.95% uptime maintained'},
+{name:'Incident Response',status:'pass',score:85,desc:'MTTR: 18 minutes'},
+{name:'Change Management',status:'warn',score:68,desc:'Some changes bypass review'},
+{name:'Disaster Recovery',status:'pass',score:90,desc:'RTO: 1h, RPO: 15min'},
+{name:'Monitoring Coverage',status:'warn',score:72,desc:'Gaps in non-critical services'}
+]}
+];
+
+const recentActivity=[
+{title:'GDPR audit completed',date:'2 hours ago',color:'#4f2bdf'},
+{title:'SOC 2 evidence uploaded',date:'1 day ago',color:'#00c864'},
+{title:'Bias scan flagged gender disparity',date:'2 days ago',color:'#f5a623'},
+{title:'New privacy policy published',date:'3 days ago',color:'#a78bfa'},
+{title:'Vendor DPA renewed (AWS)',date:'5 days ago',color:'#00c864'},
+{title:'Security patch deployed',date:'1 week ago',color:'#00c864'},
+];
+
+let selectedFramework=null;
+
+function renderScorecards(){
+document.getElementById('scorecards').innerHTML=frameworks.map(f=>{
+const color=f.score>=90?'#00c864':f.score>=75?'#f5a623':'#ff4757';
+const badge=f.score>=90?'Compliant':f.score>=75?'Needs Attention':'At Risk';
+const badgeClass=f.score>=90?'badge-good':f.score>=75?'badge-warn':'badge-bad';
+const total=214;
+const filled=(f.score/100)*total;
+return`<div class="scorecard ${selectedFramework===f.id?'active':''}" onclick="selectFramework('${f.id}')">
+<svg class="score-ring" viewBox="0 0 90 90">
+<circle cx="45" cy="45" r="38" fill="none" stroke="#0d1b3e" stroke-width="7"/>
+<circle cx="45" cy="45" r="38" fill="none" stroke="${color}" stroke-width="7" stroke-dasharray="0 ${total}" stroke-linecap="round" transform="rotate(-90 45 45)" class="score-arc" data-target="${filled}"/>
+<text x="45" y="42" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">${f.score}</text>
+<text x="45" y="55" text-anchor="middle" fill="#888" font-size="8">/ 100</text>
+</svg>
+<div class="score-title">${f.icon} ${f.name}</div>
+<span class="score-badge ${badgeClass}">${badge}</span>
+</div>`}).join('');
+animateScorecards();
+}
+
+function animateScorecards(){
+document.querySelectorAll('.score-arc').forEach(arc=>{
+const target=parseFloat(arc.dataset.target);
+let current=0;
+const step=()=>{current+=target/40;if(current>target)current=target;arc.setAttribute('stroke-dasharray',`${current} 214`);if(current<target)requestAnimationFrame(step)};step();
+});
+}
+
+function selectFramework(id){
+selectedFramework=selectedFramework===id?null:id;
+renderScorecards();
+renderMain();
+}
+
+function renderMain(){
+const f=selectedFramework?frameworks.find(x=>x.id===selectedFramework):null;
+const panel=document.getElementById('mainContent');
+if(!f){
+const totalScore=Math.round(frameworks.reduce((s,f)=>s+f.score,0)/frameworks.length);
+panel.innerHTML=`
+<div class="panel">
+<div class="panel-title">📊 Compliance Overview</div>
+<div class="bar-chart">${frameworks.map(f=>`<div class="bar-group">
+<div class="bar" style="height:0;background:${f.color}" data-height="${(f.score/100)*140}"></div>
+<div class="bar-label">${f.icon}<br>${f.name}</div>
+</div>`).join('')}</div>
+<div style="text-align:center;margin-top:16px"><span style="font-size:.85rem;color:#888">Overall Score: </span><span style="font-size:1.4rem;font-weight:700;color:${totalScore>=85?'#00c864':'#f5a623'}">${totalScore}/100</span></div>
+</div>
+<div class="panel">
+<div class="panel-title">📋 Recent Activity</div>
+${recentActivity.map(a=>`<div class="timeline-item">
+<div class="timeline-dot" style="background:${a.color}"></div>
+<div class="timeline-info">
+<div class="timeline-title">${a.title}</div>
+<div class="timeline-date">${a.date}</div>
+</div>
+</div>`).join('')}
+</div>
+<div class="panel full-width">
+<div class="panel-title">⚠️ Risk Areas Requiring Attention</div>
+${frameworks.flatMap(f=>f.items.filter(i=>i.status!=='pass').map(i=>({...i,framework:f.name,icon:f.icon}))).map(r=>`
+<div class="risk-bar">
+<div class="risk-label"><span>${r.icon} ${r.framework}: ${r.name}</span><span style="color:${r.score>=70?'#f5a623':'#ff4757'}">${r.score}%</span></div>
+<div class="risk-track"><div class="risk-fill" style="width:0;background:${r.score>=70?'#f5a623':'#ff4757'}" data-width="${r.score}%"></div></div>
+</div>`).join('')}
+</div>`;
+setTimeout(()=>{document.querySelectorAll('.bar[data-height]').forEach(b=>{b.style.height=b.dataset.height+'px'});document.querySelectorAll('.risk-fill[data-width]').forEach(f=>{f.style.width=f.dataset.width})},100);
+}else{
+panel.innerHTML=`
+<div class="panel full-width">
+<div class="panel-title">${f.icon} ${f.name} — Detailed Compliance</div>
+${f.items.map(i=>`<div class="compliance-item">
+<div class="compliance-icon ${i.status}">${i.status==='pass'?'✅':i.status==='warn'?'⚠️':'❌'}</div>
+<div class="compliance-info"><div class="compliance-name">${i.name}</div><div class="compliance-desc">${i.desc}</div></div>
+<div class="compliance-score" style="color:${i.score>=90?'#00c864':i.score>=70?'#f5a623':'#ff4757'}">${i.score}%</div>
+</div>`).join('')}
+</div>
+<div class="panel">
+<div class="panel-title">📈 Score Trend</div>
+<div style="text-align:center;padding:20px">
+<div style="font-size:2.5rem;font-weight:700;color:${f.score>=90?'#00c864':f.score>=75?'#f5a623':'#ff4757'}">${f.score}</div>
+<div style="font-size:.82rem;color:#888;margin-top:4px">Current Score</div>
+<div style="margin-top:12px;font-size:.82rem;color:#aaa">${f.items.filter(i=>i.status==='pass').length}/${f.items.length} controls passing</div>
+</div>
+<div style="padding:0 12px">
+${f.items.map(i=>`<div class="risk-bar">
+<div class="risk-label"><span>${i.name}</span><span style="color:${i.score>=90?'#00c864':i.score>=70?'#f5a623':'#ff4757'}">${i.score}%</span></div>
+<div class="risk-track"><div class="risk-fill" style="width:${i.score}%;background:${i.score>=90?'#00c864':i.score>=70?'#f5a623':'#ff4757'}"></div></div>
+</div>`).join('')}
+</div>
+</div>`;
+}
+}
+
+function runAudit(){
+frameworks.forEach(f=>{f.score=Math.min(100,f.score+Math.floor(Math.random()*5))});
+renderScorecards();renderMain();
+}
+
+function exportReport(){alert('📄 Report exported: governance-report-'+new Date().toISOString().split('T')[0]+'.pdf')}
+
+function resetDashboard(){
+frameworks[0].score=87;frameworks[1].score=92;frameworks[2].score=74;frameworks[3].score=81;frameworks[4].score=95;frameworks[5].score=79;
+selectedFramework=null;renderScorecards();renderMain();
+}
+
+renderScorecards();renderMain();
+</script>
+</body>
+</html>

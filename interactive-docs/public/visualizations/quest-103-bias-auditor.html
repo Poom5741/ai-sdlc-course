@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bias Detection Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:24px;font-size:.9rem}
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:1100px;margin:0 auto 30px}
+.gauge-card{background:#16213e;border-radius:16px;padding:24px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s}
+.gauge-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(79,43,223,.3)}
+.gauge-card.active{border:2px solid #4f2bdf}
+.gauge-label{font-size:.85rem;color:#aaa;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+.gauge-svg{width:160px;height:100px;margin:0 auto}
+.gauge-value{font-size:1.6rem;font-weight:700;margin-top:8px}
+.gauge-desc{font-size:.75rem;color:#666;margin-top:6px}
+.detail-panel{max-width:1100px;margin:0 auto;background:#16213e;border-radius:16px;padding:30px;min-height:200px;display:none}
+.detail-panel.visible{display:block;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.detail-title{color:#4f2bdf;font-size:1.2rem;margin-bottom:12px}
+.detail-body{color:#ccc;line-height:1.7;font-size:.9rem}
+.metric-bar{margin:10px 0}
+.metric-bar label{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px}
+.bar-track{height:8px;background:#0d1b3e;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1.5s cubic-bezier(.25,.8,.25,1)}
+.tooltip{position:absolute;background:#0d1b3e;color:#fff;padding:8px 14px;border-radius:8px;font-size:.78rem;pointer-events:none;opacity:0;transition:opacity .2s;z-index:10;max-width:220px}
+.controls{text-align:center;margin-bottom:24px}
+.controls button{background:#4f2bdf;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:.85rem;margin:0 6px;transition:background .2s}
+.controls button:hover{background:#6b45e0}
+.controls button.secondary{background:#16213e;border:1px solid #4f2bdf}
+.legend{display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap}
+.legend span{font-size:.75rem;color:#888;display:flex;align-items:center;gap:5px}
+.legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+@media(max-width:600px){.dashboard{grid-template-columns:1fr 1fr}.gauge-svg{width:120px;height:80px}}
+</style>
+</head>
+<body>
+<h1>🔍 Bias Detection Dashboard</h1>
+<p class="subtitle">Click a bias metric to see detailed analysis. Click "Simulate Scan" to animate all gauges.</p>
+<div class="controls">
+<button onclick="simulateScan()">⚡ Simulate Scan</button>
+<button class="secondary" onclick="resetAll()">↻ Reset</button>
+</div>
+<div class="dashboard" id="dashboard"></div>
+<div class="detail-panel" id="detailPanel"></div>
+<div class="legend">
+<span><span class="dot" style="background:#00c864"></span> Low Risk (0-30%)</span>
+<span><span class="dot" style="background:#f5a623"></span> Medium (31-60%)</span>
+<span><span class="dot" style="background:#ff4757"></span> High Risk (61-100%)</span>
+</div>
+
+<script>
+const biasTypes=[
+{id:'gender',name:'Gender Bias',icon:'👤',value:0,target:23,desc:'Under-representation of female candidates in tech roles',details:{findings:['Resumes with female names scored 12% lower','Job description uses masculine-coded language 8x more','Interview panel lacks gender diversity'],metrics:[{label:'Name-blind scoring gap',val:12},{label:'Language polarity',val:34},{label:'Panel diversity score',val:78}]}},
+{id:'age',name:'Age Bias',icon:'📅',value:0,target:45,desc:'Preference for younger candidates in screening',details:{findings:['Graduation year used as screening filter','Keywords like "digital native" appear 15 times','Older candidates filtered at resume stage'],metrics:[{label:'Age correlation score',val:45},{label:'Keyword bias count',val:62},{label:'Screening fairness',val:55}]}},
+{id:'racial',name:'Racial Bias',icon:'🌍',value:0,target:31,desc:'Unequal treatment across demographic groups',details:{findings:['Name-based scoring disparity detected','Geographic bias toward specific regions','Language fluency threshold is unnecessarily high'],metrics:[{label:'Name disparity index',val:31},{label:'Regional fairness',val:28},{label:'Language threshold',val:42}]}},
+{id:'socioeconomic',name:'Socioeconomic',icon:'💰',value:0,target:52,desc:'Bias toward specific educational institutions',details:{findings:['Top-10 university filter excludes 94% of candidates','GPA requirement disadvantages first-gen graduates','Internship requirements favor wealthy candidates'],metrics:[{label:'School prestige bias',val:52},{label:'GPA fairness',val:38},{label:'Experience equity',val:61}]}},
+{id:'disability',name:'Disability Bias',icon:'♿',value:0,target:18,desc:'Accessibility barriers in assessment process',details:{findings:['Timed assessments disadvantage neurodiverse candidates','Visual-only data presentation in case studies','No accommodation options in application flow'],metrics:[{label:'Timing fairness',val:18},{label:'Format accessibility',val:25},{label:'Accommodation coverage',val:12}]}},
+{id:'confirmation',name:'Confirmation Bias',icon:'🧠',value:0,target:67,desc:'Interviewers seeking confirming evidence',details:{findings:['67% of interviews lack structured questions','Interviewers anchor on first impression','Positive feedback loops in panel discussions'],metrics:[{label:'Structure compliance',val:67},{label:'Anchor effect score',val:58},{label:'Panel independence',val:41}]}},
+];
+
+function getColor(v){return v<=30?'#00c864':v<=60?'#f5a623':'#ff4757'}
+
+function createGaugeCard(b){
+const card=document.createElement('div');
+card.className='gauge-card';
+card.id='card-'+b.id;
+card.onclick=()=>showDetail(b);
+const lbl=document.createElement('div'); lbl.className='gauge-label'; lbl.textContent=b.icon+' '+b.name; card.appendChild(lbl);
+const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','gauge-svg'); svg.setAttribute('viewBox','0 0 160 100');
+const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+const grad=document.createElementNS('http://www.w3.org/2000/svg','linearGradient'); grad.id='grad-'+b.id; grad.setAttribute('x1','0'); grad.setAttribute('y1','0'); grad.setAttribute('x2','1'); grad.setAttribute('y2','0');
+[['0%','#00c864'],['50%','#f5a623'],['100%','#ff4757']].forEach(([o,c])=>{const s=document.createElementNS('http://www.w3.org/2000/svg','stop'); s.setAttribute('offset',o); s.setAttribute('stop-color',c); grad.appendChild(s);});
+defs.appendChild(grad); svg.appendChild(defs);
+const bg=document.createElementNS('http://www.w3.org/2000/svg','path'); bg.setAttribute('d','M20 90 A60 60 0 0 1 140 90'); bg.setAttribute('fill','none'); bg.setAttribute('stroke','#0d1b3e'); bg.setAttribute('stroke-width','12'); bg.setAttribute('stroke-linecap','round'); svg.appendChild(bg);
+const arc=document.createElementNS('http://www.w3.org/2000/svg','path'); arc.id='arc-'+b.id; arc.setAttribute('d','M20 90 A60 60 0 0 1 140 90'); arc.setAttribute('fill','none'); arc.setAttribute('stroke','url(#grad-'+b.id+')'); arc.setAttribute('stroke-width','12'); arc.setAttribute('stroke-linecap','round'); arc.setAttribute('stroke-dasharray','0 189'); svg.appendChild(arc);
+const txt=document.createElementNS('http://www.w3.org/2000/svg','text'); txt.setAttribute('x','80'); txt.setAttribute('y','78'); txt.setAttribute('text-anchor','middle'); txt.setAttribute('fill','#fff'); txt.setAttribute('font-size','22'); txt.setAttribute('font-weight','700'); txt.id='val-'+b.id; txt.textContent='0%'; svg.appendChild(txt);
+card.appendChild(svg);
+const desc=document.createElement('div'); desc.className='gauge-desc'; desc.textContent=b.desc; card.appendChild(desc);
+return card;
+}
+
+function animateGauge(b,dur=1500){
+const arc=document.getElementById('arc-'+b.id);
+const val=document.getElementById('val-'+b.id);
+const total=189;
+const target=(b.target/100)*total;
+let start=null;
+function step(ts){
+if(!start)start=ts;
+const p=Math.min((ts-start)/dur,1);
+const ease=1-Math.pow(1-p,3);
+const current=ease*b.target;
+b.value=Math.round(current);
+arc.setAttribute('stroke-dasharray',`${(current/100)*total} ${total}`);
+val.textContent=Math.round(current)+'%';
+val.setAttribute('fill',getColor(current));
+if(p<1)requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+}
+
+function showDetail(b){
+document.querySelectorAll('.gauge-card').forEach(c=>c.classList.remove('active'));
+document.getElementById('card-'+b.id).classList.add('active');
+const panel=document.getElementById('detailPanel');
+panel.className='detail-panel visible';
+const color=getColor(b.target);
+const titleDiv=document.createElement('div'); titleDiv.className='detail-title';
+titleDiv.appendChild(document.createTextNode(b.icon+' '+b.name+' — Risk Level: '));
+const riskSpan=document.createElement('span'); riskSpan.style.color=color; riskSpan.textContent=b.target+'%'; titleDiv.appendChild(riskSpan);
+const bodyDiv=document.createElement('div'); bodyDiv.className='detail-body';
+const p=document.createElement('p'); p.style.marginBottom='12px'; p.textContent=b.desc; bodyDiv.appendChild(p);
+const h3f=document.createElement('h3'); h3f.style.cssText='font-size:.95rem;margin-bottom:8px'; h3f.textContent='📋 Key Findings'; bodyDiv.appendChild(h3f);
+const findingsUl=document.createElement('ul'); findingsUl.style.cssText='margin-bottom:16px;padding-left:20px';
+b.details.findings.forEach(f=>{const li=document.createElement('li'); li.style.margin='6px 0'; li.textContent=f; findingsUl.appendChild(li);});
+bodyDiv.appendChild(findingsUl);
+const h3m=document.createElement('h3'); h3m.style.cssText='font-size:.95rem;margin-bottom:8px'; h3m.textContent='📊 Metrics Breakdown'; bodyDiv.appendChild(h3m);
+b.details.metrics.forEach(m=>{const bar=document.createElement('div'); bar.className='metric-bar';
+const lab=document.createElement('label'); const sp1=document.createElement('span'); sp1.textContent=m.label; const sp2=document.createElement('span'); sp2.style.color=getColor(m.val); sp2.textContent=m.val+'%'; lab.appendChild(sp1); lab.appendChild(sp2); bar.appendChild(lab);
+const track=document.createElement('div'); track.className='bar-track'; const fill=document.createElement('div'); fill.className='bar-fill'; fill.style.width='0'; fill.style.background=getColor(m.val); fill.dataset.target=m.val; track.appendChild(fill); bar.appendChild(track);
+bodyDiv.appendChild(bar);});
+const h3r=document.createElement('h3'); h3r.style.cssText='font-size:.95rem;margin:16px 0 8px'; h3r.textContent='🛡️ Recommended Mitigations'; bodyDiv.appendChild(h3r);
+const mitigUl=document.createElement('ul'); mitigUl.style.paddingLeft='20px';
+if(b.target>50){const warnLi=document.createElement('li'); warnLi.style.cssText='color:#ff4757;margin:6px 0'; warnLi.textContent='⚠️ High priority — immediate action required'; mitigUl.appendChild(warnLi);}
+['Implement blind review processes','Add structured scoring rubrics','Diversify evaluation panels','Regular bias audits with third-party review'].forEach(t=>{const li=document.createElement('li'); li.textContent=t; mitigUl.appendChild(li);});
+bodyDiv.appendChild(mitigUl);
+while(panel.firstChild)panel.removeChild(panel.firstChild);
+panel.appendChild(titleDiv); panel.appendChild(bodyDiv);
+setTimeout(()=>{panel.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.target+'%'})},100);
+}
+
+function simulateScan(){
+resetAll();
+setTimeout(()=>{biasTypes.forEach((b,i)=>{setTimeout(()=>animateGauge(b,1200+i*200),i*300)})},200);
+}
+
+function resetAll(){
+biasTypes.forEach(b=>{b.value=0;const arc=document.getElementById('arc-'+b.id);if(arc){arc.setAttribute('stroke-dasharray','0 189');document.getElementById('val-'+b.id).textContent='0%'}});
+document.getElementById('detailPanel').className='detail-panel';
+document.querySelectorAll('.gauge-card').forEach(c=>c.classList.remove('active'));
+}
+
+// Init
+const dash=document.getElementById('dashboard');
+biasTypes.forEach(b=>dash.appendChild(createGaugeCard(b)));
+</script>
+</body>
+</html>

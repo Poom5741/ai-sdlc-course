@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DPO Loss Concept</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:750px;margin:0 auto}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:600px){.vs{grid-template-columns:1fr}}
+.card{background:#16213e;border-radius:12px;padding:16px;border:2px solid #333;transition:all .4s}
+.card.chosen{border-color:#00c864}.card.rejected{border-color:#e74c3c}
+.card h3{font-size:.9rem;margin-bottom:8px}
+.card.chosen h3{color:#00c864}.card.rejected h3{color:#e74c3c}
+.card p{font-size:.8rem;color:#aaa;line-height:1.5}
+.score{display:flex;align-items:center;gap:8px;margin-top:10px}
+.score-bar{height:8px;border-radius:4px;background:#1a1a2e;flex:1;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.score span{font-size:.75rem;min-width:36px;text-align:right}
+.margin-box{background:#16213e;border-radius:12px;padding:16px;text-align:center;border:2px solid #4f2bdf;margin-bottom:16px}
+.margin-box h3{color:#4f2bdf;font-size:.9rem;margin-bottom:10px}
+.margin{display:flex;align-items:center;justify-content:center;gap:12px}
+.margin-val{font-size:1.5rem;font-weight:bold;color:#00c864}
+svg{width:100%;height:auto;display:block;background:#16213e;border-radius:12px;border:1px solid #333;margin-bottom:16px}
+.info{background:#16213e;border-radius:10px;padding:14px;font-size:.8rem;line-height:1.6;border:1px solid #333;color:#aaa}
+.info .hi{color:#00c864}
+.btn{display:block;margin:12px auto 0;padding:8px 20px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>⚖️ DPO Loss Concept</h1>
+<div class="ctn">
+<div class="vs">
+<div class="card chosen">
+<h3>✅ Chosen Response</h3>
+<p>"To handle null values in SQL, use COALESCE(), IS NULL checks, or set NOT NULL constraints at the schema level."</p>
+<div class="score"><div class="score-bar"><div class="score-fill" id="cf" style="background:#00c864;width:0"></div></div><span id="cv">0%</span></div>
+</div>
+<div class="card rejected">
+<h3>❌ Rejected Response</h3>
+<p>"Just use try-catch blocks everywhere and it will be fine. Nulls aren't really a problem in production."</p>
+<div class="score"><div class="score-bar"><div class="score-fill" id="rf" style="background:#e74c3c;width:0"></div></div><span id="rv">0%</span></div>
+</div>
+</div>
+<div class="margin-box">
+<h3>Preference Margin (β·log σ(r_chosen − r_rejected))</h3>
+<div class="margin">
+<span style="font-size:.8rem;color:#888">chosen</span>
+<div style="flex:1;height:24px;background:#1a1a2e;border-radius:12px;position:relative;overflow:hidden">
+<div id="mbar" style="height:100%;background:linear-gradient(90deg,#e74c3c,#4f2bdf,#00c864);border-radius:12px;width:0;transition:width 1.5s"></div>
+</div>
+<span style="font-size:.8rem;color:#888">rejected</span>
+</div>
+<div class="margin-val" id="mval">Δ = 0.00</div>
+</div>
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="20" fill="#888" font-size="10" font-family="system-ui">Loss</text>
+<text x="570" y="195" fill="#888" font-size="10" font-family="system-ui">Training Steps →</text>
+<line x1="40" y1="180" x2="580" y2="180" stroke="#333" stroke-width="1"/>
+<path id="loss" fill="none" stroke="#4f2bdf" stroke-width="2.5"/>
+<circle id="dot" r="4" fill="#4f2bdf" opacity="0"/>
+</svg>
+<button class="btn" onclick="animate()">▶ Animate Training</button>
+<div class="info">
+<strong>How DPO works:</strong> Instead of training a reward model separately, DPO directly optimizes the policy using <span class="hi">chosen vs rejected</span> response pairs.
+The loss pushes the model to assign <span class="hi">higher probability to chosen</span> responses and <span class="hi">lower to rejected</span> ones.
+The margin (Δ) grows as training progresses — larger Δ = stronger preference alignment.
+</div>
+</div>
+</div>
+<script>
+let animId;
+function animate(){
+cancelAnimationFrame(animId);
+const steps=60;let i=0;
+const loss=[];
+for(let s=0;s<steps;s++){loss.push(2.5*Math.exp(-s*0.05)+0.2+Math.random()*0.15)}
+function frame(){
+if(i>=steps)return;
+const t=i/(steps-1);
+document.getElementById('cf').style.width=(40+t*55)+'%';
+document.getElementById('cv').textContent=Math.round(40+t*55)+'%';
+document.getElementById('rf').style.width=(40-t*30)+'%';
+document.getElementById('rv').textContent=Math.round(40-t*30)+'%';
+document.getElementById('mbar').style.width=(t*90)+'%';
+document.getElementById('mval').textContent='Δ = '+(t*3.2).toFixed(2);
+let d='M';const W=540,H=160,ox=40,oy=10;
+for(let s=0;s<=i;s++){
+const x=ox+(s/(steps-1))*W;
+const y=oy+(loss[s]/3)*H;
+d+=(s===0?'':'L')+x+','+y+' ';
+}
+document.getElementById('loss').setAttribute('d',d);
+const dx=ox+(i/(steps-1))*W;
+const dy=oy+(loss[i]/3)*H;
+const dot=document.getElementById('dot');
+dot.setAttribute('cx',dx);dot.setAttribute('cy',dy);dot.style.opacity='1';
+i++;animId=requestAnimationFrame(()=>setTimeout(frame,50));
+}
+frame();
+}
+animate();
+</script>
+</body></html>

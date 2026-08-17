@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Story Generator — Quest 23</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem}
+  h1{font-size:1.8rem;margin-bottom:.3rem;color:#fff}
+  .subtitle{color:#9e9eb8;margin-bottom:2rem;font-size:.95rem}
+  .container{display:flex;gap:2rem;width:100%;max-width:1000px;flex-wrap:wrap}
+  .builder{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a}
+  .preview{flex:1;min-width:320px;background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #2a2a4a;position:sticky;top:2rem;align-self:flex-start}
+  .panel-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:#4f2bdf}
+  .field{margin-bottom:1.2rem}
+  .field label{display:block;font-size:.9rem;font-weight:600;margin-bottom:.4rem;color:#ccc}
+  .field input,.field textarea,.field select{width:100%;background:#0f1629;border:1px solid #2a2a4a;border-radius:8px;padding:.6rem .8rem;color:#e0e0e0;font-size:.9rem;font-family:inherit;transition:border-color .2s}
+  .field input:focus,.field textarea:focus{outline:none;border-color:#4f2bdf}
+  .field textarea{resize:vertical;min-height:60px}
+  .role-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem}
+  .role-tag{padding:.3rem .7rem;border-radius:20px;font-size:.8rem;cursor:pointer;border:1px solid #2a2a4a;background:#0f1629;transition:all .2s}
+  .role-tag:hover{border-color:#4f2bdf}
+  .role-tag.selected{background:#4f2bdf;border-color:#4f2bdf;color:#fff}
+  .story-card{background:#0f1629;border-radius:10px;padding:1.5rem;border-left:4px solid #4f2bdf}
+  .story-structure{margin-bottom:1rem}
+  .story-line{margin-bottom:.6rem;font-size:.95rem;line-height:1.5}
+  .story-role{color:#4f2bdf;font-weight:700}
+  .story-goal{color:#00c864;font-weight:700}
+  .story-benefit{color:#f0c040;font-weight:700}
+  .story-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:#666;margin-bottom:.15rem}
+  .acceptance{margin-top:1rem;padding-top:1rem;border-top:1px solid #2a2a4a}
+  .acceptance h4{font-size:.85rem;color:#9e9eb8;margin-bottom:.5rem}
+  .ac-item{padding:.3rem 0;font-size:.85rem;color:#aaa;display:flex;gap:.5rem;align-items:flex-start}
+  .ac-item::before{content:'☐';color:#4f2bdf;flex-shrink:0}
+  .placeholder{color:#555;font-style:italic;font-size:.9rem}
+  .complexity{display:inline-block;padding:.2rem .6rem;border-radius:12px;font-size:.75rem;font-weight:600;margin-top:.8rem}
+  .complexity.low{background:rgba(0,200,100,.15);color:#00c864}
+  .complexity.med{background:rgba(240,192,64,.15);color:#f0c040}
+  .complexity.high{background:rgba(255,71,87,.15);color:#ff4757}
+  .btn{background:#4f2bdf;color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-size:.9rem;cursor:pointer;font-weight:600;transition:background .2s;margin-top:.5rem}
+  .btn:hover{background:#6141e0}
+  .btn:active{transform:scale(.97)}
+  .tip{font-size:.75rem;color:#666;margin-top:.3rem;font-style:italic}
+</style>
+</head>
+<body>
+<h1>📖 User Story Generator</h1>
+<p class="subtitle">Quest 23 · Craft user stories with the As-a / I-want / So-that template</p>
+<div class="container">
+  <div class="builder">
+    <div class="panel-title">✏️ Story Builder</div>
+    <div class="field">
+      <label>Who is the user?</label>
+      <div class="role-tags" id="roleTags"></div>
+      <input type="text" id="roleInput" placeholder="e.g. a registered customer">
+      <div class="tip">Click a preset or type your own</div>
+    </div>
+    <div class="field">
+      <label>What do they want to do?</label>
+      <input type="text" id="goalInput" placeholder="e.g. reset my password via email">
+    </div>
+    <div class="field">
+      <label>Why? What's the benefit?</label>
+      <input type="text" id="benefitInput" placeholder="e.g. regain access to my account securely">
+    </div>
+    <div class="field">
+      <label>Context / Notes (optional)</label>
+      <textarea id="contextInput" placeholder="Any additional context, constraints, or edge cases..."></textarea>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="categorySelect">
+        <option value="feature">✨ Feature</option>
+        <option value="bug">🐛 Bug Fix</option>
+        <option value="chore">🔧 Chore / Tech Debt</option>
+        <option value="spike">🔍 Spike / Research</option>
+      </select>
+    </div>
+    <button class="btn" id="generateBtn">Generate Acceptance Criteria</button>
+  </div>
+  <div class="preview">
+    <div class="panel-title">📋 Story Preview</div>
+    <div class="story-card" id="storyCard">
+      <div class="story-structure">
+        <div class="story-line"><span class="story-label">Role</span><div><span class="story-role">As a <span id="outRole" class="placeholder">user...</span></span></div></div>
+        <div class="story-line"><span class="story-label">Goal</span><div><span class="story-goal">I want to <span id="outGoal" class="placeholder">do something...</span></span></div></div>
+        <div class="story-line"><span class="story-label">Benefit</span><div><span class="story-benefit">So that <span id="outBenefit" class="placeholder">I get value...</span></span></div></div>
+      </div>
+      <div class="acceptance">
+        <h4>✅ Acceptance Criteria</h4>
+        <div id="acList"><div class="placeholder">Fill in the fields and click generate...</div></div>
+      </div>
+      <div id="complexityBadge"></div>
+    </div>
+  </div>
+</div>
+<script>
+const roles = ['registered customer','admin user','guest visitor','content creator','support agent'];
+const tags = document.getElementById('roleTags');
+roles.forEach(r => {
+  const t = document.createElement('span');
+  t.className = 'role-tag';
+  t.textContent = r;
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.role-tag').forEach(x => x.classList.remove('selected'));
+    t.classList.add('selected');
+    document.getElementById('roleInput').value = r;
+    update();
+  });
+  tags.appendChild(t);
+});
+
+const roleIn = document.getElementById('roleInput');
+const goalIn = document.getElementById('goalInput');
+const benefitIn = document.getElementById('benefitInput');
+const ctxIn = document.getElementById('contextInput');
+
+function update() {
+  document.getElementById('outRole').textContent = roleIn.value || 'user...';
+  document.getElementById('outRole').className = roleIn.value ? '' : 'placeholder';
+  document.getElementById('outGoal').textContent = goalIn.value || 'do something...';
+  document.getElementById('outGoal').className = goalIn.value ? '' : 'placeholder';
+  document.getElementById('outBenefit').textContent = benefitIn.value || 'I get value...';
+  document.getElementById('outBenefit').className = benefitIn.value ? '' : 'placeholder';
+}
+roleIn.addEventListener('input', update);
+goalIn.addEventListener('input', update);
+benefitIn.addEventListener('input', update);
+
+document.getElementById('generateBtn').addEventListener('click', () => {
+  const role = roleIn.value;
+  const goal = goalIn.value;
+  const benefit = benefitIn.value;
+  if (!goal) { goalIn.focus(); return; }
+
+  const acList = document.getElementById('acList');
+  acList.textContent = '';
+  const criteria = generateAC(role, goal, benefit, ctxIn.value);
+  criteria.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'ac-item';
+    d.textContent = c;
+    acList.appendChild(d);
+  });
+
+  const badge = document.getElementById('complexityBadge');
+  badge.textContent = '';
+  const score = criteria.length;
+  const cls = score <= 3 ? 'low' : score <= 5 ? 'med' : 'high';
+  const label = score <= 3 ? 'Simple' : score <= 5 ? 'Medium' : 'Complex';
+  const b = document.createElement('span');
+  b.className = 'complexity ' + cls;
+  b.textContent = `${label} · ${score} criteria`;
+  badge.appendChild(b);
+});
+
+function generateAC(role, goal, benefit, ctx) {
+  const acs = [
+    `User can ${goal} without errors`,
+    `System validates input and shows clear error messages`,
+    `Action completes within 2 seconds under normal load`,
+  ];
+  if (ctx) acs.push(`Edge case: ${ctx}`);
+  if (benefit) acs.push(`Success state confirms: "${benefit}"`);
+  acs.push('Action is logged for audit trail');
+  acs.push('Works on mobile and desktop viewports');
+  return acs;
+}
+
+// initial tags click
+</script>
+</body>
+</html>

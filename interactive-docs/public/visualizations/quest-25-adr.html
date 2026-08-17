@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ADR Structure — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:2rem}
+.tree{position:relative;width:100%;max-width:700px}
+.tree::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:#4f2bdf33}
+.node{position:relative;margin:0 auto 1.5rem;padding:1rem 1.2rem;background:#16213e;border:1px solid #4f2bdf55;border-radius:10px;cursor:pointer;transition:all .3s;max-width:520px}
+.node:hover{border-color:#4f2bdf;box-shadow:0 0 20px #4f2bdf44}
+.node.open{border-color:#00c864}
+.node .title{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1rem}
+.node .title::after{content:'▸';transition:transform .3s;color:#4f2bdf}
+.node.open .title::after{transform:rotate(90deg);color:#00c864}
+.node .detail{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;padding:0 0;font-size:.85rem;color:#aaa;line-height:1.5}
+.node.open .detail{max-height:300px;padding:1rem 0 0}
+.badge{display:inline-block;background:#4f2bdf33;color:#4f2bdf;font-size:.65rem;padding:2px 8px;border-radius:99px;margin-left:8px;font-weight:400}
+.connector{width:2px;height:20px;background:#4f2bdf33;margin:0 auto}
+.flow-label{text-align:center;color:#00c864;font-size:.75rem;margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.node{animation:fadeUp .5s ease backwards}
+.node:nth-child(2){animation-delay:.1s}.node:nth-child(3){animation-delay:.2s}
+.node:nth-child(4){animation-delay:.3s}.node:nth-child(5){animation-delay:.4s}
+</style>
+</head>
+<body>
+<h1>ADR Structure</h1>
+<p class="sub">Architecture Decision Record — Click each section to explore</p>
+<div class="tree" id="tree"></div>
+<script>
+const sections=[
+  {title:'Status',badge:'required',detail:'Current state: Proposed → Accepted → Deprecated → Superseded. Tracks lifecycle of the decision.'},
+  {title:'Context',badge:'key',detail:'What is the issue that motivates this decision? Describe the forces at play — technical, business, and organizational.'},
+  {title:'Decision',badge:'core',detail:'What is the change being proposed? State it clearly in active voice: "We will…" Avoid ambiguity.'},
+  {title:'Consequences',badge:'key',detail:'What becomes easier or harder? List positive outcomes, trade-offs, and risks introduced by this decision.'},
+  {title:'Alternatives Considered',badge:'optional',detail:'What other options were evaluated? Why were they rejected? Provides traceability and builds confidence in the chosen path.'},
+  {title:'Related ADRs',badge:'optional',detail:'Links to other ADRs that this decision builds on, contradicts, or supersedes. Maintains the decision graph.'}
+];
+const tree=document.getElementById('tree');
+sections.forEach((s,i)=>{
+  const div=document.createElement('div');div.className='node';
+  const t=document.createElement('div');t.className='title';t.textContent=s.title;const b=document.createElement('span');b.className='badge';b.textContent=s.badge;t.appendChild(b);const d=document.createElement('div');d.className='detail';d.textContent=s.detail;div.appendChild(t);div.appendChild(d);
+  div.onclick=()=>div.classList.toggle('open');
+  tree.appendChild(div);
+  if(i<sections.length-1){const c=document.createElement('div');c.className='connector';tree.appendChild(c)}
+});
+// auto-open first after delay
+setTimeout(()=>tree.querySelector('.node').classList.add('open'),800);
+</script>
+</body>
+</html>

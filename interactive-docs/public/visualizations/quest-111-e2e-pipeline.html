@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E2E Test Pipeline</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;font-size:1.8rem;margin-bottom:8px}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.9rem}
+.pipeline{max-width:1000px;margin:0 auto;display:flex;align-items:stretch;gap:0;position:relative}
+.stage{flex:1;background:#16213e;border-radius:0;padding:20px;text-align:center;position:relative;min-height:280px;border:2px solid #0d1b3e;transition:all .5s;cursor:pointer}
+.stage:first-child{border-radius:12px 0 0 12px}
+.stage:last-child{border-radius:0 12px 12px 0}
+.stage.active{border-color:#4f2bdf;background:#1a1a3e;box-shadow:0 0 30px rgba(79,43,223,.2)}
+.stage.passed{border-color:#00c864}
+.stage.failed{border-color:#ff4757}
+.stage.running{border-color:#f5a623;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 5px rgba(245,166,35,.3)}50%{box-shadow:0 0 25px rgba(245,166,35,.5)}}
+.arrow{position:absolute;right:-14px;top:50%;transform:translateY(-50%);z-index:2;color:#4f2bdf;font-size:1.2rem;transition:color .5s}
+.arrow.active{color:#00c864}
+.arrow.running{color:#f5a623;animation:pulse 1s infinite}
+.stage-icon{font-size:2rem;margin-bottom:8px}
+.stage-name{font-weight:700;font-size:1rem;margin-bottom:4px}
+.stage-count{font-size:.75rem;color:#888}
+.stage-stats{margin-top:12px;text-align:left}
+.stat{display:flex;justify-content:space-between;font-size:.75rem;padding:4px 0;border-bottom:1px solid #0d1b3e}
+.stat-label{color:#888}
+.stat-value{color:#ccc;font-weight:600}
+.stat-value.pass{color:#00c864}
+.stat-value.fail{color:#ff4757}
+.stat-value.skip{color:#f5a623}
+.progress-bar{height:4px;background:#0d1b3e;border-radius:2px;margin-top:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#4f2bdf,#00c864);width:0;transition:width 2s ease;border-radius:2px}
+.controls{max-width:1000px;margin:20px auto;text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.controls button{background:#4f2bdf;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.controls button:hover{background:#6b45e0}
+.controls button.secondary{background:#16213e;border:1px solid #4f2bdf}
+.controls button:disabled{opacity:.4;cursor:not-allowed}
+.timeline{max-width:1000px;margin:20px auto;background:#16213e;border-radius:12px;padding:16px 20px}
+.timeline h3{font-size:.88rem;color:#4f2bdf;margin-bottom:10px}
+.log{font-family:'Fira Code',monospace;font-size:.75rem;line-height:1.7;max-height:200px;overflow-y:auto}
+.log-entry{display:flex;gap:8px}
+.log-time{color:#666;min-width:70px}
+.log-stage{min-width:90px;font-weight:600}
+.log-stage.unit{color:#4f2bdf}
+.log-stage.integration{color:#a78bfa}
+.log-stage.e2e{color:#f5a623}
+.log-stage.deploy{color:#00c864}
+.log-msg{color:#aaa}
+.log-msg.success{color:#00c864}
+.log-msg.error{color:#ff4757}
+.legend{max-width:1000px;margin:16px auto;display:flex;gap:20px;justify-content:center;font-size:.78rem;color:#666}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend .dot{width:8px;height:8px;border-radius:50%}
+.parallel-viz{max-width:1000px;margin:16px auto;background:#16213e;border-radius:12px;padding:16px 20px;display:none}
+.parallel-viz.visible{display:block;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.parallel-viz h3{font-size:.88rem;color:#4f2bdf;margin-bottom:12px}
+.parallel-bar{display:flex;align-items:center;gap:10px;margin:6px 0}
+.parallel-label{min-width:100px;font-size:.78rem;color:#aaa}
+.parallel-track{flex:1;height:24px;background:#0d1b3e;border-radius:4px;overflow:hidden;position:relative}
+.parallel-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:.7rem;color:#fff;font-weight:600;transition:width 2s ease;white-space:nowrap}
+</style>
+</head>
+<body>
+<h1>🚀 E2E Test Pipeline</h1>
+<p class="subtitle">Click stages for details. Watch the pipeline execute with parallel test execution.</p>
+<div class="controls">
+<button id="runBtn" onclick="runPipeline()">▶ Run Pipeline</button>
+<button class="secondary" id="parallelBtn" onclick="showParallel()">📊 Parallel View</button>
+<button class="secondary" onclick="resetPipeline()">↻ Reset</button>
+</div>
+<div class="pipeline" id="pipeline"></div>
+<div class="parallel-viz" id="parallelViz">
+<h3>📊 Parallel Execution Timeline</h3>
+<div id="parallelBars"></div>
+</div>
+<div class="timeline">
+<h3>📋 Execution Log</h3>
+<div class="log" id="log"><div class="log-entry"><span class="log-time">00:00</span><span class="log-msg" style="color:#666">Pipeline ready. Click "Run Pipeline" to start.</span></div></div>
+</div>
+<div class="legend">
+<span><span class="dot" style="background:#4f2bdf"></span> Unit Tests</span>
+<span><span class="dot" style="background:#a78bfa"></span> Integration</span>
+<span><span class="dot" style="background:#f5a623"></span> E2E Tests</span>
+<span><span class="dot" style="background:#00c864"></span> Deploy</span>
+</div>
+
+<script>
+const stages=[
+{id:'unit',name:'Unit Tests',icon:'🧪',tests:147,pass:143,fail:2,skip:2,time:'12s',details:['auth.test.ts — 24 tests','validation.test.ts — 18 tests','api.test.ts — 31 tests','utils.test.ts — 42 tests','components.test.ts — 32 tests']},
+{id:'integration',name:'Integration',icon:'🔗',tests:38,pass:36,fail:1,skip:1,time:'45s',details:['API → DB integration','Auth flow integration','Payment gateway mock','Email service integration','Search index sync']},
+{id:'e2e',name:'E2E Tests',icon:'🎭',tests:24,pass:23,fail:0,skip:1,time:'2m 15s',details:['Login & registration flow','Checkout pipeline','Dashboard navigation','File upload workflow','Admin panel access']},
+{id:'deploy',name:'Deploy',icon:'🚀',tests:6,pass:6,fail:0,skip:0,time:'30s',details:['Build artifacts ✓','Environment vars ✓','Database migration ✓','Health check ✓','Rollback plan ✓']}
+];
+
+const parallelData=[
+{name:'auth.test.ts',stage:'unit',start:0,end:15,color:'#4f2bdf'},
+{name:'validation.test.ts',stage:'unit',start:0,end:12,color:'#6b45e0'},
+{name:'api.test.ts',stage:'unit',start:2,end:20,color:'#4f2bdf'},
+{name:'components.test.ts',stage:'unit',start:1,end:18,color:'#5a35cf'},
+{name:'API → DB',stage:'integration',start:22,end:50,color:'#a78bfa'},
+{name:'Auth flow',stage:'integration',start:24,end:48,color:'#c4a8fc'},
+{name:'Payment',stage:'integration',start:26,end:55,color:'#a78bfa'},
+{name:'Login E2E',stage:'e2e',start:58,end:100,color:'#f5a623'},
+{name:'Checkout E2E',stage:'e2e',start:60,end:110,color:'#f5a623'},
+{name:'Dashboard E2E',stage:'e2e',start:62,end:95,color:'#f7b84e'},
+{name:'Build',stage:'deploy',start:115,end:125,color:'#00c864'},
+{name:'Migrate',stage:'deploy',start:120,end:135,color:'#00d97a'},
+];
+
+let running=false;
+let startTime=null;
+
+function renderPipeline(){
+const container=document.getElementById('pipeline');
+container.innerHTML=stages.map((s,i)=>{
+const status=s.id===currentStage?'running':completedStages.includes(s.id)?'passed':'';
+return`<div class="stage ${status}" id="stage-${s.id}" onclick="showStageDetail('${s.id}')">
+${i<stages.length-1?`<span class="arrow ${status}">▸</span>`:''}
+<div class="stage-icon">${s.icon}</div>
+<div class="stage-name">${s.name}</div>
+<div class="stage-count">${s.tests} tests · ${s.time}</div>
+<div class="stage-stats">
+<div class="stat"><span class="stat-label">Pass</span><span class="stat-value pass">${s.pass}</span></div>
+<div class="stat"><span class="stat-label">Fail</span><span class="stat-value fail">${s.fail}</span></div>
+<div class="stat"><span class="stat-label">Skip</span><span class="stat-value skip">${s.skip}</span></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-${s.id}"></div></div>
+</div>`}).join('');
+}
+
+let currentStage=null;
+let completedStages=[];
+
+async function runPipeline(){
+if(running)return;
+running=true;
+currentStage=null;
+completedStages=[];
+document.getElementById('runBtn').disabled=true;
+document.getElementById('log').innerHTML='';
+startTime=Date.now();
+
+for(const stage of stages){
+currentStage=stage.id;
+renderPipeline();
+addLog(stage.id.startsWith('unit')?'unit':stage.id==='integration'?'integration':stage.id==='e2e'?'e2e':'deploy',`Starting ${stage.name}...`);
+const progress=document.getElementById('progress-'+stage.id);
+let p=0;
+const step=()=>{p+=Math.random()*15+5;if(p>100)p=100;progress.style.width=p+'%';if(p<100)setTimeout(step,100)};step();
+await sleep(800+Math.random()*1200);
+progress.style.width='100%';
+completedStages.push(stage.id);
+currentStage=null;
+const logType=stage.id.startsWith('unit')?'unit':stage.id==='integration'?'integration':stage.id==='e2e'?'e2e':'deploy';
+addLog(logType,`${stage.name} complete: ${stage.pass} passed, ${stage.fail} failed`,'#00c864');
+renderPipeline();
+}
+addLog('deploy','✅ Pipeline complete! All stages passed. Ready for production.','success');
+document.getElementById('runBtn').disabled=false;
+running=false;
+}
+
+function addLog(type,msg,color=''){
+const log=document.getElementById('log');
+const elapsed=Math.floor((Date.now()-startTime)/1000);
+const min=String(Math.floor(elapsed/60)).padStart(2,'0');
+const sec=String(elapsed%60).padStart(2,'0');
+log.innerHTML+=`<div class="log-entry"><span class="log-time">${min}:${sec}</span><span class="log-stage ${type}">[${type.toUpperCase()}]</span><span class="log-msg ${color?'success':''}" ${color?`style="color:${color}"`:''}>${msg}</span></div>`;
+log.scrollTop=log.scrollHeight;
+}
+
+function showStageDetail(id){
+const stage=stages.find(s=>s.id===id);
+if(!stage)return;
+addLog(id.startsWith('unit')?'unit':'info',`${stage.name}: ${stage.details.join(' · ')}`);
+}
+
+function showParallel(){
+const viz=document.getElementById('parallelViz');
+viz.classList.toggle('visible');
+if(viz.classList.contains('visible')){
+document.getElementById('parallelBars').innerHTML=parallelData.map(d=>`
+<div class="parallel-bar">
+<span class="parallel-label">${d.name}</span>
+<div class="parallel-track">
+<div class="parallel-fill" style="width:0;background:${d.color}" data-target="${(d.end/135)*100}">${d.stage.toUpperCase()}</div>
+</div>
+</div>`).join('');
+setTimeout(()=>{document.querySelectorAll('.parallel-fill').forEach(el=>{el.style.width=el.dataset.target+'%'})},100);
+}
+}
+
+function resetPipeline(){
+running=false;currentStage=null;completedStages=[];
+document.getElementById('runBtn').disabled=false;
+document.getElementById('parallelViz').classList.remove('visible');
+document.getElementById('log').innerHTML='<div class="log-entry"><span class="log-time">00:00</span><span class="log-msg" style="color:#666">Pipeline ready. Click "Run Pipeline" to start.</span></div>';
+renderPipeline();
+}
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+renderPipeline();
+</script>
+</body>
+</html>

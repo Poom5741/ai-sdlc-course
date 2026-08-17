@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Function Calling Flow — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+.controls{display:flex;gap:.8rem;margin-bottom:2rem}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
+button:hover{background:#6143e8}
+button.play{background:#00c864}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:600px}
+.step{display:flex;align-items:center;gap:1rem;width:100%;padding:1rem;border-radius:10px;opacity:.25;transition:all .4s;transform:translateY(8px)}
+.step.active{opacity:1;transform:translateY(0);background:#16213e;border:1px solid #4f2bdf44}
+.step.done{opacity:.6;border:1px solid #00c86433}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.avatar.user{background:#4f2bdf44;color:#4f2bdf}
+.avatar.llm{background:#e8a02044;color:#e8a020}
+.avatar.fn{background:#00c86444;color:#00c864}
+.avatar.exec{background:#ff446644;color:#ff4466}
+.arrow{width:2px;height:24px;background:#4f2bdf33;margin:0 auto}
+.msg{font-size:.85rem;line-height:1.4}
+.msg strong{color:#4f2bdf}
+.msg em{color:#00c864;font-style:normal}
+.code{font-family:'Courier New',monospace;font-size:.75rem;background:#0d1117;padding:.4rem .6rem;border-radius:6px;margin-top:.4rem;color:#888;display:none}
+.step.active .code{display:block}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #4f2bdf44}50%{box-shadow:0 0 12px 4px #4f2bdf66}}
+.step.active .avatar{animation:pulse 1.5s infinite}
+</style>
+</head>
+<body>
+<h1>Function Calling Flow</h1>
+<p class="sub">How LLMs invoke external functions — Step through or auto-play</p>
+<div class="controls">
+<button class="play" id="playBtn">▶ Auto Play</button>
+<button id="resetBtn">↺ Reset</button>
+</div>
+<div class="flow" id="flow"></div>
+<script>
+const steps=[
+  {icon:'👤',cls:'user',msg:'<strong>User:</strong> "What\'s the weather in Tokyo?"',code:''},
+  {icon:'🧠',cls:'llm',msg:'<strong>LLM:</strong> Recognizes intent, selects <em>get_weather</em> function',code:'function_call: { name: "get_weather",\n  arguments: { city: "Tokyo" } }'},
+  {icon:'⚡',cls:'exec',msg:'<strong>System:</strong> Executes function call against API',code:'result = get_weather("Tokyo")\n→ { temp: 22, cond: "Clear" }'},
+  {icon:'📤',cls:'fn',msg:'<strong>Function:</strong> Returns structured result to LLM',code:'tool_result: { temperature: 22°C,\n  condition: "Clear skies" }'},
+  {icon:'🧠',cls:'llm',msg:'<strong>LLM:</strong> Generates natural language from result',code:'msg: "The weather in Tokyo is 22°C\n  with clear skies today."'},
+  {icon:'💬',cls:'user',msg:'<strong>User:</strong> Receives final answer',code:''}
+];
+const flow=document.getElementById('flow');
+const arrows=[];
+steps.forEach((s,i)=>{
+  const el=document.createElement('div');
+  el.className='step';el.id='s'+i;
+  const av=document.createElement('div');av.className='avatar '+s.cls;av.textContent=s.icon;const mg=document.createElement('div');mg.className='msg';mg.textContent=s.msg;if(s.code){const cd=document.createElement('div');cd.className='code';cd.textContent=s.code;mg.appendChild(cd)}el.appendChild(av);el.appendChild(mg);
+  flow.appendChild(el);
+  if(i<steps.length-1){const a=document.createElement('div');a.className='arrow';flow.appendChild(a);arrows.push(a)}
+});
+let cur=-1,timer=null;
+function advance(){
+  if(cur>=0){flow.children[cur*2].classList.remove('active');flow.children[cur*2].classList.add('done')}
+  cur++;
+  if(cur>=steps.length){cur=steps.length-1;clearInterval(timer);return}
+  flow.children[cur*2].classList.add('active');
+  flow.children[cur*2].scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+document.getElementById('playBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('playBtn').textContent='▶ Auto Play';return}cur=-1;flow.querySelectorAll('.step').forEach(s=>{s.classList.remove('active','done')});timer=setInterval(advance,1200);document.getElementById('playBtn').textContent='⏸ Pause';advance()};
+document.getElementById('resetBtn').onclick=()=>{clearInterval(timer);timer=null;cur=-1;flow.querySelectorAll('.step').forEach(s=>s.classList.remove('active','done'));document.getElementById('playBtn').textContent='▶ Auto Play'};
+</script>
+</body>
+</html>

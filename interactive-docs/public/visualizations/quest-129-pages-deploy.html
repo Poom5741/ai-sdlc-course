@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cloudflare Pages Deploy — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem;text-align:center}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem;text-align:center}
+.container{max-width:1100px;margin:0 auto}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+.panel{background:#16213e;border:2px solid #333;border-radius:12px;padding:1.2rem;transition:border-color .3s}
+.panel:hover{border-color:#4f2bdf}
+.panel h2{color:#4f2bdf;font-size:1rem;margin-bottom:.8rem}
+.pipeline{position:relative;max-width:500px;margin:0 auto 1rem}
+.pipe-stage{display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;background:#0d1117;border:2px solid #333;border-radius:10px;margin-bottom:.4rem;cursor:pointer;transition:all .3s}
+.pipe-stage:hover{border-color:#4f2bdf}
+.pipe-stage.active{border-color:#e8a020;box-shadow:0 0 15px #e8a02022}
+.pipe-stage.pass{border-color:#00c864}
+.pipe-stage.fail{border-color:#ff4466}
+.pipe-stage .icon{font-size:1.3rem;flex-shrink:0;width:32px;text-align:center}
+.pipe-stage .info{flex:1}
+.pipe-stage .name{font-size:.85rem;font-weight:700}
+.pipe-stage .desc{font-size:.72rem;color:#888}
+.pipe-stage .status-dot{width:10px;height:10px;border-radius:50%;background:#333;flex-shrink:0;transition:all .3s}
+.pipe-stage.active .status-dot{background:#e8a020;animation:pulse 1s infinite}
+.pipe-stage.pass .status-dot{background:#00c864}
+.pipe-stage.fail .status-dot{background:#ff4466}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.pipe-connector{width:2px;height:12px;background:#333;margin:0 0 0 24px;transition:background .3s}
+.pipe-connector.active{background:#e8a020}
+.pipe-connector.pass{background:#00c864}
+.env-toggle{display:flex;gap:.5rem;margin-bottom:1rem}
+.env-btn{flex:1;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.5rem;text-align:center;cursor:pointer;transition:all .2s;font-size:.82rem}
+.env-btn:hover{border-color:#4f2bdf}
+.env-btn.active{border-color:#00c864;color:#00c864;background:#00c86410}
+.env-url{font-family:monospace;font-size:.75rem;color:#888;margin-top:.3rem}
+.env-url .preview{color:#e8a020}
+.env-url .prod{color:#00c864}
+.terminal{background:#0d1117;border:1px solid #333;border-radius:8px;padding:.8rem;font-family:'SF Mono',monospace;font-size:.72rem;max-height:280px;overflow-y:auto;line-height:1.6}
+.term-line{white-space:pre-wrap;word-break:break-all}
+.term-green{color:#00c864}
+.term-yellow{color:#e8a020}
+.term-red{color:#ff4466}
+.term-dim{color:#555}
+.config-section{margin-bottom:1rem}
+.config-label{font-size:.82rem;color:#888;margin-bottom:.4rem}
+.config-select{width:100%;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.4rem .6rem;color:#e0e0e0;font-size:.82rem;margin-bottom:.5rem}
+.config-input{width:100%;background:#0d1117;border:2px solid #333;border-radius:8px;padding:.4rem .6rem;color:#e0e0e0;font-size:.82rem;font-family:monospace;margin-bottom:.5rem}
+.config-input:focus,.config-select:focus{outline:none;border-color:#4f2bdf}
+.env-vars{margin-top:.5rem}
+.env-var-row{display:flex;gap:.3rem;margin-bottom:.3rem}
+.env-var-row input{flex:1;background:#0d1117;border:1px solid #333;border-radius:6px;padding:.3rem .5rem;color:#e0e0e0;font-size:.75rem;font-family:monospace}
+.env-var-row input:focus{outline:none;border-color:#4f2bdf}
+.env-var-add{background:none;border:1px dashed #444;border-radius:6px;padding:.25rem .6rem;color:#4f2bdf;cursor:pointer;font-size:.72rem;text-align:center;width:100%;transition:all .2s}
+.env-var-add:hover{border-color:#4f2bdf;background:#4f2bdf10}
+.controls{display:flex;gap:.8rem;margin-top:1rem;justify-content:center;flex-wrap:wrap}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.82rem;transition:all .2s}
+button:hover{background:#6143e8}
+.btn-green{background:#00c864;color:#1a1a2e}
+.btn-green:hover{background:#00dd70}
+</style>
+</head>
+<body>
+<h1>Cloudflare Pages Deploy</h1>
+<p class="sub">Interactive deployment flow — configure, build, and deploy</p>
+
+<div class="container">
+  <div class="main-grid">
+    <!-- Left: Pipeline + Config -->
+    <div>
+      <div class="panel">
+        <h2>🚀 Deployment Pipeline</h2>
+        <div class="pipeline" id="pipeline"></div>
+      </div>
+
+      <div class="panel" style="margin-top:1rem">
+        <h2>⚙️ Build Configuration</h2>
+        <div class="config-section">
+          <div class="config-label">Framework</div>
+          <select class="config-select" id="frameworkSelect">
+            <option value="static">Static HTML/CSS/JS</option>
+            <option value="react">React (CRA)</option>
+            <option value="next">Next.js</option>
+            <option value="vue">Vue.js</option>
+            <option value="astro">Astro</option>
+            <option value="svelte">SvelteKit</option>
+          </select>
+        </div>
+        <div class="config-section">
+          <div class="config-label">Build Command</div>
+          <input class="config-input" id="buildCmd" value="npm run build">
+        </div>
+        <div class="config-section">
+          <div class="config-label">Output Directory</div>
+          <input class="config-input" id="outputDir" value="dist">
+        </div>
+        <div class="config-section">
+          <div class="config-label">Environment Variables</div>
+          <div class="env-vars" id="envVars">
+            <div class="env-var-row"><input placeholder="KEY" value="NODE_ENV"><input placeholder="VALUE" value="production"></div>
+          </div>
+          <div class="env-var-add" id="envAdd">+ Add Variable</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-green" id="deployBtn" onclick="runDeploy()">▶ Deploy</button>
+        <button onclick="resetDeploy()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- Right: Environment + Log -->
+    <div>
+      <div class="panel">
+        <h2>🌐 Environment</h2>
+        <div class="env-toggle">
+          <div class="env-btn active" id="envPreview" onclick="switchEnv('preview')">
+            Preview
+            <div class="env-url"><span class="preview">abc123.myproject.pages.dev</span></div>
+          </div>
+          <div class="env-btn" id="envProd" onclick="switchEnv('prod')">
+            Production
+            <div class="env-url"><span class="prod">myproject.com</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:1rem">
+        <h2>📋 Deploy Log</h2>
+        <div class="terminal" id="terminal"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const stages = [
+  {id:'connect', name:'Connect Repo', emoji:'🔗', desc:'Link GitHub/GitLab repository'},
+  {id:'configure', name:'Configure Build', emoji:'⚙️', desc:'Set framework, commands, output'},
+  {id:'build', name:'Build', emoji:'🔨', desc:'Install dependencies & compile'},
+  {id:'deploy-preview', name:'Deploy Preview', emoji:'👀', desc:'Deploy to preview URL'},
+  {id:'review', name:'Review', emoji:'🔍', desc:'Check preview before production'},
+  {id:'deploy-prod', name:'Deploy Production', emoji:'🚀', desc:'Push to production domain'},
+  {id:'domain', name:'Custom Domain', emoji:'🌍', desc:'Configure custom domain & SSL'}
+];
+
+let stageIdx = -1;
+let running = false;
+let currentEnv = 'preview';
+
+const buildConfigs = {
+  static: {cmd:'cp -r public/* dist/', dir:'dist'},
+  react: {cmd:'react-scripts build', dir:'build'},
+  next: {cmd:'next build && next export', dir:'out'},
+  vue: {cmd:'npm run build', dir:'dist'},
+  astro: {cmd:'astro build', dir:'dist'},
+  svelte: {cmd:'npm run build', dir:'build'}
+};
+
+// Render pipeline
+function renderPipeline() {
+  const container = document.getElementById('pipeline');
+  while (container.firstChild) container.removeChild(container.firstChild);
+  stages.forEach((s, i) => {
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'pipe-connector';
+      if (i <= stageIdx) conn.className += ' pass';
+      if (i === stageIdx + 1 && running) conn.className += ' active';
+      container.appendChild(conn);
+    }
+    const div = document.createElement('div');
+    div.className = 'pipe-stage';
+    if (i < stageIdx) div.classList.add('pass');
+    if (i === stageIdx) div.classList.add(running ? 'active' : 'pass');
+    const icon = document.createElement('div');
+    icon.className = 'icon';
+    icon.textContent = s.emoji;
+    const info = document.createElement('div');
+    info.className = 'info';
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = s.name;
+    const desc = document.createElement('div');
+    desc.className = 'desc';
+    desc.textContent = s.desc;
+    info.appendChild(name);
+    info.appendChild(desc);
+    const dot = document.createElement('div');
+    dot.className = 'status-dot';
+    div.appendChild(icon);
+    div.appendChild(info);
+    div.appendChild(dot);
+    container.appendChild(div);
+  });
+}
+
+// Framework select
+document.getElementById('frameworkSelect').onchange = (e) => {
+  const cfg = buildConfigs[e.target.value];
+  document.getElementById('buildCmd').value = cfg.cmd;
+  document.getElementById('outputDir').value = cfg.dir;
+};
+
+// Env vars
+document.getElementById('envAdd').onclick = () => {
+  const row = document.createElement('div');
+  row.className = 'env-var-row';
+  const k = document.createElement('input');
+  k.placeholder = 'KEY';
+  const v = document.createElement('input');
+  v.placeholder = 'VALUE';
+  row.appendChild(k);
+  row.appendChild(v);
+  document.getElementById('envVars').appendChild(row);
+};
+
+function switchEnv(env) {
+  currentEnv = env;
+  document.getElementById('envPreview').classList.toggle('active', env === 'preview');
+  document.getElementById('envProd').classList.toggle('active', env === 'prod');
+}
+
+function addLog(text, cls) {
+  const terminal = document.getElementById('terminal');
+  const line = document.createElement('div');
+  line.className = 'term-line ' + (cls || '');
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+async function runDeploy() {
+  if (running) return;
+  running = true;
+  document.getElementById('deployBtn').disabled = true;
+  const terminal = document.getElementById('terminal');
+  while (terminal.firstChild) terminal.removeChild(terminal.firstChild);
+
+  const fw = document.getElementById('frameworkSelect').value;
+  const buildCmd = document.getElementById('buildCmd').value;
+  const outputDir = document.getElementById('outputDir').value;
+  const envUrl = currentEnv === 'preview' ? 'abc123.myproject.pages.dev' : 'myproject.com';
+
+  addLog('$ npx wrangler pages deploy ./' + outputDir, 'term-dim');
+  addLog('');
+
+  for (let i = 0; i < stages.length; i++) {
+    stageIdx = i;
+    renderPipeline();
+    addLog('▸ ' + stages[i].name + '...', 'term-yellow');
+    await sleep(400 + Math.random() * 300);
+
+    if (stages[i].id === 'build') {
+      addLog('  Installing dependencies...', 'term-dim');
+      await sleep(300);
+      addLog('  > ' + buildCmd, 'term-dim');
+      await sleep(500);
+      addLog('  ✓ Build complete → ' + outputDir + '/', 'term-green');
+    } else if (stages[i].id === 'deploy-preview' || stages[i].id === 'deploy-prod') {
+      addLog('  Uploading assets...', 'term-dim');
+      await sleep(400);
+      addLog('  ✓ Deployed to ' + envUrl, 'term-green');
+    } else if (stages[i].id === 'domain') {
+      addLog('  SSL certificate provisioned', 'term-green');
+      addLog('  DNS configured ✓', 'term-green');
+    } else {
+      addLog('  ✓ Done', 'term-green');
+    }
+    await sleep(200);
+  }
+
+  addLog('');
+  addLog('🎉 Deployment complete!', 'term-green');
+  addLog('  → ' + envUrl, 'term-green');
+  stageIdx = stages.length;
+  renderPipeline();
+  running = false;
+  document.getElementById('deployBtn').disabled = false;
+}
+
+function resetDeploy() {
+  running = false;
+  stageIdx = -1;
+  document.getElementById('deployBtn').disabled = false;
+  renderPipeline();
+  const terminal = document.getElementById('terminal');
+  while (terminal.firstChild) terminal.removeChild(terminal.firstChild);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+renderPipeline();
+</script>
+</body>
+</html>

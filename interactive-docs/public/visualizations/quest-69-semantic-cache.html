@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semantic Cache Lookup</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.5rem}
+h1{color:#4f2bdf;font-size:1.5rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.2rem}
+.sim-container{width:100%;max-width:750px;display:flex;flex-direction:column;gap:1rem}
+.query-box{display:flex;gap:.6rem;flex-wrap:wrap}
+.query-box input{flex:1;min-width:200px;padding:.7rem 1rem;border-radius:8px;border:1px solid #333;background:#16213e;color:#e0e0e0;font-size:.9rem}
+.query-box input:focus{outline:none;border-color:#4f2bdf}
+.btn{padding:.7rem 1.2rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;background:#4f2bdf;color:#fff;transition:all .2s}
+.btn:hover{background:#6c47ff}
+.threshold{background:#16213e;border-radius:10px;padding:1rem;border:1px solid #333}
+.threshold label{font-size:.85rem;color:#888}
+.threshold input[type=range]{width:100%;margin-top:.5rem;accent-color:#4f2bdf}
+.threshold .val{text-align:right;font-size:1.1rem;font-weight:700;color:#4f2bdf;margin-top:.3rem}
+.cache-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.6rem}
+.cache-item{background:#16213e;border:2px solid #333;border-radius:10px;padding:.7rem;transition:all .4s;position:relative;overflow:hidden}
+.cache-item.hit{border-color:#00c864;box-shadow:0 0 15px rgba(0,200,100,.3)}
+.cache-item.miss{border-color:#e8433e;opacity:.5}
+.cache-item .phrase{font-size:.8rem;color:#ccc;margin-bottom:.3rem}
+.cache-item .sim-bar{height:6px;background:#333;border-radius:3px;overflow:hidden}
+.cache-item .sim-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.result-banner{padding:1rem;border-radius:10px;text-align:center;font-weight:700;font-size:1rem;opacity:0;transition:all .4s}
+.result-banner.show{opacity:1}
+.result-banner.hit{background:rgba(0,200,100,.15);border:1px solid #00c864;color:#00c864}
+.result-banner.miss{background:rgba(232,67,62,.15);border:1px solid #e8433e;color:#e8433e}
+.embedding-vis{background:#16213e;border:1px solid #333;border-radius:10px;padding:1rem;position:relative;min-height:60px;display:flex;align-items:center;justify-content:center;gap:.3rem;flex-wrap:wrap}
+.vec-val{font-size:.65rem;color:#4f2bdf;font-family:monospace;opacity:0;transition:opacity .1s}
+.vec-val.show{opacity:1}
+svg.progress{width:100%;margin-top:.5rem}
+</style>
+</head>
+<body>
+<h1>🔍 Semantic Cache Lookup</h1>
+<p class="sub">Query embedding → Cosine similarity → Cache hit/miss</p>
+<div class="sim-container">
+  <div class="query-box">
+    <input type="text" id="queryInput" placeholder="Type a query (e.g. 'how to deploy')" onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="btn" onclick="doSearch()">Search</button>
+  </div>
+  <div class="embedding-vis" id="embedVis">
+    <span style="color:#666;font-size:.8rem">Query embedding vector</span>
+  </div>
+  <div class="threshold">
+    <label>Similarity Threshold</label>
+    <input type="range" id="threshold" min="20" max="95" value="70" oninput="document.getElementById('threshVal').textContent=this.value+'%'">
+    <div class="val" id="threshVal">70%</div>
+  </div>
+  <div id="resultBanner" class="result-banner"></div>
+  <svg class="progress" id="progressSvg" viewBox="0 0 750 8" height="8" style="opacity:0;transition:opacity .3s">
+    <rect x="0" y="0" width="0" height="8" rx="4" fill="#4f2bdf" id="progressBar"/>
+  </svg>
+  <div class="cache-grid" id="cacheGrid"></div>
+</div>
+<script>
+const cache=[
+  {phrase:"How do I deploy to production?",vec:[.82,.41,.67,.23,.89,.55,.34,.71]},
+  {phrase:"Best practices for CI/CD pipelines",vec:[.78,.35,.59,.31,.82,.61,.28,.65]},
+  {phrase:"What is machine learning?",vec:[.15,.92,.44,.88,.12,.77,.63,.21]},
+  {phrase:"Docker containerization guide",vec:[.71,.48,.73,.19,.85,.50,.39,.68]},
+  {phrase:"How to set up Kubernetes",vec:[.68,.52,.70,.25,.80,.53,.42,.64]},
+  {phrase:"Explain quantum computing basics",vec:[.11,.88,.40,.91,.08,.80,.58,.17]},
+  {phrase:"Deploy applications to cloud",vec:[.80,.39,.65,.27,.87,.57,.36,.70]},
+  {phrase:"Network security fundamentals",vec:[.22,.85,.48,.82,.18,.74,.52,.25]}
+];
+
+function cosineSim(a,b){let dot=0,ma=0,mb=0;for(let i=0;i<a.length;i++){dot+=a[i]*b[i];ma+=a[i]*a[i];mb+=b[i]*b[i]}return dot/(Math.sqrt(ma)*Math.sqrt(mb))}
+
+function genQueryVec(){return Array.from({length:8},()=>.2+Math.random()*.7)}
+
+function showEmbed(vec){
+  const c=document.getElementById('embedVis');
+  while(c.firstChild)c.removeChild(c.firstChild);
+  vec.forEach((v,i)=>{
+    const s=document.createElement('span');s.className='vec-val';s.textContent=v.toFixed(2);
+    c.appendChild(s);setTimeout(()=>s.classList.add('show'),i*50);
+  });
+}
+
+function doSearch(){
+  const qVec=genQueryVec();showEmbed(qVec);
+  const thresh=parseInt(document.getElementById('threshold').value)/100;
+  const g=document.getElementById('cacheGrid');
+  while(g.firstChild)g.removeChild(g.firstChild);
+  document.getElementById('progressSvg').style.opacity='1';
+  const bar=document.getElementById('progressBar');bar.setAttribute('width','0');
+
+  let maxSim=0,hitItem=null;
+  cache.forEach((item,i)=>{
+    const sim=cosineSim(qVec,item.vec);maxSim=Math.max(maxSim,sim);
+    if(sim>=thresh&&!hitItem)hitItem=item;
+    setTimeout(()=>{
+      const d=document.createElement('div');d.className='cache-item';
+      const pct=Math.round(sim*100);const isHit=sim>=thresh;
+      d.classList.add(isHit?'hit':'miss');
+      var phraseEl=document.createElement('div');phraseEl.className='phrase';phraseEl.textContent=item.phrase;
+      var barWrap=document.createElement('div');barWrap.className='sim-bar';var fill=document.createElement('div');fill.className='sim-fill';fill.style.width=pct+'%';fill.style.background=isHit?'#00c864':'#e8433e';barWrap.appendChild(fill);
+      var pctEl=document.createElement('div');pctEl.style.cssText='font-size:.7rem;margin-top:.3rem';pctEl.style.color=isHit?'#00c864':'#888';pctEl.textContent=pct+'% match';
+      d.appendChild(phraseEl);d.appendChild(barWrap);d.appendChild(pctEl);
+      g.appendChild(d);
+      bar.setAttribute('width',`${((i+1)/cache.length)*750}`);
+    },i*150);
+  });
+
+  setTimeout(()=>{
+    const banner=document.getElementById('resultBanner');
+    banner.classList.add('show');
+    if(hitItem){banner.className='result-banner show hit';banner.textContent='✅ Cache HIT! Matched: "'+hitItem.phrase+'"'}
+    else{banner.className='result-banner show miss';banner.textContent='❌ Cache MISS — no entry above '+Math.round(thresh*100)+'% threshold. Generating new response.'}
+  },cache.length*150+200);
+}
+
+// initial render
+const initGrid=document.getElementById('cacheGrid');
+cache.forEach(item=>{
+  const d=document.createElement('div');d.className='cache-item';
+  const phraseEl=document.createElement('div');phraseEl.className='phrase';phraseEl.textContent=item.phrase;
+  const barWrap=document.createElement('div');barWrap.className='sim-bar';const fill=document.createElement('div');fill.className='sim-fill';fill.style.width='0%';fill.style.background='#333';barWrap.appendChild(fill);
+  d.appendChild(phraseEl);d.appendChild(barWrap);
+  initGrid.appendChild(d);
+});
+</script>
+</body>
+</html>

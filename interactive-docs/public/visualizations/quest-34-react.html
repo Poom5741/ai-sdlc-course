@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReAct Pattern — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+.controls{display:flex;gap:.8rem;margin-bottom:2rem}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
+button:hover{background:#6143e8}
+.loop{position:relative;width:100%;max-width:600px}
+.phase{display:flex;align-items:center;gap:1rem;padding:1rem;border-radius:10px;margin-bottom:.5rem;opacity:.25;transition:all .4s;border:1px solid transparent;transform:scale(.97)}
+.phase.active{opacity:1;background:#16213e;border-color:#4f2bdf55;transform:scale(1)}
+.phase.done{opacity:.5}
+.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.icon.think{background:#e8a02044;color:#e8a020}
+.icon.act{background:#4f2bdf44;color:#4f2bdf}
+.icon.observe{background:#00c86444;color:#00c864}
+.content .label{font-weight:700;font-size:.9rem;margin-bottom:.2rem}
+.content .desc{font-size:.8rem;color:#999;line-height:1.4}
+.content .thought{font-family:'Courier New',monospace;font-size:.75rem;background:#0d1117;padding:.3rem .5rem;border-radius:5px;margin-top:.4rem;color:#e8a020;display:none}
+.phase.active .thought{display:block}
+.connector{width:2px;height:16px;background:#4f2bdf33;margin:0 auto}
+.counter{text-align:center;margin-top:1.5rem;padding:.8rem;background:#16213e;border-radius:10px;border:1px solid #4f2bdf33}
+.counter span{color:#00c864;font-size:1.8rem;font-weight:700}
+.counter .label{font-size:.75rem;color:#888;margin-top:.2rem}
+@keyframes glow{0%,100%{box-shadow:0 0 0 transparent}50%{box-shadow:0 0 16px 2px #4f2bdf55}}
+.phase.active{animation:glow 1.5s infinite}
+</style>
+</head>
+<body>
+<h1>ReAct Pattern</h1>
+<p class="sub">Reasoning + Acting loop — Thought → Action → Observation</p>
+<div class="controls"><button id="playBtn">▶ Auto Play</button><button id="resetBtn">↺ Reset</button></div>
+<div class="loop" id="loop"></div>
+<div class="counter"><span id="count">0</span><div class="label">Iterations completed</div></div>
+<script>
+const phases=[
+  {cls:'think',label:'💭 Thought',desc:'Reason about what to do next',thought:'I need to find the capital of France. Let me search for it.'},
+  {cls:'act',label:'⚡ Action',desc:'Select and execute an action',thought:'action = search("capital of France")'},
+  {cls:'observe',label:'👁️ Observe',desc:'Receive and parse the result',thought:'result = "Paris is the capital of France"'},
+  {cls:'think',label:'💭 Thought',desc:'Evaluate — is the question answered?',thought:'I now know the answer: Paris. Time to respond.'},
+  {cls:'act',label:'🗣️ Final Response',desc:'Generate the final answer',thought:'response = "The capital of France is Paris."'}
+];
+const loop=document.getElementById('loop'),phEls=[];
+phases.forEach((p,i)=>{
+  if(i>0){const c=document.createElement('div');c.className='connector';loop.appendChild(c)}
+  const el=document.createElement('div');el.className='phase';el.id='p'+i;
+  const ic=document.createElement('div');ic.className='icon '+p.cls;ic.textContent=p.label.split(' ')[0];
+  const ct=document.createElement('div');ct.className='content';
+  const lb=document.createElement('div');lb.className='label';lb.textContent=p.label;
+  const ds=document.createElement('div');ds.className='desc';ds.textContent=p.desc;
+  const th=document.createElement('div');th.className='thought';th.textContent=p.thought;
+  ct.appendChild(lb);ct.appendChild(ds);ct.appendChild(th);
+  el.appendChild(ic);el.appendChild(ct);
+  loop.appendChild(el);phEls.push(el);
+});
+let cur=-1,timer=null,iters=0;
+function advance(){
+  if(cur>=0)phEls[cur].classList.remove('active');
+  cur++;if(cur>=phases.length){phEls[cur-1].classList.add('done');iters++;document.getElementById('count').textContent=iters;cur=-1;phEls.forEach(e=>e.classList.remove('done','active'));setTimeout(()=>phEls[0].classList.add('active'),300);cur=0;return}
+  phEls[cur].classList.add('active');
+  phEls[cur].scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+document.getElementById('playBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('playBtn').textContent='▶ Auto Play';return}cur=-1;phEls.forEach(e=>e.classList.remove('active','done'));timer=setInterval(advance,1400);document.getElementById('playBtn').textContent='⏸ Pause';advance()};
+document.getElementById('resetBtn').onclick=()=>{clearInterval(timer);timer=null;cur=-1;iters=0;document.getElementById('count').textContent=0;phEls.forEach(e=>e.classList.remove('active','done'));document.getElementById('playBtn').textContent='▶ Auto Play'};
+</script>
+</body>
+</html>

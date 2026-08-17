@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multi-Agent Architecture</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:16px;font-size:1.4rem}
+.ctn{max-width:800px;margin:0 auto}
+svg{width:100%;height:auto;display:block}
+.agent{cursor:pointer;transition:transform .2s}
+.agent:hover{transform:scale(1.05)}
+.agent circle{transition:all .3s}
+.agent.active circle{filter:drop-shadow(0 0 8px #4f2bdf)}
+.msg{fill:none;stroke:#4f2bdf;stroke-width:1.5;stroke-dasharray:300;stroke-dashoffset:300;transition:stroke-dashoffset 1s}
+.msg.a{stroke-dashoffset:0}
+.dot{fill:#4f2bdf;opacity:0;transition:opacity .3s}
+.dot.a{opacity:1}
+.info{background:#16213e;border-radius:10px;padding:16px;margin-top:16px;border:1px solid #333;min-height:80px}
+.info h3{color:#4f2bdf;margin-bottom:6px;font-size:.95rem}
+.info p{font-size:.8rem;line-height:1.6;color:#aaa}
+.info .hi{color:#00c864}
+.legend{display:flex;gap:12px;justify-content:center;margin-top:12px;font-size:.7rem;color:#888;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<h1>🤝 Multi-Agent Architecture</h1>
+<div class="ctn">
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#4f2bdf"/></marker>
+</defs>
+<!-- connections -->
+<line class="msg" id="m12" x1="180" y1="100" x2="320" y2="100" marker-end="url(#ah)"/>
+<line class="msg" id="m23" x1="380" y1="120" x2="500" y2="200" marker-end="url(#ah)"/>
+<line class="msg" id="m34" x1="500" y1="260" x2="380" y2="300" marker-end="url(#ah)"/>
+<line class="msg" id="m41" x1="320" y1="300" x2="180" y2="200" marker-end="url(#ah)"/>
+<line class="msg" id="m24" x1="350" y1="130" x2="350" y2="270" marker-end="url(#ah)"/>
+<!-- moving dots -->
+<circle class="dot" id="d12" r="4"/><circle class="dot" id="d23" r="4"/>
+<circle class="dot" id="d34" r="4"/><circle class="dot" id="d41" r="4"/>
+<!-- agents -->
+<g class="agent" data-a="planner" onclick="select(this)" transform="translate(120,60)">
+<circle cx="60" cy="40" r="40" fill="#16213e" stroke="#4f2bdf" stroke-width="2"/>
+<text x="60" y="35" text-anchor="middle" fill="#4f2bdf" font-size="20">📋</text>
+<text x="60" y="55" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="system-ui">Planner</text>
+</g>
+<g class="agent" data-a="coder" onclick="select(this)" transform="translate(300,60)">
+<circle cx="60" cy="40" r="40" fill="#16213e" stroke="#00c864" stroke-width="2"/>
+<text x="60" y="35" text-anchor="middle" fill="#00c864" font-size="20">💻</text>
+<text x="60" y="55" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="system-ui">Coder</text>
+</g>
+<g class="agent" data-a="reviewer" onclick="select(this)" transform="translate(460,170)">
+<circle cx="60" cy="40" r="40" fill="#16213e" stroke="#e74c3c" stroke-width="2"/>
+<text x="60" y="35" text-anchor="middle" fill="#e74c3c" font-size="20">🔍</text>
+<text x="60" y="55" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="system-ui">Reviewer</text>
+</g>
+<g class="agent" data-a="tester" onclick="select(this)" transform="translate(300,260)">
+<circle cx="60" cy="40" r="40" fill="#16213e" stroke="#f1c40f" stroke-width="2"/>
+<text x="60" y="35" text-anchor="middle" fill="#f1c40f" font-size="20">🧪</text>
+<text x="60" y="55" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="system-ui">Tester</text>
+</g>
+<g class="agent" data-a="coordinator" onclick="select(this)" transform="translate(100,160)">
+<circle cx="50" cy="40" r="40" fill="#16213e" stroke="#9b59b6" stroke-width="2"/>
+<text x="50" y="35" text-anchor="middle" fill="#9b59b6" font-size="20">🎯</text>
+<text x="50" y="55" text-anchor="middle" fill="#e0e0e0" font-size="11" font-family="system-ui">Coordinator</text>
+</g>
+</svg>
+<div class="info" id="info">
+<h3>Click an agent to learn its role</h3>
+<p>Each agent is a specialized LLM instance with its own system prompt, tools, and objectives. They communicate via messages to solve complex tasks collaboratively.</p>
+</div>
+<div class="legend">
+<span>📋 Planner</span><span>💻 Coder</span><span>🔍 Reviewer</span><span>🧪 Tester</span><span>🎯 Coordinator</span>
+</div>
+</div>
+<script>
+const roles={
+planner:{t:'📋 Planner',d:'Breaks down complex tasks into subtasks. Creates execution plans, assigns work to other agents, and tracks progress. Uses <span class="hi">tree-of-thought</span> reasoning.'},
+coder:{t:'💻 Coder',d:'Implements code based on the plan. Has access to file system and terminal. Writes code <span class="hi">test-first</span> and iterates based on feedback from Reviewer and Tester.'},
+reviewer:{t:'🔍 Reviewer',d:'Reviews code for quality, security, and correctness. Flags anti-patterns, suggests improvements. Uses <span class="hi">static analysis</span> and pattern matching.'},
+tester:{t:'🧪 Tester',d:'Writes and runs test suites. Reports failures back to Coder. Covers unit, integration, and edge cases. Ensures <span class="hi">coverage targets</span> are met.'},
+coordinator:{t:'🎯 Coordinator',d:'Orchestrates the workflow between agents. Manages turn-taking, resolves conflicts, and ensures agents stay on task. The <span class="hi">conductor</span> of the ensemble.'}
+};
+function select(el){
+document.querySelectorAll('.agent').forEach(a=>a.classList.remove('active'));
+el.classList.add('active');
+const r=roles[el.dataset.a];
+const el=document.getElementById('info');el.textContent='';const h=document.createElement('h3');h.textContent=r.t;el.appendChild(h);const p=document.createElement('p');p.textContent=r.d;el.appendChild(p);
+animateMsgs();
+}
+let msgIv;
+function animateMsgs(){
+document.querySelectorAll('.msg,.dot').forEach(e=>e.classList.remove('a'));
+clearInterval(msgIv);
+const msgs=['m12','m23','m34','m41','m24'];
+const dots=['d12','d23','d34','d41','d24'];
+let i=0;
+msgIv=setInterval(()=>{if(i>=msgs.length)return clearInterval(msgs);document.getElementById(msgs[i]).classList.add('a');document.getElementById(dots[i]).classList.add('a');i++},400);
+}
+window.addEventListener('DOMContentLoaded',()=>select(document.querySelector('[data-a="planner"]')));
+</script>
+</body></html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Performance Metrics — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;color:#4f2bdf;margin-bottom:6px;font-size:1.5rem}
+.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
+.ctn{max-width:900px;margin:0 auto}
+/* Toggle */
+.toggle-row{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tog-btn{padding:8px 18px;border-radius:20px;background:#16213e;border:1px solid #333;color:#aaa;font-size:.8rem;cursor:pointer;transition:all .3s}
+.tog-btn.active{background:#4f2bdf;color:#fff;border-color:#4f2bdf}
+/* Chart area */
+.chart-area{background:#16213e;border-radius:12px;padding:20px;border:1px solid #333;margin-bottom:20px}
+.chart-area h2{font-size:.9rem;color:#4f2bdf;margin-bottom:16px;text-align:center}
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar-row{display:flex;align-items:center;gap:12px}
+.bar-label{min-width:110px;font-size:.8rem;text-align:right;color:#aaa}
+.bar-pair{flex:1;display:flex;flex-direction:column;gap:4px}
+.bar-track{height:22px;background:#0d1117;border-radius:6px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.2s ease;display:flex;align-items:center;padding:0 8px;font-size:.7rem;font-weight:700;color:#fff;white-space:nowrap}
+.bar-fill.before{background:linear-gradient(90deg,#ff4466,#ff6b6b)}
+.bar-fill.after{background:linear-gradient(90deg,#00c864,#00e676)}
+.bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.7rem;color:#ccc}
+.improve{font-size:.7rem;color:#00c864;font-weight:700;min-width:60px;text-align:right}
+.improve.down{color:#00c864}.improve.up{color:#ff4466}
+.legend-row{display:flex;gap:16px;justify-content:center;margin-bottom:16px;font-size:.75rem;color:#888}
+.legend-row span{display:flex;align-items:center;gap:5px}
+.ldot{width:12px;height:12px;border-radius:3px}
+.ldot.b{background:#ff4466}.ldot.a{background:#00c864}
+/* Insight cards */
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.ins-card{background:#0d1117;border-radius:10px;padding:14px;border:1px solid #333;text-align:center;transition:border-color .3s}
+.ins-card:hover{border-color:#4f2bdf}
+.ins-card .val{font-size:1.5rem;font-weight:700;color:#00c864}
+.ins-card .lbl{font-size:.75rem;color:#888;margin-top:4px}
+.btn{display:block;margin:20px auto 0;padding:10px 28px;background:#4f2bdf;color:#fff;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;transition:background .2s}
+.btn:hover{background:#6143e8}
+</style>
+</head>
+<body>
+<h1>⚡ Performance Metrics</h1>
+<p class="sub">Before/After optimization — toggle metrics to compare</p>
+<div class="ctn">
+<div class="legend-row">
+  <span><span class="ldot b"></span> Before</span>
+  <span><span class="ldot a"></span> After</span>
+</div>
+<div class="toggle-row" id="toggles"></div>
+<div class="chart-area">
+  <h2 id="chartTitle">All Metrics</h2>
+  <div class="bars" id="bars"></div>
+</div>
+<div class="insights" id="insights"></div>
+<button class="btn" onclick="animateAll()">▶ Replay Animation</button>
+</div>
+
+<script>
+const datasets={
+  'All Metrics':[
+    {label:'API Latency',before:450,after:120,unit:'ms',lower:true},
+    {label:'Bundle Size',before:842,after:310,unit:'KB',lower:true},
+    {label:'LCP',before:4.2,after:1.8,unit:'s',lower:true},
+    {label:'Memory Usage',before:180,after:95,unit:'MB',lower:true},
+    {label:'DB Queries',before:24,after:6,unit:'/req',lower:true},
+    {label:'TTI',before:6.1,after:2.3,unit:'s',lower:true},
+    {label:'FCP',before:2.8,after:0.9,unit:'s',lower:true},
+  ],
+  'Web Vitals':[
+    {label:'LCP',before:4.2,after:1.8,unit:'s',lower:true},
+    {label:'FID',before:180,after:45,unit:'ms',lower:true},
+    {label:'CLS',before:0.28,after:0.05,unit:'',lower:true},
+    {label:'FCP',before:2.8,after:0.9,unit:'s',lower:true},
+    {label:'TTFB',before:800,after:200,unit:'ms',lower:true},
+    {label:'INP',before:350,after:120,unit:'ms',lower:true},
+  ],
+  'Backend':[
+    {label:'API Latency',before:450,after:120,unit:'ms',lower:true},
+    {label:'DB Queries',before:24,after:6,unit:'/req',lower:true},
+    {label:'Memory Usage',before:180,after:95,unit:'MB',lower:true},
+    {label:'CPU Load',before:78,after:35,unit:'%',lower:true},
+    {label:'P99 Latency',before:1200,after:280,unit:'ms',lower:true},
+    {label:'Error Rate',before:3.2,after:0.4,unit:'%',lower:true},
+  ],
+  'Bundle':[
+    {label:'Total Size',before:842,after:310,unit:'KB',lower:true},
+    {label:'JS Gzip',before:210,after:68,unit:'KB',lower:true},
+    {label:'CSS',before:85,after:32,unit:'KB',lower:true},
+    {label:'Images',before:520,after:180,unit:'KB',lower:true},
+    {label:'Fonts',before:120,after:45,unit:'KB',lower:true},
+    {label:'Chunks',before:18,after:6,unit:'',lower:true},
+  ],
+};
+const defaultDS='All Metrics';
+const $toggles=document.getElementById('toggles');
+const $bars=document.getElementById('bars');
+const $insights=document.getElementById('insights');
+let currentDS=defaultDS;
+
+function renderToggles(){
+  while($toggles.firstChild)$toggles.removeChild($toggles.firstChild);
+  Object.keys(datasets).forEach(k=>{
+    const btn=document.createElement('span');
+    btn.className='tog-btn'+(k===currentDS?' active':'');
+    btn.textContent=k;
+    btn.onclick=()=>{currentDS=k;renderToggles();animateAll();};
+    $toggles.appendChild(btn);
+  });
+}
+
+function animateAll(){
+  const data=datasets[currentDS];
+  document.getElementById('chartTitle').textContent=currentDS;
+  while($bars.firstChild)$bars.removeChild($bars.firstChild);
+  const maxBefore=Math.max(...data.map(d=>d.before));
+  data.forEach((d,i)=>{
+    const pctB=(d.before/maxBefore)*100;
+    const pctA=(d.after/maxBefore)*100;
+    const improve=d.lower?Math.round((1-d.after/d.before)*100):Math.round((d.after/d.before-1)*100);
+    const impClass=d.lower?'down':'up';
+    const row=document.createElement('div');row.className='bar-row';
+    const lbl=document.createElement('span');lbl.className='bar-label';lbl.textContent=d.label;row.appendChild(lbl);
+    const pair=document.createElement('div');pair.className='bar-pair';
+    const trk1=document.createElement('div');trk1.className='bar-track';const fill1=document.createElement('div');fill1.className='bar-fill before';fill1.style.width='0%';fill1.dataset.w=String(pctB);fill1.textContent=d.before+d.unit;trk1.appendChild(fill1);pair.appendChild(trk1);
+    const trk2=document.createElement('div');trk2.className='bar-track';const fill2=document.createElement('div');fill2.className='bar-fill after';fill2.style.width='0%';fill2.dataset.w=String(pctA);fill2.textContent=d.after+d.unit;trk2.appendChild(fill2);pair.appendChild(trk2);
+    row.appendChild(pair);
+    const imp=document.createElement('span');imp.className='improve '+impClass;imp.textContent=(d.lower?'↓':'↑')+Math.abs(improve)+'%';row.appendChild(imp);
+    $bars.appendChild(row);
+  });
+  // Animate bars after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    $bars.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});
+  }));
+  // Insights
+  const avgBefore=data.reduce((s,d)=>s+d.before,0)/data.length;
+  const avgAfter=data.reduce((s,d)=>s+d.after,0)/data.length;
+  const avgImp=Math.round((1-avgAfter/avgBefore)*100);
+  const biggest=data.reduce((best,d)=>{const imp=(1-d.after/d.before);return imp>best.imp?{imp,label:d.label}:best;},{imp:0,label:''});
+  while($insights.firstChild)$insights.removeChild($insights.firstChild);
+  const cards=[{v:'↓'+avgImp+'%',l:'Avg Improvement'},{v:String(data.length),l:'Metrics Tracked'},{v:'↓'+Math.round((1-biggest.imp)*100)+'→'+Math.round(biggest.imp*100)+'%',l:'Best: '+biggest.label},{v:'A+',l:'Overall Grade'}];
+  cards.forEach(c=>{
+    const card=document.createElement('div');card.className='ins-card';
+    const val=document.createElement('div');val.className='val';val.textContent=c.v;card.appendChild(val);
+    const lbl=document.createElement('div');lbl.className='lbl';lbl.textContent=c.l;card.appendChild(lbl);
+    $insights.appendChild(card);
+  });
+}
+
+renderToggles();animateAll();
+</script>
+</body>
+</html>

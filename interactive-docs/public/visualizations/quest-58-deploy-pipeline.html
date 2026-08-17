@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CI/CD Pipeline — BlueBeltDojo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+h1{color:#4f2bdf;font-size:1.6rem;margin-bottom:.3rem}
+.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+.pipeline{display:flex;gap:0;width:100%;max-width:800px;overflow-x:auto;padding-bottom:1rem}
+@media(max-width:600px){.pipeline{flex-direction:column;align-items:center}}
+.stage{flex:1;min-width:200px;position:relative;cursor:pointer;transition:all .3s}
+.stage-body{background:#16213e;border:2px solid #333;border-radius:12px;padding:1rem;margin:0 .3rem;transition:all .3s}
+.stage:hover .stage-body{border-color:#4f2bdf}
+.stage.active .stage-body{border-color:#4f2bdf;box-shadow:0 0 20px #4f2bdf44}
+.stage.pass .stage-body{border-color:#00c864}
+.stage.fail .stage-body{border-color:#ff4466}
+.stage .icon{font-size:1.8rem;text-align:center;margin-bottom:.4rem}
+.stage .name{font-weight:700;font-size:.9rem;text-align:center;margin-bottom:.5rem}
+.actions{max-height:0;overflow:hidden;transition:max-height .4s}
+.stage.active .actions{max-height:400px}
+.action{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-size:.78rem;color:#aaa;border-bottom:1px solid #ffffff0a}
+.action .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.dot.pending{background:#555}
+.dot.running{background:#e8a020;animation:pulse 1s infinite}
+.dot.pass{background:#00c864}
+.dot.fail{background:#ff4466}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.connector-h{width:30px;min-height:2px;background:#333;flex-shrink:0;align-self:center;margin-top:-40px}
+@media(max-width:600px){.connector-h{width:2px;min-height:20px;margin:0 auto}}
+.controls{display:flex;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center}
+button{background:#4f2bdf;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
+button:hover{background:#6143e8}
+.btn-run{background:#00c864;color:#1a1a2e}
+.btn-run:hover{background:#00dd70}
+.status-bar{margin-top:1.2rem;padding:.6rem 1rem;background:#16213e;border-radius:8px;font-size:.8rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;width:100%;max-width:800px}
+.status-item{display:flex;align-items:center;gap:4px}
+.status-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+<h1>CI/CD Pipeline</h1>
+<p class="sub">Click stages to explore — Run Pipeline to simulate</p>
+<div class="pipeline" id="pipeline"></div>
+<div class="controls">
+  <button class="btn-run" id="runBtn">▶ Run Pipeline</button>
+  <button id="resetBtn">↺ Reset</button>
+</div>
+<div class="status-bar" id="statusBar"></div>
+<script>
+const stages=[
+  {name:'🔨 Build',icon:'🔨',actions:['Checkout code','Install dependencies','Compile TypeScript','Bundle assets','Build Docker image','Push to registry']},
+  {name:'🧪 Test',icon:'🧪',actions:['Run unit tests','Run integration tests','Run E2E tests','Code coverage check','Lint & format check','Security scan']},
+  {name:'🔍 Review',icon:'🔍',actions:['Static analysis','Dependency audit','License compliance','Performance benchmarks','Accessibility check']},
+  {name:'🚀 Deploy',icon:'🚀',actions:['Provision staging','Deploy to staging','Run smoke tests','Promote to production','Update DNS/CDN','Notify team']},
+  {name:'📊 Monitor',icon:'📊',actions:['Health check','Error rate monitoring','Latency tracking','Cost monitoring','Alert configuration']}
+];
+const pipe=document.getElementById('pipeline'),stageEls=[];
+stages.forEach((s,i)=>{
+  if(i>0){const c=document.createElement('div');c.className='connector-h';pipe.appendChild(c)}
+  const st=document.createElement('div');st.className='stage';
+  const body=document.createElement('div');body.className='stage-body';
+  const icon=document.createElement('div');icon.className='icon';icon.textContent=s.icon;
+  const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;
+  const acts=document.createElement('div');acts.className='actions';
+  s.actions.forEach(a=>{
+    const act=document.createElement('div');act.className='action';
+    const dot=document.createElement('span');dot.className='dot pending';
+    const txt=document.createElement('span');txt.textContent=a;
+    act.appendChild(dot);act.appendChild(txt);
+    acts.appendChild(act);
+  });
+  body.appendChild(icon);body.appendChild(nm);body.appendChild(acts);
+  st.appendChild(body);pipe.appendChild(st);
+  st.onclick=()=>{if(!st.classList.contains('active')){stageEls.forEach(e=>e.classList.remove('active'));st.classList.add('active')}};
+  stageEls.push(st);
+});
+const statusBar=document.getElementById('statusBar');
+function updateStatus(){statusBar.textContent='';const labels=['Build','Test','Review','Deploy','Monitor'];const colors=['#555','#555','#555','#555','#555'];
+stageEls.forEach((s,i)=>{if(s.classList.contains('pass'))colors[i]='#00c864';if(s.classList.contains('fail'))colors[i]='#ff4466'});
+labels.forEach((l,i)=>{const item=document.createElement('div');item.className='status-item';const dot=document.createElement('span');dot.className='status-dot';dot.style.background=colors[i];const txt=document.createElement('span');txt.textContent=l;item.appendChild(dot);item.appendChild(txt);statusBar.appendChild(item)});}
+let running=false;
+document.getElementById('runBtn').onclick=()=>{
+  if(running)return;running=true;
+  stageEls.forEach(s=>{s.classList.remove('active','pass','fail');const dots=s.querySelectorAll('.dot');dots.forEach(d=>{d.className='dot pending'})});
+  updateStatus();
+  let si=0;
+  function runStage(){
+    if(si>=stages.length){running=false;return}
+    stageEls[si].classList.add('active');
+    const dots=stageEls[si].querySelectorAll('.dot');
+    let di=0;
+    function runAction(){
+      if(di>=dots.length){
+        const fail=Math.random()<0.15;
+        stageEls[si].classList.remove('active');
+        stageEls[si].classList.add(fail?'fail':'pass');
+        dots.forEach(d=>d.className='dot '+(fail?'fail':'pass'));
+        updateStatus();
+        si++;runStage();return;
+      }
+      dots[di].className='dot running';
+      setTimeout(()=>{dots[di].className='dot pass';di++;runAction()},150+Math.random()*200);
+    }
+    runAction();
+  }
+  runStage();
+};
+document.getElementById('resetBtn').onclick=()=>{running=false;stageEls.forEach(s=>{s.classList.remove('active','pass','fail');s.querySelectorAll('.dot').forEach(d=>d.className='dot pending')});updateStatus()};
+updateStatus();
+</script>
+</body>
+</html>
