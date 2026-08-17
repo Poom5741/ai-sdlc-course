@@ -1,47 +1,30 @@
 ---
 // Admin Panel for LMS Access Code Management
+// Uses unified auth - redirects to /login if not authenticated or not admin
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Admin Panel - AI SDLC Course">
   <main class="min-h-screen bg-gray-50 py-12">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Login Form (shown when not authenticated) -->
-      <div id="login-section" class="max-w-md mx-auto">
+      <!-- Loading State -->
+      <div id="loading-section" class="max-w-md mx-auto text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-trail-green mx-auto"></div>
+        <p class="mt-4 text-gray-600">Checking access...</p>
+      </div>
+
+      <!-- Access Denied -->
+      <div id="denied-section" class="max-w-md mx-auto text-center py-12 hidden">
         <div class="bg-white rounded-2xl shadow-lg p-8">
-          <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">🔧 Admin Panel</h1>
-            <p class="text-gray-600">Enter your admin password to continue</p>
-          </div>
-
-          <form id="login-form" class="space-y-4">
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-trail-green focus:outline-none transition-colors"
-                placeholder="Enter admin password"
-                required
-              />
-              <p id="login-error" class="mt-2 text-sm text-red-600 hidden"></p>
-            </div>
-
-            <button
-              type="submit"
-              id="login-btn"
-              class="w-full bg-trail-green text-white py-3 px-6 rounded-lg font-semibold hover:bg-trail-green/90 transition-colors"
-            >
-              Login
-            </button>
-          </form>
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">🔒 Access Denied</h1>
+          <p class="text-gray-600 mb-6">You need admin privileges to access this page.</p>
+          <a href="/login" class="inline-block bg-trail-green text-white py-3 px-6 rounded-lg font-semibold hover:bg-trail-green/90 transition-colors">
+            Sign In with Admin Account
+          </a>
         </div>
       </div>
 
-      <!-- Dashboard (shown when authenticated) -->
+      <!-- Dashboard (shown when authenticated as admin) -->
       <div id="dashboard-section" class="hidden">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
@@ -49,12 +32,18 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <h1 class="text-3xl font-bold text-gray-900">🔧 Admin Panel</h1>
             <p class="text-gray-600 mt-1">Manage access codes for the workshop</p>
           </div>
-          <button
-            id="logout-btn"
-            class="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Logout
-          </button>
+          <div class="flex items-center gap-4">
+            <span id="admin-email" class="text-sm text-gray-500"></span>
+            <a href="/dashboard" class="px-4 py-2 text-trail-green hover:text-trail-green/80 border border-trail-green rounded-lg hover:bg-trail-green/5 transition-colors">
+              Dashboard
+            </a>
+            <button
+              id="logout-btn"
+              class="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <!-- Stats Cards -->
@@ -228,16 +217,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  // Admin Panel Logic
-  let sessionId: string | null = null;
+  // Admin Panel Logic - Uses unified auth (bbd_token)
+  let authToken: string | null = null;
   let currentPage = 1;
   const pageSize = 20;
 
   // DOM Elements
-  const loginSection = document.getElementById('login-section');
+  const loadingSection = document.getElementById('loading-section');
+  const deniedSection = document.getElementById('denied-section');
   const dashboardSection = document.getElementById('dashboard-section');
-  const loginForm = document.getElementById('login-form') as HTMLFormElement;
-  const loginError = document.getElementById('login-error') as HTMLElement;
+  const adminEmail = document.getElementById('admin-email');
   const logoutBtn = document.getElementById('logout-btn');
   const createForm = document.getElementById('create-form') as HTMLFormElement;
   const createdCodes = document.getElementById('created-codes');
@@ -249,76 +238,65 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const prevPageBtn = document.getElementById('prev-page') as HTMLButtonElement | null;
   const nextPageBtn = document.getElementById('next-page') as HTMLButtonElement | null;
 
-  // Check if already logged in
-  function checkAuth(): boolean {
-    const stored = localStorage.getItem('admin_session');
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (new Date(data.expires) > new Date()) {
-        sessionId = data.sessionId;
-        return true;
+  // Check auth and verify admin role
+  async function checkAuth(): Promise<boolean> {
+    const token = localStorage.getItem('bbd_token');
+    if (!token) return false;
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        localStorage.removeItem('bbd_token');
+        localStorage.removeItem('bbd_role');
+        return false;
       }
-      localStorage.removeItem('admin_session');
+
+      const data = await res.json();
+      
+      // Check if user is admin
+      if (data.role !== 'admin') {
+        return false;
+      }
+
+      authToken = token;
+      adminEmail!.textContent = data.email;
+      return true;
+    } catch {
+      return false;
     }
-    return false;
   }
 
-  // Show login or dashboard
-  function updateUI(): void {
-    if (sessionId) {
-      loginSection?.classList.add('hidden');
+  // Show appropriate section
+  async function init(): Promise<void> {
+    const isAdmin = await checkAuth();
+    
+    loadingSection?.classList.add('hidden');
+    
+    if (isAdmin) {
       dashboardSection?.classList.remove('hidden');
       loadStats();
       loadCodes();
     } else {
-      loginSection?.classList.remove('hidden');
-      dashboardSection?.classList.add('hidden');
-    }
-  }
-
-  // Login
-  async function login(password: string): Promise<boolean> {
-    try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        sessionId = result.sessionId;
-        localStorage.setItem('admin_session', JSON.stringify({
-          sessionId: result.sessionId,
-          expires: result.expires
-        }));
-        updateUI();
-        return true;
-      } else {
-        loginError.textContent = result.error || 'Login failed';
-        loginError.classList.remove('hidden');
-        return false;
-      }
-    } catch (error) {
-      loginError.textContent = 'Network error. Please try again.';
-      loginError.classList.remove('hidden');
-      return false;
+      deniedSection?.classList.remove('hidden');
     }
   }
 
   // Logout
   function logout(): void {
-    sessionId = null;
-    localStorage.removeItem('admin_session');
-    updateUI();
+    authToken = null;
+    localStorage.removeItem('bbd_token');
+    localStorage.removeItem('bbd_role');
+    window.location.href = '/login';
   }
 
   // Load stats
   async function loadStats(): Promise<void> {
     try {
       const response = await fetch('/api/admin/codes?limit=1000', {
-        headers: { 'Authorization': `Bearer ${sessionId}` }
+        headers: { 'Authorization': `Bearer ${authToken}` }
       });
       const data = await response.json();
       
@@ -347,7 +325,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       if (status !== 'all') url += `&status=${status}`;
       
       const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${sessionId}` }
+        headers: { 'Authorization': `Bearer ${authToken}` }
       });
       const data = await response.json();
       
@@ -387,7 +365,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
                      code.used ? 'used' : 
                      (code.expires && new Date(code.expires) < new Date()) ? 'expired' : 'unused';
       
-      const statusBadge = {
+      const statusBadge: Record<string, string> = {
         unused: '<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Unused</span>',
         used: '<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Used</span>',
         expired: '<span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Expired</span>',
@@ -446,7 +424,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
       const response = await fetch('/api/admin/codes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
         body: JSON.stringify(body)
       });
 
@@ -475,7 +453,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     try {
       const response = await fetch(`/api/admin/codes?code=${code}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${sessionId}` }
+        headers: { 'Authorization': `Bearer ${authToken}` }
       });
 
       if (response.ok) {
@@ -494,12 +472,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   (window as any).revokeCode = revokeCode;
 
   // Event Listeners
-  loginForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const password = (document.getElementById('password') as HTMLInputElement).value;
-    await login(password);
-  });
-
   logoutBtn?.addEventListener('click', logout);
 
   createForm?.addEventListener('submit', async (e) => {
@@ -540,9 +512,5 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   });
 
   // Initialize
-  if (checkAuth()) {
-    updateUI();
-  } else {
-    updateUI();
-  }
+  init();
 </script>

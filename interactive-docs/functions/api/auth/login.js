@@ -84,7 +84,7 @@ export async function onRequestPost(context) {
 
     // Find user by email
     const user = await env.DB.prepare(
-      'SELECT id, email, password_hash, display_name, current_belt FROM users WHERE email = ?'
+      'SELECT id, email, password_hash, display_name, current_belt, role FROM users WHERE email = ?'
     ).bind(email.toLowerCase().trim()).first();
 
     if (!user) {
@@ -122,7 +122,8 @@ export async function onRequestPost(context) {
         userId: user.id,
         email: user.email,
         displayName: user.display_name,
-        belt: user.current_belt
+        belt: user.current_belt,
+        role: user.role || 'user'
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

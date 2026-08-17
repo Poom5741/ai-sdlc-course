@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
 
     // Get user profile from D1
     const user = await env.DB.prepare(
-      'SELECT id, email, display_name, current_belt, created_at FROM users WHERE id = ?'
+      'SELECT id, email, display_name, current_belt, role, created_at FROM users WHERE id = ?'
     ).bind(session.userId).first();
 
     if (!user) {
@@ -43,6 +43,7 @@ export async function onRequestGet(context) {
         email: user.email,
         displayName: user.display_name,
         belt: user.current_belt,
+        role: user.role || 'user',
         createdAt: user.created_at
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
