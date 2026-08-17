@@ -34,28 +34,52 @@ async function generateUniqueCode(env) {
   return code;
 }
 
-// Validate session from Authorization header against KV
-async function validateAdminSession(env, request) {
+// Validate admin session using stateless token
+async function validateAdminAuth(env, request) {
   const authHeader = request.headers.get("authorization") || "";
-  const sessionId = authHeader.replace("Bearer ", "").trim();
-  if (!sessionId) return false;
+  const token = authHeader.replace("Bearer ", "").trim();
+  if (!token) return false;
 
-  const data = await env.KV_NAMESPACE.get(`admin:session:${sessionId}`, {
-    type: "json",
-  });
-  if (!data) return false;
-  if (new Date(data.expires) < new Date()) {
-    await env.KV_NAMESPACE.delete(`admin:session:${sessionId}`);
+  try {
+    const decoded = atob(token + "==");
+    const parts = decoded.split(":");
+    if (parts.length !== 4) return false;
+
+    const [timestamp, expires, _tokenIp, sigHex] = parts;
+
+    // Check expiry
+    if (Date.now() > parseInt(expires)) return false;
+
+    // Verify HMAC signature
+    const payload = `${timestamp}:${expires}:${_tokenIp}`;
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(env.ADMIN_PASSWORD),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"],
+    );
+    const sigBytes = new Uint8Array(
+      sigHex.match(/.{2}/g).map((b) => parseInt(b, 16)),
+    );
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      sigBytes,
+      new TextEncoder().encode(payload),
+    );
+
+    return valid;
+  } catch {
     return false;
   }
-  return true;
 }
 
 export async function onRequestGet(context) {
   const { request, env } = context;
 
   // Check authentication
-  const isAuth = await validateAdminSession(env, request);
+  const isAuth = await validateAdminAuth(env, request);
   if (!isAuth) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -141,7 +165,7 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   // Check authentication
-  const isAuth = await validateAdminSession(env, request);
+  const isAuth = await validateAdminAuth(env, request);
   if (!isAuth) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -210,7 +234,7 @@ export async function onRequestDelete(context) {
   const { request, env } = context;
 
   // Check authentication
-  const isAuth = await validateAdminSession(env, request);
+  const isAuth = await validateAdminAuth(env, request);
   if (!isAuth) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
