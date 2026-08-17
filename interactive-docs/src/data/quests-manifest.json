@@ -4,112 +4,63 @@
     "title": "First AI Code Completion",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
-    "slug": "quest-1"
+    "slug": "quest-01"
   },
   {
     "id": "quest-02-multi-file",
     "title": "Multi-File AI Workflow",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
-    "slug": "quest-2"
+    "slug": "quest-02"
   },
   {
     "id": "quest-03-compare-tools",
     "title": "AI Tool Comparison",
     "difficulty": "easy",
     "block": "block-1-ai-tools",
-    "slug": "quest-3"
+    "slug": "quest-03"
   },
   {
     "id": "quest-04-fix-prompt",
     "title": "Fix a Broken Prompt",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
-    "slug": "quest-4"
-  },
-  {
-    "id": "quest-04-token-counter",
-    "title": "Token Counter",
-    "difficulty": "easy",
-    "block": "module-1/block-a",
-    "slug": "quest-04-token-counter"
-  },
-  {
-    "id": "quest-05-context-budget",
-    "title": "Context Window Budget Calculator",
-    "difficulty": "medium",
-    "block": "module-1/block-a",
-    "slug": "quest-05-context-budget"
+    "slug": "quest-04"
   },
   {
     "id": "quest-05-multi-step",
     "title": "Multi-Step Prompt Chain",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
-    "slug": "quest-5"
+    "slug": "quest-05"
   },
   {
     "id": "quest-06-domain-specific",
     "title": "Domain-Specific Code Generation",
     "difficulty": "medium",
     "block": "block-2-prompt-engineering",
-    "slug": "quest-6"
-  },
-  {
-    "id": "quest-06-hallucination-detector",
-    "title": "Hallucination Detector",
-    "difficulty": "medium",
-    "block": "module-1/block-a",
-    "slug": "quest-06-hallucination-detector"
+    "slug": "quest-06"
   },
   {
     "id": "quest-07-spot-vulnerability",
     "title": "Spot the Security Vulnerability",
     "difficulty": "medium",
     "block": "block-3-security",
-    "slug": "quest-7"
-  },
-  {
-    "id": "quest-07-vibe-coding-analysis",
-    "title": "Vibe Coding vs Vibe Engineering Analysis",
-    "difficulty": "medium",
-    "block": "module-1/block-a",
-    "slug": "quest-07-vibe-coding-analysis"
+    "slug": "quest-07"
   },
   {
     "id": "quest-08-fix-harden",
     "title": "Fix and Harden the Code",
     "difficulty": "medium",
     "block": "block-3-security",
-    "slug": "quest-8"
-  },
-  {
-    "id": "quest-08-tool-selection",
-    "title": "AI Tool Selection Matrix",
-    "difficulty": "medium",
-    "block": "module-1/block-a",
-    "slug": "quest-08-tool-selection"
+    "slug": "quest-08"
   },
   {
     "id": "quest-09-security-architecture",
     "title": "Security Architecture Design",
     "difficulty": "medium",
     "block": "block-3-security",
-    "slug": "quest-9"
-  },
-  {
-    "id": "quest-09-self-attention",
-    "title": "Self-Attention Implementation",
-    "difficulty": "medium",
-    "block": "module-1/block-b",
-    "slug": "quest-09-self-attention"
-  },
-  {
-    "id": "quest-10-position-encoding",
-    "title": "Position Encoding Explorer",
-    "difficulty": "medium",
-    "block": "module-1/block-b",
-    "slug": "quest-10-position-encoding"
+    "slug": "quest-09"
   },
   {
     "id": "quest-10-setup-loop",
@@ -126,13 +77,6 @@
     "slug": "quest-11"
   },
   {
-    "id": "quest-11-model-arch-classifier",
-    "title": "Model Architecture Classifier",
-    "difficulty": "hard",
-    "block": "module-1/block-b",
-    "slug": "quest-11-model-arch-classifier"
-  },
-  {
     "id": "quest-12-multi-agent",
     "title": "Multi-Agent Collaboration",
     "difficulty": "hard",
@@ -140,39 +84,25 @@
     "slug": "quest-12"
   },
   {
-    "id": "quest-12-transformer-scratch",
-    "title": "Transformer From Scratch",
+    "id": "quest-13-rag-design",
+    "title": "RAG System Design",
     "difficulty": "hard",
-    "block": "module-1/block-b",
-    "slug": "quest-12-transformer-scratch"
-  },
-  {
-    "id": "quest-13-next-token-predictor",
-    "title": "Next Token Predictor",
-    "difficulty": "easy",
-    "block": "module-2/block-a",
+    "block": "block-5-architecture",
     "slug": "quest-13"
   },
   {
-    "id": "quest-137-rag-design",
-    "title": "quest-13-rag-design",
+    "id": "quest-14-full-system",
+    "title": "Full System Integration",
     "difficulty": "hard",
     "block": "block-5-architecture",
-    "slug": "quest-137"
+    "slug": "quest-14"
   },
   {
-    "id": "quest-138-full-system",
-    "title": "quest-14-full-system",
-    "difficulty": "hard",
-    "block": "block-5-architecture",
-    "slug": "quest-138"
-  },
-  {
-    "id": "quest-14-scaling-laws",
+    "id": "quest-141-scaling-laws",
     "title": "Scaling Laws Calculator",
     "difficulty": "medium",
     "block": "module-2/block-a",
-    "slug": "quest-14"
+    "slug": "quest-141"
   },
   {
     "id": "quest-15-data-curator",

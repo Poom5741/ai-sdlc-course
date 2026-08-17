@@ -157,7 +157,7 @@ test.describe("Journey: User browses workshop", () => {
   });
 
   test("user views quest page with content", async ({ page }) => {
-    await page.goto("/en/quests/quest-1-first-code");
+    await page.goto("/en/quests/quest-01-first-completion");
     // Quest page should have some content
     await expect(page.locator("main").first()).toBeVisible();
   });

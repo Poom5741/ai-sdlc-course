@@ -1,5 +1,5 @@
 {
-  "name": "quest-14-scaling-laws",
+  "name": "quest-141-scaling-laws",
   "version": "1.0.0",
   "description": "Quest 2.2: Scaling Laws Calculator",
   "main": "problem.js",
@@ -8,9 +8,9 @@
   "author": "AI SDLC Workshop",
   "license": "MIT",
   "quest": {
-    "id": "quest-14-scaling-laws",
+    "id": "quest-141-scaling-laws",
     "block": "module-2/block-a",
-    "slug": "quest-14",
+    "slug": "quest-141",
     "difficulty": "medium",
     "title": "Scaling Laws Calculator"
   }

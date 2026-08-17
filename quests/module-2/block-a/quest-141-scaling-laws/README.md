@@ -10,7 +10,7 @@
 ## 📋 Instructions
 
 ```bash
-npx degit Poom5741/ai-sdlc-course/quests/module-2/block-a/quest-14-scaling-laws my-quest
+npx degit Poom5741/ai-sdlc-course/quests/module-2/block-a/quest-141-scaling-laws my-quest
 cd my-quest
 ```
 
