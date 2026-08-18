@@ -589,3 +589,7 @@
 {"type":"session_shutdown","value":{"reason":"resume"},"at":"2026-08-18T08:45:38.101Z"}
 {"type":"session_rebound","value":{"reason":"resume"},"at":"2026-08-18T08:45:38.225Z"}
 {"type":"id_invalidation","value":{"oldId":"01a01407-007b-70b3-88b9-6a1cd2fe6bc8","newId":"01a01403-77e7-79de-8c6b-30a031908c37","reason":"session_shutdown","shutdownReason":"resume","at":"2026-08-18T08:45:38.232Z"},"at":"2026-08-18T08:45:38.233Z"}
+{"type":"subagent_session","value":{"sessionId":"c2ac88de-b4b3-447","agentType":"Explore","summary":"Find all quiz data sources","at":"2026-08-18T08:49:44.277Z"},"at":"2026-08-18T08:49:44.277Z"}
+{"type":"session_shutdown","value":{"reason":"new"},"at":"2026-08-18T08:52:41.659Z"}
+{"type":"session_rebound","value":{"reason":"new"},"at":"2026-08-18T08:52:41.863Z"}
+{"type":"id_invalidation","value":{"oldId":"01a01403-77e7-79de-8c6b-30a031908c37","newId":"01a01412-a63a-787e-b8c2-94884b421d0f","reason":"forced_rewrite","at":"2026-08-18T08:52:41.874Z"},"at":"2026-08-18T08:52:41.874Z"}

@@ -17,15 +17,14 @@ interface Props {
 
 const { questId } = Astro.props;
 
+const quizModules = import.meta.glob<QuizData>('../data/quizzes/*.json', { eager: true });
+
 let quizData: QuizData | null = null;
-try {
-  const quizPath = `${import.meta.env.BASE_URL}quizzes/${questId}.json`;
-  const response = await fetch(quizPath);
-  if (response.ok) {
-    quizData = await response.json();
+for (const [path, mod] of Object.entries(quizModules)) {
+  if (mod.default.questId === questId || path.includes(`${questId}.json`)) {
+    quizData = mod.default;
+    break;
   }
-} catch (e) {
-  // Quiz not found for this quest
 }
 ---
 
