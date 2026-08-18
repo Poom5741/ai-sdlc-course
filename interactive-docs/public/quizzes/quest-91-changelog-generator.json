@@ -1,0 +1,38 @@
+{
+  "questId": "quest-91-changelog-generator",
+  "questions": [
+    {
+      "question": "Why must breaking changes (feat!:) be in their own changelog section?",
+      "choices": [
+        "It's just a formatting preference",
+        "They represent backward-incompatible changes that can break existing code — users need to see them first",
+        "Breaking changes are always bugs",
+        "The changelog tool requires it"
+      ],
+      "answer": 1,
+      "explanation": "Breaking changes can cause existing code to fail when users upgrade. Putting them in a prominent, separate section ensures developers see them immediately and can prepare for the impact."
+    },
+    {
+      "question": "After categorizing a commit by its prefix, what should happen to the prefix in the display message?",
+      "choices": [
+        "Keep it: 'feat: add user profile'",
+        "Strip it: 'add user profile' (the section heading already shows the type)",
+        "Capitalize it: 'FEAT: add user profile'",
+        "Move it to the end: 'add user profile (feat)'"
+      ],
+      "answer": 1,
+      "explanation": "Once you've placed a commit in the correct section (e.g., ## Features), the type prefix is redundant in the display message. Show just the description for cleaner output."
+    },
+    {
+      "question": "What should happen to commits that don't follow the conventional commit format?",
+      "choices": [
+        "Throw an error",
+        "Place them in an 'Other Changes' section",
+        "Skip them silently",
+        "Put them in the Features section"
+      ],
+      "answer": 1,
+      "explanation": "Non-conventional commits should be included in an 'Other Changes' section. Silently skipping them means lost information; putting them in the wrong category is misleading."
+    }
+  ]
+}

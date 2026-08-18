@@ -1,0 +1,38 @@
+{
+  "questId": "quest-43-sql-injection-spotter",
+  "questions": [
+    {
+      "question": "SQL injection เกิดขึ้นได้อย่างไร?",
+      "choices": [
+        "เมื่อใช้ ORM แทน raw SQL",
+        "เมื่อนำ user input มารวมกับ SQL query โดยไม่มี parameterization",
+        "เมื่อ database server ไม่ได้ update",
+        "เมื่อใช้ HTTPS แทน HTTP"
+      ],
+      "answer": 1,
+      "explanation": "SQL injection เกิดเมื่อนำ user input มารวมกับ SQL query แบบ raw string โดยไม่ใช้ parameterized queries ผู้โจมตีสามารถ inject SQL commands เข้าไปใน input ได้"
+    },
+    {
+      "question": "SQL injection pattern ใดที่มีความรุนแรงสูง (high severity)?",
+      "choices": [
+        "String comparison ใน SQL",
+        "Template literal ใน SQL query (`SELECT ... ${var}`)",
+        "ใช้ WHERE clause ธรรมดา",
+        "ใช้ JOIN statement"
+      ],
+      "answer": 1,
+      "explanation": "Template literals ใน SQL queries เป็น high severity เพราะ attacker สามารถ inject SQL commands ผ่าน variable interpolation ได้โดยตรง"
+    },
+    {
+      "question": "วิธีป้องกัน SQL injection ที่ดีที่สุดคืออะไร?",
+      "choices": [
+        "ใช้ blacklist กรอง keywords เช่น DROP, DELETE",
+        "ใช้ parameterized queries เสมอ",
+        "ตรวจสอบ input length เท่านั้น",
+        "ใช้ database user ที่มี permission น้อยที่สุด"
+      ],
+      "answer": 1,
+      "explanation": "Parameterized queries เป็น defense ที่ดีที่สุดเพราะ database จะ treat parameters เป็น data ไม่ใช่ executable SQL — ไม่ว่า attacker จะ inject อะไรก็ตาม"
+    }
+  ]
+}

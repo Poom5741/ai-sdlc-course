@@ -1,0 +1,38 @@
+{
+  "questId": "quest-39-test",
+  "questions": [
+    {
+      "question": "Test coverage percentage บอกอะไร และไม่บอกอะไร?",
+      "choices": [
+        "บอกว่าโค้ดถูก test ครบทุกบรรทัด — ไม่มีข้อเสีย",
+        "บอกว่า code ถูก execute กี่ % — แต่ไม่บอกว่า tests ตรวจสอบ behavior ถูกต้องไหม",
+        "บอกว่า tests ทั้งหมดผ่าน",
+        "บอกว่า production ปลอดภัย"
+      ],
+      "answer": 1,
+      "explanation": "Coverage % บอกว่า code ถูก execute เท่าไหร่ — แต่ไม่ได้ guarantee ว่า tests จริงๆ ตรวจสอบ behavior ที่ถูกต้อง"
+    },
+    {
+      "question": "Risk-based test prioritization ควรพิจารณาอะไร?",
+      "choices": [
+        "เขียน test สำหรับ functions ที่ง่ายที่สุดก่อน",
+        "Complexity ของ function × Criticality ต่อ business",
+        "Functions ที่มี code มากที่สุดก่อน",
+        "Test ที่เขียนง่ายที่สุดก่อน"
+      ],
+      "answer": 1,
+      "explanation": "Functions ที่ซับซ้อนและ critical ต่อ business ควรมี tests ก่อน — ความเสี่ยง = complexity × impact"
+    },
+    {
+      "question": "ถ้า project มี coverage 95% แต่มี critical bug ใน 5% ที่ไม่มี test ควรทำยังไง?",
+      "choices": [
+        "95% ดีพอแล้ว ไม่ต้องทำอะไร",
+        "เขียน tests สำหรับ critical functions ใน 5% นั้นก่อน",
+        "เพิ่ม tests ใน functions ที่มี coverage แล้ว",
+        "ลบ functions 5% นั้นทิ้ง"
+      ],
+      "answer": 1,
+      "explanation": "Critical functions ที่ไม่มี tests คือ highest risk — 5% นั้นอาจทำให้ production down ได้"
+    }
+  ]
+}

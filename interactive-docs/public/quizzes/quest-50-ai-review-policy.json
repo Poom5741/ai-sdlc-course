@@ -1,0 +1,38 @@
+{
+  "questId": "quest-50-ai-review-policy",
+  "questions": [
+    {
+      "question": "ทำไม policy ต้องมาก่อน tooling?",
+      "choices": [
+        "เพราะ policy ถูกกว่า tooling",
+        "เพราะต้องตกลง rules ก่อน automate — humans ต้อง agree ว่า rule คืออะไร",
+        "เพราะ policy ทำงานเร็วกว่า",
+        "ไม่จำเป็น ทำ tooling ก่อนได้"
+      ],
+      "answer": 1,
+      "explanation": "Policy before tooling: humans ต้อง agree ว่า rules คืออะไรก่อน automate — ถ้า automate โดยไม่มี agreement จะเกิด chaos"
+    },
+    {
+      "question": "AI code review ไม่สามารถแทนที่ human judgment ในเรื่องใด?",
+      "choices": [
+        "Pattern detection ใน code",
+        "Business logic correctness และ architecture decisions",
+        "Checking for hardcoded secrets",
+        "Enforcing code style"
+      ],
+      "answer": 1,
+      "explanation": "AI ทำได้ดีใน pattern detection, vulnerability scanning, consistency checks — แต่ business logic, architecture decisions, และ team dynamics ต้องใช้ human judgment"
+    },
+    {
+      "question": "Human override process ใน AI review policy สำคัญเพราะอะไร?",
+      "choices": [
+        "เพื่อให้ developer รู้สึกดี",
+        "เพราะมี situations ที่ AI flag ผิด — humans ต้องยกเลิกได้ด้วย justification",
+        "เพื่อ reduce workload ของ AI",
+        "ไม่จำเป็น ถ้า AI ตัดสินใจแล้วก็จบ"
+      ],
+      "answer": 1,
+      "explanation": "AI มี false positives — human override ช่วยให้ developers ยกเลิก AI decision ได้เมื่อมีเหตุผล valid พร้อม justification ที่บันทึกไว้"
+    }
+  ]
+}

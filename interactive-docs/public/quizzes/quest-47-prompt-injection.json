@@ -1,0 +1,38 @@
+{
+  "questId": "quest-47-prompt-injection",
+  "questions": [
+    {
+      "question": "Prompt injection คืออะไร?",
+      "choices": [
+        "เทคนิคการ optimize prompt ให้สั้นลง",
+        "เทคนิคที่ attacker inject instructions ใหม่เข้าไปใน LLM conversation",
+        "วิธีสร้าง prompt template",
+        "เทคนิค compression สำหรับ long prompts"
+      ],
+      "answer": 1,
+      "explanation": "Prompt injection คือ SQL injection ของโลก AI — attacker หลอกให้ LLM ทำตามคำสั่งของ attacker แทน system prompt"
+    },
+    {
+      "question": "ทำไมการเช็คแค่ 'ignore previous instructions' ไม่เพียงพอ?",
+      "choices": [
+        "เพราะ phrase นี้สั้นเกินไป",
+        "เพราะ attacker ใช้ synonyms เช่น 'disregard', 'forget', 'prior' และ indirect phrasing",
+        "เพราะ LLM ไม่เข้าใจ phrase นี้",
+        "เพราะ phrase นี้ถูก block โดย default"
+      ],
+      "answer": 1,
+      "explanation": "Sophisticated attacks ใช้ synonyms, paraphrasing, และ creative phrasing — 'disregard all prior instructions', 'forget your previous role' — ล้วน bypass naive detection ได้"
+    },
+    {
+      "question": "การ detect prompt injection ที่ดีควรมี confidence score เพราะอะไร?",
+      "choices": [
+        "เพื่อให้ code ดู professional",
+        "เพื่อให้ downstream system ตัดสินใจได้: block high-confidence, warn medium, log low",
+        "เพื่อ reduce memory usage",
+        "เพื่อให้ log ดูสวยงาม"
+      ],
+      "answer": 1,
+      "explanation": "Confidence score ช่วยให้ downstream system ตัดสินใจได้ดี — block สำหรับ high-confidence, warn สำหรับ medium, log สำหรับ low — แทนที่จะ binary block/allow"
+    }
+  ]
+}

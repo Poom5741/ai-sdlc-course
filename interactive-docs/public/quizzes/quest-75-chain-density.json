@@ -1,0 +1,38 @@
+{
+  "questId": "quest-75-chain-density",
+  "questions": [
+    {
+      "question": "Chain-of-Density optimization มีเป้าหมายหลักคืออะไร?",
+      "choices": [
+        "เพิ่มความยาวของข้อความให้ละเอียดขึ้น",
+        "ลดความยาวของข้อความโดยคงข้อมูลสำคัญไว้",
+        "เปลี่ยนภาษาของข้อความ",
+        "ลบ key terms ออกเพื่อประหยัด token"
+      ],
+      "answer": 1,
+      "explanation": "เป้าหมายคือลดความยาว (token) โดยรักษา key terms ไว้ — ทุก token มีค่าใช้จ่าย ดังนั้นทุกคำต้อง \"มีค่า\""
+    },
+    {
+      "question": "คำไหนเป็น filler word ที่ควรกำจัด?",
+      "choices": [
+        "calculate, function, array",
+        "very, really, basically, actually",
+        "if, else, return",
+        "async, await, promise"
+      ],
+      "answer": 1,
+      "explanation": "Filler words คือคำที่ไม่ได้เพิ่มความหมาย — very, really, basically, actually สามารถตัดออกได้โดยไม่เสียสาระสำคัญ"
+    },
+    {
+      "question": "ถ้า targetRatio = 0.5 หมายความว่าอะไร?",
+      "choices": [
+        "ข้อความต้องยาวขึ้น 50%",
+        "ข้อความต้องสั้นลงเหลือ 50% ของความยาวเดิม",
+        "ต้องใช้ 50 tokens",
+        "ต้องมี 50% ของ key terms"
+      ],
+      "answer": 1,
+      "explanation": "targetRatio = 0.5 หมายความว่า optimized text ต้องมีความยาวไม่เกิน 50% ของ original — เช่น 100 tokens → ≤ 50 tokens"
+    }
+  ]
+}

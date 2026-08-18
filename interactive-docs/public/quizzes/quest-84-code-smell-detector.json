@@ -1,0 +1,38 @@
+{
+  "questId": "quest-84-code-smell-detector",
+  "questions": [
+    {
+      "question": "What is a 'code smell' in software engineering?",
+      "choices": [
+        "A bug that causes the program to crash",
+        "A surface-level indicator that code could be cleaner or more maintainable",
+        "A security vulnerability in the code",
+        "A performance bottleneck"
+      ],
+      "answer": 1,
+      "explanation": "A code smell is not a bug or error — it's a signal that the code might benefit from refactoring. Examples include long functions, deep nesting, magic numbers, and too many parameters."
+    },
+    {
+      "question": "Why is a 10-line function with 5 levels of nesting worse than a 40-line function with flat structure?",
+      "choices": [
+        "Longer functions are always better",
+        "Deep nesting makes logic harder to follow than simple linear code",
+        "Line count is the only metric that matters",
+        "Nesting doesn't affect readability"
+      ],
+      "answer": 1,
+      "explanation": "Deep nesting requires keeping multiple conditions in mind simultaneously. A flat 40-line function is easier to read top-to-bottom than a 10-line function with 5 levels of if/else nesting."
+    },
+    {
+      "question": "What makes a code smell detection report actually useful to developers?",
+      "choices": [
+        "Listing every possible issue in the file",
+        "Providing actionable messages that explain WHY something is a smell and what to do",
+        "Only showing the line number",
+        "Using the highest severity for all findings"
+      ],
+      "answer": 1,
+      "explanation": "A useful report tells developers not just WHAT is wrong but WHY it matters and HOW to fix it. 'Magic number 42 — extract to MAX_RETRY_COUNT' is actionable; 'Found issue on line 12' is not."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-108-multimodal-processor",
+  "questions": [
+    {
+      "question": "Why do images have a fixed token cost in multimodal models?",
+      "choices": [
+        "Images are always the same file size",
+        "The vision encoder produces a standard number of tokens regardless of image complexity",
+        "Images are compressed before tokenization",
+        "Only small images have fixed token costs"
+      ],
+      "answer": 1,
+      "explanation": "The vision encoder in multimodal models processes images into a fixed number of tokens (typically 1000 in simplified models), regardless of whether the image is a simple icon or a complex photograph."
+    },
+    {
+      "question": "What is the correct way to estimate text tokens?",
+      "choices": [
+        "Count the number of words",
+        "Count the number of characters",
+        "Divide content length by ~4 (characters per token)",
+        "Use a fixed 100 tokens per text block"
+      ],
+      "answer": 2,
+      "explanation": "Text tokens in most models average about 4 characters per token. So a 200-character text block is roughly 50 tokens (200 / 4 = 50)."
+    },
+    {
+      "question": "Why should you return a consistent structure even when there's no input?",
+      "choices": [
+        "It's a JavaScript best practice",
+        "Callers expect a consistent shape and may crash on undefined properties",
+        "Empty input is impossible in production",
+        "The API requires it"
+      ],
+      "answer": 1,
+      "explanation": "If the caller expects `{ textParts: [], imageRefs: [], combined: '', tokens: 0 }` and instead gets `undefined` or `null`, accessing `.length` or other properties will throw errors. A consistent shape prevents runtime crashes."
+    }
+  ]
+}

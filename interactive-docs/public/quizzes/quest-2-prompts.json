@@ -1,0 +1,38 @@
+{
+  "questId": "quest-2-prompts",
+  "questions": [
+    {
+      "question": "What is the key principle of multi-file generation with AI?",
+      "choices": [
+        "Let AI create all files at once in a single request",
+        "Define the public interface first, then have AI fill each file",
+        "Always use a single file for simplicity",
+        "Copy-paste between files manually"
+      ],
+      "answer": 1,
+      "explanation": "Decomposing before generating means defining the interface (exports, types, contracts) first, then having AI implement each file against that interface. This leads to consistent, well-structured code."
+    },
+    {
+      "question": "What should `divide(x, 0)` return in this quest's math library?",
+      "choices": [
+        "throw new Error('Division by zero')",
+        "0",
+        "Infinity",
+        "null"
+      ],
+      "answer": 2,
+      "explanation": "The quest specifies that divide(x, 0) MUST return Infinity, not throw an error. This is a specific design decision that naive AI implementations often miss."
+    },
+    {
+      "question": "What is the correct file structure for the multi-file math library?",
+      "choices": [
+        "One big file with all functions",
+        "math.js (operations), validators.js (checks), index.js (re-export + dispatcher)",
+        "math.js only, no other files needed",
+        "test.js as the main implementation file"
+      ],
+      "answer": 1,
+      "explanation": "The recommended decomposition is: math.js for core operations (add, subtract, multiply, divide), validators.js for input checks, and index.js for re-exports and the calculate() dispatcher."
+    }
+  ]
+}

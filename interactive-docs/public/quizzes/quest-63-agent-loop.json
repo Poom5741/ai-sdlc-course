@@ -1,0 +1,38 @@
+{
+  "questId": "quest-63-agent-loop",
+  "questions": [
+    {
+      "question": "Agent Loop ทำอะไร?",
+      "choices": [
+        "สร้าง output ครั้งเดียวแล้วส่งเลย",
+        "หมุนวน generate → review → fix จนกว่าจะผ่านหรือครบจำนวนรอบ",
+        "รัน agents หลายคนพร้อมกัน",
+        "cache responses ที่คล้ายกัน"
+      ],
+      "answer": 1,
+      "explanation": "Agent Loop คือ generate-review-fix cycle ที่หมุนวนจน reviewer approve หรือ|maxIterations|ถึง — ป้องกัน infinite loop"
+    },
+    {
+      "question": "ทำไมต้องมี max iterations guard?",
+      "choices": [
+        "เพื่อให้ loop เร็วขึ้น",
+        "เพราะ reviewer อาจไม่เคย approve ทำให้ loop ไม่มีวันหยุด",
+        "เพราะ generator ทำงานช้า",
+        "เพราะ history จะยาวเกินไป"
+      ],
+      "answer": 1,
+      "explanation": "ถ้า reviewer ไม่เคย approve (เช่น generator ไม่สามารถสร้างงานที่ดีพอได้) loop จะทำงานตลอดกาล max iterations guard ป้องกันปัญหานี้"
+    },
+    {
+      "question": "ข้อผิดพลาดใดที่พบบ่อยที่สุดของ Agent Loop?",
+      "choices": [
+        "loop เร็วเกินไป",
+        "ไม่ส่ง feedback จาก reviewer ให้ generator",
+        "เก็บ history มากเกินไป",
+        "ใช้ maxIterations มากเกินไป"
+      ],
+      "answer": 1,
+      "explanation": "ถ้า generator ได้รับ 'initial' ทุกรอบ (ไม่ได้รับ feedback จริง) loop จะวนไปเรื่อยๆ โดยไม่สร้าง output ที่ดีขึ้น"
+    }
+  ]
+}

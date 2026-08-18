@@ -1,0 +1,38 @@
+{
+  "questId": "quest-123-rebase-simulator",
+  "questions": [
+    {
+      "question": "What happens when you 'squash' a commit in interactive rebase?",
+      "choices": [
+        "The commit is deleted without any trace",
+        "The commit is combined into the previous commit, merging their messages",
+        "The commit is moved to the end of the history",
+        "The commit's changes are reverted"
+      ],
+      "answer": 1,
+      "explanation": "Squash combines the target commit's changes and message into the previous commit. The result is a single commit with a merged message like 'A + B'."
+    },
+    {
+      "question": "Why must you deep copy commits before performing rebase operations?",
+      "choices": [
+        "Deep copy is faster than shallow copy",
+        "To avoid mutating the original commit data during splice and merge operations",
+        "Git requires immutable data structures",
+        "It doesn't matter — JavaScript arrays are passed by value"
+      ],
+      "answer": 1,
+      "explanation": "Operations like splice modify the array in place. If you don't deep copy first, the original commits array gets corrupted, leading to unpredictable behavior."
+    },
+    {
+      "question": "Why can't you squash the first commit in a sequence?",
+      "choices": [
+        "The first commit is always protected by Git",
+        "There is no previous commit to combine it into",
+        "Squash requires at least two commits after the target",
+        "The first commit has no parent hash"
+      ],
+      "answer": 1,
+      "explanation": "Squash merges a commit INTO the previous one. The first commit has no previous commit, so there's nothing to merge into."
+    }
+  ]
+}

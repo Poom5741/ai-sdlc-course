@@ -1,0 +1,38 @@
+{
+  "questId": "quest-81-prompt-eval",
+  "questions": [
+    {
+      "question": "ทำไม \"รู้สึกว่า prompt ดี\" ถึงไม่ใช่ metric ที่เชื่อถือได้?",
+      "choices": [
+        "เพราะคนเราไม่เก่ง",
+        "เพราะไม่มี objective measurement — ต้องใช้ test cases และ scoring เพื่อวัดจริงๆ",
+        "เพราะ AI เปลี่ยน behavior ตลอดเวลา",
+        "เพราะ prompt ดีต้องวัดด้วย token count เท่านั้น"
+      ],
+      "answer": 1,
+      "explanation": "\"It feels right\" is not a metric — ต้องมี test cases ที่บอกชัดเจนว่า input นี้ต้องได้ output นี้ และ scoring ที่วัดจริงๆ ว่า prompt ดีขึ้นหรือไม่"
+    },
+    {
+      "question": "ทำไมต้อง penalize forbidden content?",
+      "choices": [
+        "เพื่อให้ได้คะแนนน้อยลง",
+        "เพราะ output อาจมีข้อมูลผิด/อันตราย — แม้จะมี expected string ก็ตาม",
+        "เพื่อทดสอบ regex",
+        "เพราะ test cases ต้องมี penalty"
+      ],
+      "answer": 1,
+      "explanation": "Penalty สำหรับ forbidden content ช่วยจับ output ที่มีข้อมูลผิด/อันตราย — เช่น output มี \"4\" (expected) แต่ก็มี \"five\" (forbidden) ด้วย"
+    },
+    {
+      "question": "runAll() method ควร return อะไร?",
+      "choices": [
+        "แค่ total score",
+        "results ของทุก test cases + total score + pass/fail status",
+        "แค่ errors",
+        "แค่ test cases ที่ pass"
+      ],
+      "answer": 1,
+      "explanation": "runAll() ต้อง return ทุก results เพื่อให้เห็นภาพรวมว่า test case ไหน pass/fail, total score เท่าไหร่, และ overall pass/fail status"
+    }
+  ]
+}

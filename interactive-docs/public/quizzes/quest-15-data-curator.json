@@ -1,0 +1,38 @@
+{
+  "questId": "quest-15-data-curator",
+  "questions": [
+    {
+      "question": "Why is data curation important before training an LLM?",
+      "choices": [
+        "It makes training faster",
+        "Garbage in, garbage out — poor data quality leads to poor model performance",
+        "It reduces the number of GPUs needed",
+        "It's required by the training framework"
+      ],
+      "answer": 1,
+      "explanation": "Data quality directly impacts model quality. Cleaning training data removes noise, duplicates, and low-quality samples that would degrade model performance."
+    },
+    {
+      "question": "When checking for duplicates, why should you trim whitespace first?",
+      "choices": [
+        "Trimming makes strings shorter and faster to compare",
+        "'Hello' and '  Hello  ' are semantically the same but string-different",
+        "Whitespace causes regex to fail",
+        "The test suite requires trimmed strings"
+      ],
+      "answer": 1,
+      "explanation": "Without trimming, identical content with different whitespace would be treated as separate entries, defeating the purpose of deduplication."
+    },
+    {
+      "question": "How should you handle punctuation-heavy lines in training data?",
+      "choices": [
+        "Remove all lines containing any punctuation",
+        "Remove lines where punctuation exceeds 50% of characters",
+        "Convert all punctuation to periods",
+        "Keep all lines regardless of punctuation"
+      ],
+      "answer": 1,
+      "explanation": "Some punctuation is valid (exclamation marks in sentences), but lines that are mostly punctuation are noise. Check the ratio, not just presence."
+    }
+  ]
+}

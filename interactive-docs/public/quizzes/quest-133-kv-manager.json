@@ -1,0 +1,38 @@
+{
+  "questId": "quest-133-kv-manager",
+  "questions": [
+    {
+      "question": "KV key format `user:profile:123` มีส่วนประกอบใดบ้าง?",
+      "choices": [
+        "key และ value",
+        "namespace, entity, และ id",
+        "prefix, type, และ identifier",
+        "folder, file, และ extension"
+      ],
+      "answer": 1,
+      "explanation": "Namespaced KV key ประกอบด้วย 3 ส่วน: namespace (เช่น `user`), entity (เช่น `profile`), และ id (เช่น `123`) คั่นด้วย colon"
+    },
+    {
+      "question": "ACTION_TTL สำหรับ action `write` คือเท่าใด?",
+      "choices": [
+        "0 (ไม่มี expiration)",
+        "3600 (1 ชั่วโมง)",
+        "86400 (1 วัน)",
+        "604800 (1 สัปดาห์)"
+      ],
+      "answer": 1,
+      "explanation": "Write action มี TTL = 3600 วินาที (1 ชั่วโมง) — ข้อมูลที่ write จะหมดอายุอัตโนมัติหลังจากนั้น"
+    },
+    {
+      "question": "จะเกิดอะไรขึ้นถ้า `buildKVKey('user', 'profile', '123', 'update')` ถูกเรียก?",
+      "choices": [
+        "Return key: 'user:profile:123', ttl: 0",
+        "Return key: 'user:profile:123', ttl: undefined",
+        "Return error: 'invalid action: update'",
+        "Throw error"
+      ],
+      "answer": 2,
+      "explanation": "Action 'update' ไม่มีใน ACTION_TTL map — ฟังก์ชันต้อง check `hasOwnProperty` ก่อนแล้ว return error 'invalid action: update'"
+    }
+  ]
+}

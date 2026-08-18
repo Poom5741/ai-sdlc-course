@@ -1,0 +1,38 @@
+{
+  "questId": "quest-71-rate-limiter",
+  "questions": [
+    {
+      "question": "Token Bucket Algorithm ทำงานอย่างไร?",
+      "choices": [
+        "Reset tokens ทุกวินาที",
+        "Tokens refill ช้าๆ ตามเวลา (refillRate) แต่ละ request consume tokens — ถ้าไม่พอ = denied",
+        "Count requests เท่านั้น",
+        "ใช้ tokens ไม่จำกัด"
+      ],
+      "answer": 1,
+      "explanation": "Token Bucket: tokens refill ช้าๆ ตาม refillRate (tokens/sec) — ทุก request consume tokens ถ้าไม่พอ = denied พร้อม retryAfter"
+    },
+    {
+      "question": "retryAfter คำนวณอย่างไร?",
+      "choices": [
+        "1 วินาทีเสมอ",
+        "tokensNeeded ÷ refillRate — เวลาที่ต้องรอจน tokens พอ",
+        "tokens ÷ maxTokens",
+        "refillRate × maxTokens"
+      ],
+      "answer": 1,
+      "explanation": "retryAfter = (tokensNeeded - available) / refillRate — เวลาที่ต้องรอให้ tokens refill จนพอสำหรับ request ถัดไป"
+    },
+    {
+      "question": "Token Bucket ดีกว่า Fixed Window อย่างไร?",
+      "choices": [
+        "เร็วกว่า",
+        "Refill ช้าๆ ตามเวลาจริง — ไม่ reset ทั้งหมดพร้อมกัน ทำให้ distribute requests สม่ำเสมอกว่า",
+        "ใช้ memory น้อยกว่า",
+        "ไม่ต้องมี config"
+      ],
+      "answer": 1,
+      "explanation": "Fixed Window reset ทั้งหมดพร้อมกัน — ถ้าใช้ 10 requests ใน 1 วินาทีแรกต้องรอ 59 วินาที Token Bucket refill ช้าๆ ทำให้รอไม่นาน"
+    }
+  ]
+}

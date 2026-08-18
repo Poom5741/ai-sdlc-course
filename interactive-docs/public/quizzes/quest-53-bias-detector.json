@@ -1,0 +1,38 @@
+{
+  "questId": "quest-53-bias-detector",
+  "questions": [
+    {
+      "question": "What is the 4/5ths rule (disparate impact ratio) used for?",
+      "choices": [
+        "Measuring the total number of approved vs denied outputs",
+        "Comparing approval rates between demographic groups to detect bias",
+        "Counting how many times each group appears in the dataset",
+        "Calculating the average response time of the AI model"
+      ],
+      "answer": 1,
+      "explanation": "The 4/5ths rule compares approval RATES between groups. If one group's rate is less than 80% of another group's rate, bias is flagged. It uses rates, not raw counts."
+    },
+    {
+      "question": "Why is comparing raw counts (instead of rates) a critical mistake in bias detection?",
+      "choices": [
+        "Raw counts are slower to compute than rates",
+        "A larger group will naturally have more approvals even with the same rate, masking bias",
+        "Raw counts don't include demographic information",
+        "Counts are less precise than percentages"
+      ],
+      "answer": 1,
+      "explanation": "If Group A has 1,000 people and Group B has 10, comparing raw counts will always make Group B look 'underrepresented' — even if both groups have the same approval rate. Rates normalize for group size."
+    },
+    {
+      "question": "Group A: 9 approved out of 10 (90%). Group B: 1 approved out of 2 (50%). What is the disparate impact ratio?",
+      "choices": [
+        "0.11 (1 divided by 9)",
+        "0.555 (0.5 divided by 0.9)",
+        "0.9 (the higher rate)",
+        "0.5 (the lower rate)"
+      ],
+      "answer": 1,
+      "explanation": "The disparate impact ratio = min(rate) / max(rate) = 0.5 / 0.9 = 0.555. Since 0.555 < 0.8, this is flagged as biased. The key insight: despite Group A having 9x more approvals in raw count, the RATES reveal the real disparity."
+    }
+  ]
+}

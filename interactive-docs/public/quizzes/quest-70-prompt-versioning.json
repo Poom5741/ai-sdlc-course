@@ -1,0 +1,38 @@
+{
+  "questId": "quest-70-prompt-versioning",
+  "questions": [
+    {
+      "question": "ทำไม Prompt ต้องมี Versioning?",
+      "choices": [
+        "เพื่อให้ prompt ยาวขึ้น",
+        "Prompt คือ code — ต้อง version, test, rollback เหมือน code อื่นๆ",
+        "เพื่อ cache prompts",
+        "เพื่อ optimize prompts"
+      ],
+      "answer": 1,
+      "explanation": "Prompt ส่งผลโดยตรงต่อคุณภาพ output — เหมือน code ที่ต้องมี versioning, A/B testing, และ rollback เพื่อ data-driven decisions"
+    },
+    {
+      "question": "A/B Testing ใน Prompt Manager ทำอะไร?",
+      "choices": [
+        "ทดสอบ prompt เดียวหลายๆ ครั้ง",
+        "รัน prompt variants พร้อมกันแล้วเปรียบเทียบ performance เพื่อเลือก winner",
+        "ลบ prompt เก่า",
+        "optimize prompt ให้สั้น"
+      ],
+      "answer": 1,
+      "explanation": "A/B test รัน variants พร้อมกัน (ไม่ใช่ทีละตัว) เพื่อเปรียบเทียบ performance — variable อื่นๆ เท่ากัน ต่างกันแค่ prompt"
+    },
+    {
+      "question": "Rollback สำคัญอย่างไร?",
+      "choices": [
+        "เพื่อ speed up deployment",
+        "เมื่อ prompt ใหม่แย่กว่าเดิม ต้องย้อนกลับไป version ก่อนหน้าได้",
+        "เพื่อ backup prompts",
+        "ไม่สำคัญ แค่ deploy ใหม่"
+      ],
+      "answer": 1,
+      "explanation": "ไม่ใช่ทุก prompt ใหม่จะดีกว่าเดิม — rollback ช่วยย้อนกลับเมื่อ A/B test แสดงว่า prompt ใหม่แย่กว่า"
+    }
+  ]
+}

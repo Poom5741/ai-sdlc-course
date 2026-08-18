@@ -1,0 +1,38 @@
+{
+  "questId": "quest-128-cicd-pipeline",
+  "questions": [
+    {
+      "question": "Why should the Node.js version in a GitHub Actions workflow come from config instead of being hardcoded?",
+      "choices": [
+        "Hardcoded values are faster to execute",
+        "Different projects use different Node versions, and hardcoded values break when the project upgrades",
+        "GitHub Actions rejects hardcoded version strings",
+        "It doesn't matter — all Node versions are backward compatible"
+      ],
+      "answer": 1,
+      "explanation": "A hardcoded node-version: '18' will fail if the project upgrades to Node 20. Configurable versions let the workflow adapt to the project's actual requirements without editing the YAML."
+    },
+    {
+      "question": "In a standard CI pipeline, what is the correct order of steps?",
+      "choices": [
+        "Test → Install → Lint → Build → Checkout",
+        "Checkout → Setup Node → Install → Lint → Test → Build",
+        "Install → Checkout → Build → Test → Lint",
+        "Build → Test → Lint → Install → Checkout"
+      ],
+      "answer": 1,
+      "explanation": "You must checkout the code first, then set up the runtime, install dependencies, and only then can you lint, test, and build. Running tests before install will always fail."
+    },
+    {
+      "question": "What happens if a GitHub Actions workflow is missing the checkout step?",
+      "choices": [
+        "The workflow runs on a blank environment with no code",
+        "GitHub automatically checks out the default branch",
+        "The workflow fails immediately with an error",
+        "The build step uses cached code from previous runs"
+      ],
+      "answer": 0,
+      "explanation": "Without actions/checkout@v4, the runner has no source code. Subsequent steps like npm install or npm test will fail because there's no package.json or source files to work with."
+    }
+  ]
+}

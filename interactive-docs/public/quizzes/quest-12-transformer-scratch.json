@@ -1,0 +1,38 @@
+{
+  "questId": "quest-12-transformer-scratch",
+  "questions": [
+    {
+      "question": "Why are residual connections critical in transformer blocks?",
+      "choices": [
+        "They make the code run faster",
+        "They prevent gradient vanishing in deep networks by allowing gradients to flow directly",
+        "They reduce the number of parameters",
+        "They make the output more accurate"
+      ],
+      "answer": 1,
+      "explanation": "Residual connections (adding input back after each sub-layer) provide a direct path for gradients to flow, preventing them from vanishing in deep networks."
+    },
+    {
+      "question": "In a transformer block, what is the correct order of operations?",
+      "choices": [
+        "Self-Attention -> Layer Norm -> Residual -> Feed-Forward",
+        "Layer Norm -> Self-Attention -> Residual -> Layer Norm -> Feed-Forward -> Residual",
+        "Feed-Forward -> Self-Attention -> Layer Norm",
+        "Residual -> Self-Attention -> Layer Norm -> Feed-Forward"
+      ],
+      "answer": 1,
+      "explanation": "The correct order is: Layer Norm -> Self-Attention -> Add input (residual) -> Layer Norm -> Feed-Forward -> Add previous output (residual)."
+    },
+    {
+      "question": "What does Layer Normalization do in a transformer block?",
+      "choices": [
+        "Removes all negative values",
+        "Scales and shifts activations to stabilize training",
+        "Randomly drops neurons",
+        "Converts tokens to embeddings"
+      ],
+      "answer": 1,
+      "explanation": "Layer normalization normalizes activations across the feature dimension, stabilizing training by ensuring consistent scales across layers."
+    }
+  ]
+}

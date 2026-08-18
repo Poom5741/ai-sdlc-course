@@ -1,0 +1,38 @@
+{
+  "questId": "quest-22-hallucination",
+  "questions": [
+    {
+      "question": "What is an LLM hallucination?",
+      "choices": [
+        "When the model crashes or throws an error during inference",
+        "When the model generates fluent, plausible-sounding text that is factually incorrect or unsupported by the provided context",
+        "When the model refuses to answer a question",
+        "When the model takes longer than expected to respond"
+      ],
+      "answer": 1,
+      "explanation": "Hallucination occurs when an LLM produces confident-sounding outputs that are fabricated, factually wrong, or not grounded in the source material. The text looks convincing but is unreliable."
+    },
+    {
+      "question": "Which technique is most effective at reducing hallucination in RAG systems?",
+      "choices": [
+        "Using a larger vocabulary size",
+        "Grounding the model's responses in retrieved context and instructing it to cite sources or say 'I don't know' when context is insufficient",
+        "Increasing the temperature parameter",
+        "Removing all safety filters from the model"
+      ],
+      "answer": 1,
+      "explanation": "Grounding responses in retrieved documents and explicitly instructing the model to rely only on provided context (and to abstain when context is insufficient) significantly reduces hallucination by anchoring outputs to verifiable sources."
+    },
+    {
+      "question": "Why do LLMs hallucinate in the first place?",
+      "choices": [
+        "Because they have access to the internet during inference",
+        "Because they are trained to predict the most probable next token, not to verify factual accuracy, and they optimize for fluency over truthfulness",
+        "Because hallucination is a deliberate feature for creative writing",
+        "Because the training data is always 100% accurate"
+      ],
+      "answer": 1,
+      "explanation": "LLMs are probabilistic text predictors — they generate statistically likely continuations, not verified facts. During training, the loss function rewards fluency and coherence, not factual accuracy, so the model can produce plausible but false statements."
+    }
+  ]
+}

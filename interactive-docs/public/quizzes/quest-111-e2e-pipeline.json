@@ -1,0 +1,38 @@
+{
+  "questId": "quest-111-e2e-pipeline",
+  "questions": [
+    {
+      "question": "ทำไม pipeline ต้อง execute stages แบบ sequential 而不是 parallel?",
+      "choices": [
+        "Sequential is faster than parallel execution",
+        "Test stage needs code to be complete first — dependency chain",
+        "Parallel execution requires more memory",
+        "AI tools can only run one at a time"
+      ],
+      "answer": 1,
+      "explanation": "In the SDLC, test stage depends on code stage output. Testing code that doesn't exist yet is meaningless. Sequential execution respects the dependency chain."
+    },
+    {
+      "question": "Pipeline report แสดง '5 stages, 3 AI-enhanced' — 3 หมายถึงอะไร?",
+      "choices": [
+        "3 stages ที่ใช้ AI tools (aiEnhanced: true)",
+        "3 stages ที่ล้มเหลว",
+        "3 stages ที่เป็น manual",
+        "3 stages ที่รันซ้ำ"
+      ],
+      "answer": 0,
+      "explanation": "The report counts stages where aiEnhanced is true. This provides transparency about which parts of the pipeline are AI-assisted vs manual."
+    },
+    {
+      "question": "ถ้าส่ง empty array เข้า createPipeline() แล้ว execute() ควร return อะไร?",
+      "choices": [
+        "null",
+        "undefined",
+        "Empty array []",
+        "Error object"
+      ],
+      "answer": 2,
+      "explanation": "An empty pipeline has no stages to execute, so it should return an empty results array — not throw an error. Good code handles empty input gracefully."
+    }
+  ]
+}

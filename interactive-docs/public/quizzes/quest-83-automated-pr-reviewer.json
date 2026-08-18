@@ -1,0 +1,38 @@
+{
+  "questId": "quest-83-automated-pr-reviewer",
+  "questions": [
+    {
+      "question": "Why is automated code review considered a 'force multiplier' rather than a replacement for human review?",
+      "choices": [
+        "It catches everything humans miss",
+        "It catches 80% of trivial issues so humans can focus on architecture and logic",
+        "It eliminates the need for code review entirely",
+        "It only works on small codebases"
+      ],
+      "answer": 1,
+      "explanation": "Automated review handles the obvious stuff (console.log, magic numbers, TODO comments) in milliseconds, freeing human reviewers to focus on deeper issues like design, correctness, and business logic."
+    },
+    {
+      "question": "When parsing a diff, why must you strip the +/- prefix from each line before pattern matching?",
+      "choices": [
+        "The prefixes contain secret information",
+        "Regex patterns won't match text that starts with + or -",
+        "The prefixes cause the function to crash",
+        "It's just a formatting preference"
+      ],
+      "answer": 1,
+      "explanation": "Diff lines start with '+' or '-' to indicate additions or removals. If you search for 'console.log' in a line like '+  console.log(\"test\")', the pattern won't match because of the prefix characters."
+    },
+    {
+      "question": "Why should common values like 0, 1, and -1 NOT be flagged as magic numbers?",
+      "choices": [
+        "They are too small to matter",
+        "They are universally understood constants that don't need named constants",
+        "The regex can't detect them",
+        "They only appear in test files"
+      ],
+      "answer": 1,
+      "explanation": "Values like 0, 1, and -1 are so commonly used in programming (array indexing, boolean-like flags, loop counters) that extracting them to named constants would reduce readability rather than improve it."
+    }
+  ]
+}

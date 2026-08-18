@@ -1,0 +1,38 @@
+{
+  "questId": "quest-131-worker-api",
+  "questions": [
+    {
+      "question": "Path prefix ใดที่ใช้สำหรับ routing ไปหา KV storage ใน Worker API?",
+      "choices": [
+        "/storage/kv/",
+        "/kv/",
+        "/key-value/",
+        "/cache/"
+      ],
+      "answer": 1,
+      "explanation": "Path /kv/ เป็น prefix ที่ใช้สำหรับ route requests ไปหา KV storage — เช่น /kv/get, /kv/put"
+    },
+    {
+      "question": "ทำไม D1 ใน preview environment ต้องมี error handling ต่างจาก production?",
+      "choices": [
+        "D1 ช้ากว่าใน preview",
+        "Database อาจไม่ ready หรือ binding ไม่ถูก config ใน preview",
+        "D1 รองรับ SQL น้อยกว่าใน preview",
+        "Preview ไม่รองรับ D1 เลย"
+      ],
+      "answer": 1,
+      "explanation": "In preview environments, D1 database อาจยังไม่ ready หรือ binding อาจไม่ถูก config — ต้อง return friendly error messages แทน raw errors"
+    },
+    {
+      "question": "method name GET ต้องทำอย่างไรก่อนสร้าง handler name?",
+      "choices": [
+        "ใช้ตรงๆ ได้เลย",
+        "แปลงเป็น uppercase",
+        "ใช้ .toLowerCase() เพื่อเปลี่ยนเป็น 'get'",
+        "ใส่เครื่องหมาย _ หน้าชื่อ"
+      ],
+      "answer": 2,
+      "explanation": "ต้องใช้ .toLowerCase() เสมอ เพื่อให้ handler name ตรง format เช่น kv-get, d1-post — ไม่ใช่ kv-GET"
+    }
+  ]
+}

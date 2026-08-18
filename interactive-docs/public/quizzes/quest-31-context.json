@@ -1,0 +1,38 @@
+{
+  "questId": "quest-31-context",
+  "questions": [
+    {
+      "question": "Why is context window management important when working with LLMs?",
+      "choices": [
+        "LLMs work better with more context regardless of quality",
+        "Context windows are limited, so you must prioritize the most relevant information to avoid exceeding limits while maintaining response quality",
+        "Context windows can always be expanded infinitely",
+        "Only the last few tokens matter for LLM responses"
+      ],
+      "answer": 1,
+      "explanation": "Every LLM has a finite context window. Filling it with irrelevant information wastes precious space and can actually degrade performance (the 'lost in the middle' effect). Strategic prioritization ensures the most important context is always available."
+    },
+    {
+      "question": "What is the 'lost in the middle' phenomenon in LLM context windows?",
+      "choices": [
+        "LLMs forget the beginning of conversations",
+        "LLMs tend to pay more attention to information at the beginning and end of the context, while information in the middle is often overlooked or weighted less",
+        "LLMs process context from right to left",
+        "LLMs randomly select which parts of context to use"
+      ],
+      "answer": 1,
+      "explanation": "Research shows LLMs have a U-shaped attention pattern — they attend strongly to the first and last parts of the context but often underweight information placed in the middle. This means document ordering within the context window matters."
+    },
+    {
+      "question": "What strategy helps ensure critical information isn't lost when the context window is near capacity?",
+      "choices": [
+        "Repeating the same information 10 times to make sure it's noticed",
+        "Prioritizing the most relevant files, summarizing less critical context, and placing key information at the beginning or end of the context",
+        "Switching to a larger model every time the window fills up",
+        "Removing all previous conversation history"
+      ],
+      "answer": 1,
+      "explanation": "Effective context management involves prioritizing by relevance, summarizing verbose content, and strategically positioning critical information at high-attention positions (start/end). This maximizes the value extracted from limited context space."
+    }
+  ]
+}

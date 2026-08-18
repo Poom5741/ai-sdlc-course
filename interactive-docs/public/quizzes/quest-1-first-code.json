@@ -1,0 +1,38 @@
+{
+  "questId": "quest-1-first-code",
+  "questions": [
+    {
+      "question": "What is the main lesson of this quest?",
+      "choices": [
+        "AI always generates correct code",
+        "AI output is a starting point — you must verify edge cases",
+        "You should never use AI for coding",
+        "Testing is optional when using AI tools"
+      ],
+      "answer": 1,
+      "explanation": "AI generates code that looks correct for obvious cases but often misses edge cases. Your job is to review, test, and validate."
+    },
+    {
+      "question": "What is wrong with this naive AI suggestion: `if (n <= 1) return 1`?",
+      "choices": [
+        "It doesn't handle recursion properly",
+        "It returns 1 for negative numbers instead of throwing an error",
+        "It's too slow for large numbers",
+        "It only works with positive integers"
+      ],
+      "answer": 1,
+      "explanation": "Factorial of a negative number is undefined, but `n <= 1` includes negative numbers and returns 1. The correct implementation should throw an error for n < 0."
+    },
+    {
+      "question": "When a test fails, what should you do first?",
+      "choices": [
+        "Copy the solution from _solution/solution.js",
+        "Keep tweaking code until tests pass",
+        "Read the failure message to understand what the test expects",
+        "Ask AI to fix it automatically"
+      ],
+      "answer": 2,
+      "explanation": "The failing test message tells you exactly what edge case you missed. Understanding the failure is more valuable than blindly fixing it."
+    }
+  ]
+}

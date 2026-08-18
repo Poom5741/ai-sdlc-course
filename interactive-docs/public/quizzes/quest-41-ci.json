@@ -1,0 +1,38 @@
+{
+  "questId": "quest-41-ci",
+  "questions": [
+    {
+      "question": "CI pipeline ควรมี step ไหนบ้างเป็นอย่างน้อย?",
+      "choices": [
+        "แค่ build",
+        "Lint, test, build",
+        "Deploy อย่างเดียว",
+        "Documentation generation"
+      ],
+      "answer": 1,
+      "explanation": "CI pipeline ขั้นต่ำควรมี lint (code quality), test (correctness), และ build (production readiness)"
+    },
+    {
+      "question": "เพราะเหตุใด CI pipeline จึงควร cache dependencies?",
+      "choices": [
+        "เพื่อให้ code ดูเยอะ",
+        "เพื่อลด build time — npm install ซ้ำๆ ใช้เวลาเปล่าๆ",
+        "เพื่อไม่ต้อง lock dependencies",
+        "ไม่มีเหตุผล particular"
+      ],
+      "answer": 1,
+      "explanation": "Caching dependencies ลด build time ได้มาก — npm install ทุกครั้งใช้เวลาและ bandwidth เปล่าๆ"
+    },
+    {
+      "question": "ทำไม production deployments ควรมี approval gate?",
+      "choices": [
+        "เพื่อให้ดูมี process",
+        "เพื่อป้องกัน accidental deploy จาก code ที่ไม่ ready",
+        "เพื่อให้ developer รู้สึกดี",
+        "ไม่จำเป็น"
+      ],
+      "answer": 1,
+      "explanation": "Approval gate ป้องกัน accidental deploy — code ที่ merge ไม่ได้แปลว่าพร้อม production"
+    }
+  ]
+}

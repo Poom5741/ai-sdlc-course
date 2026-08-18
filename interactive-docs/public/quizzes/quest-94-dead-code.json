@@ -1,0 +1,38 @@
+{
+  "questId": "quest-94-dead-code",
+  "questions": [
+    {
+      "question": "An exported function that is never called locally should be flagged as dead code. True or false?",
+      "choices": [
+        "True — if it's not called in this file, it's dead",
+        "False — exported functions may be used by other modules",
+        "True — but only if the module has no other exports",
+        "False — exported functions are always dead code"
+      ],
+      "answer": 1,
+      "explanation": "Exported functions ผ่าน module.exports อาจถูกใช้โดย module อื่น — แม้ว่าจะไม่ถูกเรียกในไฟล์นี้ ห้าม flag เป็น dead code"
+    },
+    {
+      "question": "Which of these is considered dead code?",
+      "choices": [
+        "A function that is called by another function",
+        "An imported module that is used in a console.log",
+        "An unused variable that is never referenced",
+        "An exported function in module.exports"
+      ],
+      "answer": 2,
+      "explanation": "Variable ที่ไม่เคยถูก reference ที่ไหนเลย = dead code. แต่ exported functions, used imports, และ called functions ไม่ใช่ dead code"
+    },
+    {
+      "question": "What should findDeadCode return for empty input?",
+      "choices": [
+        "null",
+        "undefined",
+        "An empty array []",
+        "An error message"
+      ],
+      "answer": 2,
+      "explanation": "Empty input ไม่มี dead code — return empty array [] แทนที่จะ throw error หรือ return null"
+    }
+  ]
+}

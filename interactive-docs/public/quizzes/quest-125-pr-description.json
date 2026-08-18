@@ -1,0 +1,38 @@
+{
+  "questId": "quest-125-pr-description",
+  "questions": [
+    {
+      "question": "Why is a 'How to Test' section essential in PR descriptions?",
+      "choices": [
+        "It's required by GitHub's PR template",
+        "It tells reviewers exactly how to verify the changes work correctly",
+        "It automatically runs the tests for you",
+        "It prevents merge conflicts"
+      ],
+      "answer": 1,
+      "explanation": "Without testing instructions, reviewers must guess how to verify changes. This slows down review and increases the chance of shipping untested code."
+    },
+    {
+      "question": "When should you include a breaking change notice in a PR description?",
+      "choices": [
+        "Only when the PR touches more than 5 files",
+        "When the changes may require code modifications in dependent projects or consumers",
+        "Every time the PR is larger than 100 lines",
+        "Only for PRs that modify package.json"
+      ],
+      "answer": 1,
+      "explanation": "Breaking changes affect downstream consumers. Flagging them ensures teams that depend on your code know they need to update their code when they pull the changes."
+    },
+    {
+      "question": "What makes a good changes list in a PR description?",
+      "choices": [
+        "Long paragraphs describing every detail",
+        "Vague statements like 'Made improvements'",
+        "Specific bullet points that describe what changed and why",
+        "A link to the diff without any explanation"
+      ],
+      "answer": 2,
+      "explanation": "Specific bullet points let reviewers quickly understand the scope of changes without reading every line of code. Each point should be clear and actionable."
+    }
+  ]
+}

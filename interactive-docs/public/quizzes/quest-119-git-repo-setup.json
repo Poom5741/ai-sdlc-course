@@ -1,0 +1,38 @@
+{
+  "questId": "quest-119-git-repo-setup",
+  "questions": [
+    {
+      "question": "What happens if you forget to set git user.name and user.email before committing?",
+      "choices": [
+        "Git will refuse to create the commit",
+        "Commits will show 'unknown' as the author",
+        "Git will use your OS username automatically",
+        "The commit will fail silently with no output"
+      ],
+      "answer": 1,
+      "explanation": "Git doesn't enforce identity configuration. It will create commits, but the author field will show 'unknown', making it impossible to tell who wrote what."
+    },
+    {
+      "question": "In a valid commit chain, what should the first commit's parent be?",
+      "choices": [
+        "The hash of the second commit",
+        "An empty string",
+        "null (signifying a root commit)",
+        "The branch name"
+      ],
+      "answer": 2,
+      "explanation": "The first commit in a repository (root commit) has parent === null. This is the starting point of the entire commit chain."
+    },
+    {
+      "question": "Why is it important to check that config.name and config.email are non-empty strings (not just truthy)?",
+      "choices": [
+        "Git treats empty strings as valid names",
+        "A whitespace-only string like ' ' is truthy but would show as blank author",
+        "JavaScript truthy checks are faster than string comparison",
+        "It doesn't matter — any truthy value is fine"
+      ],
+      "answer": 1,
+      "explanation": "A string containing only spaces (' ') is truthy in JavaScript, but would appear as a blank author in git log. You must trim whitespace and check for actual content."
+    }
+  ]
+}

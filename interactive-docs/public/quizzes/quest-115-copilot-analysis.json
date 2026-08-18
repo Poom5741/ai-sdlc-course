@@ -1,0 +1,38 @@
+{
+  "questId": "quest-115-copilot-analysis",
+  "questions": [
+    {
+      "question": "ตัวชี้วัดที่สำคัญที่สุดสำหรับ AI tool effectiveness คืออะไร?",
+      "choices": [
+        "จำนวน developer ที่สมัครใช้ (subscribers)",
+        "Acceptance rate — percentage of suggestions ที่ developer accept",
+        "ราคาของ tool",
+        "จำนวน languages ที่รองรับ"
+      ],
+      "answer": 1,
+      "explanation": "Acceptance rate reveals whether AI suggestions are actually useful. High acceptance means good alignment with team needs; low acceptance indicates room for optimization."
+    },
+    {
+      "question": "Anti-pattern 'Over-Reliance' หมายถึงอะไร?",
+      "choices": [
+        "ไม่ใช้ AI tools เลย",
+        "Developer หยุดคิด critical thinking เพราะเชื่อ AI suggestions โดยไม่ review",
+        "ใช้ AI สำหรับ testing เท่านั้น",
+        "ใช้ AI มากเกินไปจน tool crash"
+      ],
+      "answer": 1,
+      "explanation": "Over-reliance happens when developers accept AI suggestions without critical review, leading to potential bugs, security issues, and reduced coding skills over time."
+    },
+    {
+      "question": "การวิเคราะห์ Copilot usage ที่ดีควร包含 อะไรบ้าง?",
+      "choices": [
+        "เฉพาะ acceptance rate เท่านั้น",
+        "Usage patterns, acceptance rate, productivity metrics, anti-patterns, team guidelines",
+        "เฉพาะราคาและROI เท่านั้น",
+        "เฉพาะ code quality scores"
+      ],
+      "answer": 1,
+      "explanation": "A comprehensive analysis covers usage patterns (how people use it), acceptance rate (effectiveness), productivity metrics (measurable impact), anti-patterns (what to avoid), and team guidelines (best practices)."
+    }
+  ]
+}

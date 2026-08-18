@@ -1,0 +1,38 @@
+{
+  "questId": "quest-28-sprint-planner",
+  "questions": [
+    {
+      "question": "Sprint Planning คืออะไร?",
+      "choices": [
+        "การเขียน code ทั้งหมดในวันเดียว",
+        "การแบ่ง features ขนาดใหญ่ให้เป็น tasks ขนาดเล็กที่ทำเสร็จได้ใน 1 sprint",
+        "การเขียน test cases สำหรับทุก feature",
+        "การเลือก technology stack สำหรับ project"
+      ],
+      "answer": 1,
+      "explanation": "Sprint Planning คือการแบ่ง features ขนาดใหญ่ให้เป็น tasks เล็กๆ ที่ทำเสร็จได้ใน 1 sprint — เหมือนนักรบที่แบ่งศึกออกเป็นกลยุทธ์ย่อยๆ"
+    },
+    {
+      "question": "เพราะอะไร `totalEstimate` ต้องเท่ากับผลรวมของ tasks เท่านั้น?",
+      "choices": [
+        "เพราะเป็นแค่ formal requirement",
+        "เพราะถ้าไม่ตรง = คำนวณผิด → ตัดสินใจ fitInSprint ผิด",
+        "เพราะ test บังคับให้เท่ากัน",
+        "เพราะ AI ต้องการ input ที่ถูกต้อง"
+      ],
+      "answer": 1,
+      "explanation": "ถ้า totalEstimate ไม่ตรงกับผลรวม tasks = คำนวณผิด → การตัดสินใจว่า fit ใน sprint หรือไม่ก็จะผิดตามไปด้วย"
+    },
+    {
+      "question": "เมื่อ totalEstimate > teamCapacity ควรทำอย่างไร?",
+      "choices": [
+        "บีบงานเข้าไปทั้งหมด because deadline สำคัญ",
+        "ตั้ง fitsInSprint = false และพิจารณาแบ่ง tasks หรือลด scope",
+        "เพิ่ม capacity ของทีม",
+        "เพิกเฉยและเริ่มทำงานเลย"
+      ],
+      "answer": 1,
+      "explanation": "เมื่องานเกิน capacity → fitsInSprint = false → ต้องแบ่ง tasks ต่อหรือลด scope ไม่ใช่บีบเข้าไป because การบีบ lead ไปสู่ quality issues"
+    }
+  ]
+}

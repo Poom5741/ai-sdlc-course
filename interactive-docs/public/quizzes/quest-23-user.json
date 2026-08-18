@@ -1,0 +1,38 @@
+{
+  "questId": "quest-23-user",
+  "questions": [
+    {
+      "question": "What is the standard format of a well-written user story?",
+      "choices": [
+        "A technical specification with implementation details",
+        "As a [role], I want [feature] so that [benefit]",
+        "A list of acceptance criteria without context",
+        "A Jira ticket title with priority level"
+      ],
+      "answer": 1,
+      "explanation": "The 'As a [role], I want [feature] so that [benefit]' format forces clarity about who the user is, what they need, and why — ensuring every feature is tied to a real user need and business value."
+    },
+    {
+      "question": "Why should user stories focus on the 'why' (benefit) rather than just the 'what' (feature)?",
+      "choices": [
+        "The 'why' makes the ticket longer and more impressive",
+        "Understanding the underlying need allows developers to find better solutions and avoid building features that don't solve the real problem",
+        "The 'why' is only needed for compliance documentation",
+        "Product managers prefer longer descriptions"
+      ],
+      "answer": 1,
+      "explanation": "When developers understand the underlying motivation, they can suggest simpler or more effective solutions. Without the 'why', teams risk building exactly what was asked for but not what was actually needed."
+    },
+    {
+      "question": "What is the role of acceptance criteria in a user story?",
+      "choices": [
+        "They describe the technical architecture for implementation",
+        "They define the specific, testable conditions that must be true for the story to be considered complete",
+        "They list all the bugs found during QA testing",
+        "They specify which programming language to use"
+      ],
+      "answer": 1,
+      "explanation": "Acceptance criteria provide concrete, measurable conditions (Given/When/Then format is common) that define 'done.' They eliminate ambiguity, guide development, and serve as the basis for automated and manual testing."
+    }
+  ]
+}

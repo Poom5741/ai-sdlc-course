@@ -1,0 +1,38 @@
+{
+  "questId": "quest-52-audit-trail",
+  "questions": [
+    {
+      "question": "Audit trail สำคัญเพราะอะไร?",
+      "choices": [
+        "เพื่อให้ code ดู professional",
+        "เพื่อให้ compliance และ incident investigation มีหลักฐานว่าเกิดอะไรขึ้น ใครทำ เมื่อไหร่",
+        "เพื่อ reduce server cost",
+        "เพื่อ improve code performance"
+      ],
+      "answer": 1,
+      "explanation": "Audit trail เป็น evidence สำหรับ compliance (SOC2, GDPR, HIPAA) และเครื่องมือสำคัญสำหรับ incident investigation — ถ้าไม่มี log ก็ไม่มีหลักฐาน"
+    },
+    {
+      "question": "Query function ควร support filtering แบบใด?",
+      "choices": [
+        "Filter ได้แค่ userId อย่างเดียว",
+        "Filter ได้แค่ action อย่างเดียว",
+        "Multi-criteria filtering ด้วย AND logic: userId + action + date range พร้อมกัน",
+        "ไม่ต้อง filter ได้เลย"
+      ],
+      "answer": 2,
+      "explanation": "Real investigations ต้องใช้ AND logic: 'show all login attempts by user-123 in the last 24 hours' — single-criteria filtering ไม่พอ"
+    },
+    {
+      "question": "getStats() ควร return ข้อมูลอะไรบ้าง?",
+      "choices": [
+        "แค่ total entries เท่านั้น",
+        "Total entries, breakdown by action type, และ breakdown by user",
+        "แค่ timestamp ล่าสุด",
+        "ไม่ต้อง return อะไร"
+      ],
+      "answer": 1,
+      "explanation": "getStats() ต้อง aggregate ทั้ง byAction (login: 45, logout: 42) และ byUser (user-123: 20, user-456: 15) เพื่อ compliance reporting"
+    }
+  ]
+}

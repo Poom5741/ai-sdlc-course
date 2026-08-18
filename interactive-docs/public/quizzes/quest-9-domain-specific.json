@@ -1,0 +1,38 @@
+{
+  "questId": "quest-9-domain-specific",
+  "questions": [
+    {
+      "question": "What is the core mechanism of self-attention in a Transformer?",
+      "choices": [
+        "It uses a recurrent loop to process tokens sequentially",
+        "Each token generates a Query, Key, and Value vector to compute attention scores against all other tokens",
+        "It compares each token to a fixed external memory bank",
+        "It only looks at the previous three tokens in the sequence"
+      ],
+      "answer": 1,
+      "explanation": "Self-attention computes Q, K, V vectors for each token, then calculates attention scores using the dot product of Q and K, scaled and passed through softmax, to weight the Value vectors."
+    },
+    {
+      "question": "Why is the scaling factor √(d_k) used when computing attention scores?",
+      "choices": [
+        "To speed up matrix multiplication by reducing dimensions",
+        "To prevent dot products from growing too large, which would push softmax into regions with tiny gradients",
+        "To make the model use less memory during training",
+        "To ensure all attention weights are exactly 0 or 1"
+      ],
+      "answer": 1,
+      "explanation": "As the dimension d_k grows, dot products tend to increase in magnitude, pushing softmax into regions with extremely small gradients. Dividing by √d_k keeps the variance stable and gradients healthy."
+    },
+    {
+      "question": "In the self-attention formula Attention(Q, K, V) = softmax(QK^T / √d_k) · V, what does the softmax operation do?",
+      "choices": [
+        "It converts the attention scores into a probability distribution that sums to 1",
+        "It removes all negative values from the score matrix",
+        "It normalizes the input tokens to have zero mean",
+        "It selects only the single highest-scoring token"
+      ],
+      "answer": 0,
+      "explanation": "Softmax converts raw attention scores into a probability distribution — each row sums to 1 — so the weighted sum of Value vectors represents a mixture of information from all tokens, weighted by relevance."
+    }
+  ]
+}

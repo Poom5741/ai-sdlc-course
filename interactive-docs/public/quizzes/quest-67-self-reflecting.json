@@ -1,0 +1,38 @@
+{
+  "questId": "quest-67-self-reflecting",
+  "questions": [
+    {
+      "question": "Self-Reflecting Agent ทำอะไร?",
+      "choices": [
+        "สร้าง output แล้วส่งเลย",
+        "สร้าง output แล้ว self-assess คุณภาพ พร้อม retry ถ้าต่ำ",
+        " evaluate output ของ agent อื่น",
+        "cache self-scores"
+      ],
+      "answer": 1,
+      "explanation": "Self-reflecting agent generate output แล้วใช้ evaluateFn ให้คะแนนตัวเอง — ถ้า score ต่ำจะ retry ครั้งเดียวก่อนรายงาน"
+    },
+    {
+      "question": "needsHelp: true หมายถึงอะไร?",
+      "choices": [
+        "Agent ล้มเหลว",
+        "Agent รู้ตัวว่า output คุณภาพต่ำและต้องขอความช่วยเหลือ",
+        "Agent หยุดทำงาน",
+        "Agent หมด tokens"
+      ],
+      "answer": 1,
+      "explanation": "needsHelp = confidence === 'low' (score < 50) — นี่คือ self-awareness ไม่ใช่ failure agent รู้ตัวว่าต้องขอความช่วยเหลือ"
+    },
+    {
+      "question": "Agent ควร retry กี่ครั้งเมื่อ selfScore < 60?",
+      "choices": [
+        "ไม่ต้อง retry",
+        "ครั้งเดียว",
+        "3 ครั้ง",
+        "ไม่จำกัด"
+      ],
+      "answer": 1,
+      "explanation": "Self-reflecting agent ควร retry ครั้งเดียวก่อนรายงาน — ไม่ยอมแพ้ทันที แต่ก็ไม่ retry ไม่จำกัด"
+    }
+  ]
+}

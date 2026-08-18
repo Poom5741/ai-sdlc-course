@@ -1,0 +1,38 @@
+{
+  "questId": "quest-69-semantic-cache",
+  "questions": [
+    {
+      "question": "Semantic Cache ต่างจาก Regular Cache อย่างไร?",
+      "choices": [
+        "เร็วกว่า",
+        "Lookup ด้วย similarity แทน exact match — query ที่คล้ายกันใช้ cached response ได้",
+        "เก็บ data มากกว่า",
+        "ไม่ต้องมี threshold"
+      ],
+      "answer": 1,
+      "explanation": "Regular cache ใช้ exact match — แต่ semantic cache ใช้ similarity lookup query ที่คล้ายกัน (เช่น 'What is AI?' vs 'Explain AI') ใช้ cached response เดียวกันได้"
+    },
+    {
+      "question": "Threshold ใน semantic cache คืออะไร?",
+      "choices": [
+        "จำนวน cache entries สูงสุด",
+        "similarity ขั้นต่ำที่จะถือว่าเป็น cache hit",
+        "เวลาที่ cache หมดอายุ",
+        "จำนวน tokens ที่ใช้"
+      ],
+      "answer": 1,
+      "explanation": "Threshold คือ similarity ขั้นต่ำ (0-1) ที่จะถือว่า query ใหม่ 'คล้ายกันพอ' กับ cached query ถ้า similarity > threshold = cache hit"
+    },
+    {
+      "question": "ถ้า threshold ต่ำเกินไป (เช่น 0.5) จะเกิดอะไร?",
+      "choices": [
+        "Cache hit บ่อยขึ้น แต่ได้ response ผิด — เสีย accuracy",
+        "Cache ทำงานเร็วขึ้น",
+        "Cache ไม่ทำงานเลย",
+        "Memory ลดลง"
+      ],
+      "answer": 0,
+      "explanation": "Threshold ต่ำ = ทุก query ดู 'คล้ายกัน' — cache hit บ่อยแต่ได้ response ที่ไม่ตรงกับ query จริง = accuracy ลดลง"
+    }
+  ]
+}

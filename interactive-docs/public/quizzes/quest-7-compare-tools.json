@@ -1,0 +1,38 @@
+{
+  "questId": "quest-7-compare-tools",
+  "questions": [
+    {
+      "question": "When is vibe coding (no structure, just AI-generated code) appropriate?",
+      "choices": [
+        "For production systems with multiple developers",
+        "For quick prototypes, throwaway scripts, and learning exercises",
+        "For any code that will be maintained long-term",
+        "Never — it's always bad practice"
+      ],
+      "answer": 1,
+      "explanation": "Vibe coding works for quick prototypes, throwaway scripts, learning exercises, and one-off utilities where long-term maintenance isn't needed."
+    },
+    {
+      "question": "What makes vibe engineering different from vibe coding?",
+      "choices": [
+        "It's slower but produces more code",
+        "It adds structure: interfaces, tests, decomposition before AI generation",
+        "It avoids using AI entirely",
+        "It requires a specific programming language"
+      ],
+      "answer": 1,
+      "explanation": "Vibe engineering adds deliberate structure — defining interfaces, writing tests, planning decomposition — before having AI generate code. This makes code maintainable and reliable."
+    },
+    {
+      "question": "What is the biggest risk of vibe coding in production?",
+      "choices": [
+        "Code runs too fast",
+        "Code looks too clean",
+        "Code lacks tests, error handling, and structure, making it hard to maintain",
+        "Code uses too many dependencies"
+      ],
+      "answer": 2,
+      "explanation": "Production code without tests, error handling, and proper structure becomes increasingly difficult and dangerous to maintain as the project grows."
+    }
+  ]
+}

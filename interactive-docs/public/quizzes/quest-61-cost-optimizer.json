@@ -1,0 +1,38 @@
+{
+  "questId": "quest-61-cost-optimizer",
+  "questions": [
+    {
+      "question": "Why shouldn't a cost optimizer always pick the cheapest model?",
+      "choices": [
+        "Cheap models are always slower",
+        "Complex tasks need quality models — a bad legal summary costs more than the GPT-4 call that would have gotten it right",
+        "Cheap models have no API rate limits",
+        "The cheapest model is always the most reliable"
+      ],
+      "answer": 1,
+      "explanation": "A cheap model producing wrong or poor-quality output can cost more in rework, customer complaints, or legal risk than the savings from using it. The optimizer must respect complexity requirements."
+    },
+    {
+      "question": "What happens when no model fits within the remaining daily budget?",
+      "choices": [
+        "The system crashes with an error",
+        "The request is queued until the next day",
+        "Return the cheapest model with withinBudget: false so the caller can decide",
+        "Automatically increase the daily budget"
+      ],
+      "answer": 2,
+      "explanation": "When no model fits the budget, the optimizer should still return a result (the cheapest model) with `withinBudget: false`. This lets the calling system decide whether to wait, use the budget anyway, or queue the request."
+    },
+    {
+      "question": "What does a cost optimizer check about a model's max context before routing a request?",
+      "choices": [
+        "It checks if the model is currently online",
+        "It verifies the model's context window can handle the request's maxTokens requirement",
+        "It checks the model's release date",
+        "It verifies the model supports streaming responses"
+      ],
+      "answer": 1,
+      "explanation": "A model with a 4K context window can't handle a request needing 10K tokens. The optimizer must filter models by their maxContext capacity before selecting the cheapest qualifying model."
+    }
+  ]
+}

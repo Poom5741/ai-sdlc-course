@@ -1,0 +1,38 @@
+{
+  "questId": "quest-14-scaling-laws-calculator",
+  "questions": [
+    {
+      "question": "According to Chinchilla scaling laws, how should parameters (N) and tokens (D) scale with compute budget (C)?",
+      "choices": [
+        "N scales linearly, D stays constant",
+        "N and D both scale as C^0.5",
+        "N scales as C^2, D scales as C",
+        "N and D are inversely proportional"
+      ],
+      "answer": 1,
+      "explanation": "Chinchilla scaling laws show that optimal allocation requires both parameters and tokens to scale proportionally with C^0.5, maintaining balance."
+    },
+    {
+      "question": "What does an 'over-parameterized' ratio indicate?",
+      "choices": [
+        "The model has too little data and will memorize instead of learn",
+        "The model is perfectly balanced",
+        "The model has too much data for its size",
+        "The compute budget is insufficient"
+      ],
+      "answer": 0,
+      "explanation": "Over-parameterized means the model has more parameters than the data can support, leading to memorization rather than generalization."
+    },
+    {
+      "question": "Why should you keep floating-point precision when computing optimal allocation?",
+      "choices": [
+        "JavaScript doesn't support integers",
+        "Rounding too early loses accuracy in the scaling law calculations",
+        "Floating-point numbers use less memory",
+        "The test suite requires exact integer values"
+      ],
+      "answer": 1,
+      "explanation": "Scaling laws are continuous functions. Rounding to integers early introduces error that compounds, especially for small compute budgets."
+    }
+  ]
+}

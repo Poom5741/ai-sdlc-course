@@ -1,0 +1,38 @@
+{
+  "questId": "quest-24-prd",
+  "questions": [
+    {
+      "question": "What is the primary purpose of a Product Requirements Document (PRD)?",
+      "choices": [
+        "To document the codebase architecture for new developers",
+        "To clearly define what the product should do, who it's for, and what success looks like — aligning all stakeholders before development begins",
+        "To serve as the final user manual for the product",
+        "To track individual developer productivity metrics"
+      ],
+      "answer": 1,
+      "explanation": "A PRD aligns everyone — product, design, engineering, and stakeholders — on the problem, goals, target users, and success metrics before any code is written, reducing costly misalignments later."
+    },
+    {
+      "question": "Which section is most critical in a PRD for preventing scope creep during development?",
+      "choices": [
+        "The technology stack section",
+        "Out-of-scope items and explicit non-goals",
+        "The team's organizational chart",
+        "The office layout diagram"
+      ],
+      "answer": 1,
+      "explanation": "Explicitly listing what is NOT being built (out-of-scope, non-goals) prevents stakeholders from adding requirements mid-development and keeps the team focused on the agreed scope."
+    },
+    {
+      "question": "How should a PRD handle technical decisions?",
+      "choices": [
+        "The PRD should specify exact implementation details and code patterns",
+        "The PRD should focus on user-facing requirements and outcomes, leaving technical decisions to engineering during design reviews",
+        "Technical details should be omitted entirely from PRDs",
+        "The PRD should contain the complete source code"
+      ],
+      "answer": 1,
+      "explanation": "A good PRD defines the 'what' and 'why' — user needs, behaviors, and success criteria. The 'how' (technical implementation) should be determined by engineering during technical design, where they have the expertise to make the right calls."
+    }
+  ]
+}

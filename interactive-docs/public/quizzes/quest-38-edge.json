@@ -1,0 +1,38 @@
+{
+  "questId": "quest-38-edge",
+  "questions": [
+    {
+      "question": "Edge cases คืออะไร?",
+      "choices": [
+        "โค้ดที่ทำงานเร็วที่สุด",
+        "Input patterns ที่อยู่นอก expected behavior เช่น null, empty, boundary values",
+        "โค้ดที่ไม่มีใครใช้",
+        "Tests ที่รันช้าที่สุด"
+      ],
+      "answer": 1,
+      "explanation": "Edge cases คือ inputs ที่อยู่ 'ขอบ' ของ expected behavior — เช่น empty strings, null, boundary numbers, หรือ unexpected types"
+    },
+    {
+      "question": "เพราะเหตุใด developer มักจะมองข้าม edge cases?",
+      "choices": [
+        "Edge cases ไม่สำคัญ",
+        "Brain โฟกัสที่ happy path — สิ่งที่โค้ดควรทำ มากกว่าสิ่งที่โค้ดไม่ควรทำ",
+        "Edge cases test ยากเกินไป",
+        "AI จับ edge cases ได้หมดแล้ว"
+      ],
+      "answer": 1,
+      "explanation": "Developer เขียนโค้ดด้วย brain ที่โฟกัสที่ 'happy path' — แต่ production bugs มักเกิดจาก edge cases ที่มองข้าม"
+    },
+    {
+      "question": "เพราะเหตุใด floating point precision จึงเป็น edge case ที่มักถูกมองข้าม?",
+      "choices": [
+        "JavaScript ไม่มี floating point",
+        "0.1 + 0.2 = 0.30000000000000004 ใน JavaScript — ผลลัพธ์ไม่เท่าที่คาด",
+        "Floating point ทำงานถูกต้องเสมอ",
+        "เฉพาะ Python ที่มีปัญหานี้"
+      ],
+      "answer": 1,
+      "explanation": "JavaScript floating point มี precision issues — 0.1 + 0.2 ไม่เท่า 0.3 exactly ต้องใช้ rounding เสมอ"
+    }
+  ]
+}

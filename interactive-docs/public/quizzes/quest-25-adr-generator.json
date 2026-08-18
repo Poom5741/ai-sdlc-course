@@ -1,0 +1,38 @@
+{
+  "questId": "quest-25-adr-generator",
+  "questions": [
+    {
+      "question": "ADR ย่อมาจากอะไร และมีวัตถุประสงค์หลักคืออะไร?",
+      "choices": [
+        "Application Design Report — บันทึกการออกแบบ UI",
+        "Architecture Decision Record — บันทึกการตัดสินใจทางเทคนิคว่าเลือกอะไรและทำไม",
+        "Automated Deployment Routine — บันทึกขั้นตอน deployment",
+        "Advanced Debug Report — บันทึกวิธีแก้ bugs"
+      ],
+      "answer": 1,
+      "explanation": "ADR (Architecture Decision Record) คือเอกสารที่บันทึกว่าเลือกทางเลือกไหน, ทำไมถึงเลือก, และผลกระทบคืออะไร — เหมือน 'time capsule' สำหรับ decision สำคัญ"
+    },
+    {
+      "question": "ส่วนไหนของ ADR ที่ AI มักลืมเขียนมากที่สุด?",
+      "choices": [
+        "Title",
+        "Context",
+        "Consequences",
+        "Decision"
+      ],
+      "answer": 2,
+      "explanation": "AI มักลืมเขียน consequences (ผลที่ตามมา) ซึ่งเป็นส่วนที่สำคัญมาก — มันบอกว่า decision นี้จะส่งผลอะไรต่อทีมในอนาคต"
+    },
+    {
+      "question": "ADR ที่ดีควรมีลักษณะใด?",
+      "choices": [
+        "เขียนยาวมากเพื่อให้ดูมีสาระ",
+        "บันทึก decision ที่ชัดเจน, context ที่ครบถ้วน, และ consequences ทั้งดีและไม่ดี",
+        "เขียนเฉพาะ technical details โดยไม่ต้องอธิบายเหตุผล",
+        "เขียนแค่ code example ไม่ต้องมีคำอธิบาย"
+      ],
+      "answer": 1,
+      "explanation": "ADR ที่ดีต้องมี decision ที่ชัดเจน, context ที่ครบถ้วน (สถานการณ์จริงของทีม), และ consequences ทั้ง positive และ negative"
+    }
+  ]
+}

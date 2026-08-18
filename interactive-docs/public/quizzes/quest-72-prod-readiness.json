@@ -1,0 +1,38 @@
+{
+  "questId": "quest-72-prod-readiness",
+  "questions": [
+    {
+      "question": "Production Readiness Checker ทำอะไร?",
+      "choices": [
+        "รัน unit tests",
+        "Audit ความพร้อมของ system ก่อน deploy — ครอบคลุม testing, monitoring, auth, logging",
+        "Deploy ให้อัตโนมัติ",
+        "optimize performance"
+      ],
+      "answer": 1,
+      "explanation": "Readiness checker ทำ pre-flight checklist — ตรวจสอบว่า system มีครบทุกอย่างที่จำเป็นก่อน deploy ลง production"
+    },
+    {
+      "question": "Critical-failure gating หมายถึงอะไร?",
+      "choices": [
+        "ถ้า score >= 70 = ready",
+        "Critical items (auth, logging, healthCheck) ต้องผ่านเสมอ — ถ้าตัวไหน failed = not ready ทันที แม้ score สูง",
+        "ทุก items สำคัญเท่ากัน",
+        "Critical items ข้ามได้"
+      ],
+      "answer": 1,
+      "explanation": "ไม่ใช่ทุก item สำคัญเท่ากัน — auth, logging, healthCheck เป็น critical ถ้าตัวไหน failed = not ready ทันที ไม่สน score"
+    },
+    {
+      "question": "Score คำนวณอย่างไร?",
+      "choices": [
+        "นับ critical items เท่านั้น",
+        "(passed / total) × 100 — แต่ ready ต้องผ่าน critical items ด้วย",
+        "sum ของ severity",
+        "จำนวน items ที่มี"
+      ],
+      "answer": 1,
+      "explanation": "Score = (passed / total) × 100 แต่ ready = ALL critical items pass AND score >= 70 — ทั้งสองเงื่อนไขต้องเป็น true"
+    }
+  ]
+}

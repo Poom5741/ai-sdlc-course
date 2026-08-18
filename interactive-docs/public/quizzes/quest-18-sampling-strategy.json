@@ -1,0 +1,38 @@
+{
+  "questId": "quest-18-sampling-strategy",
+  "questions": [
+    {
+      "question": "What is the correct order for applying temperature in sampling?",
+      "choices": [
+        "Apply softmax first, then divide probabilities by temperature",
+        "Divide logits by temperature, then apply softmax",
+        "Apply temperature as a post-processing step after sampling",
+        "Temperature doesn't affect the sampling process"
+      ],
+      "answer": 1,
+      "explanation": "Temperature must be applied to raw logits BEFORE softmax. Applying it after softmax gives the opposite effect (flatter distribution instead of sharper)."
+    },
+    {
+      "question": "What happens when temperature = 0 in sampling?",
+      "choices": [
+        "The model crashes with a division by zero error",
+        "All tokens have equal probability",
+        "The sampling becomes greedy (always picks the highest logit)",
+        "The model generates completely random output"
+      ],
+      "answer": 2,
+      "explanation": "Temperature 0 makes the distribution infinitely sharp — the highest logit gets probability 1, everything else gets 0. This is equivalent to greedy sampling."
+    },
+    {
+      "question": "How does top-p (nucleus) sampling differ from top-k?",
+      "choices": [
+        "Top-p is always faster than top-k",
+        "Top-p selects a dynamic number of tokens based on cumulative probability",
+        "Top-p uses a fixed number of tokens like top-k",
+        "Top-p doesn't require softmax probabilities"
+      ],
+      "answer": 1,
+      "explanation": "Top-p accumulates tokens by probability until reaching threshold p, making the candidate set dynamic. Top-k always keeps exactly k tokens regardless of their probabilities."
+    }
+  ]
+}

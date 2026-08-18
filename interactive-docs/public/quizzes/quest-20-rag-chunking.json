@@ -1,0 +1,38 @@
+{
+  "questId": "quest-20-rag-chunking",
+  "questions": [
+    {
+      "question": "Why is document chunking important for RAG systems?",
+      "choices": [
+        "It reduces storage costs",
+        "Too small loses context, too large dilutes relevance — chunking balances both",
+        "It's required by the embedding model",
+        "It makes documents shorter for faster reading"
+      ],
+      "answer": 1,
+      "explanation": "Chunking affects retrieval quality: small chunks lose context, large chunks dilute relevance. The right chunk size maximizes retrieval precision."
+    },
+    {
+      "question": "What is the purpose of overlap between chunks?",
+      "choices": [
+        "To increase the total number of chunks",
+        "To preserve context that would otherwise be lost at chunk boundaries",
+        "To make chunks bigger",
+        "To reduce processing time"
+      ],
+      "answer": 1,
+      "explanation": "Overlap ensures that sentences or concepts split across chunk boundaries are still captured in adjacent chunks, preserving context."
+    },
+    {
+      "question": "What is a common edge case when splitting by words?",
+      "choices": [
+        "Splitting in the middle of a word",
+        "Creating too many chunks",
+        "Losing punctuation",
+        "Changing the case of words"
+      ],
+      "answer": 0,
+      "explanation": "Word-based splitting must respect word boundaries. A naive split might break 'Hello' into 'Hel' and 'lo', losing meaning."
+    }
+  ]
+}

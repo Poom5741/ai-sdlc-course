@@ -1,0 +1,38 @@
+{
+  "questId": "quest-10-position-encoding",
+  "questions": [
+    {
+      "question": "Why do transformers need positional encoding?",
+      "choices": [
+        "To make the model run faster",
+        "Because attention alone is permutation-invariant — it doesn't know token order",
+        "To reduce the number of parameters",
+        "To make the output longer"
+      ],
+      "answer": 1,
+      "explanation": "Self-attention treats input as a set, not a sequence. Without positional encoding, 'I love cats' and 'cats love I' would be identical to the model."
+    },
+    {
+      "question": "In sinusoidal positional encoding, which dimension indices use sin vs cos?",
+      "choices": [
+        "Even indices (0,2,4,...) use sin, odd indices (1,3,5,...) use cos",
+        "Even indices use cos, odd indices use sin",
+        "All indices use sin",
+        "All indices use cos"
+      ],
+      "answer": 0,
+      "explanation": "The pattern is: even indices (0, 2, 4, ...) get sin values, and odd indices (1, 3, 5, ...) get cos values. Swapping these breaks the encoding."
+    },
+    {
+      "question": "What is the formula for the angle at position pos and dimension i?",
+      "choices": [
+        "pos * i / dModel",
+        "pos / 10000^(2i/dModel)",
+        "pos + i / dModel",
+        "10000^(pos / dModel)"
+      ],
+      "answer": 1,
+      "explanation": "The correct formula is pos / 10000^(2i/dModel), which creates sinusoidal patterns at different frequencies across dimensions."
+    }
+  ]
+}

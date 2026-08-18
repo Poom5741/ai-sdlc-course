@@ -1,0 +1,38 @@
+{
+  "questId": "quest-48-security-arch",
+  "questions": [
+    {
+      "question": "Security by Design หมายถึงอะไร?",
+      "choices": [
+        "เพิ่ม security หลังจาก deploy เสร็จ",
+        "วางแผน security controls ตั้งแต่ขั้นตอน design ไม่ใช่ตอน deploy",
+        "ซ่อน security code ไว้ไม่ให้ใครเห็น",
+        "ใช้ security library ตัวเดียว"
+      ],
+      "answer": 1,
+      "explanation": "Security by Design คือการออกแบบ security controls ตั้งแต่ขั้นตอน design — ไม่ใช่ build app ก่อนแล้วค่อยนึกถึง security"
+    },
+    {
+      "question": "AI application มี threat ที่เป็น unique อะไรบ้าง?",
+      "choices": [
+        "มีแค่ SQL injection เหมือน web app ทั่วไป",
+        "Prompt injection, data exfiltration, model manipulation",
+        "มีแค่ DDoS attack",
+        "ไม่มี threat เฉพาะตัว ใช้ security เดียวกับ web app"
+      ],
+      "answer": 1,
+      "explanation": "AI applications มี unique threats: prompt injection (หลอกให้ model ทำตามคำสั่ง attacker), data exfiltration (model leak ข้อมูล), model manipulation (adversarial inputs)"
+    },
+    {
+      "question": "Output guardrails สำหรับ AI chatbot สำคัญเพราะอะไร?",
+      "choices": [
+        "เพื่อให้ response ดูสวยงาม",
+        "เพื่อป้องกันไม่ให้ AI ทำสิ่งที่อันตราย เช่น leak ข้อมูล หรือ execute unauthorized actions",
+        "เพื่อ reduce API cost",
+        "เพื่อ improve response time"
+      ],
+      "answer": 1,
+      "explanation": "Output guardrails ป้องกันไม่ให้ AI ทำสิ่งที่อันตราย — เช่น leak database contents, execute unauthorized API calls, หรือส่ง email ที่ไม่ได้รับอนุญาต"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-15-data",
+  "questions": [
+    {
+      "question": "What is the purpose of data curation in the ML pipeline?",
+      "choices": [
+        "To collect as much raw data as possible without any filtering",
+        "To clean, filter, and select high-quality training data that improves model performance",
+        "To encrypt all training data for security compliance",
+        "To compress data into smaller file formats for storage savings"
+      ],
+      "answer": 1,
+      "explanation": "Data curation is the process of filtering, cleaning, and selecting training data to ensure quality. The principle 'garbage in, garbage out' applies — better data consistently yields better models than more data."
+    },
+    {
+      "question": "Why is deduplication an important step in data curation?",
+      "choices": [
+        "Duplicate data makes the dataset take up less disk space",
+        "Duplicate entries bias the model toward over-represented patterns, wasting training compute and reducing diversity",
+        "Deduplication is only important for image datasets, not text",
+        "Duplicate data always improves model accuracy"
+      ],
+      "answer": 1,
+      "explanation": "Duplicate data skews the model's learned distribution toward repeated patterns, effectively reducing the diversity of the training set. Removing duplicates ensures more uniform coverage of the data distribution."
+    },
+    {
+      "question": "What does a quality scoring function with a sigmoid activation do in a data curation pipeline?",
+      "choices": [
+        "It converts raw data into text format",
+        "It outputs a probability between 0 and 1 indicating how likely a data sample is to be high quality",
+        "It deletes low-quality data directly without human review",
+        "It doubles the size of the dataset"
+      ],
+      "answer": 1,
+      "explanation": "A sigmoid function maps any input to a value between 0 and 1, making it ideal for binary classification — scoring each data sample as likely good (near 1) or likely bad (near 0) based on quality criteria."
+    }
+  ]
+}

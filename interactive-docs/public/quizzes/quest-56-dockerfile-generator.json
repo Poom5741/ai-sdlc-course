@@ -1,0 +1,38 @@
+{
+  "questId": "quest-56-dockerfile-generator",
+  "questions": [
+    {
+      "question": "Why should Docker containers run as a non-root user?",
+      "choices": [
+        "Root users use more memory",
+        "If an attacker escapes the container, they have root access to the host machine",
+        "Root users can't access the network",
+        "Docker doesn't support root users in production"
+      ],
+      "answer": 1,
+      "explanation": "Running as root is the most common Docker security mistake. If an attacker breaks out of the container, root access means they can compromise the host. Using a non-root user (like USER appuser) limits this risk."
+    },
+    {
+      "question": "What is the benefit of a multi-stage Docker build?",
+      "choices": [
+        "It makes the Dockerfile shorter",
+        "It separates build tools from the production image, reducing size and attack surface",
+        "It allows running multiple containers simultaneously",
+        "It automatically scales the application"
+      ],
+      "answer": 1,
+      "explanation": "Multi-stage builds compile/prepare in a 'builder' stage, then copy only the production artifacts to a slim final image. Build tools, source code, and dev dependencies stay out of the production image."
+    },
+    {
+      "question": "What does the HEALTHCHECK instruction do in a Dockerfile?",
+      "choices": [
+        "It runs unit tests during the build",
+        "It tells Docker/orchestrators how to verify the container is running correctly",
+        "It encrypts the container's network traffic",
+        "It automatically restarts the container every 30 seconds"
+      ],
+      "answer": 1,
+      "explanation": "HEALTHCHECK defines how Docker can verify the container is healthy. Without it, orchestrators like Kubernetes can't detect a broken container and restart it, leading to silent failures."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-64-tool-registry",
+  "questions": [
+    {
+      "question": "Tool Registry ทำหน้าที่อะไร?",
+      "choices": [
+        "เก็บ source code ของ tools",
+        "จัดการ registration, validation, และ dispatch ของ tools ตอน runtime",
+        "รัน tests สำหรับ tools ทุกตัว",
+        "สร้าง documentation สำหรับ tools"
+      ],
+      "answer": 1,
+      "explanation": "Tool Registry คือ central hub ที่ agents discover, register, validate, และ execute tools ได้ตอน runtime — ไม่ต้อง hardcode"
+    },
+    {
+      "question": "ทำไม Tool Registry ต้อง validate parameters ก่อน execute?",
+      "choices": [
+        "เพื่อให้ execute เร็วขึ้น",
+        "ป้องกัน runtime errors เมื่อ args ขาด field จำเป็น",
+        "เพื่อ log ทุก request",
+        "เพื่อ cache results"
+      ],
+      "answer": 1,
+      "explanation": "ถ้าไม่ validate args ก่อน execute agent อาจส่ง arguments ผิดประเภท ทำให้เกิด runtime errors ที่ยากจะ debug"
+    },
+    {
+      "question": "findTools(query) ทำอะไร?",
+      "choices": [
+        "ลบ tools ที่ไม่ใช้แล้ว",
+        "ค้นหา tools ที่ตรงกับ keyword จาก name หรือ description",
+        "รัน tools ทั้งหมดพร้อมกัน",
+        "สร้าง tool ใหม่จาก query"
+      ],
+      "answer": 1,
+      "explanation": "findTools ช่วย agent ค้นหา tools ที่เหมาะสมจาก keyword — เร็วกว่า listTools แล้วเลือกเองเมื่อมี tools หลายสิบตัว"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-54-ai-usage-policy",
+  "questions": [
+    {
+      "question": "What are the six pillars of a comprehensive AI usage policy?",
+      "choices": [
+        "Budget, timeline, team size, tools, vendor, support",
+        "Approved tools, prohibited uses, data handling, attribution, consequences, review cadence",
+        "Security, performance, reliability, cost, compliance, monitoring",
+        "Planning, development, testing, deployment, monitoring, retirement"
+      ],
+      "answer": 1,
+      "explanation": "A complete AI usage policy must cover: approved tools & permitted uses, prohibited uses, data handling rules, attribution & disclosure, consequences for violations, and review/update cadence."
+    },
+    {
+      "question": "Why is 'use AI tools responsibly' an ineffective policy statement?",
+      "choices": [
+        "It's too short to fit in a document",
+        "It's too vague to be enforced — specific prohibitions are needed",
+        "It doesn't mention which AI tools to use",
+        "It only applies to senior developers"
+      ],
+      "answer": 1,
+      "explanation": "Vague policies are unenforceable. A good policy names specific tools, lists specific prohibitions (like 'don't paste customer PII into AI tools'), and defines specific consequences."
+    },
+    {
+      "question": "Why must an AI usage policy have a review cadence?",
+      "choices": [
+        "Legal requirements mandate monthly policy reviews",
+        "AI tools change rapidly — a policy from 2024 may reference tools that no longer exist",
+        "Review cadences make policies look more professional",
+        "It's a way to give the compliance team more work"
+      ],
+      "answer": 1,
+      "explanation": "AI tools and their data practices evolve quickly. A policy that isn't reviewed quarterly may reference deprecated tools, miss new risks, or fail to address newly discovered vulnerabilities."
+    }
+  ]
+}

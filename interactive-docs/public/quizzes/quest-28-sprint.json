@@ -1,0 +1,38 @@
+{
+  "questId": "quest-28-sprint",
+  "questions": [
+    {
+      "question": "What is the primary goal of sprint planning?",
+      "choices": [
+        "To assign as many tasks as possible to each developer",
+        "To select a manageable set of high-priority features and break them into concrete, estimable tasks the team can complete within the sprint",
+        "To plan the entire project timeline in detail",
+        "To review the previous sprint's code for style violations"
+      ],
+      "answer": 1,
+      "explanation": "Sprint planning focuses the team on the highest-priority work, breaking features into tasks small enough to estimate and complete within the sprint. The goal is a realistic, achievable commitment — not maximum throughput."
+    },
+    {
+      "question": "Why should features be broken down into smaller tasks during sprint planning?",
+      "choices": [
+        "Smaller tasks look better on the sprint board",
+        "Smaller tasks are easier to estimate, track, and complete; they reduce risk and enable earlier delivery of working increments",
+        "Smaller tasks require less testing",
+        "Breaking down tasks is only needed for junior developers"
+      ],
+      "answer": 1,
+      "explanation": "Large tasks are harder to estimate accurately, carry more risk of exceeding estimates, and provide less visibility into progress. Breaking them down enables better planning, earlier feedback, and continuous delivery of working increments."
+    },
+    {
+      "question": "What should the team do if they realize during sprint planning that a feature is too large for a single sprint?",
+      "choices": [
+        "Work overtime to force it into the sprint",
+        "Split the feature into a thin vertical slice that delivers a working increment, and schedule the rest for future sprints",
+        "Remove all other features to make room",
+        "Skip the planning phase and start coding immediately"
+      ],
+      "answer": 1,
+      "explanation": "When a feature is too large, the team should identify the smallest valuable slice that delivers working functionality. The remaining work is estimated and planned for subsequent sprints, maintaining a sustainable pace and delivering value incrementally."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-59-monitoring-dashboard",
+  "questions": [
+    {
+      "question": "Why is P95 (95th percentile) more useful than average for latency monitoring?",
+      "choices": [
+        "P95 is faster to compute than average",
+        "Average hides outliers — P95 reveals that 5% of requests are experiencing severe delays",
+        "P95 is always higher than average, making it a more conservative metric",
+        "P95 is required by regulatory compliance standards"
+      ],
+      "answer": 1,
+      "explanation": "For latency values [100, 120, 110, 150, 3000], the average is 696ms (looks fine) but P95 is 3000ms (reveals the outlier). Average masks the worst user experiences; P95 exposes them."
+    },
+    {
+      "question": "What must you do before calculating the P95 percentile?",
+      "choices": [
+        "Convert all values to percentages",
+        "Sort the values in ascending order",
+        "Remove outliers from the dataset",
+        "Calculate the standard deviation first"
+      ],
+      "answer": 1,
+      "explanation": "Percentile calculation requires sorted data. The P95 value is at index `Math.ceil(sorted.length * 0.95) - 1` in the sorted array. Unsorted data gives incorrect results."
+    },
+    {
+      "question": "A monitoring dashboard shows avg latency = 200ms but P95 latency = 5000ms. What does this indicate?",
+      "choices": [
+        "The monitoring system is broken and showing wrong numbers",
+        "Most requests are fast, but 5% of requests are extremely slow — investigate the outliers",
+        "The average is more reliable than P95 and should be trusted",
+        "The server needs more RAM to handle the load"
+      ],
+      "answer": 1,
+      "explanation": "The gap between average (200ms) and P95 (5000ms) means a small percentage of requests are experiencing severe delays. This could indicate cold starts, cache misses, or specific query patterns that need investigation."
+    }
+  ]
+}

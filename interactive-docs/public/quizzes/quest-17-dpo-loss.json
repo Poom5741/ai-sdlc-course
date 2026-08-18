@@ -1,0 +1,38 @@
+{
+  "questId": "quest-17-dpo-loss",
+  "questions": [
+    {
+      "question": "What is the DPO loss formula?",
+      "choices": [
+        "L = log(σ(β × ratio))",
+        "L = -log(σ(β × (log π(y_w)/π_ref(y_w) - log π(y_l)/π_ref(y_l))))",
+        "L = β × (chosen - rejected)",
+        "L = softmax(policy - reference)"
+      ],
+      "answer": 1,
+      "explanation": "DPO loss is the negative log-sigmoid of the scaled log-probability ratio between chosen and rejected responses."
+    },
+    {
+      "question": "Why should you use log-space arithmetic instead of computing probabilities directly?",
+      "choices": [
+        "Log-space is faster to compute",
+        "Direct probability computation can overflow/underflow with very small or large values",
+        "Log-space uses less memory",
+        "JavaScript doesn't support floating-point division"
+      ],
+      "answer": 1,
+      "explanation": "Log-probabilities can be very large negative numbers. Computing exp() on them gives 0, and dividing 0/0 gives NaN. Subtracting log-probs is always numerically stable."
+    },
+    {
+      "question": "When the policy model matches the reference model exactly, what is the DPO loss?",
+      "choices": [
+        "0",
+        "1",
+        "log(2) ≈ 0.693",
+        "β"
+      ],
+      "answer": 2,
+      "explanation": "When policy = reference, the ratio is 1, β×1 = β, σ(β) depends on β, but for the standard formulation with β=1, the loss equals log(2). This is the 'no improvement' baseline."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-66-agent-hierarchy",
+  "questions": [
+    {
+      "question": "Manager-Worker Hierarchy มีข้อดีอย่างไร?",
+      "choices": [
+        "Manager ทำงานเองได้เร็วกว่า",
+        "Manager decompose งานแล้วให้ workers หลายคนทำ parallel — scale ได้",
+        "Workers ไม่ต้องรายงานผล",
+        "ไม่ต้องมี validation"
+      ],
+      "answer": 1,
+      "explanation": "Manager แบ่งงานใหญ่เป็นงานย่อยแล้ว assign ให้ workers หลายคนทำพร้อมกัน — ประสิทธิภาพสูงกว่า agent เดียวทำงานเอง"
+    },
+    {
+      "question": "ทำไม Manager ต้อง validate ผลลัพธ์จาก Workers?",
+      "choices": [
+        "เพื่อเช็คว่า worker ทำงานเสร็จ",
+        "เพื่อ ensure quality — ถ้า worker output คุณภาพต่ำ ต้อง retry หรือ assign ใหม่",
+        "เพื่อ log performance",
+        "ไม่ต้อง validate ก็ได้"
+      ],
+      "answer": 1,
+      "explanation": "ถ้า manager รับผลลัพธ์จาก workers โดยไม่ validate quality จะไม่保证 — worker อาจสร้าง output คุณภาพต่ำโดยไม่รู้ตัว"
+    },
+    {
+      "question": "ถ้า manager.validate() reject results บางส่วน ควรทำอย่างไร?",
+      "choices": [
+        "_IGNORE แล้ว return results ที่มี",
+        "Retry หรือ assign ใหม่สำหรับ items ที่ถูก reject",
+        "ยกเลิกทั้งหมด",
+        "เปลี่ยน manager"
+      ],
+      "answer": 1,
+      "explanation": "Feedback loop สำคัญ — manager ต้อง retry หรือ assign ใหม่สำหรับ items ที่ rejected ไม่ใช่ ignored"
+    }
+  ]
+}

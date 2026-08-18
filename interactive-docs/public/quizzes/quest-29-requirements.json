@@ -1,0 +1,38 @@
+{
+  "questId": "quest-29-requirements",
+  "questions": [
+    {
+      "question": "What are the key quality dimensions for evaluating software requirements?",
+      "choices": [
+        "Length, font size, and color of the requirements document",
+        "Completeness, consistency, clarity, testability, and traceability",
+        "Number of requirements, file size, and page count",
+        "Which developer wrote them and when they were written"
+      ],
+      "answer": 1,
+      "explanation": "High-quality requirements are complete (nothing missing), consistent (no contradictions), clear (unambiguous), testable (verifiable with concrete criteria), and traceable (linked to business goals and test cases)."
+    },
+    {
+      "question": "Why is 'testability' considered a critical quality dimension for requirements?",
+      "choices": [
+        "Testability only matters for QA teams",
+        "Requirements that cannot be tested have no objective way to verify completion, leading to endless debates about whether the feature is 'done'",
+        "Testable requirements are always shorter",
+        "Testability is only relevant for unit tests"
+      ],
+      "answer": 1,
+      "explanation": "If a requirement can't be tested, there's no objective way to confirm it's implemented correctly. This leads to ambiguity about 'done' status and disputes during acceptance. Testable requirements translate directly to acceptance criteria and test cases."
+    },
+    {
+      "question": "How does an AI-powered requirements analyzer add value to the development process?",
+      "choices": [
+        "It replaces the need for product managers entirely",
+        "It can automatically identify gaps, ambiguities, and inconsistencies in requirements before development begins, reducing costly rework",
+        "It generates the complete codebase from requirements",
+        "It only checks spelling and grammar"
+      ],
+      "answer": 1,
+      "explanation": "AI-powered analysis can scan requirements for common quality issues — missing acceptance criteria, vague language, contradictory constraints, untested edge cases — catching problems early when they're far cheaper to fix."
+    }
+  ]
+}

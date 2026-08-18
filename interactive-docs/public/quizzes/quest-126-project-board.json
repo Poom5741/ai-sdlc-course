@@ -1,0 +1,27 @@
+{
+  "questId": "quest-126-project-board",
+  "questions": [
+    {
+      "question": "Why are automation rules essential for a GitHub Project board?",
+      "choices": [
+        "They make the board look more professional",
+        "They ensure items move through statuses automatically, keeping the board accurate without manual updates",
+        "They prevent team members from creating new issues",
+        "They automatically close stale issues"
+      ],
+      "answer": 1,
+      "explanation": "Without automation, team members must manually move items between columns. This rarely happens consistently, so the board becomes stale and unreliable. Automation keeps it accurate."
+    },
+    {
+      "question": "What is the purpose of having multiple views (Board, Table, Roadmap) on a single project?",
+      "choices": [
+        "Each view shows completely different data",
+        "Different audiences need different perspectives — daily standups need board, stakeholder demos need roadmap, workload analysis needs table",
+        "GitHub requires at least 3 views per project",
+        "Multiple views improve loading performance"
+      ],
+      "answer": 1,
+      "explanation": "Board view works for daily standups, Table view lets PMs filter by assignee for 1-on-1s, and Roadmap view shows timeline for stakeholder demos. Same data, different perspectives."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "questId": "quest-26-tech-stack-recommender",
+  "questions": [
+    {
+      "question": "เพราะอะไร AI มักแนะนำ stack เดิมซ้ำๆ ไม่ว่า requirements จะต่างกัน?",
+      "choices": [
+        "เพราะ AI ไม่รู้จัก technology ใหม่ๆ",
+        "เพราะ AI ฝึกมาจากข้อมูลที่ React + Node.js ได้รับความนิยมสูงสุด จึงแนะนำเป็นค่า default",
+        "เพราะ AI ต้องการขาย license ของ technology เหล่านั้น",
+        "เพราะ AI ไม่สามารถวิเคราะห์ requirements ได้เลย"
+      ],
+      "answer": 1,
+      "explanation": "AI ฝึกมาจากข้อมูลจำนวนมากที่ React + Node.js ได้รับความนิยม จึงมักแนะนำเป็น default — แต่ enterprise fintech ควรใช้ stack ที่ต่างจาก small personal project"
+    },
+    {
+      "question": "4 evaluation dimensions สำหรับเลือก tech stack คืออะไร?",
+      "choices": [
+        "Cost, Speed, Design, Marketing",
+        "Scale, Team Size, Complexity, Domain",
+        "Language, Framework, Database, Hosting",
+        "Frontend, Backend, Mobile, Desktop"
+      ],
+      "answer": 1,
+      "explanation": "4 มิติหลักคือ: Scale (ขนาด project), Team Size (ทีมกี่คน), Complexity (ความซับซ้อน), Domain (อุตสาหกรรม) — แต่ละมิติส่งผลต่อ stack ที่เหมาะสม"
+    },
+    {
+      "question": "Rationale ที่ดีควรมีลักษณะใด?",
+      "choices": [
+        "เขียนสั้นๆ เช่น 'because it's good'",
+        "อธิบายว่าทำไม stack นี้เหมาะกับ requirements เฉพาะของ project นี้",
+        "列出 technology features โดยไม่เชื่อมโยงกับ requirements",
+        "เขียนยาวเท่าที่จะยาวได้เพื่อให้ดูมีสาระ"
+      ],
+      "answer": 1,
+      "explanation": "Rationale ต้องอธิบายว่าทำไม stack นี้เหมาะกับ requirements เฉพาะ — เช่น 'enterprise fintech needs ACID compliance and audit trails'"
+    }
+  ]
+}

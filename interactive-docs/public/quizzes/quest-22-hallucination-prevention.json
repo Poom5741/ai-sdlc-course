@@ -1,0 +1,38 @@
+{
+  "questId": "quest-22-hallucination-prevention",
+  "questions": [
+    {
+      "question": "What is 'defense in depth' in the context of hallucination prevention?",
+      "choices": [
+        "Using only the strongest prevention technique",
+        "Layering multiple strategies so no single point of failure causes hallucination",
+        "Preventing hallucination at the model training level only",
+        "Using a single temperature setting for all prompts"
+      ],
+      "answer": 1,
+      "explanation": "No single technique catches all hallucinations. Defense in depth layers multiple strategies (temperature, context, citation, confidence) for robustness."
+    },
+    {
+      "question": "What warning should the system generate when temperature is high?",
+      "choices": [
+        "'Model is running too fast'",
+        "'High temperature may increase hallucination risk. Consider lowering to 0.3-0.5'",
+        "'Temperature is optimal'",
+        "'No warnings needed'"
+      ],
+      "answer": 1,
+      "explanation": "High temperature (>0.7) increases randomness and creativity, which can lead to more hallucinations. The system should warn and suggest a lower value."
+    },
+    {
+      "question": "What happens when context is empty in a hallucination prevention system?",
+      "choices": [
+        "The system proceeds normally",
+        "The system returns a strong warning about potential hallucination",
+        "The system crashes",
+        "The system generates context automatically"
+      ],
+      "answer": 1,
+      "explanation": "Empty context means the model has no grounded information to reference, making hallucination likely. A strong warning is essential."
+    }
+  ]
+}

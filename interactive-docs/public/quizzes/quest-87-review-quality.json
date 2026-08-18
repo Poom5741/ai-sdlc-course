@@ -1,0 +1,38 @@
+{
+  "questId": "quest-87-review-quality",
+  "questions": [
+    {
+      "question": "What makes a code review comment 'actionable'?",
+      "choices": [
+        "It's written in uppercase letters",
+        "It tells the developer specifically what to change and how",
+        "It's at least 100 words long",
+        "It references a code style guide"
+      ],
+      "answer": 1,
+      "explanation": "An actionable review comment tells the developer exactly what to do: 'Extract this into a helper function' or 'Use a Map for O(1) lookups.' Vague comments like 'this is wrong' give no direction."
+    },
+    {
+      "question": "Why is quality more important than quantity in code review comments?",
+      "choices": [
+        "More comments slow down the CI pipeline",
+        "10 vague 'fix this' comments are worse than 3 specific, actionable ones",
+        "Managers only count comments for performance reviews",
+        "Automated tools can replace human comments"
+      ],
+      "answer": 1,
+      "explanation": "Specific, actionable comments that identify real issues are far more valuable than many vague ones. Too many low-quality comments create noise and cause developers to ignore all feedback."
+    },
+    {
+      "question": "A reviewer writes: 'This is terrible.' Is this a good review comment?",
+      "choices": [
+        "Yes — it correctly identifies a problem",
+        "No — while technically feedback, it lacks specificity, actionability, and constructive framing",
+        "Yes — short comments are preferred",
+        "It depends on the reviewer's seniority"
+      ],
+      "answer": 1,
+      "explanation": "Good review feedback must be specific (what's wrong), actionable (what to do instead), and constructive (framed as improvement, not criticism). 'This is terrible' fails on all three dimensions."
+    }
+  ]
+}

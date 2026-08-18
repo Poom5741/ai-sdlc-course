@@ -1,0 +1,38 @@
+{
+  "questId": "quest-8-tool-selection",
+  "questions": [
+    {
+      "question": "What is a Tool Selection Matrix?",
+      "choices": [
+        "A list of all available AI tools",
+        "A structured comparison table with criteria, scoring, and recommendations",
+        "A pricing comparison between tools",
+        "A tutorial for using a specific tool"
+      ],
+      "answer": 1,
+      "explanation": "A Tool Selection Matrix is a structured comparison with defined criteria (speed, accuracy, cost, etc.), a scoring system, and recommendations for different use cases."
+    },
+    {
+      "question": "Why should you not give subjective scores like 'Claude is better because I like it'?",
+      "choices": [
+        "Subjective scores are always wrong",
+        "Scores should be based on objective, measurable criteria",
+        "Only managers should rate tools",
+        "Subjective opinions don't matter"
+      ],
+      "answer": 1,
+      "explanation": "A useful matrix requires objective, measurable criteria so the comparison is fair and reproducible. Personal preference doesn't help others make decisions."
+    },
+    {
+      "question": "Why should the tool matrix be updated regularly?",
+      "choices": [
+        "To keep the document looking fresh",
+        "AI tools evolve rapidly — new features, pricing, and capabilities change frequently",
+        "To practice writing markdown",
+        "It's not necessary to update"
+      ],
+      "answer": 1,
+      "explanation": "AI tools develop quickly. New features, updated pricing, and changed capabilities mean an outdated matrix can lead to poor tool selection decisions."
+    }
+  ]
+}

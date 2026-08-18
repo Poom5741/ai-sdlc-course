@@ -1,0 +1,38 @@
+{
+  "questId": "quest-57-iac-generator",
+  "questions": [
+    {
+      "question": "Why must sensitive values like passwords use Terraform variables instead of being hardcoded?",
+      "choices": [
+        "Variables are faster to deploy",
+        "Hardcoded secrets are visible in git history forever — variables let you inject values at deploy time",
+        "Terraform doesn't support hardcoded strings",
+        "Variables use less memory during planning"
+      ],
+      "answer": 1,
+      "explanation": "Once a secret is committed to git, it's in the history permanently — even if you delete it later. Using variables with `sensitive = true` lets you inject values from environment variables or secrets managers at deploy time."
+    },
+    {
+      "question": "What are the four main components of a Terraform HCL file?",
+      "choices": [
+        "Imports, classes, methods, exports",
+        "Provider block, variable declarations, resource blocks, output blocks",
+        "Functions, loops, conditionals, handlers",
+        "Namespaces, modules, packages, interfaces"
+      ],
+      "answer": 1,
+      "explanation": "A Terraform HCL file needs: a provider block (which cloud), variable declarations (input parameters, especially sensitive ones), resource blocks (what to create), and output blocks (useful IDs to reference later)."
+    },
+    {
+      "question": "What does `sensitive = true` do on a Terraform variable?",
+      "choices": [
+        "Encrypts the variable at rest",
+        "Prevents Terraform from printing the value in plan output and logs",
+        "Makes the variable only accessible to admins",
+        "Compresses the variable to save disk space"
+      ],
+      "answer": 1,
+      "explanation": "Without `sensitive = true`, Terraform will print the variable's value in `terraform plan` output and logs. Setting it to true masks the value, preventing accidental exposure."
+    }
+  ]
+}

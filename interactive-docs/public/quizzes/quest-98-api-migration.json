@@ -1,0 +1,38 @@
+{
+  "questId": "quest-98-api-migration",
+  "questions": [
+    {
+      "question": "In GraphQL, what should POST REST routes be converted to?",
+      "choices": [
+        "Query resolvers",
+        "Mutation resolvers",
+        "Subscription resolvers",
+        "Type definitions"
+      ],
+      "answer": 1,
+      "explanation": "POST routes มี side effects (สร้างข้อมูล) — ใน GraphQL นั่นคือ Mutation. Query ใช้สำหรับ read-only operations (GET)"
+    },
+    {
+      "question": "What is the correct output structure for restToGraphQL()?",
+      "choices": [
+        "{ routes: [], handlers: {} }",
+        "{ schema: string, resolvers: object }",
+        "{ query: string, mutation: string }",
+        "{ endpoints: [], middleware: [] }"
+      ],
+      "answer": 1,
+      "explanation": "restToGraphQL ต้อง return schema (GraphQL type definitions string) และ resolvers (object with Query/Mutation resolver functions)"
+    },
+    {
+      "question": "Why should REST → GraphQL migration be done incrementally?",
+      "choices": [
+        "GraphQL can't handle all routes at once",
+        "Rewriting everything at once increases risk of breaking changes",
+        "Express doesn't support GraphQL",
+        "Incremental migration is slower but safer"
+      ],
+      "answer": 1,
+      "explanation": "Rewriting ทุก endpoint พร้อมกันมีความเสี่ยงสูง — wrap existing endpoints แล้ว migrate ทีละตัวจะปลอดภัยกว่า ถ้ามีปัญหาจะ isolate ได้ง่าย"
+    }
+  ]
+}

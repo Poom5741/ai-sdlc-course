@@ -1,0 +1,38 @@
+{
+  "questId": "quest-11-security-architecture",
+  "questions": [
+    {
+      "question": "Why is security architecture design especially important for AI applications?",
+      "choices": [
+        "AI apps are always open-source so security is handled by the community",
+        "AI apps handle sensitive data, model access, and API keys, creating unique attack surfaces beyond traditional web apps",
+        "Security only matters for apps with payment processing",
+        "AI models are inherently secure because they only predict text"
+      ],
+      "answer": 1,
+      "explanation": "AI applications introduce unique security concerns: model inference endpoints can be abused, training data may contain sensitive information, API keys grant powerful access, and prompt injection can bypass intended behavior."
+    },
+    {
+      "question": "What is the principle of least privilege in the context of AI system security?",
+      "choices": [
+        "Giving every component full access to simplify development",
+        "Granting each component only the minimum permissions it needs to perform its function",
+        "Using the smallest possible model to reduce attack surface",
+        "Limiting user input to a single sentence"
+      ],
+      "answer": 1,
+      "explanation": "Least privilege means each service, component, or user gets only the permissions required for their specific role. This limits damage from breaches — if one component is compromised, it can't access everything."
+    },
+    {
+      "question": "Which of the following is a critical security concern specific to LLM-powered applications?",
+      "choices": [
+        "SQL injection attacks on the database",
+        "Cross-site scripting in the HTML template",
+        "Prompt injection that causes the model to bypass safety rules or leak sensitive data",
+        "Outdated CSS styles that look unprofessional"
+      ],
+      "answer": 2,
+      "explanation": "Prompt injection is an attack where malicious input tricks an LLM into ignoring its instructions, revealing system prompts, or performing unintended actions. It's a unique vulnerability of AI applications."
+    }
+  ]
+}

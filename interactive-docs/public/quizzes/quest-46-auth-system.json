@@ -1,0 +1,38 @@
+{
+  "questId": "quest-46-auth-system",
+  "questions": [
+    {
+      "question": "ทำไม verifyToken ต้องเช็คทั้ง signature และ expiration?",
+      "choices": [
+        "เช็คตัวใดตัวหนึ่งก็พอ เพราะทั้งสองเชื่อมโยงกัน",
+        "เช็ค signature ช่วยป้องกัน token expiration",
+        "ถ้าลืม expiration check token จะอยู่ตลอดกาล ถ้า leak ก็อันตราย",
+        "Expiration check ช่วย verify signature"
+      ],
+      "answer": 2,
+      "explanation": "Signed token ที่ไม่มี expiration = permanent key ถ้า token leak ผู้โจมตีจะมี access ตลอดกาล ต้องเช็คทั้งสองตัว"
+    },
+    {
+      "question": "กฎความปลอดภัยของ password ที่ถูกต้องคืออะไร?",
+      "choices": [
+        "ความยาวอย่างน้อย 8 ตัวอักษร + มี uppercase และ digit",
+        "ใช้ dictionary words ที่จำง่าย",
+        "ความยาว 4 ตัวอักษรก็พอ",
+        "ใช้เฉพาะตัวเลขเท่านั้น"
+      ],
+      "answer": 0,
+      "explanation": "Password ที่ปลอดภัยต้องมีความยาวอย่างน้อย 8 ตัวอักษร และมีความหลากหลาย: uppercase, digit, special characters"
+    },
+    {
+      "question": " Defense in Depth สำหรับ authentication หมายถึงอะไร?",
+      "choices": [
+        "ใช้ security layer เดียวที่แข็งแกร่งมาก",
+        "ใช้หลาย security layers ซ้อนกัน: hashing + token signing + expiration + rate limiting",
+        "ซ่อน authentication logic ไว้ใน code",
+        "ใช้ authentication library ตัวเดียว"
+      ],
+      "answer": 1,
+      "explanation": "Defense in Depth คือการใช้หลาย security layers ซ้อนกัน — ถ้าชั้นหนึ่งหลุด ชั้นถัดไปยังป้องกันได้"
+    }
+  ]
+}

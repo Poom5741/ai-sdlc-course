@@ -1,0 +1,38 @@
+{
+  "questId": "quest-106-accessibility-checker",
+  "questions": [
+    {
+      "question": "Why should an `<img>` with `role='presentation'` NOT be flagged as a violation?",
+      "choices": [
+        "Decorative images are exempt from accessibility laws",
+        "role='presentation' tells screen readers to skip the image, so no alt is needed",
+        "The image is hidden from all users",
+        "role='presentation' automatically adds alt text"
+      ],
+      "answer": 1,
+      "explanation": "A decorative image with `role='presentation'` signals to screen readers that the image has no informational value and should be skipped. Requiring alt text here would be a false positive."
+    },
+    {
+      "question": "What distinguishes an 'error' from a 'warning' in accessibility violations?",
+      "choices": [
+        "Errors are legal violations; warnings are style preferences",
+        "Errors block access for users; warnings degrade experience but don't block",
+        "Errors are for images; warnings are for text",
+        "There's no difference — they're interchangeable"
+      ],
+      "answer": 1,
+      "explanation": "Missing alt text on an image blocks screen reader users from understanding the content (error). A heading skip degrades the document structure but doesn't completely block access (warning)."
+    },
+    {
+      "question": "Why must accessibility violation reports include line numbers?",
+      "choices": [
+        "Line numbers make reports look more professional",
+        "They help developers find and fix the exact location of the violation",
+        "Line numbers are required by WCAG",
+        "They're only needed for multi-file projects"
+      ],
+      "answer": 1,
+      "explanation": "A violation report without line numbers forces developers to search manually for the issue. Line numbers make reports actionable by pointing directly to the problem."
+    }
+  ]
+}

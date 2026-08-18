@@ -1,0 +1,38 @@
+{
+  "questId": "quest-114-feature-flags",
+  "questions": [
+    {
+      "question": "ทำไม Feature Flags จึงต้องใช้ deterministic hash แทน Math.random()?",
+      "choices": [
+        "Math.random() is slower",
+        "Math.random() ทำให้ผลเปลี่ยนทุกครั้ง — user เห็น feature หาย/ปรากฏ",
+        "Math.random() ไม่รองรับ percentage",
+        "Hash function ใช้ memory น้อยกว่า"
+      ],
+      "answer": 1,
+      "explanation": "Math.random() returns different values each call, so the same user would see the feature toggle on/off randomly. Deterministic hash ensures the same user always gets the same result."
+    },
+    {
+      "question": "evaluateFlag ควร check อะไรก่อน — rules หรือ percentage?",
+      "choices": [
+        "Percentage ก่อน เพราะเร็วกว่า",
+        "Rules ก่อน — explicit targeting takes precedence over percentage",
+        "สลับกันทุกครั้ง",
+        "ไม่ต้อง check อะไร — return true เสมอ"
+      ],
+      "answer": 1,
+      "explanation": "Rules (like environment-based targeting) should be checked first because they represent explicit overrides. A staging environment flag should always be on for staging, regardless of percentage."
+    },
+    {
+      "question": "Feature flag ที่มี percentage: 100 ควร return ผลลัพธ์อะไร?",
+      "choices": [
+        "{ enabled: false, reason: 'Not in percentage' }",
+        "{ enabled: true, reason: '100% rollout' }",
+        "ต้อง hash userId ก่อน",
+        "depends on rules"
+      ],
+      "answer": 1,
+      "explanation": "At 100% rollout, every user should see the feature — no hashing needed. Similarly, 0% should always return false. These are optimization shortcuts."
+    }
+  ]
+}

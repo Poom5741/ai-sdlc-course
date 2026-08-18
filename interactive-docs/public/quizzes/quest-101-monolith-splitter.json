@@ -1,0 +1,38 @@
+{
+  "questId": "quest-101-monolith-splitter",
+  "questions": [
+    {
+      "question": "Modules that share the same database dependency should be:",
+      "choices": [
+        "Split into separate microservices",
+        "Grouped together in the same service",
+        "Deleted as redundant",
+        "Converted to GraphQL endpoints"
+      ],
+      "answer": 1,
+      "explanation": "Modules ที่ share dependencies (เช่น users-db) ควรอยู่ใน service เดียวกัน — ถ้าแยกจะเกิด distributed monolith ที่ต้อง cross-service call ตลอดเวลา"
+    },
+    {
+      "question": "What is the better approach for splitting a monolith?",
+      "choices": [
+        "Split by technical layer (database, API, UI)",
+        "Split by business domain (users, orders, inventory)",
+        "Split by file size (large files = separate services)",
+        "Split by number of functions"
+      ],
+      "answer": 1,
+      "explanation": "SPLIT BY DOMAIN, NOT BY LAYER — services ควร ownership business capability (users, orders, inventory) ไม่ใช่ technical layer (database, API)"
+    },
+    {
+      "question": "Why must every service in the output have a `reason` field?",
+      "choices": [
+        "It's required by the test framework",
+        "It documents the domain justification for the service boundary",
+        "It helps with code generation",
+        "It's used for logging purposes"
+      ],
+      "answer": 1,
+      "explanation": "Reason field อธิบายว่าทำไม service นี้ถึงมีอยู่ — 'User domain — shares user database' ช่วยให้ทีมเข้าใจ service boundaries และตัดสินใจได้ถูกต้อง"
+    }
+  ]
+}

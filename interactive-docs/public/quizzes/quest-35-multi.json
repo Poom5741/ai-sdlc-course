@@ -1,0 +1,38 @@
+{
+  "questId": "quest-35-multi",
+  "questions": [
+    {
+      "question": "Multi-agent orchestration ควรใช้เมื่อไหร่?",
+      "choices": [
+        "ทุกครั้งที่เขียนโค้ด",
+        "เมื่อ mission ใหญ่เกินไปสำหรับ agent ตัวเดียว",
+        "เมื่อมี budget เท่านั้น",
+        "เมื่อ project เล็กๆ"
+      ],
+      "answer": 1,
+      "explanation": "Multi-agent systems เหมาะเมื่อ task ใหญ่และซับซ้อน — แต่ละ agent ควร specialization แทน generalization"
+    },
+    {
+      "question": "Sequential orchestration ต่างจาก Parallel ยังไง?",
+      "choices": [
+        "Sequential เร็วกว่า",
+        "Sequential แต่ละ step ขึ้นอยู่กับ step ก่อน, Parallel ทำอิสระจากกัน",
+        "Parallel ต้องมี agent มากกว่า",
+        "Sequential ใช้ memory น้อยกว่า"
+      ],
+      "answer": 1,
+      "explanation": "Sequential: agent B รับผลลัพธ์จาก agent A ก่อน — Parallel: agents หลายตัวทำงานพร้อมกัน"
+    },
+    {
+      "question": "ข้อผิดพลาดที่พบบ่อยที่สุดในการ orchestrate agents คืออะไร?",
+      "choices": [
+        "ใช้ agents มากเกินไป",
+        "ไม่ track results จากแต่ละ agent",
+        "Agents เก่งเกินไป",
+        "ไม่ใช้ AI"
+      ],
+      "answer": 1,
+      "explanation": "ถ้าไม่ track results จากแต่ละ agent debugging จะยากมาก — ต้อง trace ผลลัพธ์ทุก step"
+    }
+  ]
+}

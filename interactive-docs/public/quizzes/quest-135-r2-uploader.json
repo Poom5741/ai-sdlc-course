@@ -1,0 +1,38 @@
+{
+  "questId": "quest-135-r2-uploader",
+  "questions": [
+    {
+      "question": "MULTIPART_THRESHOLD สำหรับ R2 upload คือเท่าใด?",
+      "choices": [
+        "1MB",
+        "5MB",
+        "10MB",
+        "25MB"
+      ],
+      "answer": 1,
+      "explanation": "MULTIPART_THRESHOLD = 5 * 1024 * 1024 = 5MB — ไฟล์ขนาด 5MB หรือน้อยกว่าใช้ single upload, มากกว่าใช้ multipart"
+    },
+    {
+      "question": "ถ้าไฟล์มีขนาด 25MB และ CHUNK_SIZE = 10MB ต้องใช้กี่ parts?",
+      "choices": [
+        "2 parts",
+        "2.5 parts",
+        "3 parts",
+        "5 parts"
+      ],
+      "answer": 2,
+      "explanation": "25MB / 10MB = 2.5 → ต้องใช้ `Math.ceil(2.5)` = 3 parts (part สุดท้ายจะมีขนาด 5MB)"
+    },
+    {
+      "question": "Presigned URL ทำหน้าที่อะไร?",
+      "choices": [
+        "เข้ารหัสไฟล์ก่อน upload",
+        "ให้ temporary permission upload/download โดยไม่ expose credentials",
+        "บีบอัดไฟล์ให้เล็กลง",
+        "สร้าง thumbnail อัตโนมัติ"
+      ],
+      "answer": 1,
+      "explanation": "Presigned URLs เป็น temporary URLs ที่มี permission ในตัว — client ใช้ upload/download ได้โดยไม่ต้องรู้ API keys ของ server"
+    }
+  ]
+}

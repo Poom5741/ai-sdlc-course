@@ -1,0 +1,38 @@
+{
+  "questId": "quest-118-governance-framework",
+  "questions": [
+    {
+      "question": "Core principle ของ AI governance ที่ดีคืออะไร?",
+      "choices": [
+        "Block all AI usage to be safe",
+        "Governance enables — สร้าง guidelines ที่ชัดเจนเพื่อให้ใช้ AI ได้อย่างมั่นใจ",
+        "Trust developers completely — ไม่ต้อง rules",
+        "Copy governance จากบริษัทอื่นโดยไม่ modify"
+      ],
+      "answer": 1,
+      "explanation": "Good governance enables teams by removing ambiguity. Instead of blocking AI (which teams will work around), it provides clear guidelines so everyone can use AI confidently and safely."
+    },
+    {
+      "question": "Security rules ควรห้ามไม่ให้ส่งอะไรเข้า AI tools?",
+      "choices": [
+        "Open-source code patterns",
+        "API keys, passwords, PII, secrets",
+        "Test cases and documentation",
+        "Variable names and comments"
+      ],
+      "answer": 1,
+      "explanation": "AI tools may send code snippets to external APIs. API keys, passwords, PII, and secrets must never be shared with AI tools to prevent data breaches and security incidents."
+    },
+    {
+      "question": "AI-generated code ควรมี requirement อะไรใน code review?",
+      "choices": [
+        "No special requirements — same as human code",
+        "ต้อง marked ว่า AI-generated และ reviewer ต้อง verify security, performance, logic",
+        "Skip review เพราะ AI ไม่ make mistakes",
+        "Review เฉพาะ performance เท่านั้น"
+      ],
+      "answer": 1,
+      "explanation": "AI-generated code must be labeled and undergo human review. Reviewers should specifically check for security vulnerabilities, performance issues, and logical correctness since AI can generate subtly flawed code."
+    }
+  ]
+}

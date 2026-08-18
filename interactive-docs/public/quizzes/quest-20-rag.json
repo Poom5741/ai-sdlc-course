@@ -1,0 +1,38 @@
+{
+  "questId": "quest-20-rag",
+  "questions": [
+    {
+      "question": "Why is document chunking critical for RAG system performance?",
+      "choices": [
+        "Smaller chunks always produce better search results",
+        "Chunks that are too large dilute relevance scores with irrelevant content, while chunks that are too small lose important context",
+        "Chunking is only needed for documents over 10,000 words",
+        "The chunk size has no effect on retrieval quality"
+      ],
+      "answer": 1,
+      "explanation": "Chunk size directly impacts retrieval quality. Oversized chunks include noise that dilutes the relevance signal; undersized chunks miss contextual information needed for meaningful answers. The optimal size balances specificity with context."
+    },
+    {
+      "question": "What is the purpose of overlap in sliding-window chunking?",
+      "choices": [
+        "To make the total number of chunks larger for better coverage",
+        "To preserve context across chunk boundaries, ensuring that information split between chunks is still accessible in at least one chunk",
+        "To reduce memory usage during embedding generation",
+        "Overlap is not recommended in production systems"
+      ],
+      "answer": 1,
+      "explanation": "Without overlap, a sentence or concept split between two chunks would lose coherence in both. Overlapping windows ensure that content near boundaries appears in multiple chunks, preserving semantic completeness."
+    },
+    {
+      "question": "Which chunking strategy is best for preserving the semantic structure of documents?",
+      "choices": [
+        "Fixed-size chunking with 100-character windows",
+        "Recursive splitting by natural document boundaries (paragraphs, sections, headings) before falling back to smaller units",
+        "Random sampling of sentences",
+        "Putting the entire document into a single chunk"
+      ],
+      "answer": 1,
+      "explanation": "Recursive/hierarchical chunking respects document structure by splitting on natural boundaries first (sections → paragraphs → sentences). This preserves semantic coherence better than arbitrary fixed-size splits."
+    }
+  ]
+}

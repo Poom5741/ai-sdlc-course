@@ -1,0 +1,38 @@
+{
+  "questId": "quest-73-role-prompts",
+  "questions": [
+    {
+      "question": "Role prompt ที่ดีมีองค์ประกอบหลักอะไรบ้าง?",
+      "choices": [
+        "Persona, Constraints, Output Format",
+        "Name, Description, Category",
+        "Input, Output, Processing",
+        "Temperature, Tokens, Model"
+      ],
+      "answer": 0,
+      "explanation": "Role prompt ที่ดีต้องมี Persona (เป็นใคร), Constraints (ห้ามทำอะไร), และ Output Format (ตอบแบบไหน) — ทั้ง 3 อย่างนี้ช่วยให้ AI ตอบได้ตรงจุด"
+    },
+    {
+      "question": "ถ้าส่ง role ที่ไม่รู้จักเข้าไปใน createRolePrompt() ควรทำอย่างไร?",
+      "choices": [
+        "Return prompt generic เช่น \"You are a helpful assistant\"",
+        "Throw Error แจ้งว่า role ไม่รู้จัก",
+        "Return null",
+        "Return prompt ของ role แรกใน list"
+      ],
+      "answer": 1,
+      "explanation": "การ throw Error สำหรับ unknown role ช่วยให้โค้ดที่เรียกใช้รู้ทันทีว่าได้ prompt ผิด — ถ้า return prompt generic จะไม่มีใครรู้ว่าเกิดปัญหา"
+    },
+    {
+      "question": "ทำไม generic prompt เช่น \"You are a helpful assistant\" ถึงไม่เพียงพอ?",
+      "choices": [
+        "เพราะสั้นเกินไป",
+        "เพราะไม่ได้กำหนด persona, constraints, หรือ output format — AI จะตอบแบบ generic ไม่เฉพาะเจาะจง",
+        "เพราะ AI ไม่เข้าใจภาษาอังกฤษ",
+        "เพราะต้องใช้ template literals เสมอ"
+      ],
+      "answer": 1,
+      "explanation": "Generic prompt ไม่ได้บอก AI ว่า \"เป็นใคร\" ทำอะไร หรือตอบแบบไหน — ทำให้ AI ตอบแบบ general ไม่เหมาะกับงานเฉพาะทาง"
+    }
+  ]
+}
